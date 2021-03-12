@@ -1,0 +1,30 @@
+{
+  "name": "@gliff-ai/annotate",
+  "version": "0.0.0",
+  "description": "gliff.ai ANNOTATE - a user friendly browser interface for annotating multidimensional images for machine learning",
+  "repository": "git://github.com/gliff-ai/annotate.git",
+  "main": "dist/main.js",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "build": "webpack --progress --config webpack.config.js",
+    "serve": "webpack serve"
+  },
+  "license": "AGPL-3.0-only",
+  "devDependencies": {
+    "@babel/core": "^7.13.8",
+    "@babel/preset-env": "^7.12.17",
+    "@babel/preset-react": "^7.12.13",
+    "@babel/preset-typescript": "^7.12.17",
+    "html-webpack-plugin": "^5.2.0",
+    "ts-loader": "^8.0.17",
+    "typescript": "^4.1.5",
+    "webpack": "^5.23.0",
+    "webpack-cli": "^4.5.0",
+    "webpack-dev-server": "^3.11.2"
+  },
+  "dependencies": {
+    "react": "^17.0.0"
+  }
+}
