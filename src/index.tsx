@@ -1,7 +1,10 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
+import {BaseCanvas} from "./baseCanvas"
+
+
 ReactDOM.render(
-  React.createElement("h1"),
+  <BaseCanvas name="cccc" />,
   document.getElementById("react-container")
 );
