@@ -5,6 +5,10 @@ import CoordinateSystem, { IDENTITY } from "./CoordinateSystem.js";
 
 interface Props {
     name: string
+    zoomExtents: {
+        min: number,
+        max: number
+    }
 }
 
 export class BaseCanvas extends Component<Props> {
@@ -15,16 +19,28 @@ export class BaseCanvas extends Component<Props> {
     private canvasContext: CanvasRenderingContext2D;
     private canvasObserver: ResizeObserver;
 
-    private coordSystem: any;
+    private coordSystem: CoordinateSystem;
+
+    private zoomExtents: any;
     
     constructor(props: Props) {
-        super(props);
-        this.name = props.name;
-        this.coordSystem = new CoordinateSystem({
-            scaleExtents: { min: 0.33, max: 3},
-            documentSize: { width: 400, height: 400 }
-          });
+      super(props);
+      this.name = props.name;
+      this.zoomExtents = props.zoomExtents;
+      this.coordSystem = new CoordinateSystem({
+          scaleExtents: this.zoomExtents,
+          documentSize: { width: 400, height: 400 }
+        });
+      this.coordSystem.attachViewChangeListener(this.applyView.bind(this));
     }
+
+    private resetView = () => {
+        return this.coordSystem.resetView();
+      };
+    
+    private setView = (view: any) => {
+        return this.coordSystem.setView(view);
+      };
 
     private inClientSpace = (action: any) => {
         this.canvasContext.save();
@@ -48,7 +64,6 @@ export class BaseCanvas extends Component<Props> {
         this.canvasContext.setTransform(m.a, m.b, m.c, m.d, m.e, m.f);
         
     
-        // this.redrawImage();
         // this.loop({ once: true });
 
         // const lines = this.lines;
@@ -61,6 +76,10 @@ export class BaseCanvas extends Component<Props> {
           const { width, height } = entry.contentRect;
           this.setCanvasSize(width, height);
         }
+
+        this.canvasContext.beginPath();
+        this.canvasContext.arc(100, 75, 50, 0, 2 * Math.PI);
+        this.canvasContext.stroke();
       };
 
     private setCanvasSize = (
@@ -78,24 +97,31 @@ export class BaseCanvas extends Component<Props> {
     };
 
     componentDidMount = (): void => {
-        this.canvasContext.fillRect(20, 20, 150, 100);
-      console.log(`${Date.now()} Did Mount!!!`)
       this.canvasObserver = new ResizeObserver((entries: ResizeObserverEntry[]) =>
         this.handleCanvasResize(entries)
       );
   
       this.canvasObserver.observe(this.canvasContainer);
+
+      // change the zoom after five seconds
+      let i = 1;
+      setInterval(() => {
+        console.log(`ZOOOMING IN ${i}`)
+        this.coordSystem.scaleAtClientPoint(i, {clientX: 200, clientY: 200});
+        i++;
+      }, 5000)
     }
 
-    // var c = document.getElementById("myCanvas");
-    // var ctx = c.getContext("2d");
-    // this.canvasContext.beginPath();
-    // this.canvasContext.arc(100, 75, 50, 0, 2 * Math.PI);
-    // this.canvasContext.stroke();
-  
     componentWillUnmount = (): void => {
       this.canvasObserver.unobserve(this.canvasContainer);
     };
+
+    componentDidUpdate() {
+      this.coordSystem.scaleExtents = this.props.zoomExtents;
+    //   if (!this.props.enablePanAndZoom) {
+    //     this.coordSystem.resetView();
+    //   }
+    }
   
     private addImageToCanvas = (array: Uint8Array | Uint8ClampedArray, width: number, height: number): void => {
         const imageData = this.canvasContext.createImageData(width, height);
@@ -129,15 +155,11 @@ export class BaseCanvas extends Component<Props> {
             if (canvas) {
               this.canvas = canvas;
               this.canvasContext = canvas.getContext("2d");
-              this.canvasContext.beginPath();
-              this.canvasContext.arc(100, 75, 50, 0, 2 * Math.PI);
-              this.canvasContext.stroke();
             }
           }}
           >
         </canvas>
         </div>
         );
-    }
-}
-
+    };
+};
