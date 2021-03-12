@@ -13,10 +13,10 @@ module.exports = {
         use: "ts-loader",
         exclude: /node_modules/,
       },
-      {
-        test: /\.(s*)css$/,
-        use: ["style-loader", "css-loader", "sass-loader"],
-      },
+      // {
+      //   test: /\.(s*)css$/,
+      //   use: ["style-loader", "css-loader", "sass-loader"],
+      // },
     ],
   },
   resolve: {
@@ -25,12 +25,6 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: "public/index.html",
-      favicon: "public/favicon.ico",
-    }),
-    new HtmlWebpackPlugin({
-      template: "public/autoload.html",
-      favicon: "public/favicon.ico",
-      filename: "autoload.html",
     }),
   ],
   devServer: {
