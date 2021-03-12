@@ -4,6 +4,6 @@ module.exports = {
     ["@babel/preset-env", { targets: { node: "current" } }],
     "@babel/preset-react",
     "@babel/preset-typescript",
-    "@babel/plugin-proposal-class-properties"
   ],
+  plugins:     ["@babel/proposal-class-properties"]
 };

@@ -21,8 +21,8 @@ module.exports = {
             loader: 'babel-loader',
             options: {
               presets: ['@babel/preset-env',
-                        '@babel/react',{
-                        'plugins': ['module:@babel/plugin-proposal-class-properties']}]
+                        '@babel/react'],
+              plugins: ['@babel/proposal-class-properties']
           }
           }
         }
@@ -44,7 +44,7 @@ module.exports = {
   ],
   devServer: {
     host: "localhost",
-    port,
+    port: 3001,
     historyApiFallback: true,
     open: true,
   },
