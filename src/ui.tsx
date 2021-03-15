@@ -1,5 +1,5 @@
-import React from "React";
-import { Component } from "React";
+import React from "react";
+import { Component } from "react";
 import { BackgroundCanvas } from "./toolboxes/background/canvas";
 import { BaseButton } from "./components/BaseButton";
 
