@@ -6,14 +6,13 @@ import CoordinateSystem, {
   View,
 } from "./CoordinateSystem.js";
 
-interface Props {
+export interface Props {
   name: string;
   zoomExtents: {
     min: number;
     max: number;
   };
 }
-
 export class BaseCanvas extends Component<Props> {
   private name: string;
   private canvas: HTMLCanvasElement;
@@ -36,13 +35,13 @@ export class BaseCanvas extends Component<Props> {
     });
     this.coordSystem.attachViewChangeListener(this.applyView.bind(this));
   }
-
-  private resetView = () => {
-    return this.coordSystem.resetView();
-  };
-
+  
   private setView = (view: View) => {
+    if(view.scale === 0 && view.x === 0 && view.y) {
+      this.coordSystem.resetView();
+    } else {
     return this.coordSystem.setView(view);
+    }
   };
 
   private inClientSpace = (action: any) => {
@@ -86,9 +85,9 @@ export class BaseCanvas extends Component<Props> {
       this.setCanvasSize(width, height);
     }
 
-    this.canvasContext.beginPath();
-    this.canvasContext.arc(100, 75, 50, 0, 2 * Math.PI);
-    this.canvasContext.stroke();
+    // this.canvasContext.beginPath();
+    // this.canvasContext.arc(100, 75, 50, 0, 2 * Math.PI);
+    // this.canvasContext.stroke();
   };
 
   private setCanvasSize = (width: number, height: number): void => {
@@ -129,16 +128,6 @@ export class BaseCanvas extends Component<Props> {
     //   }
   }
 
-  private addImageToCanvas = (
-    array: Uint8Array | Uint8ClampedArray,
-    width: number,
-    height: number
-  ): void => {
-    const imageData = this.canvasContext.createImageData(width, height);
-    imageData.data.set(array);
-    this.canvasContext.putImageData(imageData, 0, 0);
-  };
-
   render = (): ReactNode => {
     return (
       <div
@@ -154,18 +143,16 @@ export class BaseCanvas extends Component<Props> {
           top: 0,
           left: 0,
           background: "rgba(100,0,0,0.5)",
-          zIndex: 100,
-        }}
-      >
+          zIndex: 100}}      >
         <canvas
           style={{ background: "red", position: "absolute" }}
           key={this.name}
           id={`${this.name}-canvas`}
-          ref={(canvas) => {
-            if (canvas) {
+          ref = {(canvas)=>
+           {
               this.canvas = canvas;
-              this.canvasContext = canvas.getContext("2d");
-            }
+             this.canvasContext = canvas.getContext("2d");
+        
           }}
         ></canvas>
       </div>
