@@ -1,14 +1,9 @@
 import React from "React";
 import { Component } from "React";
 import { BackgroundCanvas } from "./toolboxes/background/canvas";
+import { BaseButton } from "./components/BaseButton";
 
 export class UserInterface extends Component {
-  // scale: {
-  //   x: number;
-  //   y: number;
-  //   scale: number;
-  // };
-
   state: {
     x: number;
     y: number;
@@ -40,24 +35,24 @@ export class UserInterface extends Component {
   render() {
     return (
       <div>
-        <div
-          style={{ background: "blue", cursor: "pointer" }}
+        <BaseButton
+          tooltip={"ZOOM"}
+          icon={"fa-zoom"}
+          name={"zoom"}
           onClick={this.incrementScale}
-        >
-          CLICK THIS
-        </div>
-        <div
-          style={{ background: "green", cursor: "pointer" }}
+        />
+        <BaseButton
+          tooltip={"panX"}
+          icon={"fa-download"}
+          name={"panx"}
           onClick={this.incrementPanX}
-        >
-          CLICK THIS
-        </div>
-        <div
-          style={{ background: "orange", cursor: "pointer" }}
+        />
+        <BaseButton
+          tooltip={"panY"}
+          icon={"fa-download"}
+          name={"pany"}
           onClick={this.incrementPanY}
-        >
-          CLICK THIS
-        </div>
+        />
         <BackgroundCanvas
           name="cccc"
           zoomExtents={{ min: 0.33, max: 3 }}

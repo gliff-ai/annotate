@@ -16,15 +16,6 @@ interface State {
 
 export class BackgroundCanvas extends Component<Props> {
   private baseCanvas: any;
-  // private canvasContainer: HTMLDivElement;
-
-  // private canvasContext: CanvasRenderingContext2D;
-  // private canvasObserver: ResizeObserver;
-
-  // private coordSystem: CoordinateSystem;
-
-  // private zoomExtents: Extents;
-
   private image: HTMLImageElement;
 
   constructor(props: Props) {
@@ -52,19 +43,10 @@ export class BackgroundCanvas extends Component<Props> {
   };
 
   componentDidMount = (): void => {
-    console.log("Mounted background");
-    console.log(this.baseCanvas);
-    console.log(this.baseCanvas?.canvas);
     this.drawImage();
   };
 
-  componentWillReceiveProps(): void {
-    console.log("bg will update");
-    this.redrawImage();
-  }
-
   componentDidUpdate(): void {
-    console.log("bg Did update");
     this.redrawImage();
   }
 

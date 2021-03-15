@@ -145,15 +145,12 @@ export class BaseCanvas extends Component<Props> {
           maxHeight: "100%",
           width: 400,
           height: 400,
-          position: "absolute",
-          top: 0,
-          left: 0,
           background: "rgba(100,0,0,0.5)",
           zIndex: 100,
         }}
       >
         <canvas
-          style={{ background: "red", position: "absolute" }}
+          style={{ background: "red" }}
           key={this.name}
           id={`${this.name}-canvas`}
           ref={(canvas) => {
