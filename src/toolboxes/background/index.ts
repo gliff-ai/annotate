@@ -1,1 +1,1 @@
-import * as canvas from "./canvas";
+export { BackgroundCanvas } from "./Canvas";

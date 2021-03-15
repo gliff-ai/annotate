@@ -8,7 +8,7 @@ import CoordinateSystem, {
 
 export interface Props {
   name: string;
-  zoomExtents: {
+  zoomExtents?: {
     min: number;
     max: number;
   };
@@ -17,6 +17,7 @@ export interface Props {
     y: number;
     scale: number;
   };
+  cursor?: "pointer" | "none";
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
@@ -32,10 +33,12 @@ export class BaseCanvas extends Component<Props> {
 
   private scaleAndPan: any;
 
+  // private cursor = "none";
+
   constructor(props: Props) {
     super(props);
     this.name = props.name;
-    this.zoomExtents = props.zoomExtents;
+    this.zoomExtents = props.zoomExtents || { min: 0.3, max: 3 };
     this.coordSystem = new CoordinateSystem({
       scaleExtents: this.zoomExtents,
       documentSize: { width: 400, height: 400 },
@@ -43,6 +46,8 @@ export class BaseCanvas extends Component<Props> {
 
     this.scaleAndPan = props.scaleAndPan;
     this.coordSystem.attachViewChangeListener(this.applyView.bind(this));
+
+    // this.cursor = props.cursor || "none";
   }
 
   private setView = (view: View) => {
@@ -123,15 +128,10 @@ export class BaseCanvas extends Component<Props> {
   };
 
   componentDidUpdate(): void {
-    console.log("componenet did update");
-
-    this.coordSystem.scaleExtents = this.props.zoomExtents;
-    console.log("SETTING VIEW");
-    console.log(this.props.scaleAndPan);
+    console.log(this.props);
+    console.log("did update base");
+    this.coordSystem.scaleExtents = this.zoomExtents;
     this.setView(this.props.scaleAndPan);
-    //   if (!this.props.enablePanAndZoom) {
-    //     this.coordSystem.resetView();
-    //   }
   }
 
   render = (): ReactNode => {
@@ -145,12 +145,13 @@ export class BaseCanvas extends Component<Props> {
           maxHeight: "100%",
           width: 400,
           height: 400,
-          background: "rgba(100,0,0,0.5)",
           zIndex: 100,
+          top: "150px",
+          position: "absolute",
+          cursor: this.props.cursor || "none",
         }}
       >
         <canvas
-          style={{ background: "red" }}
           key={this.name}
           id={`${this.name}-canvas`}
           ref={(canvas) => {

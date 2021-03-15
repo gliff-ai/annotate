@@ -1,0 +1,1 @@
+export { SplineCanvas } from "./Canvas";

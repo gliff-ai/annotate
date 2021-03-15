@@ -1,5 +1,5 @@
-import React from "React";
-import { Component } from "React";
+import React from "react";
+import { Component } from "react";
 
 import { BaseCanvas, Props as BaseProps } from "../../baseCanvas";
 // @ts-ignore
