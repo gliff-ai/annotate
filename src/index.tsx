@@ -7,7 +7,7 @@ import {BackgroundCanvas} from "./toolboxes/background/canvas";
 
 ReactDOM.render(
   // <BaseCanvas name="cccc" zoomExtents={{min: 0.33, max: 3}} />,
-  <BackgroundCanvas name="cccc" zoomExtents={{min: 0.33, max: 3}} />,
+  <BackgroundCanvas name="cccc" zoomExtents={{min: 0.33, max: 3}} imgSrc="./test.png" />,
   document.getElementById("react-container")
 );
  
