@@ -4,10 +4,11 @@ import CoordinateSystem, {
   IDENTITY,
   Extents,
   View,
+  ClientPoint,
 } from "./CoordinateSystem.js";
 
 export interface Props {
-  name: string;
+  name?: string;
   zoomExtents?: {
     min: number;
     max: number;
@@ -17,7 +18,8 @@ export interface Props {
     y: number;
     scale: number;
   };
-  cursor?: "pointer" | "none";
+  cursor?: "crosshair" | "none";
+  onClick?: (arg0: number, arg1: number) => void;
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
@@ -33,8 +35,6 @@ export class BaseCanvas extends Component<Props> {
 
   private scaleAndPan: any;
 
-  // private cursor = "none";
-
   constructor(props: Props) {
     super(props);
     this.name = props.name;
@@ -47,7 +47,7 @@ export class BaseCanvas extends Component<Props> {
     this.scaleAndPan = props.scaleAndPan;
     this.coordSystem.attachViewChangeListener(this.applyView.bind(this));
 
-    // this.cursor = props.cursor || "none";
+    this.onClickHandler = this.onClickHandler.bind(this);
   }
 
   private setView = (view: View) => {
@@ -128,10 +128,29 @@ export class BaseCanvas extends Component<Props> {
   };
 
   componentDidUpdate(): void {
-    console.log(this.props);
-    console.log("did update base");
     this.coordSystem.scaleExtents = this.zoomExtents;
     this.setView(this.props.scaleAndPan);
+  }
+
+  onClickHandler(e: React.MouseEvent): void {
+    console.log(e);
+    let rect = this.canvas.getBoundingClientRect();
+    console.log(rect);
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+    console.log("Coordinate x: " + x, "Coordinate y: " + y);
+
+    const clientPoint: ClientPoint = { clientX: x, clientY: y };
+
+    const res = this.coordSystem.clientPointToViewPoint(
+      clientPoint,
+      this.props.scaleAndPan
+    );
+    console.log(res);
+
+    if (this.props.onClick) {
+      this.props.onClick(1, 2);
+    }
   }
 
   render = (): ReactNode => {
@@ -149,9 +168,11 @@ export class BaseCanvas extends Component<Props> {
           top: "150px",
           position: "absolute",
           cursor: this.props.cursor || "none",
+          border: "1px solid red",
         }}
       >
         <canvas
+          onClick={this.onClickHandler}
           key={this.name}
           id={`${this.name}-canvas`}
           ref={(canvas) => {

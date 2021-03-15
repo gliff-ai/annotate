@@ -12,16 +12,19 @@ export class UserInterface extends Component {
     y: number;
     scale: number;
     activeTool?: "spline";
+    imageScalingFactor: number;
   };
 
   constructor(props: never) {
     super(props);
-    this.state = { scale: 1, x: 1, y: 1 };
+    this.state = { scale: 1, x: 0, y: 0, imageScalingFactor: 0 };
     this.state.activeTool = null;
+
     this.incrementScale = this.incrementScale.bind(this);
     this.incrementPanX = this.incrementPanX.bind(this);
     this.incrementPanY = this.incrementPanY.bind(this);
     this.toggleSpline = this.toggleSpline.bind(this);
+    this.updateImageScalingFactor = this.updateImageScalingFactor.bind(this);
   }
 
   incrementScale() {
@@ -36,6 +39,10 @@ export class UserInterface extends Component {
   incrementPanY() {
     // negative is up, +ve is down...
     this.setState({ y: this.state.y - 10 });
+  }
+
+  updateImageScalingFactor(ratio: number) {
+    this.setState({ imageScalingFactor: ratio });
   }
 
   toggleSpline() {
@@ -76,13 +83,12 @@ export class UserInterface extends Component {
         />
 
         <BackgroundCanvas
-          name="cccc"
           scaleAndPan={this.state}
           imgSrc="../public/test.png"
+          updateImageScalingFactor={this.updateImageScalingFactor}
         />
 
         <SplineCanvas
-          name="spline"
           scaleAndPan={this.state}
           isActive={this.state.activeTool === "spline"}
         />

@@ -7,6 +7,7 @@ import drawImageProp from "./drawImage";
 
 interface Props extends BaseProps {
   imgSrc?: string;
+  updateImageScalingFactor: (arg0: number) => void;
 }
 
 interface State {
@@ -23,9 +24,9 @@ export class BackgroundCanvas extends Component<Props> {
   }
 
   private redrawImage = () => {
-    this.image &&
-      this.image.complete &&
+    if (this.image && this.image.complete) {
       drawImageProp({ ctx: this.baseCanvas.canvasContext, img: this.image });
+    }
   };
 
   private drawImage = () => {
@@ -40,6 +41,16 @@ export class BackgroundCanvas extends Component<Props> {
     // Draw the image once loaded
     this.image.onload = this.redrawImage;
     this.image.src = this.props.imgSrc;
+
+    setTimeout(() => {
+      const ratio = Math.min(
+        this.baseCanvas.canvas.width / this.image.width,
+        this.baseCanvas.canvas.height / this.image.height
+      );
+
+      console.log(`Ratio: ${ratio}`);
+      this.props.updateImageScalingFactor(ratio);
+    }, 5000);
   };
 
   componentDidMount = (): void => {
