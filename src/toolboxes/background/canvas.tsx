@@ -55,11 +55,17 @@ export class BackgroundCanvas extends Component<Props> {
     this.drawImage();
   };
 
+  componentDidUpdate(): void {
+    console.log("bg Did update");
+    this.redrawImage();
+  }
+
   render() {
     return (
       <BaseCanvas
         ref={(baseCanvas) => (this.baseCanvas = baseCanvas)}
         name="background"
+        scaleAndPan={this.props.scaleAndPan}
         zoomExtents={{ min: 0.3, max: 3 }}
       />
     );

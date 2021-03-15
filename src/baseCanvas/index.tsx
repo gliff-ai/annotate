@@ -12,6 +12,11 @@ export interface Props {
     min: number;
     max: number;
   };
+  scaleAndPan: {
+    x: number;
+    y: number;
+    scale: number
+  }
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
@@ -25,6 +30,8 @@ export class BaseCanvas extends Component<Props> {
 
   private zoomExtents: Extents;
 
+  private scaleAndPan: any;
+
   constructor(props: Props) {
     super(props);
     this.name = props.name;
@@ -33,9 +40,11 @@ export class BaseCanvas extends Component<Props> {
       scaleExtents: this.zoomExtents,
       documentSize: { width: 400, height: 400 },
     });
+
+    this.scaleAndPan = props.scaleAndPan
     this.coordSystem.attachViewChangeListener(this.applyView.bind(this));
   }
-  
+
   private setView = (view: View) => {
     if(view.scale === 0 && view.x === 0 && view.y) {
       this.coordSystem.resetView();
@@ -107,14 +116,6 @@ export class BaseCanvas extends Component<Props> {
     );
 
     this.canvasObserver.observe(this.canvasContainer);
-
-    // change the zoom after five seconds
-    let i = 1;
-    setInterval(() => {
-      console.log(`ZOOMING IN x${i}`);
-      this.setView({ scale: i, x: 1, y: 1 });
-      i++;
-    }, 5000);
   };
 
   componentWillUnmount = (): void => {
@@ -122,7 +123,11 @@ export class BaseCanvas extends Component<Props> {
   };
 
   componentDidUpdate(): void {
+    console.log("componenet did update");
+
+    console.log(this.scaleAndPan);
     this.coordSystem.scaleExtents = this.props.zoomExtents;
+    this.setView(this.props.scaleAndPan);
     //   if (!this.props.enablePanAndZoom) {
     //     this.coordSystem.resetView();
     //   }
@@ -152,7 +157,7 @@ export class BaseCanvas extends Component<Props> {
            {
               this.canvas = canvas;
              this.canvasContext = canvas.getContext("2d");
-        
+
           }}
         ></canvas>
       </div>
