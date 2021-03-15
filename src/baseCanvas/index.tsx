@@ -15,8 +15,8 @@ export interface Props {
   scaleAndPan: {
     x: number;
     y: number;
-    scale: number
-  }
+    scale: number;
+  };
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
@@ -41,15 +41,15 @@ export class BaseCanvas extends Component<Props> {
       documentSize: { width: 400, height: 400 },
     });
 
-    this.scaleAndPan = props.scaleAndPan
+    this.scaleAndPan = props.scaleAndPan;
     this.coordSystem.attachViewChangeListener(this.applyView.bind(this));
   }
 
   private setView = (view: View) => {
-    if(view.scale === 0 && view.x === 0 && view.y) {
+    if (view.scale === 0 && view.x === 0 && view.y) {
       this.coordSystem.resetView();
     } else {
-    return this.coordSystem.setView(view);
+      return this.coordSystem.setView(view);
     }
   };
 
@@ -125,8 +125,9 @@ export class BaseCanvas extends Component<Props> {
   componentDidUpdate(): void {
     console.log("componenet did update");
 
-    console.log(this.scaleAndPan);
     this.coordSystem.scaleExtents = this.props.zoomExtents;
+    console.log("SETTING VIEW");
+    console.log(this.props.scaleAndPan);
     this.setView(this.props.scaleAndPan);
     //   if (!this.props.enablePanAndZoom) {
     //     this.coordSystem.resetView();
@@ -148,16 +149,19 @@ export class BaseCanvas extends Component<Props> {
           top: 0,
           left: 0,
           background: "rgba(100,0,0,0.5)",
-          zIndex: 100}}      >
+          zIndex: 100,
+        }}
+      >
         <canvas
           style={{ background: "red", position: "absolute" }}
           key={this.name}
           id={`${this.name}-canvas`}
-          ref = {(canvas)=>
-           {
+          ref={(canvas) => {
+            if (canvas) {
+              // Keep this as it is initially null
               this.canvas = canvas;
-             this.canvasContext = canvas.getContext("2d");
-
+              this.canvasContext = canvas.getContext("2d");
+            }
           }}
         ></canvas>
       </div>

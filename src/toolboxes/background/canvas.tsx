@@ -2,6 +2,7 @@ import React from "React";
 import { Component } from "React";
 
 import { BaseCanvas, Props as BaseProps } from "../../baseCanvas";
+// @ts-ignore
 import drawImageProp from "./drawImage";
 
 interface Props extends BaseProps {
@@ -31,7 +32,9 @@ export class BackgroundCanvas extends Component<Props> {
   }
 
   private redrawImage = () => {
-    this.image && this.image.complete && drawImageProp({ ctx: this.baseCanvas.canvasContext, img: this.image });
+    this.image &&
+      this.image.complete &&
+      drawImageProp({ ctx: this.baseCanvas.canvasContext, img: this.image });
   };
 
   private drawImage = () => {
@@ -54,6 +57,11 @@ export class BackgroundCanvas extends Component<Props> {
     console.log(this.baseCanvas?.canvas);
     this.drawImage();
   };
+
+  componentWillReceiveProps(): void {
+    console.log("bg will update");
+    this.redrawImage();
+  }
 
   componentDidUpdate(): void {
     console.log("bg Did update");
