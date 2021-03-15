@@ -2,6 +2,7 @@ import React from "React";
 import { Component } from "React";
 
 import { BaseCanvas, Props as BaseProps } from "../../baseCanvas";
+import drawImageProp from "./drawImage";
 
 interface Props extends BaseProps {
   imgSrc?: string;
@@ -23,9 +24,15 @@ export class BackgroundCanvas extends Component<Props> {
 
   // private zoomExtents: Extents;
 
+  private image: HTMLImageElement;
+
   constructor(props: Props) {
     super(props);
   }
+
+  private redrawImage = () => {
+    this.image && this.image.complete && drawImageProp({ ctx: this.baseCanvas.canvasContext, img: this.image });
+  };
 
   private drawImage = () => {
     if (!this.props.imgSrc) return;
@@ -45,7 +52,7 @@ export class BackgroundCanvas extends Component<Props> {
     console.log("Mounted background");
     console.log(this.baseCanvas);
     console.log(this.baseCanvas?.canvas);
-    this.drawImage(this.props.imgSrc);
+    this.drawImage();
   };
 
   render() {
