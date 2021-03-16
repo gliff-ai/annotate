@@ -1,6 +1,8 @@
 import React from "react";
 import { Component } from "react";
 
+import { Annotations } from "./annotation";
+
 import { BaseButton } from "./components/BaseButton";
 
 import { BackgroundCanvas } from "./toolboxes/background";
@@ -13,12 +15,19 @@ export class UserInterface extends Component {
     scale: number;
     activeTool?: "spline";
     imageScalingFactor: number;
+    annotationData: Annotations;
   };
 
   constructor(props: never) {
     super(props);
-    this.state = { scale: 1, x: 0, y: 0, imageScalingFactor: 0 };
-    this.state.activeTool = null;
+    this.state = {
+      scale: 1,
+      x: 0,
+      y: 0,
+      imageScalingFactor: 0,
+      activeTool: null,
+      annotationData: new Annotations(),
+    };
 
     this.incrementScale = this.incrementScale.bind(this);
     this.incrementPanX = this.incrementPanX.bind(this);
@@ -91,6 +100,7 @@ export class UserInterface extends Component {
         <SplineCanvas
           scaleAndPan={this.state}
           isActive={this.state.activeTool === "spline"}
+          annotationData={this.state.annotationData}
         />
       </div>
     );
