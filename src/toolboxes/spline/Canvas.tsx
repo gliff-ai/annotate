@@ -5,10 +5,12 @@ import { Component } from "react";
 import { BaseCanvas, Props as BaseProps } from "../../baseCanvas";
 import { Annotations } from "../../annotation";
 import { XYPoint } from "../../annotation/interfaces";
+import { ClientPoint } from "../../baseCanvas/CoordinateSystem";
 
 interface Props extends BaseProps {
   isActive: boolean;
   annotationsObject: Annotations;
+  imageScalingFactor: number;
 }
 
 export class SplineCanvas extends Component<Props> {
@@ -37,11 +39,20 @@ export class SplineCanvas extends Component<Props> {
     // Go to the first point
     const { x: originX, y: originY } = currentSplineVector[0];
 
-    context.moveTo(originX, originY);
+    let scalePoint = (x: number, y: number) => {
+      return {clientX: x * this.props.imageScalingFactor, clientY: y * this.props.imageScalingFactor}
+    }
+
+    let scaledPoint = scalePoint(originX, originY)
+
+    const {x: scaledOriginX, y: scaledOriginY} = this.baseCanvas.scaledCanvasToCanvas(scaledPoint);
+    context.moveTo(scaledOriginX, scaledOriginY);
 
     // Draw each point by taking our raw coordinates and applying the transform so they fit on our canvas
     for (const { x, y } of currentSplineVector) {
-      context.lineTo(x, y);
+      scaledPoint = scalePoint(x, y);
+      const {x: scaledX, y: scaledY} = this.baseCanvas.scaledCanvasToCanvas(scaledPoint);
+      context.lineTo(scaledX, scaledY);
     }
 
     context.stroke();
@@ -54,7 +65,7 @@ export class SplineCanvas extends Component<Props> {
       coordinates: currentSplineVector,
     } = this.props.annotationsObject.getActiveAnnotation();
 
-    currentSplineVector.push({ x, y });
+    currentSplineVector.push({ x: x / this.props.imageScalingFactor, y: y / this.props.imageScalingFactor });
 
     this.drawSplineVector(currentSplineVector);
   };

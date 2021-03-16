@@ -1,10 +1,12 @@
 import React from "react";
 import { Component, ReactNode } from "react";
+import { XYPoint } from "../annotation/interfaces";
 import CoordinateSystem, {
   IDENTITY,
   Extents,
   View,
   ClientPoint,
+  ViewPoint,
 } from "./CoordinateSystem.js";
 
 export interface Props {
@@ -139,13 +141,11 @@ export class BaseCanvas extends Component<Props> {
     console.log("Coordinate x: " + x, "Coordinate y: " + y);
 
     const clientPoint: ClientPoint = { clientX: x, clientY: y };
-
     const {
       x: viewpointX,
       y: viewpointY,
-    } = this.coordSystem.clientPointToViewPoint(
-      clientPoint,
-      this.props.scaleAndPan
+    } = this.scaledCanvasToCanvas(
+      clientPoint
     );
 
     console.log(
@@ -156,6 +156,22 @@ export class BaseCanvas extends Component<Props> {
     if (this.props.onClick) {
       this.props.onClick(viewpointX, viewpointY);
     }
+  }
+
+  public canvasToScaledCanvas = (viewPoint: ViewPoint): XYPoint => {
+    const {x, y} = this.coordSystem.viewPointToClientPoint(
+      viewPoint,
+      this.props.scaleAndPan
+    );
+    return {x, y}
+  }
+
+  public scaledCanvasToCanvas = (clientPoint: ClientPoint): XYPoint => {
+    const {x, y} = this.coordSystem.clientPointToViewPoint(
+      clientPoint,
+      this.props.scaleAndPan
+    );
+    return {x, y}
   }
 
   render = (): ReactNode => {

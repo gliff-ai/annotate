@@ -118,6 +118,7 @@ export class UserInterface extends Component {
           scaleAndPan={this.state}
           isActive={this.state.activeTool === "spline"}
           annotationsObject={this.annotationsObject}
+          imageScalingFactor={this.state.imageScalingFactor}
         />
       </div>
     );
