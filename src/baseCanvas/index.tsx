@@ -133,23 +133,28 @@ export class BaseCanvas extends Component<Props> {
   }
 
   onClickHandler(e: React.MouseEvent): void {
-    console.log(e);
     let rect = this.canvas.getBoundingClientRect();
-    console.log(rect);
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
     console.log("Coordinate x: " + x, "Coordinate y: " + y);
 
     const clientPoint: ClientPoint = { clientX: x, clientY: y };
 
-    const res = this.coordSystem.clientPointToViewPoint(
+    const {
+      x: viewpointX,
+      y: viewpointY,
+    } = this.coordSystem.clientPointToViewPoint(
       clientPoint,
       this.props.scaleAndPan
     );
-    console.log(res);
+
+    console.log(
+      "Coordinate view x: " + viewpointX,
+      "Coordinate view y: " + viewpointY
+    );
 
     if (this.props.onClick) {
-      this.props.onClick(1, 2);
+      this.props.onClick(viewpointX, viewpointY);
     }
   }
 

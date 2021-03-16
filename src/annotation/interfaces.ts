@@ -1,12 +1,11 @@
+export interface AnnotationsDataArray extends Array<Annotation> {}
 
-export interface Annotations extends Array<Annotation>{}
 export interface Annotation {
-
-    labels: string[];
-    toolbox: string;
-    spaceTimeInfo: ZTPoint;
-    coordinates: XYPoint[];
-   parameters: AnnotationParameters;
+  labels: string[];
+  toolbox: string;
+  spaceTimeInfo: ZTPoint;
+  coordinates: XYPoint[];
+  parameters: AnnotationParameters;
 }
 
 export interface AnnotationParameters {}

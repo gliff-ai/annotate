@@ -1,14 +1,13 @@
 import {
-  Annotations as AnnotationsType,
+  AnnotationsDataArray,
   Annotation,
+  AnnotationParameters,
   ZTPoint,
   XYPoint,
 } from "./interfaces";
 
-import { AnnotationParameters } from "./interfaces";
-
 export class Annotations {
-  private data: AnnotationsType;
+  private data: AnnotationsDataArray;
   private activeAnnotationID: number;
 
   constructor() {

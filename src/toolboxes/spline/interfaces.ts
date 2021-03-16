@@ -1,5 +1,5 @@
-import { AnnotationParameters } from "../../annotation";
-
-export interface SplineParameters extends AnnotationParameters {
-  function: "linear";
-}
+// import { AnnotationParameters } from "../../annotation";
+//
+// export interface SplineParameters extends AnnotationParameters {
+//   function: "linear";
+// }
