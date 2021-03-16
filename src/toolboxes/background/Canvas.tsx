@@ -42,6 +42,7 @@ export class BackgroundCanvas extends Component<Props> {
     this.image.onload = this.redrawImage;
     this.image.src = this.props.imgSrc;
 
+    //TODO: remove
     setTimeout(() => {
       const ratio = Math.min(
         this.baseCanvas.canvas.width / this.image.width,

@@ -22,12 +22,9 @@ export class SplineCanvas extends Component<Props> {
   }
 
   drawSplineVector = (currentSplineVector: XYPoint[]) => {
-    console.log(`Drawing: ${currentSplineVector}`);
-
     if (currentSplineVector.length < 2) return;
 
-    const context = this.baseCanvas.canvasContext;
-    const canvas = this.baseCanvas.canvasContext;
+    const { context, canvas } = this.baseCanvas;
     const lineWidth = 1.5;
 
     // Clear the canvas
@@ -44,7 +41,6 @@ export class SplineCanvas extends Component<Props> {
 
     // Draw each point by taking our raw coordinates and applying the transform so they fit on our canvas
     for (const { x, y } of currentSplineVector) {
-      // Why aren't we having to transform these!?!?!
       context.lineTo(x, y);
     }
 
@@ -52,6 +48,7 @@ export class SplineCanvas extends Component<Props> {
     context.closePath();
   };
 
+  // X and Y are in CanvasSpace
   onClick = (x: number, y: number): void => {
     const {
       coordinates: currentSplineVector,
@@ -61,6 +58,14 @@ export class SplineCanvas extends Component<Props> {
 
     this.drawSplineVector(currentSplineVector);
   };
+
+  componentDidUpdate(): void {
+    // Redraw if we change pan or zoom
+    const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
+    if (activeAnnotation?.coordinates) {
+      this.drawSplineVector(activeAnnotation.coordinates);
+    }
+  }
 
   render() {
     return (
