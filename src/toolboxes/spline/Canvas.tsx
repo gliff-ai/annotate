@@ -24,7 +24,7 @@ export class SplineCanvas extends Component<Props> {
   drawSplineVector = (currentSplineVector: XYPoint[]) => {
     if (currentSplineVector.length < 2) return;
 
-    const { context, canvas } = this.baseCanvas;
+    const { canvasContext: context, canvas } = this.baseCanvas;
     const lineWidth = 1.5;
 
     // Clear the canvas
