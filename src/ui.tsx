@@ -15,19 +15,24 @@ export class UserInterface extends Component {
     scale: number;
     activeTool?: "spline";
     imageScalingFactor: number;
-    annotationData: Annotations;
+    activeAnnotationID: number;
   };
 
+  annotationsObject: Annotations;
+  
   constructor(props: never) {
     super(props);
+    this.annotationsObject  = new Annotations();
     this.state = {
       scale: 1,
       x: 0,
       y: 0,
       imageScalingFactor: 0,
       activeTool: null,
-      annotationData: new Annotations(),
+      activeAnnotationID: null
     };
+
+  
 
     this.incrementScale = this.incrementScale.bind(this);
     this.incrementPanX = this.incrementPanX.bind(this);
@@ -62,6 +67,11 @@ export class UserInterface extends Component {
     }
   }
 
+   addAnnotation() {
+    this.annotationsObject.addAnnotation(this.state.activeTool)
+    this.setState({activeAnnotationID: this.annotationsObject.getActiveAnnotationID()})
+  }
+
   render() {
     return (
       <div>
@@ -85,6 +95,13 @@ export class UserInterface extends Component {
         />
 
         <BaseButton
+          tooltip={"add new object"}
+          icon={"fa-plus"}
+          name={"newobject"}
+          onClick={this.addAnnotation}
+        />
+
+        <BaseButton
           tooltip={"Activate Spline"}
           icon={"fa-bezier-curve"}
           name={"splint"}
@@ -97,10 +114,12 @@ export class UserInterface extends Component {
           updateImageScalingFactor={this.updateImageScalingFactor}
         />
 
+        
+
         <SplineCanvas
           scaleAndPan={this.state}
           isActive={this.state.activeTool === "spline"}
-          annotationData={this.state.annotationData}
+          annotationData={this.annotationsObject}
         />
       </div>
     );

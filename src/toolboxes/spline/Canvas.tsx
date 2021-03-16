@@ -1,19 +1,20 @@
 import React from "react";
 import { Component } from "react";
 
-import { SplineVector } from "./interfaces";
+// import { SplineVector } from "./interfaces";
 import { BaseCanvas, Props as BaseProps } from "../../baseCanvas";
 import { Annotations } from "../../annotation";
 
 interface Props extends BaseProps {
   isActive: boolean;
-  annotationData: Annotations;
+  annotationsObject: Annotations;
 }
 
 export class SplineCanvas extends Component<Props> {
   private baseCanvas: any;
   state: {
     cursor: "crosshair" | "none";
+  
   };
 
   constructor(props: Props) {
@@ -21,10 +22,11 @@ export class SplineCanvas extends Component<Props> {
   }
 
   onClick = (x: number, y: number): void => {
-    console.log(this);
+    const currentSplineVector = this.props.annotationsObject.getActiveAnnotation()["annotationData"]["coordinates"]
+    console.log(currentSplineVector);
     console.log(`OnCLick SPline ${x}, ${y}`);
-    this.props.annotationData.addLayer(1, "spline", [], { z: 0, t: 0 }, null);
-    debugger;
+    currentSplineVector.push([x, y])
+
   };
 
   render() {

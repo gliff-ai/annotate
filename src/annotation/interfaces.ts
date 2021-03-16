@@ -1,15 +1,12 @@
-export interface Annotations {
-  [layer: number]: {
+
+export interface Annotations extends Array<Annotation>{}
+export interface Annotation {
+
     labels: string[];
     toolbox: string;
     spaceTimeInfo: ZTPoint;
-    annotation: AnnotationVector;
-  };
-}
-
-export interface AnnotationVector {
-  coordinates: XYPoint[];
-  parameters: AnnotationParameters;
+    coordinates: XYPoint[];
+   parameters: AnnotationParameters;
 }
 
 export interface AnnotationParameters {}
