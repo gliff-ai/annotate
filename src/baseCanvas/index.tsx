@@ -1,13 +1,6 @@
 import React from "react";
 import { Component, ReactNode } from "react";
 import { XYPoint } from "../annotation/interfaces";
-import CoordinateSystem, {
-  IDENTITY,
-  Extents,
-  View,
-  ClientPoint,
-  ViewPoint,
-} from "./CoordinateSystem.js";
 
 export interface Props {
   name?: string;
@@ -31,90 +24,69 @@ export class BaseCanvas extends Component<Props> {
   private canvasContext: CanvasRenderingContext2D;
   private canvasObserver: ResizeObserver;
 
-  private coordSystem: CoordinateSystem;
-
-  private zoomExtents: Extents;
-
   private scaleAndPan: any;
 
   constructor(props: Props) {
     super(props);
     this.name = props.name;
-    this.zoomExtents = props.zoomExtents || { min: 0.3, max: 3 };
-    this.coordSystem = new CoordinateSystem({
-      scaleExtents: this.zoomExtents,
-      documentSize: { width: 400, height: 400 },
-    });
 
     this.scaleAndPan = props.scaleAndPan;
-    this.coordSystem.attachViewChangeListener(this.applyView.bind(this));
 
     this.onClickHandler = this.onClickHandler.bind(this);
   }
 
-  private setView = (view: View) => {
-    if (view.scale === 0 && view.x === 0 && view.y) {
-      this.coordSystem.resetView();
-    } else {
-      return this.coordSystem.setView(view);
-    }
-  };
 
-  private inClientSpace = (action: any) => {
-    this.canvasContext.save();
-    this.canvasContext.setTransform(
-      IDENTITY.a,
-      IDENTITY.b,
-      IDENTITY.c,
-      IDENTITY.d,
-      IDENTITY.e,
-      IDENTITY.f
-    );
-
-    try {
-      action();
-    } finally {
-      this.canvasContext.restore();
-    }
-  };
 
   private clearWindow = (): void => {
-    this.inClientSpace(() =>
+    this.canvasContext.save();
+    this.canvasContext.setTransform(1, 0, 0, 1, 0, 0); // identity matrix
+
+    try {
       this.canvasContext.clearRect(
         0,
         0,
         this.canvasContext.canvas.width,
         this.canvasContext.canvas.height
-      )
-    );
+      );
+    } 
+    finally {
+        this.canvasContext.restore();
+      }
   };
+
+  componentDidUpdate() {
+    this.applyView();
+  }
 
   private applyView = (): void => {
     this.clearWindow();
-    const m = this.coordSystem.transformMatrix;
-    this.canvasContext.setTransform(m.a, m.b, m.c, m.d, m.e, m.f);
+    this.canvasContext.setTransform(
+      this.props.scaleAndPan.scale,
+      0,
+      0,
+      this.props.scaleAndPan.scale,
+      this.props.scaleAndPan.x,
+      this.props.scaleAndPan.y
+    );
   };
 
   private handleCanvasResize = (entries: ResizeObserverEntry[]): void => {
     for (const entry of entries) {
       const { width, height } = entry.contentRect;
       this.setCanvasSize(width, height);
+      console.log(width, height)
     }
 
-    // this.canvasContext.beginPath();
-    // this.canvasContext.arc(100, 75, 50, 0, 2 * Math.PI);
-    // this.canvasContext.stroke();
+    this.canvasContext.beginPath();
+    this.canvasContext.arc(100, 75, 50, 0, 2 * Math.PI);
+    this.canvasContext.stroke();
   };
 
   private setCanvasSize = (width: number, height: number): void => {
-    this.canvas.width = width;
-    this.canvas.height = height;
+    this.canvas.width = Math.min(width, height);
+    this.canvas.height = Math.min(width, height);
     this.canvas.style.width = `${width}px`;
     this.canvas.style.height = `${height}px`;
-  };
-
-  private getContext = (): void => {
-    this.canvasContext = this.canvas.getContext("2d");
   };
 
   componentDidMount = (): void => {
@@ -129,50 +101,19 @@ export class BaseCanvas extends Component<Props> {
     this.canvasObserver.unobserve(this.canvasContainer);
   };
 
-  componentDidUpdate(): void {
-    this.coordSystem.scaleExtents = this.zoomExtents;
-    this.setView(this.props.scaleAndPan);
-  }
-
   onClickHandler(e: React.MouseEvent): void {
     let rect = this.canvas.getBoundingClientRect();
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
     console.log("Coordinate x: " + x, "Coordinate y: " + y);
 
-    const clientPoint: ClientPoint = { clientX: x, clientY: y };
-    const {
-      x: viewpointX,
-      y: viewpointY,
-    } = this.scaledCanvasToCanvas(
-      clientPoint
-    );
-
-    console.log(
-      "Coordinate view x: " + viewpointX,
-      "Coordinate view y: " + viewpointY
-    );
+    // DO STUFF HERE
 
     if (this.props.onClick) {
-      this.props.onClick(viewpointX, viewpointY);
+      this.props.onClick(x, y);
     }
   }
 
-  public canvasToScaledCanvas = (viewPoint: ViewPoint): XYPoint => {
-    const {x, y} = this.coordSystem.viewPointToClientPoint(
-      viewPoint,
-      this.props.scaleAndPan
-    );
-    return {x, y}
-  }
-
-  public scaledCanvasToCanvas = (clientPoint: ClientPoint): XYPoint => {
-    const {x, y} = this.coordSystem.clientPointToViewPoint(
-      clientPoint,
-      this.props.scaleAndPan
-    );
-    return {x, y}
-  }
 
   render = (): ReactNode => {
     return (
