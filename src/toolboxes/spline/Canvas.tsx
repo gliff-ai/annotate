@@ -14,7 +14,6 @@ export class SplineCanvas extends Component<Props> {
   private baseCanvas: any;
   state: {
     cursor: "crosshair" | "none";
-  
   };
 
   constructor(props: Props) {
@@ -22,11 +21,10 @@ export class SplineCanvas extends Component<Props> {
   }
 
   onClick = (x: number, y: number): void => {
-    const currentSplineVector = this.props.annotationsObject.getActiveAnnotation()["annotationData"]["coordinates"]
-    console.log(currentSplineVector);
-    console.log(`OnCLick SPline ${x}, ${y}`);
-    currentSplineVector.push([x, y])
-
+    const {
+      coordinates: currentSplineVector,
+    } = this.props.annotationsObject.getActiveAnnotation();
+    currentSplineVector.push({ x, y });
   };
 
   render() {

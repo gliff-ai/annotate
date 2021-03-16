@@ -1,10 +1,11 @@
 import {
   Annotations as AnnotationsType,
-   Annotation,
+  Annotation,
   ZTPoint,
   XYPoint,
 } from "./interfaces";
-export { AnnotationParameters } from "./interfaces";
+
+import { AnnotationParameters } from "./interfaces";
 
 export class Annotations {
   private data: AnnotationsType;
@@ -19,45 +20,43 @@ export class Annotations {
     toolbox: string,
     labels: string[] = [],
     spaceTimeInfo: ZTPoint = { z: 0, t: 0 },
-    coordinates:XYPoint[]  = null,
-    parameters:AnnotationParameters[]  = null
-
-  ):void => {
-    this.activeAnnotationID = this.data.push({ labels, toolbox, spaceTimeInfo, coordinates, parameters })
+    coordinates: XYPoint[] = [],
+    parameters: AnnotationParameters[] = []
+  ): void => {
+    this.activeAnnotationID =
+      this.data.push({
+        labels,
+        toolbox,
+        spaceTimeInfo,
+        coordinates,
+        parameters,
+      }) - 1;
   };
 
-
-  addLabel = (activeAnnotation: number, newLabel: string):void => {
+  addLabel = (activeAnnotation: number, newLabel: string): void => {
     this.data[activeAnnotation]["labels"].push(newLabel);
     // this.data[activeAnnotation]["labels"] = unique(this.data[activeAnnotation]["labels"]); // TODO
   };
 
-  removeLabel = (activeAnnotation: number, existingLabel: string):void => {
-    this.data[activeAnnotation]["labels"] = this.data[activeAnnotation]["labels"].filter(
-      (label) => label != existingLabel
-    );
+  removeLabel = (activeAnnotation: number, existingLabel: string): void => {
+    this.data[activeAnnotation]["labels"] = this.data[activeAnnotation][
+      "labels"
+    ].filter((label) => label != existingLabel);
   };
 
-   
+  getActiveAnnotationID = (): number => {
+    return this.activeAnnotationID;
+  };
 
-  getActiveAnnotationID = ():number => {
-    return this.activeAnnotationID
+  getActiveAnnotation = (): Annotation => {
+    return this.data[this.activeAnnotationID];
+  };
 
-  }
+  length = (): number => {
+    return this.data.length;
+  };
 
-  getActiveAnnotation = ():Annotation => {
-    return this.data[this.activeAnnotationID]
-  }
-
-
-
-  length = ():number => {
-    return this.data.length
-  }
-
-  setAnnotationCoordinates = (newCoordinates:XYPoint[]) :void => {
+  setAnnotationCoordinates = (newCoordinates: XYPoint[]): void => {
     this.data[this.activeAnnotationID]["coordinates"] = newCoordinates;
   };
-
-
 }
