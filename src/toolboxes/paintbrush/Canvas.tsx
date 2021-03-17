@@ -5,11 +5,8 @@ import { BaseCanvas, Props as BaseProps } from "../../baseCanvas";
 import {
   Annotations,
   canvasToImage,
-  imageToCanvas,
   imageToOriginalCanvas,
 } from "../../annotation";
-import { XYPoint } from "../../annotation/interfaces";
-import { ClientPoint } from "../../baseCanvas/CoordinateSystem";
 
 interface Props extends BaseProps {
   isActive: boolean;
@@ -17,7 +14,6 @@ interface Props extends BaseProps {
   imageWidth: number;
   imageHeight: number;
   brushRadius: number;
-
 }
 
 export class PaintbrushCanvas extends Component<Props> {
@@ -39,11 +35,14 @@ export class PaintbrushCanvas extends Component<Props> {
     this.points = [];
   }
 
-
-  
-  handlePointerMove = (canvasX:number, canvasY:number) => {
-    const{x,y} = canvasToImage(canvasX, canvasY, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
-
+  handlePointerMove = (canvasX: number, canvasY: number) => {
+    const { x, y } = canvasToImage(
+      canvasX,
+      canvasY,
+      this.props.imageWidth,
+      this.props.imageHeight,
+      this.props.scaleAndPan
+    );
 
     if (this.isPressing && !this.isDrawing) {
       // Start drawing and add point
@@ -64,8 +63,6 @@ export class PaintbrushCanvas extends Component<Props> {
         this.baseCanvas.canvasContext
       );
     }
-
-    // this.mouseHasMoved = true;
   };
 
   drawPoints = (
@@ -75,10 +72,17 @@ export class PaintbrushCanvas extends Component<Props> {
     clearCanvas: boolean = true,
     context: any
   ) => {
-    const points = imagePoints.map((point)=>{
-      const{x,y} = imageToOriginalCanvas(point[0], point[1], this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
-      return [x,y]
-    })
+    const points = imagePoints.map((point) => {
+      const { x, y } = imageToOriginalCanvas(
+        point[0],
+        point[1],
+        this.props.imageWidth,
+        this.props.imageHeight,
+        this.props.scaleAndPan
+      );
+      return [x, y];
+    });
+
     function midPointBetween(p1: [number, number], p2: [number, number]) {
       return {
         x: p1[0] + (p2[0] - p1[0]) / 2,
@@ -95,8 +99,8 @@ export class PaintbrushCanvas extends Component<Props> {
     }
     context.lineWidth = brushRadius * 2;
 
-    let p1 = points[0];
-    let p2 = points[1];
+    let p1 = points[0] as [number, number];
+    let p2 = points[1] as [number, number];
 
     context.moveTo(p2[0], p2[1]);
     context.beginPath();
@@ -107,8 +111,8 @@ export class PaintbrushCanvas extends Component<Props> {
       const midPoint = midPointBetween(p1, p2);
 
       context.quadraticCurveTo(p1[0], p1[1], midPoint.x, midPoint.y);
-      p1 = points[i];
-      p2 = points[i + 1];
+      p1 = points[i] as [number, number];
+      p2 = points[i + 1] as [number, number];
     }
 
     // Draw last line as a straight line while
@@ -143,7 +147,6 @@ export class PaintbrushCanvas extends Component<Props> {
       coordinates: [...this.points],
     });
 
-
     // Reset points array
     this.points.length = 0;
 
@@ -153,10 +156,7 @@ export class PaintbrushCanvas extends Component<Props> {
   };
 
   /*** Mouse events ****/
-
   onMouseDown = (canvasX: number, canvasY: number): void => {
-    // Start painting
-
     // Start drawing
     this.isPressing = true;
 
@@ -179,7 +179,7 @@ export class PaintbrushCanvas extends Component<Props> {
     this.isDrawing = false;
 
     this.saveLine(this.props.brushRadius);
-    this.drawAllStrokes()
+    this.drawAllStrokes();
   };
 
   componentDidUpdate(): void {
@@ -189,8 +189,7 @@ export class PaintbrushCanvas extends Component<Props> {
     if (activeAnnotation?.brushStrokes.length > 0) {
       //this.drawSplineVector(activeAnnotation.coordinates);
       //repaint
-      this.drawAllStrokes()
-
+      this.drawAllStrokes();
     }
   }
 
