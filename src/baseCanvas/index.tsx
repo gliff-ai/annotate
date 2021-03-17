@@ -16,6 +16,7 @@ export interface Props {
   };
   cursor?: "crosshair" | "none";
   onClick?: (arg0: number, arg1: number) => void;
+  onDoubleClick?: (arg0: number, arg1: number) => void;
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
@@ -32,8 +33,6 @@ export class BaseCanvas extends Component<Props> {
     this.name = props.name;
 
     this.scaleAndPan = props.scaleAndPan;
-
-    this.onClickHandler = this.onClickHandler.bind(this);
   }
 
 
@@ -102,7 +101,7 @@ export class BaseCanvas extends Component<Props> {
     this.canvasObserver.unobserve(this.canvasContainer);
   };
 
-  onClickHandler(e: React.MouseEvent): void {
+  onClickHandler = (e: React.MouseEvent): void => {
     // x and y start out in window space
 
     let rect = this.canvas.getBoundingClientRect();
@@ -111,14 +110,24 @@ export class BaseCanvas extends Component<Props> {
 
     // x and y are now in canvas space
 
-    console.log("Coordinate x: " + x, "Coordinate y: " + y);
-
-    // DO STUFF HERE
-
     if (this.props.onClick) {
       this.props.onClick(x, y);
     }
-  }
+  };
+
+  onDoubleClickHandler = (e: React.MouseEvent): void => {
+    // x and y start out in window space
+
+    let rect = this.canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    // x and y are now in canvas space
+
+    if (this.props.onDoubleClick) {
+      this.props.onDoubleClick(x, y);
+    }
+  };
 
   render = (): ReactNode => {
     return (
@@ -140,6 +149,7 @@ export class BaseCanvas extends Component<Props> {
       >
         <canvas
           onClick={this.onClickHandler}
+          onDoubleClick={this.onDoubleClickHandler}
           key={this.name}
           id={`${this.name}-canvas`}
           ref={(canvas) => {

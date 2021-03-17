@@ -77,10 +77,34 @@ export class SplineCanvas extends Component<Props> {
     let {x:imageX, y:imageY} = canvasToImage(x, y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
     console.log(imageX, imageY);
 
+    if (this.isClosed(currentSplineVector)) return;
+
     currentSplineVector.push({ x: imageX, y: imageY });
 
     this.drawAllSplines();
   };
+
+  onDoubleClick = (x: number, y: number): void => {
+    const {
+      coordinates: currentSplineVector,
+    } = this.props.annotationsObject.getActiveAnnotation();
+
+    console.log("onDoubleClick")
+
+    if (currentSplineVector.length < 3) {
+      return;
+    }
+    
+    currentSplineVector.push(currentSplineVector[0]);
+
+    this.drawAllSplines();
+  }
+
+  isClosed = (splineVector: XYPoint[]): boolean => {
+    return ((splineVector.length > 1 ) && 
+    (splineVector[0].x === splineVector[splineVector.length-1].x) && 
+    (splineVector[0].y === splineVector[splineVector.length-1].y ) );
+  }
 
   componentDidUpdate(): void {
     // Redraw if we change pan or zoom
@@ -94,6 +118,7 @@ export class SplineCanvas extends Component<Props> {
     return (
       <BaseCanvas
         onClick={this.onClick}
+        onDoubleClick={this.onDoubleClick}
         cursor={this.props.isActive ? "crosshair" : "none"}
         ref={(baseCanvas) => (this.baseCanvas = baseCanvas)}
         name="spline"
