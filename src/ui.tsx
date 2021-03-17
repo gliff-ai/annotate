@@ -179,10 +179,10 @@ export class UserInterface extends Component {
             <Row style={{ justifyContent: "center" }}>
               <ButtonGroup>
                 <BaseButton
-                  tooltip={"zoom in"}
-                  icon={"fa-search-plus"}
-                  name={"zoomin"}
-                  onClick={this.incrementScale}
+                  tooltip={"zoom out"}
+                  icon={"fa-search-minus"}
+                  name={"zoomout"}
+                  onClick={this.decrementScale}
                 />
                 <BaseButton
                   tooltip={"reset zoom and pan"}
@@ -191,10 +191,10 @@ export class UserInterface extends Component {
                   onClick={this.resetScaleAndPan}
                 />
                 <BaseButton
-                  tooltip={"zoom out"}
-                  icon={"fa-search-minus"}
-                  name={"zoomout"}
-                  onClick={this.decrementScale}
+                  tooltip={"zoom in"}
+                  icon={"fa-search-plus"}
+                  name={"zoomin"}
+                  onClick={this.incrementScale}
                 />
               </ButtonGroup>
 
