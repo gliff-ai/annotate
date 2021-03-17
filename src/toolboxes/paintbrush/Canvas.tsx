@@ -62,7 +62,7 @@ export class PaintbrushCanvas extends Component<Props> {
     // this.mouseHasMoved = true;
   };
 
-  drawPoints = (points: [number, number][], brushColor: string, brushRadius: number) => {
+  drawPoints = (points: [number, number][], brushColor: string, brushRadius: number, clearCanvas: boolean = true) => {
     function midPointBetween(p1: [x: number, y: number], p2: [x: number, y: number]) {
       return {
         x: p1[0] + (p2[0] - p1[0]) / 2,
@@ -76,15 +76,15 @@ export class PaintbrushCanvas extends Component<Props> {
     context.lineCap = "round";
     context.strokeStyle = brushColor;
 
-    context.clearRect(
+    if (clearCanvas){context.clearRect(
       0,
       0,
       context.canvas.width,
       context.canvas.height
-    );
+    );}
     context.lineWidth = brushRadius * 2;
 
-    let p1 = points[0]; // [x,y]
+    let p1 = points[0]; 
     let p2 = points[1];
 
     context.moveTo(p2[0], p2[1]);
@@ -107,15 +107,28 @@ export class PaintbrushCanvas extends Component<Props> {
     context.stroke();
   };
 
+  drawAllStrokes = () =>{
+    const {
+      brushStrokes,
+     } = this.props.annotationsObject.getActiveAnnotation();
+    
+    for(let i= 0; i < brushStrokes.length; i++){
+      this.drawPoints(brushStrokes[i].coordinates,brushStrokes[i].brushColor,brushStrokes[i].brushRadius, false)
+    }
+
+  }
+
   saveLine = ( brushColor = "#00ff00", brushRadius = 20) => {
     if (this.points.length < 2) return;
 
-    // Save as new line into the big data structre
-    this.lines.push({
-      points: [...this.points],
-      brushColor,
-      brushRadius
-    });
+    const {
+     brushStrokes,
+    } = this.props.annotationsObject.getActiveAnnotation();
+
+    brushStrokes.push( {brushColor, brushRadius, coordinates:[...this.points]})
+
+    console.log(brushStrokes)
+
 
     // Reset points array
     this.points.length = 0;
@@ -131,6 +144,7 @@ export class PaintbrushCanvas extends Component<Props> {
     this.ctx.temp.clearRect(0, 0, width, height);
 
     this.triggerOnChange(); */
+    this.drawAllStrokes()
   };
 
 
@@ -171,6 +185,7 @@ export class PaintbrushCanvas extends Component<Props> {
   componentDidUpdate(): void {
     // Redraw if we change pan or zoom
     const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
+    
     if (activeAnnotation?.coordinates) {
       //this.drawSplineVector(activeAnnotation.coordinates);
       //repaint

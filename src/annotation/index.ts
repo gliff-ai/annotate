@@ -4,6 +4,7 @@ import {
   AnnotationParameters,
   ZTPoint,
   XYPoint,
+  BrushStrokes
 } from "./interfaces";
 
 export class Annotations {
@@ -20,6 +21,7 @@ export class Annotations {
     labels: string[] = [],
     spaceTimeInfo: ZTPoint = { z: 0, t: 0 },
     coordinates: XYPoint[] = [],
+    brushStrokes: BrushStrokes[] = [],
     parameters: AnnotationParameters[] = []
   ): void => {
     this.activeAnnotationID =
@@ -28,6 +30,7 @@ export class Annotations {
         toolbox,
         spaceTimeInfo,
         coordinates,
+        brushStrokes,
         parameters,
       }) - 1;
   };

@@ -59,19 +59,19 @@ export class SplineCanvas extends Component<Props> {
       coordinates: currentSplineVector,
     } = this.props.annotationsObject.getActiveAnnotation();
 
-    let {x:imageX, y:imageY} = canvasToImage(x, y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
+    const {x:imageX, y:imageY} = canvasToImage(x, y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
     console.log(imageX, imageY);
 
-    currentSplineVector.push({ x: imageX, y: imageY });
+    currentSplineVector.push({ x: imageX, y: imageY } as XYPoint);
 
-    this.drawSplineVector(currentSplineVector);
+    this.drawSplineVector(currentSplineVector as XYPoint[]);
   };
 
   componentDidUpdate(): void {
     // Redraw if we change pan or zoom
     const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
     if (activeAnnotation?.coordinates) {
-      this.drawSplineVector(activeAnnotation.coordinates);
+      this.drawSplineVector(activeAnnotation.coordinates as XYPoint[]);
     }
   }
 
