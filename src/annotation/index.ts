@@ -60,13 +60,18 @@ export class Annotations {
   };
 }
 
-export function canvasToImage(canvasX: number, canvasY: number, imageWidth: number, imageHeight:number, scaleAndPan:any) {
-  let { x: translateX, y: translateY, scale:scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
-
+export function canvasToImage(
+  canvasX: number,
+  canvasY: number,
+  imageWidth: number,
+  imageHeight: number,
+  scaleAndPan: any
+) {
+  let { x: translateX, y: translateY, scale: scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
 
   // transform from canvas space to original canvas space:
-  let x = (canvasX-translateX) / scale;
-  let y = (canvasY-translateY) / scale;
+  let x = (canvasX - translateX) / scale;
+  let y = (canvasY - translateY) / scale;
 
   // original canvas to image transform:
   x = (x / 400) * Math.min(imageWidth, imageHeight);
@@ -74,67 +79,78 @@ export function canvasToImage(canvasX: number, canvasY: number, imageWidth: numb
 
   if (imageWidth > imageHeight) {
     x += (imageWidth - imageHeight) / 2;
-  }
-  else if (imageHeight > imageWidth) {
+  } else if (imageHeight > imageWidth) {
     y += (imageHeight - imageWidth) / 2;
   }
 
-  return {x: x, y: y}
+  return { x: x, y: y };
 }
 
-export function imageToCanvas(imageX: number, imageY: number, imageWidth: number, imageHeight:number, scaleAndPan:any) {
-  let { x: translateX, y: translateY, scale:scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
+export function imageToCanvas(
+  imageX: number,
+  imageY: number,
+  imageWidth: number,
+  imageHeight: number,
+  scaleAndPan: any
+) {
+  let { x: translateX, y: translateY, scale: scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
 
-  let x = imageX, y = imageY;
+  let x = imageX,
+    y = imageY;
 
-  console.log("Beginning imageToCanvas")
+  //   console.log("Beginning imageToCanvas")
 
-  console.log(x, y) // image space
+  //   console.log(x, y) // image space
 
   if (imageWidth > imageHeight) {
     x -= (imageWidth - imageHeight) / 2;
-  }
-  else if (imageHeight > imageWidth) {
+  } else if (imageHeight > imageWidth) {
     y -= (imageHeight - imageWidth) / 2;
   }
 
-  console.log(x, y) // largest central square image space
+  //   console.log(x, y) // largest central square image space
 
-  x = 400 * x / Math.min(imageWidth, imageHeight);
-  y = 400 * y / Math.min(imageWidth, imageHeight);
+  x = (400 * x) / Math.min(imageWidth, imageHeight);
+  y = (400 * y) / Math.min(imageWidth, imageHeight);
 
-  console.log(x, y) // original canvas space
+  //   console.log(x, y) // original canvas space
 
   x = x * scale + translateX;
   y = y * scale + translateY;
 
-  console.log(x, y) // canvas space
+  //   console.log(x, y) // canvas space
 
-  return {x: x, y: y}
+  return { x: x, y: y };
 }
 
-export function imageToOriginalCanvas(imageX: number, imageY: number, imageWidth: number, imageHeight:number, scaleAndPan:any) {
-  let { x: translateX, y: translateY, scale:scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
+export function imageToOriginalCanvas(
+  imageX: number,
+  imageY: number,
+  imageWidth: number,
+  imageHeight: number,
+  scaleAndPan: any
+) {
+  let { x: translateX, y: translateY, scale: scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
 
-  let x = imageX, y = imageY;
+  let x = imageX,
+    y = imageY;
 
-  console.log("Beginning imageToCanvas")
+  //   console.log("Beginning imageToCanvas");
 
-  console.log(x, y) // image space
+  //   console.log(x, y); // image space
 
   if (imageWidth > imageHeight) {
     x -= (imageWidth - imageHeight) / 2;
-  }
-  else if (imageHeight > imageWidth) {
+  } else if (imageHeight > imageWidth) {
     y -= (imageHeight - imageWidth) / 2;
   }
 
-  console.log(x, y) // largest central square image space
+  //   console.log(x, y); // largest central square image space
 
-  x = 400 * x / Math.min(imageWidth, imageHeight);
-  y = 400 * y / Math.min(imageWidth, imageHeight);
+  x = (400 * x) / Math.min(imageWidth, imageHeight);
+  y = (400 * y) / Math.min(imageWidth, imageHeight);
 
-  console.log(x, y) // original canvas space
+  //   console.log(x, y); // original canvas space
 
-  return {x: x, y: y}
+  return { x: x, y: y };
 }
