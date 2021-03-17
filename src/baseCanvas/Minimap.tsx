@@ -62,11 +62,29 @@ export class BaseMinimap extends React.Component<Props> {
     );
   };
 
+  /*** Mouse events ****/
+  onDoubleClick = (canvasX: number, canvasY: number): void => {};
+
+  onClick = (canvasX: number, canvasY: number): void => {};
+
+  onMouseDown = (canvasX: number, canvasY: number): void => {};
+
+  onMouseMove = (canvasX: number, canvasY: number): void => {};
+
+  onMouseUp = (canvasX: number, canvasY: number): void => {};
+
+  onContextMenu = (canvasX: number, canvasY: number): void => {};
+
   render = (): ReactNode => {
     return (
       <BaseCanvas
         cursor="move"
-        onClick={this.props.onClick}
+        onDoubleClick={this.onDoubleClick}
+        onClick={this.onClick}
+        onMouseDown={this.onMouseDown}
+        onMouseMove={this.onMouseMove}
+        onMouseUp={this.onMouseUp}
+        onContextMenu={this.onContextMenu}
         name={this.props.name}
         scaleAndPan={{ x: 0, y: 0, scale: 1 }}
         canvasPositionAndSize={this.props.minimapPositionAndSize}

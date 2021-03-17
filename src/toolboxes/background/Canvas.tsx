@@ -41,13 +41,11 @@ export class BackgroundCanvas extends Component<Props> {
     this.image.crossOrigin = "anonymous";
 
     // Draw the image once loaded
-    this.image.onload = this.redrawImage;
-    this.image.src = this.props.imgSrc;
-
-    //TODO: remove
-    setTimeout(() => {
+    this.image.onload = () => {
+      this.redrawImage;
       this.props.updateImageDimensions(this.image.width, this.image.height);
-    }, 5000);
+    };
+    this.image.src = this.props.imgSrc;
   };
 
   componentDidMount = (): void => {
