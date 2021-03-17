@@ -77,14 +77,18 @@ export class SplineCanvas extends Component<Props> {
     let {x:imageX, y:imageY} = canvasToImage(x, y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
     console.log(imageX, imageY);
 
+    // Don't append a new point if the spline is a closed loop:
     if (this.isClosed(currentSplineVector)) return;
 
+    // Add coordinates to the current spline
     currentSplineVector.push({ x: imageX, y: imageY });
-
+    
     this.drawAllSplines();
   };
 
   onDoubleClick = (x: number, y: number): void => {
+    // Append the first spline point to the end, making a closed polygon
+
     const {
       coordinates: currentSplineVector,
     } = this.props.annotationsObject.getActiveAnnotation();
@@ -92,7 +96,7 @@ export class SplineCanvas extends Component<Props> {
     console.log("onDoubleClick")
 
     if (currentSplineVector.length < 3) {
-      return;
+      return; // need at least three points to make a closed polygon
     }
     
     currentSplineVector.push(currentSplineVector[0]);
@@ -101,6 +105,7 @@ export class SplineCanvas extends Component<Props> {
   }
 
   isClosed = (splineVector: XYPoint[]): boolean => {
+    // Check whether the spline is a closed loop.
     return ((splineVector.length > 1 ) && 
     (splineVector[0].x === splineVector[splineVector.length-1].x) && 
     (splineVector[0].y === splineVector[splineVector.length-1].y ) );
