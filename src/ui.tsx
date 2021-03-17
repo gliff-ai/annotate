@@ -43,7 +43,7 @@ export class UserInterface extends Component {
       imageHeight: 0,
       activeTool: null,
       activeAnnotationID: null,
-      canvasPositionAndSize: { top: 0, left: 0, width: 1024, height: 768 },
+      canvasPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
     };
     this.updateImageDimensions = this.updateImageDimensions.bind(this);
   }

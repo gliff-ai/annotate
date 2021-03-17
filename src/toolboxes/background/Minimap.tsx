@@ -2,7 +2,6 @@ import React from "react";
 import { Component } from "react";
 
 import { BaseMinimap, MinimapProps as BaseProps } from "../../baseCanvas";
-// @ts-ignore
 import drawImageProp from "./drawImage";
 
 interface Props extends BaseProps {
@@ -26,10 +25,7 @@ export class BackgroundMinimap extends Component<Props> {
     if (this.image && this.image.complete) {
       this.baseMinimap.baseCanvas.canvasContext.globalCompositeOperation =
         "destination-over";
-      drawImageProp({
-        ctx: this.baseMinimap.baseCanvas.canvasContext,
-        img: this.image,
-      });
+      drawImageProp(this.baseMinimap.baseCanvas.canvasContext, this.image);
     }
   };
 
