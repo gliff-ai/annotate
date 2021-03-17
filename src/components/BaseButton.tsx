@@ -14,12 +14,12 @@ export const BaseButton: React.FC<ButtonProps> = ({
   name,
   onClick,
 }) => (
-  <div className="mt-3 mb-3">
+  <span className="mt-3 mb-3">
     <Button id={name} color="secondary" onClick={onClick}>
       <i className={`fas ${icon}`} />
     </Button>
     <UncontrolledTooltip placement="left" target={name} fade={false}>
       {tooltip}
     </UncontrolledTooltip>
-  </div>
+  </span>
 );

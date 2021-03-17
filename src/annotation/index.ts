@@ -210,8 +210,8 @@ export function originalCanvastoMinimap(
     (viewfinderHeight * -y) /
     Math.min(canvasPositionAndSize.width, canvasPositionAndSize.height);
 
-  console.log(scaleAndPan.x, scaleAndPan.y, scaleAndPan.scale);
-  console.log(viewfinderX, viewfinderY, viewfinderWidth, viewfinderHeight);
+  //   console.log(scaleAndPan.x, scaleAndPan.y, scaleAndPan.scale);
+  //   console.log(viewfinderX, viewfinderY, viewfinderWidth, viewfinderHeight);
 
   return {
     x: viewfinderX,

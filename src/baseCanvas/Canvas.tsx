@@ -156,7 +156,7 @@ export class BaseCanvas extends Component<Props> {
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
 
-    // console.log("Mouse move Coordinate x: " + x, "Coordinate y: " + y);
+    console.log("Mouse move at coordinate x: " + x, " y: " + y);
 
     // DO STUFF HERE
 

@@ -4,6 +4,7 @@ import { Component } from "react";
 import { Annotations } from "./annotation";
 
 import { BaseButton } from "./components/BaseButton";
+import { ButtonToolbar, ButtonGroup } from "reactstrap";
 
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
@@ -49,7 +50,11 @@ export class UserInterface extends Component {
   }
 
   incrementScale() {
-    this.setState({ scale: 4 });
+    this.setState({ scale: this.state.scale + 1 });
+  }
+
+  decrementScale() {
+    this.setState({ scale: this.state.scale - 1 });
   }
 
   incrementPanX() {
@@ -57,9 +62,19 @@ export class UserInterface extends Component {
     this.setState({ x: this.state.x - 10 });
   }
 
+  decrementPanX() {
+    // negative is left, +ve is right...
+    this.setState({ x: this.state.x + 10 });
+  }
+
   incrementPanY() {
     // negative is up, +ve is down...
     this.setState({ y: this.state.y - 10 });
+  }
+
+  decrementPanY() {
+    // negative is up, +ve is down...
+    this.setState({ y: this.state.y + 10 });
   }
 
   updateImageDimensions(imageWidth: number, imageHeight: number) {
@@ -87,38 +102,63 @@ export class UserInterface extends Component {
   render() {
     return (
       <div>
-        <BaseButton
-          tooltip={"ZOOM"}
-          icon={"fa-search-plus"}
-          name={"zoom"}
-          onClick={this.incrementScale}
-        />
-        <BaseButton
-          tooltip={"panX"}
-          icon={"fa-chevron-left"}
-          name={"panx"}
-          onClick={this.incrementPanX}
-        />
-        <BaseButton
-          tooltip={"panY"}
-          icon={"fa-chevron-right"}
-          name={"pany"}
-          onClick={this.incrementPanY}
-        />
+        <ButtonToolbar>
+          <ButtonGroup>
+            <BaseButton
+              tooltip={"zoom in"}
+              icon={"fa-search-plus"}
+              name={"zoom"}
+              onClick={this.incrementScale}
+            />
+            <BaseButton
+              tooltip={"zoom out"}
+              icon={"fa-search-minus"}
+              name={"zoom"}
+              onClick={this.decrementScale}
+            />
+          </ButtonGroup>
 
-        <BaseButton
-          tooltip={"add new object"}
-          icon={"fa-plus"}
-          name={"newobject"}
-          onClick={this.addAnnotation}
-        />
+          <ButtonGroup>
+            <BaseButton
+              tooltip={"pan left"}
+              icon={"fa-chevron-left"}
+              name={"panx"}
+              onClick={this.incrementPanX}
+            />
+            <BaseButton
+              tooltip={"pan right"}
+              icon={"fa-chevron-right"}
+              name={"pany"}
+              onClick={this.decrementPanX}
+            />
+            <BaseButton
+              tooltip={"pan up"}
+              icon={"fa-chevron-up"}
+              name={"panx"}
+              onClick={this.incrementPanY}
+            />
+            <BaseButton
+              tooltip={"pan down"}
+              icon={"fa-chevron-down"}
+              name={"pany"}
+              onClick={this.decrementPanY}
+            />
+          </ButtonGroup>
 
-        <BaseButton
-          tooltip={"Activate Spline"}
-          icon={"fa-bezier-curve"}
-          name={"splint"}
-          onClick={this.toggleSpline}
-        />
+          <BaseButton
+            tooltip={"add new object"}
+            icon={"fa-plus"}
+            name={"newobject"}
+            onClick={this.addAnnotation}
+          />
+
+          <BaseButton
+            tooltip={"Activate Spline"}
+            icon={"fa-bezier-curve"}
+            name={"splint"}
+            onClick={this.toggleSpline}
+          />
+        </ButtonToolbar>
 
         <BackgroundCanvas
           scaleAndPan={this.state}
