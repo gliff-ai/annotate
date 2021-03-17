@@ -148,8 +148,6 @@ export class BaseCanvas extends Component<Props> {
         }}
       >
         <canvas
-          onClick={this.onClickHandler}
-          onDoubleClick={this.onDoubleClickHandler}
           key={this.name}
           id={`${this.name}-canvas`}
           ref={(canvas) => {
@@ -159,6 +157,8 @@ export class BaseCanvas extends Component<Props> {
               this.canvasContext = canvas.getContext("2d");
             }
           }}
+          onDoubleClick={this.onDoubleClickHandler}
+          onClick={this.onClickHandler}
         ></canvas>
       </div>
     );
@@ -192,9 +192,7 @@ export function imageToCanvas(imageX: number, imageY: number, imageWidth: number
 
   let x = imageX, y = imageY;
 
-  console.log("Beginning imageToCanvas")
-
-  console.log(x, y) // image space
+  // image space
 
   if (imageWidth > imageHeight) {
     x -= (imageWidth - imageHeight) / 2;
@@ -203,17 +201,17 @@ export function imageToCanvas(imageX: number, imageY: number, imageWidth: number
     y -= (imageHeight - imageWidth) / 2;
   }
 
-  console.log(x, y) // largest central square image space
+  // largest central square image space
 
   x = 400 * x / Math.min(imageWidth, imageHeight);
   y = 400 * y / Math.min(imageWidth, imageHeight);
 
-  console.log(x, y) // original canvas space
+  // original canvas space
 
   x = x * scale + translateX;
   y = y * scale + translateY;
 
-  console.log(x, y) // canvas space
+  // canvas space
 
   return {x: x, y: y}
 }
@@ -223,9 +221,7 @@ export function imageToOriginalCanvas(imageX: number, imageY: number, imageWidth
 
   let x = imageX, y = imageY;
 
-  console.log("Beginning imageToCanvas")
-
-  console.log(x, y) // image space
+  // image space
 
   if (imageWidth > imageHeight) {
     x -= (imageWidth - imageHeight) / 2;
@@ -234,12 +230,12 @@ export function imageToOriginalCanvas(imageX: number, imageY: number, imageWidth
     y -= (imageHeight - imageWidth) / 2;
   }
 
-  console.log(x, y) // largest central square image space
+  // largest central square image space
 
   x = 400 * x / Math.min(imageWidth, imageHeight);
   y = 400 * y / Math.min(imageWidth, imageHeight);
 
-  console.log(x, y) // original canvas space
+  // original canvas space
 
   return {x: x, y: y}
 }

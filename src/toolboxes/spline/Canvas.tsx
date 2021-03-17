@@ -49,8 +49,13 @@ export class SplineCanvas extends Component<Props> {
       context.lineTo(nextPoint.x, nextPoint.y);
     }
 
+    // Draw all points
+    for (const { x, y } of splineVector) {
+      nextPoint = imageToOriginalCanvas(x, y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
+      context.rect(nextPoint.x - 2.5, nextPoint.y - 2.5, 5, 5); // draw a square to mark the point
+    }
+
     context.stroke();
-    context.closePath();
   };
 
   drawAllSplines = (): void => {
@@ -68,6 +73,26 @@ export class SplineCanvas extends Component<Props> {
     });
   }
 
+  clickNearPoint = (clickPoint: XYPoint, splineVector: XYPoint[]): number => {
+    // iterates through the points of splineVector, returns the index of the first point within distance 25 of clickPoint
+    // clickPoint and splineVector are both expected to be in image space
+    // returns -1 if no point was within distance 25
+
+    let {x:clickPointX, y:clickPointY} = imageToCanvas(clickPoint.x, clickPoint.y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
+
+    for (let i=0; i < splineVector.length; i++) {
+      // transform points into canvas space so the nudge radius won't depend on zoom level:
+      let point = splineVector[i];
+      point = imageToCanvas(point.x, point.y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
+      
+      let distanceToPoint = Math.sqrt((point.x - clickPointX)**2 + (point.y - clickPointY)**2);
+
+      if (distanceToPoint < 25) return i;
+    };
+
+    return -1;
+  }
+
   // X and Y are in CanvasSpace
   onClick = (x: number, y: number): void => {
     const {
@@ -75,31 +100,55 @@ export class SplineCanvas extends Component<Props> {
     } = this.props.annotationsObject.getActiveAnnotation();
 
     let {x:imageX, y:imageY} = canvasToImage(x, y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
-    console.log(imageX, imageY);
 
-    // Don't append a new point if the spline is a closed loop:
-    if (this.isClosed(currentSplineVector)) return;
 
-    // Add coordinates to the current spline
-    currentSplineVector.push({ x: imageX, y: imageY });
+    // check if we clicked within the nudge radius of an existing point:
+    let nudgePointIdx = this.clickNearPoint({x:imageX, y:imageY}, currentSplineVector);
+    const isClosed = this.isClosed(currentSplineVector);
+    
+    if (nudgePointIdx !== -1) {
+      let nudgePoint = currentSplineVector[nudgePointIdx];
+
+      this.updateXYPoint((nudgePoint.x + imageX) / 2, (nudgePoint.y + imageY) / 2, nudgePointIdx);
+
+      if (nudgePointIdx === 0 && isClosed) {
+        // need to update the final point as well if we're nudging the first point of a closed spline,
+        // or else the loop gets broken
+        this.updateXYPoint((nudgePoint.x + imageX) / 2, (nudgePoint.y + imageY) / 2, currentSplineVector.length - 1);
+      }
+      
+      // If the spline is not closed, append a new point
+    } else if (!isClosed) {
+
+      // Add coordinates to the current spline
+      console.log("Adding point", { x: imageX, y: imageY });
+      currentSplineVector.push({ x: imageX, y: imageY });
+    }
     
     this.drawAllSplines();
   };
 
+  updateXYPoint = (newX: number, newY: number, index: number) => {
+    const coordinates = this.props.annotationsObject.getActiveAnnotation().coordinates;
+    coordinates[index] = {x: newX, y: newY};
+  }
+
   onDoubleClick = (x: number, y: number): void => {
     // Append the first spline point to the end, making a closed polygon
 
-    const {
-      coordinates: currentSplineVector,
-    } = this.props.annotationsObject.getActiveAnnotation();
-
-    console.log("onDoubleClick")
+    const currentSplineVector = this.props.annotationsObject.getActiveAnnotation().coordinates;
 
     if (currentSplineVector.length < 3) {
       return; // need at least three points to make a closed polygon
     }
-    
+
+    if (this.isClosed(currentSplineVector)) {
+      return; // don't duplicate the first point again if the loop is already closed
+    }
+
+    console.log("Adding point dbclick", currentSplineVector[0]);
     currentSplineVector.push(currentSplineVector[0]);
+   
 
     this.drawAllSplines();
   }
