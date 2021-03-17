@@ -18,6 +18,7 @@ export class UserInterface extends Component {
     imageWidth: number;
     imageHeight: number;
     activeAnnotationID: number;
+    brushSize: number
   };
 
   annotationsObject: Annotations;
@@ -33,6 +34,7 @@ export class UserInterface extends Component {
       imageHeight: 0,
       activeTool: null,
       activeAnnotationID: null,
+      brushSize: 20
     };
 
     this.incrementScale = this.incrementScale.bind(this);
@@ -53,6 +55,11 @@ export class UserInterface extends Component {
   incrementPanY() {
     // negative is up, +ve is down...
     this.setState({ y: this.state.y - 10 });
+  }
+
+  incrementBrush = () =>{
+    console.log(this.state.brushSize)
+    this.setState({ brushSize: this.state.brushSize + 10 });
   }
 
   updateImageDimensions(imageWidth: number, imageHeight: number) {
@@ -108,6 +115,20 @@ export class UserInterface extends Component {
         />
 
         <BaseButton
+          tooltip={"increase paintbrush size"}
+          icon={"fa-brush"}
+          name={"brushradius"}
+          onClick={this.incrementBrush}
+        />
+{/* 
+         <BaseButton
+          tooltip={"decrease paintbrush size"}
+          icon={"fa-brush"}
+          name={"pany"}
+          onClick={this.incremtBrush}
+        /> */}
+
+        <BaseButton
           tooltip={"add new object"}
           icon={"fa-plus"}
           name={"newobject"}
@@ -148,6 +169,7 @@ export class UserInterface extends Component {
           annotationsObject={this.annotationsObject}
           imageWidth={this.state.imageWidth}
           imageHeight={this.state.imageHeight}
+          brushRadius = {this.state.brushSize}
         />
       </div>
     );

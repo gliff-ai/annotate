@@ -74,7 +74,6 @@ export class BaseCanvas extends Component<Props> {
     for (const entry of entries) {
       const { width, height } = entry.contentRect;
       this.setCanvasSize(width, height);
-      console.log(width, height);
     }
 
     this.canvasContext.beginPath();

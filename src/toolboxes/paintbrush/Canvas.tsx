@@ -16,6 +16,8 @@ interface Props extends BaseProps {
   annotationsObject: Annotations;
   imageWidth: number;
   imageHeight: number;
+  brushRadius: number;
+
 }
 
 export class PaintbrushCanvas extends Component<Props> {
@@ -57,7 +59,7 @@ export class PaintbrushCanvas extends Component<Props> {
       this.drawPoints(
         this.points,
         "#0000FF",
-        20,
+        this.props.brushRadius,
         true,
         this.baseCanvas.canvasContext
       );
@@ -130,7 +132,7 @@ export class PaintbrushCanvas extends Component<Props> {
     }
   };
 
-  saveLine = (brushColor = "#00ff00", brushRadius = 20) => {
+  saveLine = (brushRadius = 20, brushColor = "#00ff00") => {
     if (this.points.length < 2) return;
 
     const { brushStrokes } = this.props.annotationsObject.getActiveAnnotation();
@@ -145,22 +147,12 @@ export class PaintbrushCanvas extends Component<Props> {
     // Reset points array
     this.points.length = 0;
 
-    /*
-    const width = this.canvas.temp.width;
-    const height = this.canvas.temp.height;
-
-    // Copy the line to the drawing canvas
-    this.ctx.drawing.drawImage(this.canvas.temp, 0, 0, width, height);
-
-    // Clear the temporary line-drawing canvas
-    this.ctx.temp.clearRect(0, 0, width, height);
-
-    this.triggerOnChange(); */
     this.drawAllStrokes();
+    const context = this.baseCanvas.canvasContext;
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
   };
 
   /*** Mouse events ****/
-  onClick = (canvasX: number, canvasY: number): void => {};
 
   onMouseDown = (canvasX: number, canvasY: number): void => {
     // Start painting
@@ -186,7 +178,8 @@ export class PaintbrushCanvas extends Component<Props> {
     // Stop drawing & save the drawn line
     this.isDrawing = false;
 
-    this.saveLine();
+    this.saveLine(this.props.brushRadius);
+    this.drawAllStrokes()
   };
 
   componentDidUpdate(): void {
@@ -211,7 +204,6 @@ export class PaintbrushCanvas extends Component<Props> {
           scaleAndPan={this.props.scaleAndPan}
         />
         <BaseCanvas
-          onClick={this.onClick}
           onMouseDown={this.onMouseDown}
           onMouseMove={this.onMouseMove}
           onMouseUp={this.onMouseUp}
