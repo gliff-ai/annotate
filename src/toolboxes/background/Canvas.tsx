@@ -41,11 +41,6 @@ export class BackgroundCanvas extends Component<Props> {
     // Draw the image once loaded
     this.image.onload = () => {this.redrawImage; this.props.updateImageDimensions(this.image.width, this.image.height);}
     this.image.src = this.props.imgSrc;
-
-    // //TODO: remove
-    // setTimeout(() => {
-    //   this.props.updateImageDimensions(this.image.width, this.image.height);
-    // }, 5000);
   };
 
   componentDidMount = (): void => {

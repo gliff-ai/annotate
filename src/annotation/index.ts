@@ -58,4 +58,8 @@ export class Annotations {
   setAnnotationCoordinates = (newCoordinates: XYPoint[]): void => {
     this.data[this.activeAnnotationID]["coordinates"] = newCoordinates;
   };
+
+  getData = (): AnnotationsDataArray => {
+    return this.data;
+  }
 }

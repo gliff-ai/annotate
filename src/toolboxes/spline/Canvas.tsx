@@ -5,7 +5,7 @@ import { Component } from "react";
 import { BaseCanvas, Props as BaseProps } from "../../baseCanvas";
 import { Annotations } from "../../annotation";
 import { canvasToImage, imageToCanvas, imageToOriginalCanvas } from "../../baseCanvas";
-import { XYPoint } from "../../annotation/interfaces";
+import { Annotation, XYPoint } from "../../annotation/interfaces";
 
 interface Props extends BaseProps {
   isActive: boolean;
@@ -31,7 +31,6 @@ export class SplineCanvas extends Component<Props> {
     const lineWidth = 1.5;
 
     // Clear the canvas
-    context.clearRect(0, 0, canvas.width, canvas.height);
     context.lineWidth = lineWidth;
     context.strokeStyle = "#ff0000";
 
@@ -54,6 +53,21 @@ export class SplineCanvas extends Component<Props> {
     context.closePath();
   };
 
+  drawAllSplines = (): void => {
+    // Draw all the splines 
+
+    // Clear all the splines:
+    const { canvasContext: context, canvas } = this.baseCanvas;
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw all the splines:
+    this.props.annotationsObject.getData().forEach((annotation: Annotation) => {
+      if (annotation.toolbox === "spline") {
+        this.drawSplineVector(annotation.coordinates);
+      }
+    });
+  }
+
   // X and Y are in CanvasSpace
   onClick = (x: number, y: number): void => {
     const {
@@ -65,14 +79,14 @@ export class SplineCanvas extends Component<Props> {
 
     currentSplineVector.push({ x: imageX, y: imageY });
 
-    this.drawSplineVector(currentSplineVector);
+    this.drawAllSplines();
   };
 
   componentDidUpdate(): void {
     // Redraw if we change pan or zoom
     const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
     if (activeAnnotation?.coordinates) {
-      this.drawSplineVector(activeAnnotation.coordinates);
+      this.drawAllSplines();
     }
   }
 
