@@ -265,10 +265,8 @@ export function minimapToOriginalCanvas(
   let { x: translateX, y: translateY, scale: scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
 
   // transform from canvas space to original canvas space:
-  let x =
-    minimapX * (canvasPositionAndSize.width / minimapPositionAndSize.width);
-  let y =
-    minimapY * (canvasPositionAndSize.height / minimapPositionAndSize.height);
+  let x = minimapX; // * (canvasPositionAndSize.width / minimapPositionAndSize.width);
+  let y = minimapY; // * (canvasPositionAndSize.height / minimapPositionAndSize.height);
 
   // original canvas to image transform:
   x =

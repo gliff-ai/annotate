@@ -88,25 +88,29 @@ export class BaseMinimap extends React.Component<Props> {
       this.props.canvasPositionAndSize,
       this.props.minimapPositionAndSize
     );
-    console.log(
-      "Translates to viewpoint coordinate x: " + viewportX,
-      " y: " + viewportY + " when scale is " + this.props.scaleAndPan.scale
-    );
+    // console.log(
+    //   "Translates to viewpoint coordinate x: " + viewportX,
+    //   " y: " + viewportY + " when scale is " + this.props.scaleAndPan.scale
+    // );
 
     // calculate top left for zoom centred on these coordinates
-    let left = viewportX - this.props.canvasPositionAndSize.width / 2;
-    let top = viewportY - this.props.canvasPositionAndSize.height / 2;
+    let left =
+      viewportX * this.props.scaleAndPan.scale -
+      this.props.canvasPositionAndSize.width / 2;
+    let top =
+      viewportY * this.props.scaleAndPan.scale -
+      this.props.canvasPositionAndSize.height / 2;
 
-    console.log(
-      "So our box, which is currently " +
-        this.props.canvasPositionAndSize.width / this.props.scaleAndPan.scale +
-        " wide and " +
-        this.props.canvasPositionAndSize.height / this.props.scaleAndPan.scale +
-        " high should be at left: " +
-        left +
-        " and top: " +
-        top
-    );
+    // console.log(
+    //   "So our box, which is currently " +
+    //     this.props.canvasPositionAndSize.width / this.props.scaleAndPan.scale +
+    //     " wide and " +
+    //     this.props.canvasPositionAndSize.height / this.props.scaleAndPan.scale +
+    //     " high should be at left: " +
+    //     left +
+    //     " and top: " +
+    //     top
+    // );
 
     // update scaleAndPan using the method passed down from UI
     this.props.setScaleAndPan({
