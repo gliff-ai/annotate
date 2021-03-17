@@ -36,8 +36,6 @@ export class BaseCanvas extends Component<Props> {
     super(props);
     this.name = props.name;
 
-    this.scaleAndPan = props.scaleAndPan;
-
     this.onClickHandler = this.onClickHandler.bind(this);
   }
 
@@ -77,7 +75,7 @@ export class BaseCanvas extends Component<Props> {
     for (const entry of entries) {
       const { width, height } = entry.contentRect;
       this.setCanvasSize(width, height);
-      console.log(width, height);
+      //   console.log(width, height);
     }
   };
 
@@ -109,7 +107,7 @@ export class BaseCanvas extends Component<Props> {
 
     // x and y are now in canvas space
 
-    console.log("Coordinate x: " + x, "Coordinate y: " + y);
+    // console.log("Coordinate x: " + x, "Coordinate y: " + y);
 
     // DO STUFF HERE
 
