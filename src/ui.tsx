@@ -41,41 +41,40 @@ export class UserInterface extends Component {
       activeAnnotationID: null,
       canvasPositionAndSize: { top: 150, left: 0, width: 400, height: 400 },
     };
-
-    this.incrementScale = this.incrementScale.bind(this);
-    this.incrementPanX = this.incrementPanX.bind(this);
-    this.incrementPanY = this.incrementPanY.bind(this);
-    this.toggleSpline = this.toggleSpline.bind(this);
     this.updateImageDimensions = this.updateImageDimensions.bind(this);
   }
 
-  incrementScale() {
+  resetScaleAndPan = (): void => {
+    this.setState({ scale: 1, x: 0, y: 0 });
+  };
+
+  incrementScale = (): void => {
     this.setState({ scale: this.state.scale + 1 });
-  }
+  };
 
-  decrementScale() {
+  decrementScale = (): void => {
     this.setState({ scale: this.state.scale - 1 });
-  }
+  };
 
-  incrementPanX() {
+  incrementPanX = (): void => {
     // negative is left, +ve is right...
     this.setState({ x: this.state.x - 10 });
-  }
+  };
 
-  decrementPanX() {
+  decrementPanX = (): void => {
     // negative is left, +ve is right...
     this.setState({ x: this.state.x + 10 });
-  }
+  };
 
-  incrementPanY() {
+  incrementPanY = (): void => {
     // negative is up, +ve is down...
     this.setState({ y: this.state.y - 10 });
-  }
+  };
 
-  decrementPanY() {
+  decrementPanY = (): void => {
     // negative is up, +ve is down...
     this.setState({ y: this.state.y + 10 });
-  }
+  };
 
   updateImageDimensions(imageWidth: number, imageHeight: number) {
     this.setState({
@@ -107,13 +106,19 @@ export class UserInterface extends Component {
             <BaseButton
               tooltip={"zoom in"}
               icon={"fa-search-plus"}
-              name={"zoom"}
+              name={"zoomin"}
               onClick={this.incrementScale}
+            />
+            <BaseButton
+              tooltip={"reset zoom and pan"}
+              icon={"fa-square"}
+              name={"reset"}
+              onClick={this.resetScaleAndPan}
             />
             <BaseButton
               tooltip={"zoom out"}
               icon={"fa-search-minus"}
-              name={"zoom"}
+              name={"zoomout"}
               onClick={this.decrementScale}
             />
           </ButtonGroup>
@@ -122,25 +127,25 @@ export class UserInterface extends Component {
             <BaseButton
               tooltip={"pan left"}
               icon={"fa-chevron-left"}
-              name={"panx"}
+              name={"panxleft"}
               onClick={this.incrementPanX}
             />
             <BaseButton
               tooltip={"pan right"}
               icon={"fa-chevron-right"}
-              name={"pany"}
+              name={"panxright"}
               onClick={this.decrementPanX}
             />
             <BaseButton
               tooltip={"pan up"}
               icon={"fa-chevron-up"}
-              name={"panx"}
+              name={"panyup"}
               onClick={this.incrementPanY}
             />
             <BaseButton
               tooltip={"pan down"}
               icon={"fa-chevron-down"}
-              name={"pany"}
+              name={"panydown"}
               onClick={this.decrementPanY}
             />
           </ButtonGroup>
