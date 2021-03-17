@@ -7,13 +7,14 @@ import { BaseButton } from "./components/BaseButton";
 
 import { BackgroundCanvas } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
+import { PaintbrushCanvas } from "./toolboxes/paintbrush";
 
 export class UserInterface extends Component {
   state: {
     x: number;
     y: number;
     scale: number;
-    activeTool?: "spline";
+    activeTool?: "spline" | "paintbrush";
     imageWidth: number;
     imageHeight: number;
     activeAnnotationID: number;
@@ -56,10 +57,10 @@ export class UserInterface extends Component {
   }
 
   updateImageDimensions(imageWidth: number, imageHeight: number) {
-    this.setState({ 
+    this.setState({
       imageWidth: imageWidth,
-      imageHeight: imageHeight
-     });
+      imageHeight: imageHeight,
+    });
   }
 
   toggleSpline() {
@@ -67,6 +68,14 @@ export class UserInterface extends Component {
       this.setState({ activeTool: null });
     } else {
       this.setState({ activeTool: "spline" });
+    }
+  }
+
+  togglePaintbrush() {
+    if (this.state.activeTool === "paintbrush") {
+      this.setState({ activeTool: null });
+    } else {
+      this.setState({ activeTool: "paintbrush" });
     }
   }
 
@@ -109,8 +118,15 @@ export class UserInterface extends Component {
         <BaseButton
           tooltip={"Activate Spline"}
           icon={"fa-bezier-curve"}
-          name={"splint"}
+          name={"spline"}
           onClick={this.toggleSpline}
+        />
+
+        <BaseButton
+          tooltip={"Activate Paintbrush"}
+          icon={"fa-painbrush"}
+          name={"paintbrush"}
+          onClick={this.togglePaintbrush}
         />
 
         <BackgroundCanvas
@@ -122,6 +138,14 @@ export class UserInterface extends Component {
         <SplineCanvas
           scaleAndPan={this.state}
           isActive={this.state.activeTool === "spline"}
+          annotationsObject={this.annotationsObject}
+          imageWidth={this.state.imageWidth}
+          imageHeight={this.state.imageHeight}
+        />
+
+        <PaintbrushCanvas
+          scaleAndPan={this.state}
+          isActive={this.state.activeTool === "paintbrush"}
           annotationsObject={this.annotationsObject}
           imageWidth={this.state.imageWidth}
           imageHeight={this.state.imageHeight}

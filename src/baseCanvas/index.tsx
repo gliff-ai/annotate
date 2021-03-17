@@ -2,7 +2,6 @@ import React from "react";
 import { Component, ReactNode } from "react";
 import { XYPoint } from "../annotation/interfaces";
 
-
 export interface Props {
   name?: string;
   zoomExtents?: {
@@ -15,7 +14,10 @@ export interface Props {
     scale: number;
   };
   cursor?: "crosshair" | "none";
-  onClick?: (arg0: number, arg1: number) => void;
+  onClick?: (x: number, y: number) => void;
+  onMouseDown?: (x: number, y: number) => void;
+  onMouseMove?: (x: number, y: number) => void;
+  onMouseUp?: (x: number, y: number) => void;
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
@@ -36,8 +38,6 @@ export class BaseCanvas extends Component<Props> {
     this.onClickHandler = this.onClickHandler.bind(this);
   }
 
-
-
   private clearWindow = (): void => {
     this.canvasContext.save();
     this.canvasContext.setTransform(1, 0, 0, 1, 0, 0); // identity matrix
@@ -49,10 +49,9 @@ export class BaseCanvas extends Component<Props> {
         this.canvasContext.canvas.width,
         this.canvasContext.canvas.height
       );
-    } 
-    finally {
-        this.canvasContext.restore();
-      }
+    } finally {
+      this.canvasContext.restore();
+    }
   };
 
   componentDidUpdate() {
@@ -75,7 +74,7 @@ export class BaseCanvas extends Component<Props> {
     for (const entry of entries) {
       const { width, height } = entry.contentRect;
       this.setCanvasSize(width, height);
-      console.log(width, height)
+      console.log(width, height);
     }
 
     this.canvasContext.beginPath();
@@ -102,7 +101,7 @@ export class BaseCanvas extends Component<Props> {
     this.canvasObserver.unobserve(this.canvasContainer);
   };
 
-  onClickHandler(e: React.MouseEvent): void {
+  onClickHandler = (e: React.MouseEvent): void => {
     // x and y start out in window space
 
     let rect = this.canvas.getBoundingClientRect();
@@ -118,7 +117,49 @@ export class BaseCanvas extends Component<Props> {
     if (this.props.onClick) {
       this.props.onClick(x, y);
     }
-  }
+  };
+
+  onMouseDownHandler = (e: React.MouseEvent): void => {
+    let rect = this.canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    console.log("Mouse Down Coordinate x: " + x, "Coordinate y: " + y);
+
+    // DO STUFF HERE
+
+    if (this.props.onMouseDown) {
+      this.props.onMouseDown(x, y);
+    }
+  };
+
+  onMouseMoveHandler = (e: React.MouseEvent): void => {
+    let rect = this.canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    // console.log("Mouse move Coordinate x: " + x, "Coordinate y: " + y);
+
+    // DO STUFF HERE
+
+    if (this.props.onMouseMove) {
+      this.props.onMouseMove(x, y);
+    }
+  };
+
+  onMouseUpHandler = (e: React.MouseEvent): void => {
+    let rect = this.canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    console.log("Mouse Up Coordinate x: " + x, "Coordinate y: " + y);
+
+    // DO STUFF HERE
+
+    if (this.props.onMouseUp) {
+      this.props.onMouseUp(x, y);
+    }
+  };
 
   render = (): ReactNode => {
     return (
@@ -140,6 +181,9 @@ export class BaseCanvas extends Component<Props> {
       >
         <canvas
           onClick={this.onClickHandler}
+          onMouseDown={this.onMouseDownHandler}
+          onMouseMove={this.onMouseMoveHandler}
+          onMouseUp={this.onMouseUpHandler}
           key={this.name}
           id={`${this.name}-canvas`}
           ref={(canvas) => {
