@@ -7,7 +7,7 @@ import drawImageProp from "./drawImage";
 
 interface Props extends BaseProps {
   imgSrc?: string;
-  updateImageScalingFactor: (arg0: number) => void;
+  updateImageDimensions: (imageWidth: number, imageHeight: number) => void;
 }
 
 interface State {
@@ -44,13 +44,7 @@ export class BackgroundCanvas extends Component<Props> {
 
     //TODO: remove
     setTimeout(() => {
-      const ratio = Math.min(
-        this.baseCanvas.canvas.width / this.image.width,
-        this.baseCanvas.canvas.height / this.image.height
-      );
-
-      console.log(`Ratio: ${ratio}`);
-      this.props.updateImageScalingFactor(ratio);
+      this.props.updateImageDimensions(this.image.width, this.image.height);
     }, 5000);
   };
 

@@ -2,6 +2,7 @@ import React from "react";
 import { Component, ReactNode } from "react";
 import { XYPoint } from "../annotation/interfaces";
 
+
 export interface Props {
   name?: string;
   zoomExtents?: {
@@ -83,8 +84,8 @@ export class BaseCanvas extends Component<Props> {
   };
 
   private setCanvasSize = (width: number, height: number): void => {
-    this.canvas.width = Math.min(width, height);
-    this.canvas.height = Math.min(width, height);
+    this.canvas.width = width;
+    this.canvas.height = height;
     this.canvas.style.width = `${width}px`;
     this.canvas.style.height = `${height}px`;
   };
@@ -102,9 +103,14 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onClickHandler(e: React.MouseEvent): void {
+    // x and y start out in window space
+
     let rect = this.canvas.getBoundingClientRect();
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
+
+    // x and y are now in canvas space
+
     console.log("Coordinate x: " + x, "Coordinate y: " + y);
 
     // DO STUFF HERE
@@ -113,7 +119,6 @@ export class BaseCanvas extends Component<Props> {
       this.props.onClick(x, y);
     }
   }
-
 
   render = (): ReactNode => {
     return (

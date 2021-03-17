@@ -14,7 +14,8 @@ export class UserInterface extends Component {
     y: number;
     scale: number;
     activeTool?: "spline";
-    imageScalingFactor: number;
+    imageWidth: number;
+    imageHeight: number;
     activeAnnotationID: number;
   };
 
@@ -27,7 +28,8 @@ export class UserInterface extends Component {
       scale: 1,
       x: 0,
       y: 0,
-      imageScalingFactor: 0,
+      imageWidth: 0,
+      imageHeight: 0,
       activeTool: null,
       activeAnnotationID: null,
     };
@@ -36,7 +38,7 @@ export class UserInterface extends Component {
     this.incrementPanX = this.incrementPanX.bind(this);
     this.incrementPanY = this.incrementPanY.bind(this);
     this.toggleSpline = this.toggleSpline.bind(this);
-    this.updateImageScalingFactor = this.updateImageScalingFactor.bind(this);
+    this.updateImageDimensions = this.updateImageDimensions.bind(this);
   }
 
   incrementScale() {
@@ -53,8 +55,11 @@ export class UserInterface extends Component {
     this.setState({ y: this.state.y - 10 });
   }
 
-  updateImageScalingFactor(ratio: number) {
-    this.setState({ imageScalingFactor: ratio });
+  updateImageDimensions(imageWidth: number, imageHeight: number) {
+    this.setState({ 
+      imageWidth: imageWidth,
+      imageHeight: imageHeight
+     });
   }
 
   toggleSpline() {
@@ -111,14 +116,15 @@ export class UserInterface extends Component {
         <BackgroundCanvas
           scaleAndPan={this.state}
           imgSrc="../public/test.png"
-          updateImageScalingFactor={this.updateImageScalingFactor}
+          updateImageDimensions={this.updateImageDimensions}
         />
 
         <SplineCanvas
           scaleAndPan={this.state}
           isActive={this.state.activeTool === "spline"}
           annotationsObject={this.annotationsObject}
-          imageScalingFactor={this.state.imageScalingFactor}
+          imageWidth={this.state.imageWidth}
+          imageHeight={this.state.imageHeight}
         />
       </div>
     );
