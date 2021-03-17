@@ -1,19 +1,22 @@
 import React from "react";
 import { Component, ReactNode } from "react";
-import CoordinateSystem, {
-  IDENTITY,
-  Extents,
-  View,
-} from "./CoordinateSystem.js";
+import { XYPoint } from "../annotation/interfaces";
 
-interface Props {
-  name: string;
-  zoomExtents: {
+
+export interface Props {
+  name?: string;
+  zoomExtents?: {
     min: number;
     max: number;
   };
+  scaleAndPan: {
+    x: number;
+    y: number;
+    scale: number;
+  };
+  cursor?: "crosshair" | "none";
+  onClick?: (arg0: number, arg1: number) => void;
 }
-
 export class BaseCanvas extends Component<Props> {
   private name: string;
   private canvas: HTMLCanvasElement;
@@ -22,68 +25,57 @@ export class BaseCanvas extends Component<Props> {
   private canvasContext: CanvasRenderingContext2D;
   private canvasObserver: ResizeObserver;
 
-  private coordSystem: CoordinateSystem;
-
-  private zoomExtents: Extents;
+  private scaleAndPan: any;
 
   constructor(props: Props) {
     super(props);
     this.name = props.name;
-    this.zoomExtents = props.zoomExtents;
-    this.coordSystem = new CoordinateSystem({
-      scaleExtents: this.zoomExtents,
-      documentSize: { width: 400, height: 400 },
-    });
-    this.coordSystem.attachViewChangeListener(this.applyView.bind(this));
+
+    this.scaleAndPan = props.scaleAndPan;
+
+    this.onClickHandler = this.onClickHandler.bind(this);
   }
 
-  private resetView = () => {
-    return this.coordSystem.resetView();
-  };
 
-  private setView = (view: View) => {
-    return this.coordSystem.setView(view);
-  };
-
-  private inClientSpace = (action: any) => {
-    this.canvasContext.save();
-    this.canvasContext.setTransform(
-      IDENTITY.a,
-      IDENTITY.b,
-      IDENTITY.c,
-      IDENTITY.d,
-      IDENTITY.e,
-      IDENTITY.f
-    );
-
-    try {
-      action();
-    } finally {
-      this.canvasContext.restore();
-    }
-  };
 
   private clearWindow = (): void => {
-    this.inClientSpace(() =>
+    this.canvasContext.save();
+    this.canvasContext.setTransform(1, 0, 0, 1, 0, 0); // identity matrix
+
+    try {
       this.canvasContext.clearRect(
         0,
         0,
         this.canvasContext.canvas.width,
         this.canvasContext.canvas.height
-      )
-    );
+      );
+    } 
+    finally {
+        this.canvasContext.restore();
+      }
   };
+
+  componentDidUpdate() {
+    this.applyView();
+  }
 
   private applyView = (): void => {
     this.clearWindow();
-    const m = this.coordSystem.transformMatrix;
-    this.canvasContext.setTransform(m.a, m.b, m.c, m.d, m.e, m.f);
+    this.canvasContext.setTransform(
+      this.props.scaleAndPan.scale,
+      0,
+      0,
+      this.props.scaleAndPan.scale,
+      this.props.scaleAndPan.x,
+      this.props.scaleAndPan.y
+    );
   };
 
   private handleCanvasResize = (entries: ResizeObserverEntry[]): void => {
     for (const entry of entries) {
       const { width, height } = entry.contentRect;
       this.setCanvasSize(width, height);
+      console.log(width, height)
     }
 
     this.canvasContext.beginPath();
@@ -98,46 +90,35 @@ export class BaseCanvas extends Component<Props> {
     this.canvas.style.height = `${height}px`;
   };
 
-  private getContext = (): void => {
-    this.canvasContext = this.canvas.getContext("2d");
-  };
-
   componentDidMount = (): void => {
     this.canvasObserver = new ResizeObserver((entries: ResizeObserverEntry[]) =>
       this.handleCanvasResize(entries)
     );
 
     this.canvasObserver.observe(this.canvasContainer);
-
-    // change the zoom after five seconds
-    let i = 1;
-    setInterval(() => {
-      console.log(`ZOOMING IN x${i}`);
-      this.setView({ scale: i, x: 1, y: 1 });
-      i++;
-    }, 5000);
   };
 
   componentWillUnmount = (): void => {
     this.canvasObserver.unobserve(this.canvasContainer);
   };
 
-  componentDidUpdate(): void {
-    this.coordSystem.scaleExtents = this.props.zoomExtents;
-    //   if (!this.props.enablePanAndZoom) {
-    //     this.coordSystem.resetView();
-    //   }
-  }
+  onClickHandler(e: React.MouseEvent): void {
+    // x and y start out in window space
 
-  private addImageToCanvas = (
-    array: Uint8Array | Uint8ClampedArray,
-    width: number,
-    height: number
-  ): void => {
-    const imageData = this.canvasContext.createImageData(width, height);
-    imageData.data.set(array);
-    this.canvasContext.putImageData(imageData, 0, 0);
-  };
+    let rect = this.canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    // x and y are now in canvas space
+
+    console.log("Coordinate x: " + x, "Coordinate y: " + y);
+
+    // DO STUFF HERE
+
+    if (this.props.onClick) {
+      this.props.onClick(x, y);
+    }
+  }
 
   render = (): ReactNode => {
     return (
@@ -150,19 +131,20 @@ export class BaseCanvas extends Component<Props> {
           maxHeight: "100%",
           width: 400,
           height: 400,
-          position: "absolute",
-          top: 0,
-          left: 0,
-          background: "rgba(100,0,0,0.5)",
           zIndex: 100,
+          top: "150px",
+          position: "absolute",
+          cursor: this.props.cursor || "none",
+          border: "1px solid red",
         }}
       >
         <canvas
-          style={{ background: "red", position: "absolute" }}
+          onClick={this.onClickHandler}
           key={this.name}
           id={`${this.name}-canvas`}
           ref={(canvas) => {
             if (canvas) {
+              // Keep this as it is initially null
               this.canvas = canvas;
               this.canvasContext = canvas.getContext("2d");
             }

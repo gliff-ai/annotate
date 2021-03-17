@@ -418,19 +418,19 @@ export type ClientPoint = {
   /**
    *    an alias for clientX
    */
-  x: number;
+  x?: number;
   /**
    *    an alias for clientY
    */
-  y: number;
+  y?: number;
   /**
    *    the x-coordinate in client space, relative to the top-left corner of the
    *    canvas
    */
-  relativeX: number;
+  relativeX?: number;
   /**
    *    the y-coordinate in client space, relative to the top-left corner of the
    *    canvas
    */
-  relativeY: number;
+  relativeY?: number;
 };
