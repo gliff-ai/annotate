@@ -4,7 +4,7 @@ import { Component } from "react";
 import { Annotations } from "./annotation";
 
 import { BaseButton } from "./components/BaseButton";
-import { ButtonToolbar, ButtonGroup } from "reactstrap";
+import { Container, Row, Col, ButtonGroup } from "reactstrap";
 
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
@@ -43,7 +43,7 @@ export class UserInterface extends Component {
       imageHeight: 0,
       activeTool: null,
       activeAnnotationID: null,
-      canvasPositionAndSize: { top: 150, left: 0, width: 400, height: 400 },
+      canvasPositionAndSize: { top: 0, left: 0, width: 1024, height: 768 },
     };
     this.updateImageDimensions = this.updateImageDimensions.bind(this);
   }
@@ -122,56 +122,8 @@ export class UserInterface extends Component {
 
   render() {
     return (
-      <div>
-        <ButtonToolbar>
-          <ButtonGroup>
-            <BaseButton
-              tooltip={"zoom in"}
-              icon={"fa-search-plus"}
-              name={"zoomin"}
-              onClick={this.incrementScale}
-            />
-            <BaseButton
-              tooltip={"reset zoom and pan"}
-              icon={"fa-square"}
-              name={"reset"}
-              onClick={this.resetScaleAndPan}
-            />
-            <BaseButton
-              tooltip={"zoom out"}
-              icon={"fa-search-minus"}
-              name={"zoomout"}
-              onClick={this.decrementScale}
-            />
-          </ButtonGroup>
-
-          <ButtonGroup>
-            <BaseButton
-              tooltip={"pan left"}
-              icon={"fa-chevron-left"}
-              name={"panxleft"}
-              onClick={this.incrementPanX}
-            />
-            <BaseButton
-              tooltip={"pan right"}
-              icon={"fa-chevron-right"}
-              name={"panxright"}
-              onClick={this.decrementPanX}
-            />
-            <BaseButton
-              tooltip={"pan up"}
-              icon={"fa-chevron-up"}
-              name={"panyup"}
-              onClick={this.incrementPanY}
-            />
-            <BaseButton
-              tooltip={"pan down"}
-              icon={"fa-chevron-down"}
-              name={"panydown"}
-              onClick={this.decrementPanY}
-            />
-          </ButtonGroup>
-
+      <Container fluid={true}>
+        <Row>
           <BaseButton
             tooltip={"add new object"}
             icon={"fa-plus"}
@@ -185,39 +137,101 @@ export class UserInterface extends Component {
             name={"splint"}
             onClick={this.toggleSpline}
           />
-        </ButtonToolbar>
+        </Row>
 
-        <BackgroundCanvas
-          scaleAndPan={this.state.scaleAndPan}
-          imgSrc="../public/test.png"
-          updateImageDimensions={this.updateImageDimensions}
-          canvasPositionAndSize={this.state.canvasPositionAndSize}
-        />
+        <Row>
+          <Col md="10">
+            <BackgroundCanvas
+              scaleAndPan={this.state.scaleAndPan}
+              imgSrc="../public/test.png"
+              updateImageDimensions={this.updateImageDimensions}
+              canvasPositionAndSize={this.state.canvasPositionAndSize}
+            />
 
-        <SplineCanvas
-          scaleAndPan={this.state.scaleAndPan}
-          isActive={this.state.activeTool === "spline"}
-          annotationsObject={this.annotationsObject}
-          imageWidth={this.state.imageWidth}
-          imageHeight={this.state.imageHeight}
-          canvasPositionAndSize={this.state.canvasPositionAndSize}
-        />
+            <SplineCanvas
+              scaleAndPan={this.state.scaleAndPan}
+              isActive={this.state.activeTool === "spline"}
+              annotationsObject={this.annotationsObject}
+              imageWidth={this.state.imageWidth}
+              imageHeight={this.state.imageHeight}
+              canvasPositionAndSize={this.state.canvasPositionAndSize}
+            />
+          </Col>
 
-        <BackgroundMinimap
-          scaleAndPan={this.state.scaleAndPan}
-          setScaleAndPan={this.setScaleAndPan}
-          imgSrc="../public/test.png"
-          imageWidth={this.state.imageWidth}
-          imageHeight={this.state.imageHeight}
-          canvasPositionAndSize={this.state.canvasPositionAndSize}
-          minimapPositionAndSize={{
-            top: 0,
-            left: 450,
-            width: 200,
-            height: 200,
-          }}
-        />
-      </div>
+          <Col md="2">
+            <Row style={{ height: "200px" }}>
+              <BackgroundMinimap
+                scaleAndPan={this.state.scaleAndPan}
+                setScaleAndPan={this.setScaleAndPan}
+                imgSrc="../public/test.png"
+                imageWidth={this.state.imageWidth}
+                imageHeight={this.state.imageHeight}
+                canvasPositionAndSize={this.state.canvasPositionAndSize}
+                minimapPositionAndSize={{
+                  top: 0,
+                  left: 0,
+                  width: 200,
+                  height: 200,
+                }}
+              />
+            </Row>
+
+            <Row style={{ justifyContent: "center" }}>
+              <ButtonGroup>
+                <BaseButton
+                  tooltip={"zoom in"}
+                  icon={"fa-search-plus"}
+                  name={"zoomin"}
+                  onClick={this.incrementScale}
+                />
+                <BaseButton
+                  tooltip={"reset zoom and pan"}
+                  icon={"fa-square"}
+                  name={"reset"}
+                  onClick={this.resetScaleAndPan}
+                />
+                <BaseButton
+                  tooltip={"zoom out"}
+                  icon={"fa-search-minus"}
+                  name={"zoomout"}
+                  onClick={this.decrementScale}
+                />
+              </ButtonGroup>
+
+              <ButtonGroup vertical>
+                <ButtonGroup>
+                  <BaseButton
+                    tooltip={"pan left"}
+                    icon={"fa-chevron-left"}
+                    name={"panxleft"}
+                    onClick={this.incrementPanX}
+                  />
+                  <BaseButton
+                    tooltip={"pan right"}
+                    icon={"fa-chevron-right"}
+                    name={"panxright"}
+                    onClick={this.decrementPanX}
+                  />
+                </ButtonGroup>
+                <ButtonGroup>
+                  <BaseButton
+                    tooltip={"pan up"}
+                    icon={"fa-chevron-up"}
+                    name={"panyup"}
+                    onClick={this.incrementPanY}
+                  />
+                  <BaseButton
+                    tooltip={"pan down"}
+                    icon={"fa-chevron-down"}
+                    name={"panydown"}
+                    onClick={this.decrementPanY}
+                  />
+                </ButtonGroup>
+              </ButtonGroup>
+            </Row>
+          </Col>
+        </Row>
+      </Container>
     );
   }
 }
