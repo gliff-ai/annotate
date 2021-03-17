@@ -13,9 +13,14 @@ export interface Props {
     y: number;
     scale: number;
   };
-  cursor?: "crosshair" | "none";
+  cursor?: "crosshair" | "move" | "none";
   onClick?: (arg0: number, arg1: number) => void;
-  canvasPositionAndSize: { top: 150; left: 0; width: 400; height: 400 };
+  canvasPositionAndSize: {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  };
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;

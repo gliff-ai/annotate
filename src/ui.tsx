@@ -17,6 +17,12 @@ export class UserInterface extends Component {
     imageWidth: number;
     imageHeight: number;
     activeAnnotationID: number;
+    canvasPositionAndSize: {
+      top: number;
+      left: number;
+      width: number;
+      height: number;
+  };
   };
 
   annotationsObject: Annotations;
@@ -32,6 +38,7 @@ export class UserInterface extends Component {
       imageHeight: 0,
       activeTool: null,
       activeAnnotationID: null,
+      canvasPositionAndSize: { top: 150, left: 0, width: 400, height: 400 },
     };
 
     this.incrementScale = this.incrementScale.bind(this);
@@ -117,7 +124,7 @@ export class UserInterface extends Component {
           scaleAndPan={this.state}
           imgSrc="../public/test.png"
           updateImageDimensions={this.updateImageDimensions}
-          canvasPositionAndSize={{ top: 150, left: 0, width: 400, height: 400 }}
+          canvasPositionAndSize={this.state.canvasPositionAndSize}
         />
 
         <SplineCanvas
@@ -126,7 +133,7 @@ export class UserInterface extends Component {
           annotationsObject={this.annotationsObject}
           imageWidth={this.state.imageWidth}
           imageHeight={this.state.imageHeight}
-          canvasPositionAndSize={{ top: 150, left: 0, width: 400, height: 400 }}
+          canvasPositionAndSize={this.state.canvasPositionAndSize}
         />
       </div>
     );

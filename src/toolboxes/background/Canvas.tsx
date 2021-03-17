@@ -1,7 +1,7 @@
 import React from "react";
 import { Component } from "react";
 
-import { BaseCanvas, Props as BaseProps } from "../../baseCanvas";
+import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
 // @ts-ignore
 import drawImageProp from "./drawImage";
 
