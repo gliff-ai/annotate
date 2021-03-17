@@ -6,6 +6,7 @@ import { Annotations } from "./annotation";
 import { BaseButton } from "./components/BaseButton";
 
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
+import { SplineCanvas } from "./toolboxes/spline";
 
 export class UserInterface extends Component {
   state: {
@@ -21,13 +22,13 @@ export class UserInterface extends Component {
       left: number;
       width: number;
       height: number;
-  };
+    };
     minimapPositionAndSize: {
       top: number;
       left: number;
       width: number;
       height: number;
-  };
+    };
   };
 
   annotationsObject: Annotations;
@@ -44,7 +45,7 @@ export class UserInterface extends Component {
       activeTool: null,
       activeAnnotationID: null,
       canvasPositionAndSize: { top: 150, left: 0, width: 400, height: 400 },
-      minimapPositionAndSize: { top: 0, left: 450, width: 100, height: 100 },
+      minimapPositionAndSize: { top: 0, left: 450, width: 200, height: 200 },
     };
 
     this.incrementScale = this.incrementScale.bind(this);
@@ -145,8 +146,10 @@ export class UserInterface extends Component {
         <BackgroundMinimap
           scaleAndPan={this.state}
           imgSrc="../public/test.png"
-          updateImageDimensions={this.updateImageDimensions}
-          canvasPositionAndSize={this.state.minimapPositionAndSize}
+          imageWidth={this.state.imageWidth}
+          imageHeight={this.state.imageHeight}
+          canvasPositionAndSize={this.state.canvasPositionAndSize}
+          minimapPositionAndSize={this.state.minimapPositionAndSize}
         />
       </div>
     );

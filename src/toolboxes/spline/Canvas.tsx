@@ -48,7 +48,8 @@ export class SplineCanvas extends Component<Props> {
       firstPoint.y,
       this.props.imageWidth,
       this.props.imageHeight,
-      this.props.scaleAndPan
+      this.props.scaleAndPan,
+      this.props.canvasPositionAndSize
     );
 
     context.moveTo(firstPoint.x, firstPoint.y);
@@ -61,7 +62,8 @@ export class SplineCanvas extends Component<Props> {
         y,
         this.props.imageWidth,
         this.props.imageHeight,
-        this.props.scaleAndPan
+        this.props.scaleAndPan,
+        this.props.canvasPositionAndSize
       );
       context.lineTo(nextPoint.x, nextPoint.y);
     }
@@ -83,7 +85,7 @@ export class SplineCanvas extends Component<Props> {
       this.props.imageHeight,
       this.props.scaleAndPan
     );
-    console.log(imageX, imageY);
+    // console.log(imageX, imageY);
 
     currentSplineVector.push({ x: imageX, y: imageY });
 

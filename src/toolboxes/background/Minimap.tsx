@@ -7,7 +7,6 @@ import drawImageProp from "./drawImage";
 
 interface Props extends BaseProps {
   imgSrc?: string;
-  updateImageDimensions: (imageWidth: number, imageHeight: number) => void;
 }
 
 interface State {
@@ -62,7 +61,10 @@ export class BackgroundMinimap extends Component<Props> {
         scaleAndPan={this.props.scaleAndPan}
         ref={(baseMinimap) => (this.baseMinimap = baseMinimap)}
         name="background-minimap"
+        imageWidth={this.props.imageWidth}
+        imageHeight={this.props.imageHeight}
         canvasPositionAndSize={this.props.canvasPositionAndSize}
+        minimapPositionAndSize={this.props.minimapPositionAndSize}
       />
     );
   }
