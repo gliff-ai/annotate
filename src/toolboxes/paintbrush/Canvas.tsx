@@ -37,7 +37,12 @@ export class PaintbrushCanvas extends Component<Props> {
     this.points = [];
   }
 
-  handlePointerMove = (x: number, y: number) => {
+
+  
+  handlePointerMove = (canvasX:number, canvasY:number) => {
+    const{x,y} = canvasToImage(canvasX, canvasY, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
+
+
     if (this.isPressing && !this.isDrawing) {
       // Start drawing and add point
       this.isDrawing = true;
@@ -62,12 +67,16 @@ export class PaintbrushCanvas extends Component<Props> {
   };
 
   drawPoints = (
-    points: [number, number][],
+    imagePoints: [number, number][],
     brushColor: string,
     brushRadius: number,
     clearCanvas: boolean = true,
     context: any
   ) => {
+    const points = imagePoints.map((point)=>{
+      const{x,y} = imageToOriginalCanvas(point[0], point[1], this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
+      return [x,y]
+    })
     function midPointBetween(p1: [number, number], p2: [number, number]) {
       return {
         x: p1[0] + (p2[0] - p1[0]) / 2,
@@ -132,7 +141,6 @@ export class PaintbrushCanvas extends Component<Props> {
       coordinates: [...this.points],
     });
 
-    console.log(brushStrokes);
 
     // Reset points array
     this.points.length = 0;
@@ -156,7 +164,6 @@ export class PaintbrushCanvas extends Component<Props> {
 
   onMouseDown = (canvasX: number, canvasY: number): void => {
     // Start painting
-    console.log("PB mouse down!");
 
     // Start drawing
     this.isPressing = true;
@@ -171,10 +178,8 @@ export class PaintbrushCanvas extends Component<Props> {
 
   onMouseUp = (canvasX: number, canvasY: number): void => {
     // End painting & save painting
-    console.log("PB mouse up");
     this.isPressing = false;
 
-    console.log(this.points);
     // Draw to this end pos
     // this.handleDrawMove(canvasX, canvasY);
 
@@ -188,9 +193,11 @@ export class PaintbrushCanvas extends Component<Props> {
     // Redraw if we change pan or zoom
     const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
 
-    if (activeAnnotation?.coordinates) {
+    if (activeAnnotation?.brushStrokes.length > 0) {
       //this.drawSplineVector(activeAnnotation.coordinates);
       //repaint
+      this.drawAllStrokes()
+
     }
   }
 

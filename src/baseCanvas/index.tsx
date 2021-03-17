@@ -110,7 +110,6 @@ export class BaseCanvas extends Component<Props> {
 
     // x and y are now in canvas space
 
-    console.log("Coordinate x: " + x, "Coordinate y: " + y);
 
     // DO STUFF HERE
 
@@ -124,7 +123,6 @@ export class BaseCanvas extends Component<Props> {
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
 
-    console.log("Mouse Down Coordinate x: " + x, "Coordinate y: " + y);
 
     // DO STUFF HERE
 
@@ -138,7 +136,6 @@ export class BaseCanvas extends Component<Props> {
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
 
-    // console.log("Mouse move Coordinate x: " + x, "Coordinate y: " + y);
 
     // DO STUFF HERE
 
@@ -152,7 +149,6 @@ export class BaseCanvas extends Component<Props> {
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
 
-    console.log("Mouse Up Coordinate x: " + x, "Coordinate y: " + y);
 
     // DO STUFF HERE
 
