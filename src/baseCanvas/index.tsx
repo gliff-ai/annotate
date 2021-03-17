@@ -17,6 +17,7 @@ export interface Props {
   cursor?: "crosshair" | "none";
   onClick?: (arg0: number, arg1: number) => void;
   onDoubleClick?: (arg0: number, arg1: number) => void;
+  onMouseDown?: (arg0: number, arg1: number) => void;
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
@@ -101,14 +102,18 @@ export class BaseCanvas extends Component<Props> {
     this.canvasObserver.unobserve(this.canvasContainer);
   };
 
-  onClickHandler = (e: React.MouseEvent): void => {
-    // x and y start out in window space
+  private windowToCanvas = (e: React.MouseEvent): {x: number, y: number} => {
+    // takes a raw mouse event, returns the x and y coordinates in canvas space
 
     let rect = this.canvas.getBoundingClientRect();
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
 
-    // x and y are now in canvas space
+    return {x: x, y: y};
+  }
+
+  onClickHandler = (e: React.MouseEvent): void => {
+    let {x: x, y: y} = this.windowToCanvas(e);
 
     if (this.props.onClick) {
       this.props.onClick(x, y);
@@ -116,18 +121,20 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onDoubleClickHandler = (e: React.MouseEvent): void => {
-    // x and y start out in window space
-
-    let rect = this.canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
-
-    // x and y are now in canvas space
+    let {x: x, y: y} = this.windowToCanvas(e);
 
     if (this.props.onDoubleClick) {
       this.props.onDoubleClick(x, y);
     }
   };
+
+  onMouseDownHandler = (e: React.MouseEvent): void => {
+    let {x: x, y: y} = this.windowToCanvas(e);
+
+    if (this.props.onMouseDown) {
+      this.props.onMouseDown(x, y);
+    }
+  }
 
   render = (): ReactNode => {
     return (
@@ -159,6 +166,7 @@ export class BaseCanvas extends Component<Props> {
           }}
           onDoubleClick={this.onDoubleClickHandler}
           onClick={this.onClickHandler}
+          onMouseDown={this.onMouseDownHandler}
         ></canvas>
       </div>
     );

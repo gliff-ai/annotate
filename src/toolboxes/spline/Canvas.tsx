@@ -16,6 +16,7 @@ interface Props extends BaseProps {
 
 export class SplineCanvas extends Component<Props> {
   private baseCanvas: any;
+  private selectedPointIndex: number; 
   state: {
     cursor: "crosshair" | "none";
   };
@@ -24,11 +25,11 @@ export class SplineCanvas extends Component<Props> {
     super(props);
   }
 
-  drawSplineVector = (splineVector: XYPoint[]) => {
+  drawSplineVector = (splineVector: XYPoint[], isActive=false) => {
     if (splineVector.length < 2) return;
 
     const { canvasContext: context, canvas } = this.baseCanvas;
-    const lineWidth = 1.5;
+    const lineWidth = isActive ? 2: 1;
 
     // Clear the canvas
     context.lineWidth = lineWidth;
@@ -63,12 +64,13 @@ export class SplineCanvas extends Component<Props> {
 
     // Clear all the splines:
     const { canvasContext: context, canvas } = this.baseCanvas;
+    const activeAnnotationID = this.props.annotationsObject.getActiveAnnotationID();
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw all the splines:
-    this.props.annotationsObject.getData().forEach((annotation: Annotation) => {
+    this.props.annotationsObject.getData().forEach((annotation: Annotation, i: number) => {
       if (annotation.toolbox === "spline") {
-        this.drawSplineVector(annotation.coordinates);
+        this.drawSplineVector(annotation.coordinates, i === activeAnnotationID);
       }
     });
   }
@@ -153,6 +155,10 @@ export class SplineCanvas extends Component<Props> {
     this.drawAllSplines();
   }
 
+  onMouseDown = (x: number, y: number): void => {
+    
+  }
+
   isClosed = (splineVector: XYPoint[]): boolean => {
     // Check whether the spline is a closed loop.
     return ((splineVector.length > 1 ) && 
@@ -173,6 +179,7 @@ export class SplineCanvas extends Component<Props> {
       <BaseCanvas
         onClick={this.onClick}
         onDoubleClick={this.onDoubleClick}
+        onMouseDown={this.onMouseDown}
         cursor={this.props.isActive ? "crosshair" : "none"}
         ref={(baseCanvas) => (this.baseCanvas = baseCanvas)}
         name="spline"
