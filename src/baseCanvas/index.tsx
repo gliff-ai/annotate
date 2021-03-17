@@ -18,6 +18,8 @@ export interface Props {
   onClick?: (arg0: number, arg1: number) => void;
   onDoubleClick?: (arg0: number, arg1: number) => void;
   onMouseDown?: (arg0: number, arg1: number) => void;
+  onMouseMove?: (arg0: number, arg1: number) => void;
+  onMouseUp?: (arg0: number, arg1: number) => void;
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
@@ -136,6 +138,22 @@ export class BaseCanvas extends Component<Props> {
     }
   }
 
+  onMouseMoveHandler = (e: React.MouseEvent): void => {
+    let {x: x, y: y} = this.windowToCanvas(e);
+
+    if (this.props.onMouseMove) {
+      this.props.onMouseMove(x, y);
+    }
+  }
+
+  onMouseUpHandler = (e: React.MouseEvent): void => {
+    let {x: x, y: y} = this.windowToCanvas(e);
+
+    if (this.props.onMouseUp) {
+      this.props.onMouseUp(x, y);
+    }
+  }
+
   render = (): ReactNode => {
     return (
       <div
@@ -167,6 +185,8 @@ export class BaseCanvas extends Component<Props> {
           onDoubleClick={this.onDoubleClickHandler}
           onClick={this.onClickHandler}
           onMouseDown={this.onMouseDownHandler}
+          onMouseMove={this.onMouseMoveHandler}
+          onMouseUp={this.onMouseUpHandler}
         ></canvas>
       </div>
     );

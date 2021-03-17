@@ -23,6 +23,7 @@ export class SplineCanvas extends Component<Props> {
 
   constructor(props: Props) {
     super(props);
+    this.selectedPointIndex = -1;
   }
 
   drawSplineVector = (splineVector: XYPoint[], isActive=false) => {
@@ -129,7 +130,7 @@ export class SplineCanvas extends Component<Props> {
     
     this.drawAllSplines();
   };
-
+  
   updateXYPoint = (newX: number, newY: number, index: number) => {
     const coordinates = this.props.annotationsObject.getActiveAnnotation().coordinates;
     coordinates[index] = {x: newX, y: newY};
@@ -156,9 +157,39 @@ export class SplineCanvas extends Component<Props> {
   }
 
   onMouseDown = (x: number, y: number): void => {
+    let clickPoint = canvasToImage(x, y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
+    let annotationData = this.props.annotationsObject.getActiveAnnotation();
     
+    let nearPoint = this.clickNearPoint(clickPoint, annotationData.coordinates);
+    if (nearPoint !== -1) {
+      this.selectedPointIndex = nearPoint;
+    }
   }
 
+  onMouseMove = (x: number, y: number): void => {
+    if (this.selectedPointIndex === -1) return;
+
+    // Replace update the coordinates for the point dragged
+    let clickPoint = canvasToImage(x, y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
+    
+    // If dragging first point, update also last
+    let activeSpline = this.props.annotationsObject.getActiveAnnotation().coordinates;
+    console.log(this.selectedPointIndex, this.isClosed(activeSpline))
+    if (this.selectedPointIndex === 0 && this.isClosed(activeSpline)) {
+      this.updateXYPoint(clickPoint.x, clickPoint.y, activeSpline.length - 1);
+    }
+
+    this.updateXYPoint(clickPoint.x, clickPoint.y, this.selectedPointIndex);
+    
+    // Redraw all the splines
+    this.drawAllSplines();
+  }
+
+  onMouseUp = (): void => {
+    // Works as part of drag and drop for points.
+    this.selectedPointIndex = -1;
+  }
+  
   isClosed = (splineVector: XYPoint[]): boolean => {
     // Check whether the spline is a closed loop.
     return ((splineVector.length > 1 ) && 
@@ -180,6 +211,8 @@ export class SplineCanvas extends Component<Props> {
         onClick={this.onClick}
         onDoubleClick={this.onDoubleClick}
         onMouseDown={this.onMouseDown}
+        onMouseMove={this.onMouseMove}
+        onMouseUp={this.onMouseUp}
         cursor={this.props.isActive ? "crosshair" : "none"}
         ref={(baseCanvas) => (this.baseCanvas = baseCanvas)}
         name="spline"
