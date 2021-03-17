@@ -28,6 +28,7 @@ export class PaintbrushCanvas extends Component<Props> {
   state: {
     cursor: "crosshair" | "none";
   };
+  backCanvas: any;
 
   constructor(props: Props) {
     super(props);
@@ -55,14 +56,17 @@ export class PaintbrushCanvas extends Component<Props> {
       this.drawPoints(
         this.points,
         "#0000FF",
-        20
+        20,
+        true,
+        this.baseCanvas.canvasContext
       );
     }
 
     // this.mouseHasMoved = true;
   };
 
-  drawPoints = (points: [number, number][], brushColor: string, brushRadius: number, clearCanvas: boolean = true) => {
+  drawPoints = (points: [number, number][], brushColor: string, brushRadius: number, clearCanvas: boolean = true, context
+    ) => {
     function midPointBetween(p1: [x: number, y: number], p2: [x: number, y: number]) {
       return {
         x: p1[0] + (p2[0] - p1[0]) / 2,
@@ -70,7 +74,9 @@ export class PaintbrushCanvas extends Component<Props> {
       };
     }
 
-    const context  = this.baseCanvas.canvasContext;
+    console.log(context)
+
+
 
     context.lineJoin = "round";
     context.lineCap = "round";
@@ -113,9 +119,8 @@ export class PaintbrushCanvas extends Component<Props> {
      } = this.props.annotationsObject.getActiveAnnotation();
     
     for(let i= 0; i < brushStrokes.length; i++){
-      this.drawPoints(brushStrokes[i].coordinates,brushStrokes[i].brushColor,brushStrokes[i].brushRadius, false)
+      this.drawPoints(brushStrokes[i].coordinates,brushStrokes[i].brushColor,brushStrokes[i].brushRadius, false, this.backCanvas.canvasContext)
     }
-
   }
 
   saveLine = ( brushColor = "#00ff00", brushRadius = 20) => {
@@ -194,7 +199,14 @@ export class PaintbrushCanvas extends Component<Props> {
 
   render() {
     return (
-      <BaseCanvas
+      <div>
+          <BaseCanvas
+      cursor={"none"}
+      ref={(backCanvas) => (this.backCanvas = backCanvas)}
+      name="backCanvas"
+      scaleAndPan={this.props.scaleAndPan}
+    />
+        <BaseCanvas
         onClick={this.onClick}
         onMouseDown={this.onMouseDown}
         onMouseMove={this.onMouseMove}
@@ -204,6 +216,9 @@ export class PaintbrushCanvas extends Component<Props> {
         name="paintbrush"
         scaleAndPan={this.props.scaleAndPan}
       />
+    
+ </div>
+      
     );
   }
 }
