@@ -56,10 +56,10 @@ export class UserInterface extends Component {
   }
 
   updateImageDimensions(imageWidth: number, imageHeight: number) {
-    this.setState({ 
+    this.setState({
       imageWidth: imageWidth,
-      imageHeight: imageHeight
-     });
+      imageHeight: imageHeight,
+    });
   }
 
   toggleSpline() {
@@ -117,6 +117,7 @@ export class UserInterface extends Component {
           scaleAndPan={this.state}
           imgSrc="../public/test.png"
           updateImageDimensions={this.updateImageDimensions}
+          canvasPositionAndSize={{ top: 150, left: 0, width: 400, height: 400 }}
         />
 
         <SplineCanvas
@@ -125,6 +126,7 @@ export class UserInterface extends Component {
           annotationsObject={this.annotationsObject}
           imageWidth={this.state.imageWidth}
           imageHeight={this.state.imageHeight}
+          canvasPositionAndSize={{ top: 150, left: 0, width: 400, height: 400 }}
         />
       </div>
     );

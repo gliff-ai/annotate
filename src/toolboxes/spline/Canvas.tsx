@@ -3,7 +3,12 @@ import { Component } from "react";
 
 // import { SplineVector } from "./interfaces";
 import { BaseCanvas, Props as BaseProps } from "../../baseCanvas";
-import { Annotations, canvasToImage, imageToCanvas, imageToOriginalCanvas } from "../../annotation";
+import {
+  Annotations,
+  canvasToImage,
+  imageToCanvas,
+  imageToOriginalCanvas,
+} from "../../annotation";
 import { XYPoint } from "../../annotation/interfaces";
 
 interface Props extends BaseProps {
@@ -37,15 +42,27 @@ export class SplineCanvas extends Component<Props> {
     context.beginPath();
 
     // Go to the first point
-    let firstPoint:XYPoint = currentSplineVector[0];
-    firstPoint = imageToOriginalCanvas(firstPoint.x, firstPoint.y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
+    let firstPoint: XYPoint = currentSplineVector[0];
+    firstPoint = imageToOriginalCanvas(
+      firstPoint.x,
+      firstPoint.y,
+      this.props.imageWidth,
+      this.props.imageHeight,
+      this.props.scaleAndPan
+    );
 
     context.moveTo(firstPoint.x, firstPoint.y);
 
     // Draw each point by taking our raw coordinates and applying the transform so they fit on our canvas
     let nextPoint;
     for (const { x, y } of currentSplineVector) {
-      nextPoint = imageToOriginalCanvas(x, y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
+      nextPoint = imageToOriginalCanvas(
+        x,
+        y,
+        this.props.imageWidth,
+        this.props.imageHeight,
+        this.props.scaleAndPan
+      );
       context.lineTo(nextPoint.x, nextPoint.y);
     }
 
@@ -59,7 +76,13 @@ export class SplineCanvas extends Component<Props> {
       coordinates: currentSplineVector,
     } = this.props.annotationsObject.getActiveAnnotation();
 
-    let {x:imageX, y:imageY} = canvasToImage(x, y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
+    let { x: imageX, y: imageY } = canvasToImage(
+      x,
+      y,
+      this.props.imageWidth,
+      this.props.imageHeight,
+      this.props.scaleAndPan
+    );
     console.log(imageX, imageY);
 
     currentSplineVector.push({ x: imageX, y: imageY });
@@ -83,6 +106,7 @@ export class SplineCanvas extends Component<Props> {
         ref={(baseCanvas) => (this.baseCanvas = baseCanvas)}
         name="spline"
         scaleAndPan={this.props.scaleAndPan}
+        canvasPositionAndSize={this.props.canvasPositionAndSize}
       />
     );
   }

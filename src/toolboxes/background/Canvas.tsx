@@ -63,6 +63,7 @@ export class BackgroundCanvas extends Component<Props> {
         name="background"
         scaleAndPan={this.props.scaleAndPan}
         zoomExtents={{ min: 0.3, max: 3 }}
+        canvasPositionAndSize={this.props.canvasPositionAndSize}
       />
     );
   }
