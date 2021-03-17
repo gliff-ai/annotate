@@ -1,18 +1,32 @@
 import React from "react";
 import { ReactNode } from "react";
 import { Props as BaseProps, BaseCanvas } from "./Canvas";
-import { originalCanvastoMinimap } from "../annotation";
+import {
+  originalCanvastoMinimap,
+  minimapToOriginalCanvas,
+} from "../annotation";
 
 export interface Props extends BaseProps {
   cursor?: "move";
   imageWidth: number;
   imageHeight: number;
+  canvasPositionAndSize: {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  };
   minimapPositionAndSize: {
     top: number;
     left: number;
     width: number;
     height: number;
   };
+  setScaleAndPan: (scaleAndPan: {
+    scale?: number;
+    x?: number;
+    y?: number;
+  }) => void;
 }
 
 export class BaseMinimap extends React.Component<Props> {
@@ -65,7 +79,42 @@ export class BaseMinimap extends React.Component<Props> {
   /*** Mouse events ****/
   onDoubleClick = (canvasX: number, canvasY: number): void => {};
 
-  onClick = (canvasX: number, canvasY: number): void => {};
+  onClick = (canvasX: number, canvasY: number): void => {
+    // convert minimap click into viewport coordinate frame
+    let { x: viewportX, y: viewportY } = minimapToOriginalCanvas(
+      canvasX,
+      canvasY,
+      this.props.scaleAndPan,
+      this.props.canvasPositionAndSize,
+      this.props.minimapPositionAndSize
+    );
+    console.log(
+      "Translates to viewpoint coordinate x: " + viewportX,
+      " y: " + viewportY + " when scale is " + this.props.scaleAndPan.scale
+    );
+
+    // calculate top left for zoom centred on these coordinates
+    let left = viewportX - this.props.canvasPositionAndSize.width / 2;
+    let top = viewportY - this.props.canvasPositionAndSize.height / 2;
+
+    console.log(
+      "So our box, which is currently " +
+        this.props.canvasPositionAndSize.width / this.props.scaleAndPan.scale +
+        " wide and " +
+        this.props.canvasPositionAndSize.height / this.props.scaleAndPan.scale +
+        " high should be at left: " +
+        left +
+        " and top: " +
+        top
+    );
+
+    // update scaleAndPan using the method passed down from UI
+    this.props.setScaleAndPan({
+      scale: this.props.scaleAndPan.scale,
+      x: -left,
+      y: -top,
+    });
+  };
 
   onMouseDown = (canvasX: number, canvasY: number): void => {};
 
