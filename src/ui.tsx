@@ -38,7 +38,6 @@ export class UserInterface extends Component {
     this.incrementScale = this.incrementScale.bind(this);
     this.incrementPanX = this.incrementPanX.bind(this);
     this.incrementPanY = this.incrementPanY.bind(this);
-    this.toggleSpline = this.toggleSpline.bind(this);
     this.updateImageDimensions = this.updateImageDimensions.bind(this);
   }
 
@@ -63,21 +62,21 @@ export class UserInterface extends Component {
     });
   }
 
-  toggleSpline() {
+  toggleSpline = () => {
     if (this.state.activeTool === "spline") {
       this.setState({ activeTool: null });
     } else {
       this.setState({ activeTool: "spline" });
     }
-  }
+  };
 
-  togglePaintbrush() {
+  togglePaintbrush = () => {
     if (this.state.activeTool === "paintbrush") {
       this.setState({ activeTool: null });
     } else {
       this.setState({ activeTool: "paintbrush" });
     }
-  }
+  };
 
   addAnnotation = () => {
     this.annotationsObject.addAnnotation(this.state.activeTool);
@@ -124,7 +123,7 @@ export class UserInterface extends Component {
 
         <BaseButton
           tooltip={"Activate Paintbrush"}
-          icon={"fa-painbrush"}
+          icon={"fa-paint-brush"}
           name={"paintbrush"}
           onClick={this.togglePaintbrush}
         />
