@@ -143,6 +143,7 @@ export class UserInterface extends Component {
         />
 
         <BackgroundMinimap
+          scaleAndPan={this.state}
           imgSrc="../public/test.png"
           updateImageDimensions={this.updateImageDimensions}
           canvasPositionAndSize={this.state.minimapPositionAndSize}

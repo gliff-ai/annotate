@@ -25,6 +25,8 @@ export class BackgroundMinimap extends Component<Props> {
 
   private redrawImage = () => {
     if (this.image && this.image.complete) {
+      this.baseMinimap.baseCanvas.canvasContext.globalCompositeOperation =
+        "destination-over";
       drawImageProp({
         ctx: this.baseMinimap.baseCanvas.canvasContext,
         img: this.image,
@@ -57,6 +59,7 @@ export class BackgroundMinimap extends Component<Props> {
   render() {
     return (
       <BaseMinimap
+        scaleAndPan={this.props.scaleAndPan}
         ref={(baseMinimap) => (this.baseMinimap = baseMinimap)}
         name="background-minimap"
         canvasPositionAndSize={this.props.canvasPositionAndSize}

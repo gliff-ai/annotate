@@ -30,8 +30,6 @@ export class BaseCanvas extends Component<Props> {
   private canvasContext: CanvasRenderingContext2D;
   private canvasObserver: ResizeObserver;
 
-  private scaleAndPan: any;
-
   constructor(props: Props) {
     super(props);
     this.name = props.name;

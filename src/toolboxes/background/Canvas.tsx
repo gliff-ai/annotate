@@ -25,6 +25,8 @@ export class BackgroundCanvas extends Component<Props> {
 
   private redrawImage = () => {
     if (this.image && this.image.complete) {
+      this.baseCanvas.canvasContext.globalCompositeOperation =
+        "destination-over";
       drawImageProp({ ctx: this.baseCanvas.canvasContext, img: this.image });
     }
   };
