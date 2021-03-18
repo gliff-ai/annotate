@@ -185,7 +185,7 @@ export function imageToOriginalCanvas(
   return { x: x, y: y };
 }
 
-export function originalCanvastoMinimap(
+export function originalCanvasToMinimap(
   imageWidth: number,
   imageHeight: number,
   scaleAndPan: {

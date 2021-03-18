@@ -26,6 +26,12 @@ export class UserInterface extends Component {
       width: number;
       height: number;
     };
+    minimapPositionAndSize: {
+      top: number;
+      left: number;
+      width: number;
+      height: number;
+    };
   };
 
   annotationsObject: Annotations;
@@ -44,6 +50,7 @@ export class UserInterface extends Component {
       activeTool: null,
       activeAnnotationID: null,
       canvasPositionAndSize: { top: 150, left: 0, width: 400, height: 400 },
+      minimapPositionAndSize: { top: 0, left: 450, width: 200, height: 200 },
     };
     this.updateImageDimensions = this.updateImageDimensions.bind(this);
   }
