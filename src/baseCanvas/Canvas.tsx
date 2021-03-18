@@ -125,6 +125,8 @@ export class BaseCanvas extends Component<Props> {
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
 
+    console.log(this.props.cursor)
+
     // x and y are now in canvas space
 
     // console.log("Mouse click at coordinate x: " + x, " y: " + y);
