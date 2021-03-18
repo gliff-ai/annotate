@@ -9,12 +9,13 @@ import {
 } from "../../annotation";
 
 interface Props extends CanvasProps {
-  isActive: boolean;
+  brushType: string;
   annotationsObject: Annotations;
   imageWidth: number;
   imageHeight: number;
   brushRadius: number;
 }
+
 
 export class PaintbrushCanvas extends Component<Props> {
   private baseCanvas: any;
@@ -24,7 +25,7 @@ export class PaintbrushCanvas extends Component<Props> {
   private points: [number, number][];
 
   state: {
-    cursor: "crosshair" | "none";
+    cursor: "crosshair" | "none" | "not-allowed";
   };
 
   constructor(props: Props) {
@@ -195,6 +196,16 @@ export class PaintbrushCanvas extends Component<Props> {
     }
   }
 
+  getCursor = () =>{
+    if(this.props.brushType == "roundBrush"){
+      return "crosshair"
+    }
+    else if (this.props.brushType == "roundEraser"){
+      return "not-allowed"
+    }
+    return "none"
+  }
+
   render() {
     return (
       <div>
@@ -209,7 +220,7 @@ export class PaintbrushCanvas extends Component<Props> {
           onMouseDown={this.onMouseDown}
           onMouseMove={this.onMouseMove}
           onMouseUp={this.onMouseUp}
-          cursor={this.props.isActive ? "crosshair" : "none"}
+          cursor={this.getCursor()}
           ref={(baseCanvas) => (this.baseCanvas = baseCanvas)}
           name="paintbrush"
           scaleAndPan={this.props.scaleAndPan}

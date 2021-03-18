@@ -17,7 +17,7 @@ export class UserInterface extends Component {
       y: number;
       scale: number;
     };
-    activeTool?: "spline" | "paintbrush";
+    activeTool?: "spline" | "paintbrush" | "paintbrushEraser";
     imageWidth: number;
     imageHeight: number;
     activeAnnotationID: number;
@@ -108,6 +108,17 @@ export class UserInterface extends Component {
     this.setState({ brushSize: this.state.brushSize + 10 });
   };
 
+ 
+  toggleEraser = () => {
+    if (this.state.activeTool === "paintbrushEraser") {
+      this.setState({ activeTool: null });
+    } else {
+      this.setState({ activeTool: "paintbrushEraser" });
+    }
+    
+  };
+
+
   updateImageDimensions(imageWidth: number, imageHeight: number) {
     this.setState({
       imageWidth: imageWidth,
@@ -168,6 +179,13 @@ export class UserInterface extends Component {
             name={"paintbrush"}
             onClick={this.togglePaintbrush}
           />
+
+          <BaseButton
+            tooltip={"paint eraser"}
+            icon={"fa-square"}
+            name={"painteraser"}
+            onClick={this.toggleEraser}
+          />
         </Row>
 
         <Row>
@@ -187,6 +205,16 @@ export class UserInterface extends Component {
               imageHeight={this.state.imageHeight}
               canvasPositionAndSize={this.state.canvasPositionAndSize}
             />
+            
+            <PaintbrushCanvas
+            scaleAndPan={this.state.scaleAndPan}
+            brushType={this.state.activeTool}
+            annotationsObject={this.annotationsObject}
+            imageWidth={this.state.imageWidth}
+            imageHeight={this.state.imageHeight}
+            brushRadius={this.state.brushSize}
+            canvasPositionAndSize={this.state.canvasPositionAndSize}
+          />
           </Col>
 
           <Col md="2">
@@ -237,6 +265,7 @@ export class UserInterface extends Component {
                     name={"panxleft"}
                     onClick={this.incrementPanX}
                   />
+                
                   <BaseButton
                     tooltip={"pan right"}
                     icon={"fa-chevron-right"}

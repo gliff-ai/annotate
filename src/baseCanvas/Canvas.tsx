@@ -13,7 +13,7 @@ export interface Props {
     y: number;
     scale: number;
   };
-  cursor?: "crosshair" | "move" | "pointer" | "none";
+  cursor?: "crosshair" | "move" | "pointer" | "none" | "not-allowed";
   onDoubleClick?: (x: number, y: number) => void;
   onClick?: (x: number, y: number) => void;
   onMouseDown?: (x: number, y: number) => void;
