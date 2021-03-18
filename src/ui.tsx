@@ -1,8 +1,34 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 import { Component } from "react";
 
 import { Annotations } from "./annotation";
 
+import {
+  AppBar,
+  Container,
+  Toolbar,
+  Tooltip,
+  IconButton,
+  ButtonGroup,
+  Grid,
+  Accordion,
+  AccordionSummary,
+  Typography,
+  AccordionDetails,
+} from "@material-ui/core";
+import {
+  Add,
+  ZoomOut,
+  ZoomIn,
+  AspectRatio,
+  KeyboardArrowDown,
+  KeyboardArrowLeft,
+  KeyboardArrowRight,
+  KeyboardArrowUp,
+  ExpandMore,
+  AllOut,
+  Brush,
+} from "@material-ui/icons";
 import { BaseButton } from "./components/BaseButton";
 import { Container, Row, Col, ButtonGroup } from "reactstrap";
 
@@ -30,6 +56,8 @@ export class UserInterface extends Component {
       width: number;
       height: number;
     };
+
+    expanded: string | boolean;
   };
 
   annotationsObject: Annotations;
@@ -49,6 +77,7 @@ export class UserInterface extends Component {
       activeAnnotationID: null,
       brushSize: 20,
       canvasPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
+      expanded: false,
     };
     this.updateImageDimensions = this.updateImageDimensions.bind(this);
   }
@@ -138,6 +167,13 @@ export class UserInterface extends Component {
     });
   };
 
+  handleToolboxChange = (panel: string) => (
+    event: ChangeEvent,
+    isExpanded: boolean
+  ) => {
+    this.setState({ expanded: isExpanded ? panel : false });
+  };
+
   render() {
     return (
       <Container fluid={true}>
@@ -148,121 +184,167 @@ export class UserInterface extends Component {
             name={"newobject"}
             onClick={this.addAnnotation}
           />
+        <Container>
+          <AppBar>
+            <Toolbar color="transparent">
+              <Tooltip title="Annotate new object">
+                <IconButton id={"addAnnotation"} onClick={this.addAnnotation}>
+                  <Add />
+                </IconButton>
+              </Tooltip>
+            </Toolbar>
+          </AppBar>
+          <Toolbar />
 
-          <BaseButton
-            tooltip={"Activate Spline"}
-            icon={"fa-bezier-curve"}
-            name={"spline"}
-            onClick={this.toggleSpline}
-          />
-          <BaseButton
-            tooltip={"increase paintbrush size"}
-            icon={"fa-brush"}
-            name={"brushradius"}
-            onClick={this.incrementBrush}
-          />
-
-          <BaseButton
-            tooltip={"Activate Paintbrush"}
-            icon={"fa-paint-brush"}
-            name={"paintbrush"}
-            onClick={this.togglePaintbrush}
-          />
-        </Row>
-
-        <Row>
-          <Col md="10">
-            <BackgroundCanvas
-              scaleAndPan={this.state.scaleAndPan}
-              imgSrc="../public/test.png"
-              updateImageDimensions={this.updateImageDimensions}
-              canvasPositionAndSize={this.state.canvasPositionAndSize}
-            />
-
-            <SplineCanvas
-              scaleAndPan={this.state.scaleAndPan}
-              isActive={this.state.activeTool === "spline"}
-              annotationsObject={this.annotationsObject}
-              imageWidth={this.state.imageWidth}
-              imageHeight={this.state.imageHeight}
-              canvasPositionAndSize={this.state.canvasPositionAndSize}
-            />
-          </Col>
-
-          <Col md="2">
-            <Row style={{ height: "200px" }}>
-              <BackgroundMinimap
+          <Grid container spacing={0}>
+            <Grid item style={{ width: "85%", position: "relative" }}>
+              <BackgroundCanvas
                 scaleAndPan={this.state.scaleAndPan}
-                setScaleAndPan={this.setScaleAndPan}
                 imgSrc="../public/test.png"
+                updateImageDimensions={this.updateImageDimensions}
+                canvasPositionAndSize={this.state.canvasPositionAndSize}
+              />
+
+              <SplineCanvas
+                scaleAndPan={this.state.scaleAndPan}
+                isActive={this.state.activeTool === "spline"}
+                annotationsObject={this.annotationsObject}
                 imageWidth={this.state.imageWidth}
                 imageHeight={this.state.imageHeight}
                 canvasPositionAndSize={this.state.canvasPositionAndSize}
-                minimapPositionAndSize={{
-                  top: 0,
-                  left: 0,
-                  width: 200,
-                  height: 200,
-                }}
               />
-            </Row>
 
-            <Row style={{ justifyContent: "center" }}>
-              <ButtonGroup>
-                <BaseButton
-                  tooltip={"zoom out"}
-                  icon={"fa-search-minus"}
-                  name={"zoomout"}
-                  onClick={this.decrementScale}
-                />
-                <BaseButton
-                  tooltip={"reset zoom and pan"}
-                  icon={"fa-square"}
-                  name={"reset"}
-                  onClick={this.resetScaleAndPan}
-                />
-                <BaseButton
-                  tooltip={"zoom in"}
-                  icon={"fa-search-plus"}
-                  name={"zoomin"}
-                  onClick={this.incrementScale}
-                />
-              </ButtonGroup>
+              <PaintbrushCanvas
+                scaleAndPan={this.state.scaleAndPan}
+                isActive={this.state.activeTool === "paintbrush"}
+                annotationsObject={this.annotationsObject}
+                imageWidth={this.state.imageWidth}
+                imageHeight={this.state.imageHeight}
+                brushRadius={this.state.brushSize}
+                canvasPositionAndSize={this.state.canvasPositionAndSize}
+              />
+            </Grid>
 
-              <ButtonGroup vertical>
+            <Grid item style={{ width: "15%", position: "relative" }}>
+              <div style={{ height: 200 }}>
+                <BackgroundMinimap
+                  scaleAndPan={this.state.scaleAndPan}
+                  setScaleAndPan={this.setScaleAndPan}
+                  imgSrc="../public/test.png"
+                  imageWidth={this.state.imageWidth}
+                  imageHeight={this.state.imageHeight}
+                  canvasPositionAndSize={this.state.canvasPositionAndSize}
+                  minimapPositionAndSize={{
+                    top: 0,
+                    left: 0,
+                    width: 200,
+                    height: 200,
+                  }}
+                />
+              </div>
+
+              <Grid container justify="center">
                 <ButtonGroup>
-                  <BaseButton
-                    tooltip={"pan left"}
-                    icon={"fa-chevron-left"}
-                    name={"panxleft"}
-                    onClick={this.incrementPanX}
-                  />
-                  <BaseButton
-                    tooltip={"pan right"}
-                    icon={"fa-chevron-right"}
-                    name={"panxright"}
-                    onClick={this.decrementPanX}
-                  />
+                  <Tooltip title="Zoom out">
+                    <IconButton id={"zoom-out"} onClick={this.decrementScale}>
+                      <ZoomOut />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Reset zoom and pan">
+                    <IconButton id={"reset"} onClick={this.resetScaleAndPan}>
+                      <AspectRatio />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Zoom in">
+                    <IconButton id={"zoom-in"} onClick={this.incrementScale}>
+                      <ZoomIn />
+                    </IconButton>
+                  </Tooltip>
                 </ButtonGroup>
-                <ButtonGroup>
-                  <BaseButton
-                    tooltip={"pan up"}
-                    icon={"fa-chevron-up"}
-                    name={"panyup"}
-                    onClick={this.incrementPanY}
-                  />
-                  <BaseButton
-                    tooltip={"pan down"}
-                    icon={"fa-chevron-down"}
-                    name={"panydown"}
-                    onClick={this.decrementPanY}
-                  />
+
+                <ButtonGroup orientation="vertical">
+                  <Tooltip title="Pan up">
+                    <IconButton id={"pan-up"} onClick={this.incrementPanY}>
+                      <KeyboardArrowUp />
+                    </IconButton>
+                  </Tooltip>
+                  <ButtonGroup>
+                    <Tooltip title="Pan left">
+                      <IconButton id={"pan-left"} onClick={this.incrementPanX}>
+                        <KeyboardArrowLeft />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Pan right">
+                      <IconButton id={"pan-right"} onClick={this.decrementPanX}>
+                        <KeyboardArrowRight />
+                      </IconButton>
+                    </Tooltip>
+                  </ButtonGroup>
+                  <Tooltip title="Pan down">
+                    <IconButton id={"pan-down"} onClick={this.decrementPanY}>
+                      <KeyboardArrowDown />
+                    </IconButton>
+                  </Tooltip>
                 </ButtonGroup>
-              </ButtonGroup>
-            </Row>
-          </Col>
-        </Row>
-      </Container>
+              </Grid>
+
+              <Accordion
+                expanded={this.state.expanded === "paintbrush-toolbox"}
+                onChange={this.handleToolboxChange("paintbrush-toolbox")}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMore />}
+                  id="paintbrush-toolbox"
+                >
+                  <Typography>Paintbrushes</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <ButtonGroup>
+                    <Tooltip title="Activate paintbrush">
+                      <IconButton
+                        id={"activate-paintbrush"}
+                        onClick={this.togglePaintbrush}
+                      >
+                        <Brush />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Increase brush size">
+                      <IconButton
+                        id={"increase-paintbrush-radius"}
+                        onClick={this.incrementBrush}
+                      >
+                        <AllOut />
+                      </IconButton>
+                    </Tooltip>
+                  </ButtonGroup>
+                </AccordionDetails>
+              </Accordion>
+              <Accordion
+                expanded={this.state.expanded === "spline-toolbox"}
+                onChange={this.handleToolboxChange("spline-toolbox")}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMore />}
+                  id="spline-toolbox"
+                >
+                  <Typography>Splines</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <ButtonGroup>
+                    <Tooltip title="Activate spline">
+                      <IconButton
+                        id={"activate-spline"}
+                        onClick={this.toggleSpline}
+                      >
+                        <Brush />
+                      </IconButton>
+                    </Tooltip>
+                  </ButtonGroup>
+                </AccordionDetails>
+              </Accordion>
+            </Grid>
+          </Grid>
+        </Container>
     );
   }
 }

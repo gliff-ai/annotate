@@ -203,18 +203,18 @@ export class BaseCanvas extends Component<Props> {
         style={{
           display: "block",
           touchAction: "none",
-          width: this.props.canvasPositionAndSize.width, // can use "100%" here
+          width: "100%",
           height: this.props.canvasPositionAndSize.height,
           zIndex: 100,
+          cursor: this.props.cursor || "pointer",
+          border: "1px solid gray",
           top: this.props.canvasPositionAndSize.top,
           left: this.props.canvasPositionAndSize.left,
           position: "absolute",
-          cursor: this.props.cursor || "pointer",
-          border: "1px solid gray",
         }}
       >
         <canvas
-          width={this.props.canvasPositionAndSize.width} // can use "100%" here
+          width="100%"
           height={this.props.canvasPositionAndSize.height}
           onClick={this.onClickHandler}
           onMouseDown={this.onMouseDownHandler}
