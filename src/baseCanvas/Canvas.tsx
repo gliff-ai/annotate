@@ -197,6 +197,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   render = (): ReactNode => {
+    console.log("Rendered " + this.name);
     return (
       <div
         ref={(canvasContainer) => (this.canvasContainer = canvasContainer)}

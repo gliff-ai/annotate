@@ -200,7 +200,7 @@ export class UserInterface extends Component {
           </AppBar>
           <Toolbar />
 
-          <Grid container spacing={0}>
+          <Grid container spacing={0} justify="center" wrap="nowrap">
             <Grid item style={{ width: "85%", position: "relative" }}>
               <BackgroundCanvas
                 scaleAndPan={this.state.scaleAndPan}
@@ -229,7 +229,7 @@ export class UserInterface extends Component {
               />
             </Grid>
 
-            <Grid item style={{ width: "15%", position: "relative" }}>
+            <Grid item style={{ width: 200, position: "relative" }}>
               <div style={{ height: 200 }}>
                 <BackgroundMinimap
                   scaleAndPan={this.state.scaleAndPan}
@@ -303,24 +303,22 @@ export class UserInterface extends Component {
                   <Typography>Paintbrushes</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <ButtonGroup>
-                    <Tooltip title="Activate paintbrush">
-                      <IconButton
-                        id={"activate-paintbrush"}
-                        onClick={this.togglePaintbrush}
-                      >
-                        <Brush />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Increase brush size">
-                      <IconButton
-                        id={"increase-paintbrush-radius"}
-                        onClick={this.incrementBrush}
-                      >
-                        <AllOut />
-                      </IconButton>
-                    </Tooltip>
-                  </ButtonGroup>
+                  <Tooltip title="Activate paintbrush">
+                    <IconButton
+                      id={"activate-paintbrush"}
+                      onClick={this.togglePaintbrush}
+                    >
+                      <Brush />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Increase brush size">
+                    <IconButton
+                      id={"increase-paintbrush-radius"}
+                      onClick={this.incrementBrush}
+                    >
+                      <AllOut />
+                    </IconButton>
+                  </Tooltip>
                 </AccordionDetails>
               </Accordion>
               <Accordion
@@ -334,16 +332,14 @@ export class UserInterface extends Component {
                   <Typography>Splines</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <ButtonGroup>
-                    <Tooltip title="Activate spline">
-                      <IconButton
-                        id={"activate-spline"}
-                        onClick={this.toggleSpline}
-                      >
-                        <Brush />
-                      </IconButton>
-                    </Tooltip>
-                  </ButtonGroup>
+                  <Tooltip title="Activate spline">
+                    <IconButton
+                      id={"activate-spline"}
+                      onClick={this.toggleSpline}
+                    >
+                      <Brush />
+                    </IconButton>
+                  </Tooltip>
                 </AccordionDetails>
               </Accordion>
             </Grid>
