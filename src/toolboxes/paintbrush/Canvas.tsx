@@ -41,7 +41,8 @@ export class PaintbrushCanvas extends Component<Props> {
       canvasY,
       this.props.imageWidth,
       this.props.imageHeight,
-      this.props.scaleAndPan
+      this.props.scaleAndPan,
+      this.props.canvasPositionAndSize
     );
 
     if (this.isPressing && !this.isDrawing) {
