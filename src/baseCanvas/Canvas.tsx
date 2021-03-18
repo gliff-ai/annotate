@@ -105,11 +105,11 @@ export class BaseCanvas extends Component<Props> {
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
 
-    return {x: x, y: y};
-  }
+    return { x: x, y: y };
+  };
 
   onDoubleClickHandler = (e: React.MouseEvent): void => {
-    const {x: x, y: y} = this.windowToCanvas(e);
+    const { x: x, y: y } = this.windowToCanvas(e);
 
     if (this.props.onDoubleClick) {
       this.props.onDoubleClick(x, y);
@@ -117,7 +117,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onClickHandler = (e: React.MouseEvent): void => {
-    const {x: x, y: y} = this.windowToCanvas(e);
+    const { x: x, y: y } = this.windowToCanvas(e);
 
     if (this.props.onClick) {
       this.props.onClick(x, y);
@@ -125,7 +125,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onMouseDownHandler = (e: React.MouseEvent): void => {
-    const {x: x, y: y} = this.windowToCanvas(e);
+    const { x: x, y: y } = this.windowToCanvas(e);
 
     if (this.props.onMouseDown) {
       this.props.onMouseDown(x, y);
@@ -133,7 +133,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onMouseMoveHandler = (e: React.MouseEvent): void => {
-    const {x: x, y: y} = this.windowToCanvas(e);
+    const { x: x, y: y } = this.windowToCanvas(e);
 
     if (this.props.onMouseMove) {
       this.props.onMouseMove(x, y);
@@ -141,7 +141,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onMouseUpHandler = (e: React.MouseEvent): void => {
-    const {x: x, y: y} = this.windowToCanvas(e);
+    const { x: x, y: y } = this.windowToCanvas(e);
 
     if (this.props.onMouseUp) {
       this.props.onMouseUp(x, y);
@@ -149,7 +149,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onContextMenuHandler = (e: React.MouseEvent): void => {
-    const {x: x, y: y} = this.windowToCanvas(e);
+    const { x: x, y: y } = this.windowToCanvas(e);
 
     // x and y are now in canvas space
 
@@ -163,6 +163,7 @@ export class BaseCanvas extends Component<Props> {
       <div
         ref={(canvasContainer) => (this.canvasContainer = canvasContainer)}
         style={{
+          pointerEvents: "inherit",
           display: "block",
           touchAction: "none",
           width: this.props.canvasPositionAndSize.width, // can use "100%" here
@@ -176,6 +177,7 @@ export class BaseCanvas extends Component<Props> {
         }}
       >
         <canvas
+          style={{ pointerEvents: "inherit" }}
           width={this.props.canvasPositionAndSize.width} // can use "100%" here
           height={this.props.canvasPositionAndSize.height}
           onClick={this.onClickHandler}
@@ -196,79 +198,4 @@ export class BaseCanvas extends Component<Props> {
       </div>
     );
   };
-}
-
-export function canvasToImage(canvasX: number, canvasY: number, imageWidth: number, imageHeight:number, scaleAndPan:any) {
-  let { x: translateX, y: translateY, scale:scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
-
-
-  // transform from canvas space to original canvas space:
-  let x = (canvasX-translateX) / scale;
-  let y = (canvasY-translateY) / scale;
-
-  // original canvas to image transform:
-  x = (x / 400) * Math.min(imageWidth, imageHeight);
-  y = (y / 400) * Math.min(imageWidth, imageHeight);
-
-  if (imageWidth > imageHeight) {
-    x += (imageWidth - imageHeight) / 2;
-  }
-  else if (imageHeight > imageWidth) {
-    y += (imageHeight - imageWidth) / 2;
-  }
-
-  return {x: x, y: y}
-}
-
-export function imageToCanvas(imageX: number, imageY: number, imageWidth: number, imageHeight:number, scaleAndPan:any) {
-  let { x: translateX, y: translateY, scale:scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
-
-  let x = imageX, y = imageY;
-
-  // image space
-
-  if (imageWidth > imageHeight) {
-    x -= (imageWidth - imageHeight) / 2;
-  }
-  else if (imageHeight > imageWidth) {
-    y -= (imageHeight - imageWidth) / 2;
-  }
-
-  // largest central square image space
-
-  x = 400 * x / Math.min(imageWidth, imageHeight);
-  y = 400 * y / Math.min(imageWidth, imageHeight);
-
-  // original canvas space
-
-  x = x * scale + translateX;
-  y = y * scale + translateY;
-
-  // canvas space
-
-  return {x: x, y: y}
-}
-
-export function imageToOriginalCanvas(imageX: number, imageY: number, imageWidth: number, imageHeight:number, scaleAndPan:any) {
-  let { x: translateX, y: translateY, scale:scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
-
-  let x = imageX, y = imageY;
-
-  // image space
-
-  if (imageWidth > imageHeight) {
-    x -= (imageWidth - imageHeight) / 2;
-  }
-  else if (imageHeight > imageWidth) {
-    y -= (imageHeight - imageWidth) / 2;
-  }
-
-  // largest central square image space
-
-  x = 400 * x / Math.min(imageWidth, imageHeight);
-  y = 400 * y / Math.min(imageWidth, imageHeight);
-
-  // original canvas space
-
-  return {x: x, y: y}
 }

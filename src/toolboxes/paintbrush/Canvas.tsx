@@ -197,7 +197,7 @@ export class PaintbrushCanvas extends Component<Props> {
 
   render() {
     return (
-      <div>
+      <div style={{ pointerEvents: this.props.isActive ? "auto" : "none" }}>
         <BaseCanvas
           cursor={"none"}
           ref={(backCanvas) => (this.backCanvas = backCanvas)}

@@ -30,6 +30,5 @@ export default function drawImageProp(ctx: any, img: HTMLImageElement): void {
   //   if (ch > imageHeight) ch = imageHeight;
 
   // fill image in dest. rectangle
-  debugger;
   ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
 }
