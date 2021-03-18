@@ -21,6 +21,7 @@ interface Props extends BaseProps {
 export class SplineCanvas extends Component<Props> {
   private baseCanvas: any;
   private selectedPointIndex: number;
+  private isDragging: boolean;
   state: {
     cursor: "crosshair" | "none";
   };
@@ -28,6 +29,7 @@ export class SplineCanvas extends Component<Props> {
   constructor(props: Props) {
     super(props);
     this.selectedPointIndex = -1;
+    this.isDragging = false;
   }
 
   drawSplineVector = (splineVector: XYPoint[], isActive = false) => {
@@ -39,6 +41,7 @@ export class SplineCanvas extends Component<Props> {
     // Clear the canvas
     context.lineWidth = lineWidth;
     context.strokeStyle = "#ff0000";
+    context.fillStyle = "#0000ff";
 
     context.beginPath();
 
@@ -69,19 +72,27 @@ export class SplineCanvas extends Component<Props> {
       context.lineTo(nextPoint.x, nextPoint.y);
     }
 
-    // Draw all points
-    for (const { x, y } of splineVector) {
-      nextPoint = imageToOriginalCanvas(
-        x,
-        y,
-        this.props.imageWidth,
-        this.props.imageHeight,
-        this.props.scaleAndPan,
-        this.props.canvasPositionAndSize
-      );
-      context.rect(nextPoint.x - 2.5, nextPoint.y - 2.5, 5, 5); // draw a square to mark the point
-    }
+    context.stroke();
 
+    // Draw all points
+    context.beginPath();
+    splineVector.forEach(({ x, y }, i) => {
+      if (i !== splineVector.length - 1 || !this.isClosed(splineVector)) {
+        nextPoint = imageToOriginalCanvas(
+          x,
+          y,
+          this.props.imageWidth,
+          this.props.imageHeight,
+          this.props.scaleAndPan,
+          this.props.canvasPositionAndSize
+        );
+        if (this.selectedPointIndex === i) {
+          context.fillRect(nextPoint.x - 3, nextPoint.y - 3, 6, 6); // draw a filled square to mark the point as selected
+        } else {
+          context.rect(nextPoint.x - 3, nextPoint.y - 3, 6, 6); // draw a square to mark the point
+        }
+      }
+    });
     context.stroke();
   };
 
@@ -232,11 +243,12 @@ export class SplineCanvas extends Component<Props> {
     let nearPoint = this.clickNearPoint(clickPoint, annotationData.coordinates);
     if (nearPoint !== -1) {
       this.selectedPointIndex = nearPoint;
+      this.isDragging = true;
     }
   };
 
   onMouseMove = (x: number, y: number): void => {
-    if (this.selectedPointIndex === -1) return;
+    if (!this.isDragging) return;
 
     // Replace update the coordinates for the point dragged
     let clickPoint = canvasToImage(
@@ -264,7 +276,8 @@ export class SplineCanvas extends Component<Props> {
 
   onMouseUp = (): void => {
     // Works as part of drag and drop for points.
-    this.selectedPointIndex = -1;
+    // TODO: add shortcut for setting selectedPointIndex = -1
+    this.isDragging = false;
   };
 
   isClosed = (splineVector: XYPoint[]): boolean => {
