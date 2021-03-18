@@ -105,7 +105,7 @@ export class SplineCanvas extends Component<Props> {
     return (
       <BaseCanvas
         onClick={this.onClick}
-        cursor={this.props.isActive ? "crosshair" : "pointer"}
+        cursor={this.props.isActive ? "crosshair" : "none"}
         ref={(baseCanvas) => (this.baseCanvas = baseCanvas)}
         name="spline"
         scaleAndPan={this.props.scaleAndPan}

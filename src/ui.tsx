@@ -152,7 +152,7 @@ export class UserInterface extends Component {
           <BaseButton
             tooltip={"Activate Spline"}
             icon={"fa-bezier-curve"}
-            name={"splint"}
+            name={"spline"}
             onClick={this.toggleSpline}
           />
           <BaseButton
