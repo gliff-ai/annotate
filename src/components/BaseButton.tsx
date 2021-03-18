@@ -19,10 +19,8 @@ export const BaseButton: React.FC<ButtonProps> = ({
   const toggle = () => setTooltipOpen(!tooltipOpen);
 
   return (
-    <span>
-      <Button id={name} color="secondary" onClick={onClick}>
-        <i className={`fas ${icon}`} />
-      </Button>
+    <Button id={name} color="secondary" onClick={onClick}>
+      <i className={`fas ${icon}`} />
       <Tooltip
         placement="right"
         isOpen={tooltipOpen}
@@ -31,6 +29,6 @@ export const BaseButton: React.FC<ButtonProps> = ({
       >
         {tooltip}
       </Tooltip>
-    </span>
+    </Button>
   );
 };

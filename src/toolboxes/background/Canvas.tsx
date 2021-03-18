@@ -2,7 +2,6 @@ import React from "react";
 import { Component } from "react";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
-// @ts-ignore
 import drawImageProp from "./drawImage";
 
 interface Props extends BaseProps {
@@ -27,7 +26,7 @@ export class BackgroundCanvas extends Component<Props> {
     if (this.image && this.image.complete) {
       this.baseCanvas.canvasContext.globalCompositeOperation =
         "destination-over";
-      drawImageProp({ ctx: this.baseCanvas.canvasContext, img: this.image });
+      drawImageProp(this.baseCanvas.canvasContext, this.image);
     }
   };
 

@@ -13,8 +13,7 @@ export interface Props {
     y: number;
     scale: number;
   };
-
-  cursor?: "crosshair" | "move" | "none";
+  cursor?: "crosshair" | "move" | "pointer" | "none";
   onDoubleClick?: (x: number, y: number) => void;
   onClick?: (x: number, y: number) => void;
   onMouseDown?: (x: number, y: number) => void;
@@ -166,19 +165,24 @@ export class BaseCanvas extends Component<Props> {
         style={{
           display: "block",
           touchAction: "none",
-          maxWidth: "100%",
-          maxHeight: "100%",
-          width: this.props.canvasPositionAndSize.width,
+          width: this.props.canvasPositionAndSize.width, // can use "100%" here
           height: this.props.canvasPositionAndSize.height,
           zIndex: 100,
           top: this.props.canvasPositionAndSize.top,
           left: this.props.canvasPositionAndSize.left,
           position: "absolute",
-          cursor: this.props.cursor || "none",
-          border: "1px solid red",
+          cursor: this.props.cursor || "pointer",
+          border: "1px solid gray",
         }}
       >
         <canvas
+          width={this.props.canvasPositionAndSize.width} // can use "100%" here
+          height={this.props.canvasPositionAndSize.height}
+          onClick={this.onClickHandler}
+          onMouseDown={this.onMouseDownHandler}
+          onMouseMove={this.onMouseMoveHandler}
+          onMouseUp={this.onMouseUpHandler}
+          onDoubleClick={this.onDoubleClickHandler}
           key={this.name}
           id={`${this.name}-canvas`}
           ref={(canvas) => {
@@ -188,11 +192,6 @@ export class BaseCanvas extends Component<Props> {
               this.canvasContext = canvas.getContext("2d");
             }
           }}
-          onDoubleClick={this.onDoubleClickHandler}
-          onClick={this.onClickHandler}
-          onMouseDown={this.onMouseDownHandler}
-          onMouseMove={this.onMouseMoveHandler}
-          onMouseUp={this.onMouseUpHandler}
         ></canvas>
       </div>
     );

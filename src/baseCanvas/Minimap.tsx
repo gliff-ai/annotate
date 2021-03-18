@@ -40,12 +40,6 @@ export class BaseMinimap extends React.Component<Props> {
 
   constructor(props: Props) {
     super(props);
-    this.boundingRect = {
-      x: 0,
-      y: 0,
-      width: this.props.minimapPositionAndSize.width,
-      height: this.props.minimapPositionAndSize.height,
-    };
   }
 
   componentDidMount = (): void => {
