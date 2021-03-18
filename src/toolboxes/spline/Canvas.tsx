@@ -30,6 +30,8 @@ export class SplineCanvas extends Component<Props> {
     super(props);
     this.selectedPointIndex = -1;
     this.isDragging = false;
+
+    document.addEventListener("keydown", this.handleSingleKeydown);
   }
 
   drawSplineVector = (splineVector: XYPoint[], isActive = false) => {
@@ -86,7 +88,7 @@ export class SplineCanvas extends Component<Props> {
           this.props.scaleAndPan,
           this.props.canvasPositionAndSize
         );
-        if (this.selectedPointIndex === i) {
+        if (this.selectedPointIndex === i && isActive) {
           context.fillRect(nextPoint.x - 3, nextPoint.y - 3, 6, 6); // draw a filled square to mark the point as selected
         } else {
           context.rect(nextPoint.x - 3, nextPoint.y - 3, 6, 6); // draw a square to mark the point
@@ -115,6 +117,57 @@ export class SplineCanvas extends Component<Props> {
           );
         }
       });
+  };
+
+  private handleSingleKeydown = (event: KeyboardEvent) => {
+    // Handle single-key events.
+    // TODO: move this to ui
+    console.log(event);
+    switch (event.code) {
+      case "Delete": // Delete selected point
+        this.deleteSelectedPoint();
+        break;
+      case "Minus": // Delete selected point
+        this.deleteSelectedPoint();
+        break;
+      case "Escape": // Escape selected point
+        // TODO: add function for removing selection
+        break;
+    }
+  };
+
+  deleteSelectedPoint = () => {
+    if (this.selectedPointIndex === -1) return;
+    console.log("deleting point");
+    let coordinates = this.props.annotationsObject.getActiveAnnotation()
+      .coordinates;
+    const isClosed = this.isClosed(coordinates);
+
+    console.log(this.selectedPointIndex);
+    console.log(coordinates);
+
+    if (this.selectedPointIndex === coordinates.length - 1) {
+      this.selectedPointIndex = 0;
+    }
+    coordinates.splice(this.selectedPointIndex, 1);
+
+    if (this.selectedPointIndex === 0 && isClosed) {
+      console.log("updating last point");
+      this.updateXYPoint(
+        coordinates[0].x,
+        coordinates[0].y,
+        coordinates.length - 1
+      );
+    }
+
+    if (this.selectedPointIndex === coordinates.length - 1) {
+      this.selectedPointIndex = 0;
+    }
+
+    this.drawAllSplines();
+
+    console.log(this.selectedPointIndex);
+    console.log(coordinates);
   };
 
   clickNearPoint = (clickPoint: XYPoint, splineVector: XYPoint[]): number => {
@@ -199,6 +252,7 @@ export class SplineCanvas extends Component<Props> {
       // Add coordinates to the current spline
       console.log("Adding point", { x: imageX, y: imageY });
       currentSplineVector.push({ x: imageX, y: imageY });
+      this.selectedPointIndex = currentSplineVector.length - 1;
     }
 
     this.drawAllSplines();
@@ -263,7 +317,6 @@ export class SplineCanvas extends Component<Props> {
     // If dragging first point, update also last
     let activeSpline = this.props.annotationsObject.getActiveAnnotation()
       .coordinates;
-    console.log(this.selectedPointIndex, this.isClosed(activeSpline));
     if (this.selectedPointIndex === 0 && this.isClosed(activeSpline)) {
       this.updateXYPoint(clickPoint.x, clickPoint.y, activeSpline.length - 1);
     }
