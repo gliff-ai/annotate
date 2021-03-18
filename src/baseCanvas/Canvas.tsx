@@ -207,7 +207,7 @@ export class BaseCanvas extends Component<Props> {
           height: this.props.canvasPositionAndSize.height,
           zIndex: 100,
           cursor: this.props.cursor || "pointer",
-          border: "1px solid gray",
+          //   border: "1px solid gray",
           top: this.props.canvasPositionAndSize.top,
           left: this.props.canvasPositionAndSize.left,
           position: "absolute",

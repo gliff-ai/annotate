@@ -60,7 +60,7 @@ export class BaseMinimap extends React.Component<Props> {
     );
     this.baseCanvas.clearWindow();
     this.baseCanvas.canvasContext.beginPath();
-    this.baseCanvas.canvasContext.strokeStyle = "#666666";
+    this.baseCanvas.canvasContext.strokeStyle = "#FFFFFF";
     this.baseCanvas.canvasContext.lineWidth = 3;
     this.baseCanvas.canvasContext.strokeRect(
       this.boundingRect.x,
