@@ -4,6 +4,7 @@ export interface BrushStrokes {
   coordinates: [number, number][];
   brushColor: string;
   brushRadius: number;
+  brushType: string;
 }
 export interface Annotation {
   labels: string[];
