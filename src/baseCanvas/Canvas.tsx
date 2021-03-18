@@ -15,10 +15,12 @@ export interface Props {
   };
 
   cursor?: "crosshair" | "move" | "none";
+  onDoubleClick?: (x: number, y: number) => void;
   onClick?: (x: number, y: number) => void;
   onMouseDown?: (x: number, y: number) => void;
   onMouseMove?: (x: number, y: number) => void;
   onMouseUp?: (x: number, y: number) => void;
+  onContextMenu?: (x: number, y: number) => void;
   canvasPositionAndSize: {
     top: number;
     left: number;
@@ -99,6 +101,24 @@ export class BaseCanvas extends Component<Props> {
     this.canvasObserver.unobserve(this.canvasContainer);
   };
 
+  onDoubleClickHandler = (e: React.MouseEvent): void => {
+    // x and y start out in window space
+
+    let rect = this.canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    // x and y are now in canvas space
+
+    // console.log("Double mouse click at coordinate x: " + x, " y: " + y);
+
+    // DO STUFF HERE
+
+    if (this.props.onDoubleClick) {
+      this.props.onDoubleClick(x, y);
+    }
+  };
+
   onClickHandler = (e: React.MouseEvent): void => {
     // x and y start out in window space
 
@@ -107,6 +127,8 @@ export class BaseCanvas extends Component<Props> {
     let y = e.clientY - rect.top;
 
     // x and y are now in canvas space
+
+    // console.log("Mouse click at coordinate x: " + x, " y: " + y);
 
     // DO STUFF HERE
 
@@ -120,6 +142,8 @@ export class BaseCanvas extends Component<Props> {
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
 
+    // console.log("Mouse down at coordinate x: " + x, " y: " + y);
+
     // DO STUFF HERE
 
     if (this.props.onMouseDown) {
@@ -131,6 +155,8 @@ export class BaseCanvas extends Component<Props> {
     let rect = this.canvas.getBoundingClientRect();
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
+
+    // console.log("Mouse move at coordinate x: " + x, " y: " + y);
 
     // DO STUFF HERE
 
@@ -144,10 +170,30 @@ export class BaseCanvas extends Component<Props> {
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
 
+    // console.log("Mouse up at coordinate x: " + x, " y: " + y);
+
     // DO STUFF HERE
 
     if (this.props.onMouseUp) {
       this.props.onMouseUp(x, y);
+    }
+  };
+
+  onContextMenuHandler = (e: React.MouseEvent): void => {
+    // x and y start out in window space
+
+    let rect = this.canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    // x and y are now in canvas space
+
+    // console.log("Mouse right click at coordinate x: " + x, " y: " + y);
+
+    // DO STUFF HERE
+
+    if (this.props.onContextMenu) {
+      this.props.onContextMenu(x, y);
     }
   };
 

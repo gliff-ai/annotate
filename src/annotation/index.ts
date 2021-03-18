@@ -68,7 +68,17 @@ export function canvasToImage(
   canvasY: number,
   imageWidth: number,
   imageHeight: number,
-  scaleAndPan: any
+  scaleAndPan: {
+    x: number;
+    y: number;
+    scale: number;
+  },
+  canvasPositionAndSize: {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  }
 ) {
   let { x: translateX, y: translateY, scale: scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
 
@@ -77,8 +87,8 @@ export function canvasToImage(
   let y = (canvasY - translateY) / scale;
 
   // original canvas to image transform:
-  x = (x / 400) * Math.min(imageWidth, imageHeight);
-  y = (y / 400) * Math.min(imageWidth, imageHeight);
+  x = (x / canvasPositionAndSize.width) * Math.min(imageWidth, imageHeight);
+  y = (y / canvasPositionAndSize.height) * Math.min(imageWidth, imageHeight);
 
   if (imageWidth > imageHeight) {
     x += (imageWidth - imageHeight) / 2;
@@ -94,7 +104,17 @@ export function imageToCanvas(
   imageY: number,
   imageWidth: number,
   imageHeight: number,
-  scaleAndPan: any
+  scaleAndPan: {
+    x: number;
+    y: number;
+    scale: number;
+  },
+  canvasPositionAndSize: {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  }
 ) {
   let { x: translateX, y: translateY, scale: scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
 
@@ -107,8 +127,12 @@ export function imageToCanvas(
     y -= (imageHeight - imageWidth) / 2;
   }
 
-  x = (400 * x) / Math.min(imageWidth, imageHeight);
-  y = (400 * y) / Math.min(imageWidth, imageHeight);
+  //   console.log(x, y) // largest central square image space
+
+  x = (canvasPositionAndSize.width * x) / Math.min(imageWidth, imageHeight);
+  y = (canvasPositionAndSize.height * y) / Math.min(imageWidth, imageHeight);
+
+  //   console.log(x, y) // original canvas space
 
   x = x * scale + translateX;
   y = y * scale + translateY;
@@ -195,8 +219,8 @@ export function originalCanvasToMinimap(
     (viewfinderHeight * -y) /
     Math.min(canvasPositionAndSize.width, canvasPositionAndSize.height);
 
-  console.log(scaleAndPan.x, scaleAndPan.y, scaleAndPan.scale);
-  console.log(viewfinderX, viewfinderY, viewfinderWidth, viewfinderHeight);
+  //   console.log(scaleAndPan.x, scaleAndPan.y, scaleAndPan.scale);
+  //   console.log(viewfinderX, viewfinderY, viewfinderWidth, viewfinderHeight);
 
   return {
     x: viewfinderX,
@@ -204,4 +228,48 @@ export function originalCanvasToMinimap(
     width: viewfinderWidth,
     height: viewfinderHeight,
   };
+}
+
+export function minimapToOriginalCanvas(
+  minimapX: number,
+  minimapY: number,
+  scaleAndPan: {
+    x: number;
+    y: number;
+    scale: number;
+  },
+  canvasPositionAndSize: {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  },
+  minimapPositionAndSize: {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  }
+) {
+  let { x: translateX, y: translateY, scale: scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
+
+  // transform from canvas space to original canvas space:
+  let x = minimapX; // * (canvasPositionAndSize.width / minimapPositionAndSize.width);
+  let y = minimapY; // * (canvasPositionAndSize.height / minimapPositionAndSize.height);
+
+  // original canvas to image transform:
+  x =
+    (x / minimapPositionAndSize.width) *
+    Math.min(canvasPositionAndSize.width, canvasPositionAndSize.height);
+  y =
+    (y / minimapPositionAndSize.height) *
+    Math.min(canvasPositionAndSize.width, canvasPositionAndSize.height);
+
+  if (canvasPositionAndSize.width > canvasPositionAndSize.height) {
+    x -= (canvasPositionAndSize.width - canvasPositionAndSize.height) / 2;
+  } else if (canvasPositionAndSize.height > canvasPositionAndSize.width) {
+    y -= (canvasPositionAndSize.height - canvasPositionAndSize.width) / 2;
+  }
+
+  return { x: x, y: y };
 }

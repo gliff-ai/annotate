@@ -59,6 +59,7 @@ export class BackgroundMinimap extends Component<Props> {
     return (
       <BaseMinimap
         scaleAndPan={this.props.scaleAndPan}
+        setScaleAndPan={this.props.setScaleAndPan}
         ref={(baseMinimap) => (this.baseMinimap = baseMinimap)}
         name="background-minimap"
         imageWidth={this.props.imageWidth}

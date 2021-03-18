@@ -83,7 +83,8 @@ export class SplineCanvas extends Component<Props> {
       y,
       this.props.imageWidth,
       this.props.imageHeight,
-      this.props.scaleAndPan
+      this.props.scaleAndPan,
+      this.props.canvasPositionAndSize
     );
     // console.log(imageX, imageY);
 
