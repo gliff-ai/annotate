@@ -2,9 +2,13 @@ import React from "react";
 import { Component } from "react";
 
 // import { SplineVector } from "./interfaces";
-import { BaseCanvas, Props as BaseProps } from "../../baseCanvas";
-import { Annotations } from "../../annotation";
-import { canvasToImage, imageToCanvas, imageToOriginalCanvas } from "../../baseCanvas";
+import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
+import {
+  Annotations,
+  canvasToImage,
+  imageToCanvas,
+  imageToOriginalCanvas,
+} from "../../annotation";
 import { Annotation, XYPoint } from "../../annotation/interfaces";
 
 interface Props extends BaseProps {
@@ -40,20 +44,34 @@ export class SplineCanvas extends Component<Props> {
 
     // Go to the first point
     let firstPoint: XYPoint = splineVector[0];
-    firstPoint = imageToOriginalCanvas(firstPoint.x, firstPoint.y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
+    firstPoint = imageToOriginalCanvas(
+      firstPoint.x,
+      firstPoint.y,
+      this.props.imageWidth,
+      this.props.imageHeight,
+      this.props.scaleAndPan,
+      this.props.canvasPositionAndSize
+    );
 
     context.moveTo(firstPoint.x, firstPoint.y);
 
     // Draw each point by taking our raw coordinates and applying the transform so they fit on our canvas
     let nextPoint;
     for (const { x, y } of splineVector) {
-      nextPoint = imageToOriginalCanvas(x, y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
+      nextPoint = imageToOriginalCanvas(
+        x,
+        y,
+        this.props.imageWidth,
+        this.props.imageHeight,
+        this.props.scaleAndPan,
+        this.props.canvasPositionAndSize
+      );
       context.lineTo(nextPoint.x, nextPoint.y);
     }
 
     // Draw all points
     for (const { x, y } of splineVector) {
-      nextPoint = imageToOriginalCanvas(x, y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
+      nextPoint = imageToOriginalCanvas(x, y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan, this.props.canvasPositionAndSize);
       context.rect(nextPoint.x - 2.5, nextPoint.y - 2.5, 5, 5); // draw a square to mark the point
     }
 
@@ -81,12 +99,12 @@ export class SplineCanvas extends Component<Props> {
     // clickPoint and splineVector are both expected to be in image space
     // returns -1 if no point was within distance 25
 
-    let {x:clickPointX, y:clickPointY} = imageToCanvas(clickPoint.x, clickPoint.y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
+    let {x:clickPointX, y:clickPointY} = imageToCanvas(clickPoint.x, clickPoint.y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan, this.props.canvasPositionAndSize);
 
     for (let i=0; i < splineVector.length; i++) {
       // transform points into canvas space so the nudge radius won't depend on zoom level:
       let point = splineVector[i];
-      point = imageToCanvas(point.x, point.y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
+      point = imageToCanvas(point.x, point.y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan, this.props.canvasPositionAndSize);
       
       let distanceToPoint = Math.sqrt((point.x - clickPointX)**2 + (point.y - clickPointY)**2);
 
@@ -102,7 +120,7 @@ export class SplineCanvas extends Component<Props> {
       coordinates: currentSplineVector,
     } = this.props.annotationsObject.getActiveAnnotation();
 
-    let {x:imageX, y:imageY} = canvasToImage(x, y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
+    let {x:imageX, y:imageY} = canvasToImage(x, y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan, this.props.canvasPositionAndSize);
 
 
     // check if we clicked within the nudge radius of an existing point:
@@ -157,7 +175,7 @@ export class SplineCanvas extends Component<Props> {
   }
 
   onMouseDown = (x: number, y: number): void => {
-    let clickPoint = canvasToImage(x, y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
+    let clickPoint = canvasToImage(x, y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan, this.props.canvasPositionAndSize);
     let annotationData = this.props.annotationsObject.getActiveAnnotation();
     
     let nearPoint = this.clickNearPoint(clickPoint, annotationData.coordinates);
@@ -170,7 +188,7 @@ export class SplineCanvas extends Component<Props> {
     if (this.selectedPointIndex === -1) return;
 
     // Replace update the coordinates for the point dragged
-    let clickPoint = canvasToImage(x, y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan);
+    let clickPoint = canvasToImage(x, y, this.props.imageWidth, this.props.imageHeight, this.props.scaleAndPan, this.props.canvasPositionAndSize);
     
     // If dragging first point, update also last
     let activeSpline = this.props.annotationsObject.getActiveAnnotation().coordinates;
@@ -217,6 +235,7 @@ export class SplineCanvas extends Component<Props> {
         ref={(baseCanvas) => (this.baseCanvas = baseCanvas)}
         name="spline"
         scaleAndPan={this.props.scaleAndPan}
+        canvasPositionAndSize={this.props.canvasPositionAndSize}
       />
     );
   }

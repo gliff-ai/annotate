@@ -2,7 +2,6 @@ import React from "react";
 import { Component, ReactNode } from "react";
 import { XYPoint } from "../annotation/interfaces";
 
-
 export interface Props {
   name?: string;
   zoomExtents?: {
@@ -14,12 +13,20 @@ export interface Props {
     y: number;
     scale: number;
   };
-  cursor?: "crosshair" | "none";
-  onClick?: (arg0: number, arg1: number) => void;
-  onDoubleClick?: (arg0: number, arg1: number) => void;
-  onMouseDown?: (arg0: number, arg1: number) => void;
-  onMouseMove?: (arg0: number, arg1: number) => void;
-  onMouseUp?: (arg0: number, arg1: number) => void;
+
+  cursor?: "crosshair" | "move" | "none";
+  onDoubleClick?: (x: number, y: number) => void;
+  onClick?: (x: number, y: number) => void;
+  onMouseDown?: (x: number, y: number) => void;
+  onMouseMove?: (x: number, y: number) => void;
+  onMouseUp?: (x: number, y: number) => void;
+  onContextMenu?: (x: number, y: number) => void;
+  canvasPositionAndSize: {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  };
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
@@ -29,16 +36,10 @@ export class BaseCanvas extends Component<Props> {
   private canvasContext: CanvasRenderingContext2D;
   private canvasObserver: ResizeObserver;
 
-  private scaleAndPan: any;
-
   constructor(props: Props) {
     super(props);
     this.name = props.name;
-
-    this.scaleAndPan = props.scaleAndPan;
   }
-
-
 
   private clearWindow = (): void => {
     this.canvasContext.save();
@@ -51,10 +52,9 @@ export class BaseCanvas extends Component<Props> {
         this.canvasContext.canvas.width,
         this.canvasContext.canvas.height
       );
-    } 
-    finally {
-        this.canvasContext.restore();
-      }
+    } finally {
+      this.canvasContext.restore();
+    }
   };
 
   componentDidUpdate() {
@@ -77,12 +77,7 @@ export class BaseCanvas extends Component<Props> {
     for (const entry of entries) {
       const { width, height } = entry.contentRect;
       this.setCanvasSize(width, height);
-      console.log(width, height)
     }
-
-    this.canvasContext.beginPath();
-    this.canvasContext.arc(100, 75, 50, 0, 2 * Math.PI);
-    this.canvasContext.stroke();
   };
 
   private setCanvasSize = (width: number, height: number): void => {
@@ -104,8 +99,8 @@ export class BaseCanvas extends Component<Props> {
     this.canvasObserver.unobserve(this.canvasContainer);
   };
 
-  private windowToCanvas = (e: React.MouseEvent): {x: number, y: number} => {
-    // takes a raw mouse event, returns the x and y coordinates in canvas space
+  windowToCanvas = (e: React.MouseEvent): XYPoint => {
+    // returns the mouse coordinates from e, transformed from window to canvas space
 
     let rect = this.canvas.getBoundingClientRect();
     let x = e.clientX - rect.left;
@@ -114,45 +109,55 @@ export class BaseCanvas extends Component<Props> {
     return {x: x, y: y};
   }
 
-  onClickHandler = (e: React.MouseEvent): void => {
-    let {x: x, y: y} = this.windowToCanvas(e);
-
-    if (this.props.onClick) {
-      this.props.onClick(x, y);
-    }
-  };
-
   onDoubleClickHandler = (e: React.MouseEvent): void => {
-    let {x: x, y: y} = this.windowToCanvas(e);
+    const {x: x, y: y} = this.windowToCanvas(e);
 
     if (this.props.onDoubleClick) {
       this.props.onDoubleClick(x, y);
     }
   };
 
+  onClickHandler = (e: React.MouseEvent): void => {
+    const {x: x, y: y} = this.windowToCanvas(e);
+
+    if (this.props.onClick) {
+      this.props.onClick(x, y);
+    }
+  };
+
   onMouseDownHandler = (e: React.MouseEvent): void => {
-    let {x: x, y: y} = this.windowToCanvas(e);
+    const {x: x, y: y} = this.windowToCanvas(e);
 
     if (this.props.onMouseDown) {
       this.props.onMouseDown(x, y);
     }
-  }
+  };
 
   onMouseMoveHandler = (e: React.MouseEvent): void => {
-    let {x: x, y: y} = this.windowToCanvas(e);
+    const {x: x, y: y} = this.windowToCanvas(e);
 
     if (this.props.onMouseMove) {
       this.props.onMouseMove(x, y);
     }
-  }
+  };
 
   onMouseUpHandler = (e: React.MouseEvent): void => {
-    let {x: x, y: y} = this.windowToCanvas(e);
+    const {x: x, y: y} = this.windowToCanvas(e);
 
     if (this.props.onMouseUp) {
       this.props.onMouseUp(x, y);
     }
-  }
+  };
+
+  onContextMenuHandler = (e: React.MouseEvent): void => {
+    const {x: x, y: y} = this.windowToCanvas(e);
+
+    // x and y are now in canvas space
+
+    if (this.props.onContextMenu) {
+      this.props.onContextMenu(x, y);
+    }
+  };
 
   render = (): ReactNode => {
     return (
@@ -163,10 +168,11 @@ export class BaseCanvas extends Component<Props> {
           touchAction: "none",
           maxWidth: "100%",
           maxHeight: "100%",
-          width: 400,
-          height: 400,
+          width: this.props.canvasPositionAndSize.width,
+          height: this.props.canvasPositionAndSize.height,
           zIndex: 100,
-          top: "150px",
+          top: this.props.canvasPositionAndSize.top,
+          left: this.props.canvasPositionAndSize.left,
           position: "absolute",
           cursor: this.props.cursor || "none",
           border: "1px solid red",

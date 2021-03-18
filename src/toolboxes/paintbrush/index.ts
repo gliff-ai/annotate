@@ -1,0 +1,1 @@
+export { PaintbrushCanvas } from "./Canvas";

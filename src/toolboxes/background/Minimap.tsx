@@ -1,13 +1,12 @@
 import React from "react";
 import { Component } from "react";
 
-import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
+import { BaseMinimap, MinimapProps as BaseProps } from "../../baseCanvas";
 // @ts-ignore
 import drawImageProp from "./drawImage";
 
 interface Props extends BaseProps {
   imgSrc?: string;
-  updateImageDimensions: (imageWidth: number, imageHeight: number) => void;
 }
 
 interface State {
@@ -15,8 +14,8 @@ interface State {
   contrast: number;
 }
 
-export class BackgroundCanvas extends Component<Props> {
-  private baseCanvas: any;
+export class BackgroundMinimap extends Component<Props> {
+  private baseMinimap: any;
   private image: HTMLImageElement;
 
   constructor(props: Props) {
@@ -25,9 +24,12 @@ export class BackgroundCanvas extends Component<Props> {
 
   private redrawImage = () => {
     if (this.image && this.image.complete) {
-      this.baseCanvas.canvasContext.globalCompositeOperation =
+      this.baseMinimap.baseCanvas.canvasContext.globalCompositeOperation =
         "destination-over";
-      drawImageProp({ ctx: this.baseCanvas.canvasContext, img: this.image });
+      drawImageProp({
+        ctx: this.baseMinimap.baseCanvas.canvasContext,
+        img: this.image,
+      });
     }
   };
 
@@ -41,10 +43,7 @@ export class BackgroundCanvas extends Component<Props> {
     this.image.crossOrigin = "anonymous";
 
     // Draw the image once loaded
-    this.image.onload = () => {
-      this.redrawImage();
-      this.props.updateImageDimensions(this.image.width, this.image.height);
-    };
+    this.image.onload = this.redrawImage;
     this.image.src = this.props.imgSrc;
   };
 
@@ -58,12 +57,15 @@ export class BackgroundCanvas extends Component<Props> {
 
   render() {
     return (
-      <BaseCanvas
-        ref={(baseCanvas) => (this.baseCanvas = baseCanvas)}
-        name="background"
+      <BaseMinimap
         scaleAndPan={this.props.scaleAndPan}
-        zoomExtents={{ min: 0.3, max: 3 }}
+        setScaleAndPan={this.props.setScaleAndPan}
+        ref={(baseMinimap) => (this.baseMinimap = baseMinimap)}
+        name="background-minimap"
+        imageWidth={this.props.imageWidth}
+        imageHeight={this.props.imageHeight}
         canvasPositionAndSize={this.props.canvasPositionAndSize}
+        minimapPositionAndSize={this.props.minimapPositionAndSize}
       />
     );
   }
