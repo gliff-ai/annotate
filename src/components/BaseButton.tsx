@@ -1,5 +1,5 @@
-import * as React from "react";
-import { Button, UncontrolledTooltip } from "reactstrap";
+import React, { useState } from "react";
+import { Button, Tooltip } from "reactstrap";
 
 export interface ButtonProps {
   tooltip: string;
@@ -13,13 +13,24 @@ export const BaseButton: React.FC<ButtonProps> = ({
   icon,
   name,
   onClick,
-}) => (
-  <div className="mt-3 mb-3">
-    <Button id={name} color="secondary" onClick={onClick}>
-      <i className={`fas ${icon}`} />
-    </Button>
-    <UncontrolledTooltip placement="left" target={name} fade={false}>
-      {tooltip}
-    </UncontrolledTooltip>
-  </div>
-);
+}) => {
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+
+  const toggle = () => setTooltipOpen(!tooltipOpen);
+
+  return (
+    <span>
+      <Button id={name} color="secondary" onClick={onClick}>
+        <i className={`fas ${icon}`} />
+      </Button>
+      <Tooltip
+        placement="right"
+        isOpen={tooltipOpen}
+        target={name}
+        toggle={toggle}
+      >
+        {tooltip}
+      </Tooltip>
+    </span>
+  );
+};
