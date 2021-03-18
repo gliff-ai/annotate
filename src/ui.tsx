@@ -190,7 +190,7 @@ export class UserInterface extends Component {
         <CssBaseline />
         <Container disableGutters={true}>
           <AppBar>
-            <Toolbar color="transparent">
+            <Toolbar>
               <Tooltip title="Annotate new object">
                 <IconButton id={"addAnnotation"} onClick={this.addAnnotation}>
                   <Add />
