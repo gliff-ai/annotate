@@ -1,14 +1,14 @@
 import React from "react";
 import { Component } from "react";
 
-import { BaseCanvas, Props as BaseProps } from "../../baseCanvas";
+import { BaseCanvas, CanvasProps } from "../../baseCanvas";
 import {
   Annotations,
   canvasToImage,
   imageToOriginalCanvas,
 } from "../../annotation";
 
-interface Props extends BaseProps {
+interface Props extends CanvasProps {
   isActive: boolean;
   annotationsObject: Annotations;
   imageWidth: number;
@@ -78,7 +78,8 @@ export class PaintbrushCanvas extends Component<Props> {
         point[1],
         this.props.imageWidth,
         this.props.imageHeight,
-        this.props.scaleAndPan
+        this.props.scaleAndPan,
+        this.props.canvasPositionAndSize
       );
       return [x, y];
     });
@@ -201,6 +202,7 @@ export class PaintbrushCanvas extends Component<Props> {
           ref={(backCanvas) => (this.backCanvas = backCanvas)}
           name="backCanvas"
           scaleAndPan={this.props.scaleAndPan}
+          canvasPositionAndSize={this.props.canvasPositionAndSize}
         />
         <BaseCanvas
           onMouseDown={this.onMouseDown}
@@ -210,6 +212,7 @@ export class PaintbrushCanvas extends Component<Props> {
           ref={(baseCanvas) => (this.baseCanvas = baseCanvas)}
           name="paintbrush"
           scaleAndPan={this.props.scaleAndPan}
+          canvasPositionAndSize={this.props.canvasPositionAndSize}
         />
       </div>
     );

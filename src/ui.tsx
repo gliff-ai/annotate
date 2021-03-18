@@ -5,7 +5,7 @@ import { Annotations } from "./annotation";
 
 import { BaseButton } from "./components/BaseButton";
 
-import { BackgroundCanvas } from "./toolboxes/background";
+import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
 import { PaintbrushCanvas } from "./toolboxes/paintbrush";
 
@@ -18,7 +18,21 @@ export class UserInterface extends Component {
     imageWidth: number;
     imageHeight: number;
     activeAnnotationID: number;
-    brushSize: number
+
+    brushSize: number;
+
+    canvasPositionAndSize: {
+      top: number;
+      left: number;
+      width: number;
+      height: number;
+    };
+    minimapPositionAndSize: {
+      top: number;
+      left: number;
+      width: number;
+      height: number;
+    };
   };
 
   annotationsObject: Annotations;
@@ -34,7 +48,11 @@ export class UserInterface extends Component {
       imageHeight: 0,
       activeTool: null,
       activeAnnotationID: null,
-      brushSize: 20
+
+      brushSize: 20,
+
+      canvasPositionAndSize: { top: 150, left: 0, width: 400, height: 400 },
+      minimapPositionAndSize: { top: 0, left: 450, width: 200, height: 200 },
     };
 
     this.incrementScale = this.incrementScale.bind(this);
@@ -57,10 +75,10 @@ export class UserInterface extends Component {
     this.setState({ y: this.state.y - 10 });
   }
 
-  incrementBrush = () =>{
-    console.log(this.state.brushSize)
+  incrementBrush = () => {
+    console.log(this.state.brushSize);
     this.setState({ brushSize: this.state.brushSize + 10 });
-  }
+  };
 
   updateImageDimensions(imageWidth: number, imageHeight: number) {
     this.setState({
@@ -120,7 +138,7 @@ export class UserInterface extends Component {
           name={"brushradius"}
           onClick={this.incrementBrush}
         />
-{/* 
+        {/*
          <BaseButton
           tooltip={"decrease paintbrush size"}
           icon={"fa-brush"}
@@ -153,6 +171,7 @@ export class UserInterface extends Component {
           scaleAndPan={this.state}
           imgSrc="../public/test.png"
           updateImageDimensions={this.updateImageDimensions}
+          canvasPositionAndSize={this.state.canvasPositionAndSize}
         />
 
         <SplineCanvas
@@ -161,6 +180,16 @@ export class UserInterface extends Component {
           annotationsObject={this.annotationsObject}
           imageWidth={this.state.imageWidth}
           imageHeight={this.state.imageHeight}
+          canvasPositionAndSize={this.state.canvasPositionAndSize}
+        />
+
+        <BackgroundMinimap
+          scaleAndPan={this.state}
+          imgSrc="../public/test.png"
+          imageWidth={this.state.imageWidth}
+          imageHeight={this.state.imageHeight}
+          canvasPositionAndSize={this.state.canvasPositionAndSize}
+          minimapPositionAndSize={this.state.minimapPositionAndSize}
         />
 
         <PaintbrushCanvas
@@ -169,7 +198,8 @@ export class UserInterface extends Component {
           annotationsObject={this.annotationsObject}
           imageWidth={this.state.imageWidth}
           imageHeight={this.state.imageHeight}
-          brushRadius = {this.state.brushSize}
+          brushRadius={this.state.brushSize}
+          canvasPositionAndSize={this.state.canvasPositionAndSize}
         />
       </div>
     );
