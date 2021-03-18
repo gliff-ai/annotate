@@ -15,6 +15,7 @@ import {
   AccordionSummary,
   Typography,
   AccordionDetails,
+  CssBaseline,
 } from "@material-ui/core";
 import {
   Add,
@@ -29,8 +30,7 @@ import {
   AllOut,
   Brush,
 } from "@material-ui/icons";
-import { BaseButton } from "./components/BaseButton";
-import { Container, Row, Col, ButtonGroup } from "reactstrap";
+import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
 
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
@@ -62,6 +62,10 @@ export class UserInterface extends Component {
 
   annotationsObject: Annotations;
 
+  theme: Theme;
+
+  imageSource: string;
+
   constructor(props: never) {
     super(props);
     this.annotationsObject = new Annotations();
@@ -80,6 +84,12 @@ export class UserInterface extends Component {
       expanded: false,
     };
     this.updateImageDimensions = this.updateImageDimensions.bind(this);
+    this.theme = createMuiTheme({
+      palette: {
+        type: "dark",
+      },
+    });
+    this.imageSource = "public/zebrafish-heart.jpg";
   }
 
   setScaleAndPan = (scaleAndPan: {
@@ -176,15 +186,9 @@ export class UserInterface extends Component {
 
   render() {
     return (
-      <Container fluid={true}>
-        <Row>
-          <BaseButton
-            tooltip={"add new object"}
-            icon={"fa-plus"}
-            name={"newobject"}
-            onClick={this.addAnnotation}
-          />
-        <Container>
+      <ThemeProvider theme={this.theme}>
+        <CssBaseline />
+        <Container disableGutters={true}>
           <AppBar>
             <Toolbar color="transparent">
               <Tooltip title="Annotate new object">
@@ -200,7 +204,7 @@ export class UserInterface extends Component {
             <Grid item style={{ width: "85%", position: "relative" }}>
               <BackgroundCanvas
                 scaleAndPan={this.state.scaleAndPan}
-                imgSrc="../public/test.png"
+                imgSrc={this.imageSource}
                 updateImageDimensions={this.updateImageDimensions}
                 canvasPositionAndSize={this.state.canvasPositionAndSize}
               />
@@ -230,7 +234,7 @@ export class UserInterface extends Component {
                 <BackgroundMinimap
                   scaleAndPan={this.state.scaleAndPan}
                   setScaleAndPan={this.setScaleAndPan}
-                  imgSrc="../public/test.png"
+                  imgSrc={this.imageSource}
                   imageWidth={this.state.imageWidth}
                   imageHeight={this.state.imageHeight}
                   canvasPositionAndSize={this.state.canvasPositionAndSize}
@@ -345,6 +349,7 @@ export class UserInterface extends Component {
             </Grid>
           </Grid>
         </Container>
+      </ThemeProvider>
     );
   }
 }
