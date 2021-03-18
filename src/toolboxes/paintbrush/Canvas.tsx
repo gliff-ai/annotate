@@ -197,10 +197,11 @@ export class PaintbrushCanvas extends Component<Props> {
   }
 
   getCursor = () =>{
-    if(this.props.brushType == "roundBrush"){
+    console.log(this.props.brushType)
+    if(this.props.brushType == "paintbrush"){
       return "crosshair"
     }
-    else if (this.props.brushType == "roundEraser"){
+    else if (this.props.brushType == "eraser"){
       return "not-allowed"
     }
     return "none"

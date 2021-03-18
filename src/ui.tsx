@@ -17,7 +17,7 @@ export class UserInterface extends Component {
       y: number;
       scale: number;
     };
-    activeTool?: "spline" | "paintbrush" | "paintbrushEraser";
+    activeTool?: "spline" | "paintbrush" | "eraser";
     imageWidth: number;
     imageHeight: number;
     activeAnnotationID: number;
@@ -110,12 +110,7 @@ export class UserInterface extends Component {
 
  
   toggleEraser = () => {
-    if (this.state.activeTool === "paintbrushEraser") {
-      this.setState({ activeTool: null });
-    } else {
-      this.setState({ activeTool: "paintbrushEraser" });
-    }
-    
+      this.setState({ activeTool: "eraser" });
   };
 
 
@@ -135,11 +130,7 @@ export class UserInterface extends Component {
   };
 
   togglePaintbrush = () => {
-    if (this.state.activeTool === "paintbrush") {
-      this.setState({ activeTool: null });
-    } else {
       this.setState({ activeTool: "paintbrush" });
-    }
   };
 
   addAnnotation = () => {
