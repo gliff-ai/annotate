@@ -2,7 +2,6 @@ import React from "react";
 import { Component, ReactNode } from "react";
 import { XYPoint } from "../annotation/interfaces";
 
-
 export interface Props {
   name?: string;
   zoomExtents?: {
@@ -14,8 +13,14 @@ export interface Props {
     y: number;
     scale: number;
   };
-  cursor?: "crosshair" | "none";
+  cursor?: "crosshair" | "move" | "none";
   onClick?: (arg0: number, arg1: number) => void;
+  canvasPositionAndSize: {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  };
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
@@ -25,18 +30,12 @@ export class BaseCanvas extends Component<Props> {
   private canvasContext: CanvasRenderingContext2D;
   private canvasObserver: ResizeObserver;
 
-  private scaleAndPan: any;
-
   constructor(props: Props) {
     super(props);
     this.name = props.name;
 
-    this.scaleAndPan = props.scaleAndPan;
-
     this.onClickHandler = this.onClickHandler.bind(this);
   }
-
-
 
   private clearWindow = (): void => {
     this.canvasContext.save();
@@ -49,10 +48,9 @@ export class BaseCanvas extends Component<Props> {
         this.canvasContext.canvas.width,
         this.canvasContext.canvas.height
       );
-    } 
-    finally {
-        this.canvasContext.restore();
-      }
+    } finally {
+      this.canvasContext.restore();
+    }
   };
 
   componentDidUpdate() {
@@ -75,12 +73,8 @@ export class BaseCanvas extends Component<Props> {
     for (const entry of entries) {
       const { width, height } = entry.contentRect;
       this.setCanvasSize(width, height);
-      console.log(width, height)
+      //   console.log(width, height);
     }
-
-    this.canvasContext.beginPath();
-    this.canvasContext.arc(100, 75, 50, 0, 2 * Math.PI);
-    this.canvasContext.stroke();
   };
 
   private setCanvasSize = (width: number, height: number): void => {
@@ -111,7 +105,7 @@ export class BaseCanvas extends Component<Props> {
 
     // x and y are now in canvas space
 
-    console.log("Coordinate x: " + x, "Coordinate y: " + y);
+    // console.log("Coordinate x: " + x, "Coordinate y: " + y);
 
     // DO STUFF HERE
 
@@ -129,10 +123,11 @@ export class BaseCanvas extends Component<Props> {
           touchAction: "none",
           maxWidth: "100%",
           maxHeight: "100%",
-          width: 400,
-          height: 400,
+          width: this.props.canvasPositionAndSize.width,
+          height: this.props.canvasPositionAndSize.height,
           zIndex: 100,
-          top: "150px",
+          top: this.props.canvasPositionAndSize.top,
+          left: this.props.canvasPositionAndSize.left,
           position: "absolute",
           cursor: this.props.cursor || "none",
           border: "1px solid red",
