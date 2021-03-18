@@ -8,6 +8,7 @@ import { Container, Row, Col, ButtonGroup } from "reactstrap";
 
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
+import { PaintbrushCanvas } from "./toolboxes/paintbrush";
 
 export class UserInterface extends Component {
   state: {
@@ -16,10 +17,13 @@ export class UserInterface extends Component {
       y: number;
       scale: number;
     };
-    activeTool?: "spline";
+    activeTool?: "spline" | "paintbrush";
     imageWidth: number;
     imageHeight: number;
     activeAnnotationID: number;
+
+    brushSize: number;
+
     canvasPositionAndSize: {
       top: number;
       left: number;
@@ -43,6 +47,7 @@ export class UserInterface extends Component {
       imageHeight: 0,
       activeTool: null,
       activeAnnotationID: null,
+      brushSize: 20,
       canvasPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
     };
     this.updateImageDimensions = this.updateImageDimensions.bind(this);
@@ -98,6 +103,11 @@ export class UserInterface extends Component {
     this.setScaleAndPan({ y: this.state.scaleAndPan.y + 10 });
   };
 
+  incrementBrush = () => {
+    console.log(this.state.brushSize);
+    this.setState({ brushSize: this.state.brushSize + 10 });
+  };
+
   updateImageDimensions(imageWidth: number, imageHeight: number) {
     this.setState({
       imageWidth: imageWidth,
@@ -105,13 +115,21 @@ export class UserInterface extends Component {
     });
   }
 
-  toggleSpline() {
+  toggleSpline = () => {
     if (this.state.activeTool === "spline") {
       this.setState({ activeTool: null });
     } else {
       this.setState({ activeTool: "spline" });
     }
-  }
+  };
+
+  togglePaintbrush = () => {
+    if (this.state.activeTool === "paintbrush") {
+      this.setState({ activeTool: null });
+    } else {
+      this.setState({ activeTool: "paintbrush" });
+    }
+  };
 
   addAnnotation = () => {
     this.annotationsObject.addAnnotation(this.state.activeTool);
@@ -136,6 +154,19 @@ export class UserInterface extends Component {
             icon={"fa-bezier-curve"}
             name={"splint"}
             onClick={this.toggleSpline}
+          />
+          <BaseButton
+            tooltip={"increase paintbrush size"}
+            icon={"fa-brush"}
+            name={"brushradius"}
+            onClick={this.incrementBrush}
+          />
+
+          <BaseButton
+            tooltip={"Activate Paintbrush"}
+            icon={"fa-paint-brush"}
+            name={"paintbrush"}
+            onClick={this.togglePaintbrush}
           />
         </Row>
 

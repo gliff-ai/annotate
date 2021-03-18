@@ -2,7 +2,7 @@ import React from "react";
 import { ReactNode } from "react";
 import { Props as BaseProps, BaseCanvas } from "./Canvas";
 import {
-  originalCanvastoMinimap,
+  originalCanvasToMinimap,
   minimapToOriginalCanvas,
 } from "../annotation";
 
@@ -51,7 +51,7 @@ export class BaseMinimap extends React.Component<Props> {
   };
 
   private applyView = (): void => {
-    this.boundingRect = originalCanvastoMinimap(
+    this.boundingRect = originalCanvasToMinimap(
       this.props.imageWidth,
       this.props.imageHeight,
       this.props.scaleAndPan,

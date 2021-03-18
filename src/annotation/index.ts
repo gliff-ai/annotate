@@ -4,6 +4,7 @@ import {
   AnnotationParameters,
   ZTPoint,
   XYPoint,
+  BrushStrokes,
 } from "./interfaces";
 
 export class Annotations {
@@ -20,6 +21,7 @@ export class Annotations {
     labels: string[] = [],
     spaceTimeInfo: ZTPoint = { z: 0, t: 0 },
     coordinates: XYPoint[] = [],
+    brushStrokes: BrushStrokes[] = [],
     parameters: AnnotationParameters[] = []
   ): void => {
     this.activeAnnotationID =
@@ -28,6 +30,7 @@ export class Annotations {
         toolbox,
         spaceTimeInfo,
         coordinates,
+        brushStrokes,
         parameters,
       }) - 1;
   };
@@ -118,10 +121,6 @@ export function imageToCanvas(
   let x = imageX,
     y = imageY;
 
-  //   console.log("Beginning imageToCanvas")
-
-  //   console.log(x, y) // image space
-
   if (imageWidth > imageHeight) {
     x -= (imageWidth - imageHeight) / 2;
   } else if (imageHeight > imageWidth) {
@@ -137,8 +136,6 @@ export function imageToCanvas(
 
   x = x * scale + translateX;
   y = y * scale + translateY;
-
-  //   console.log(x, y) // canvas space
 
   return { x: x, y: y };
 }
@@ -165,27 +162,19 @@ export function imageToOriginalCanvas(
   let x = imageX,
     y = imageY;
 
-  //   console.log("Beginning imageToCanvas");
-
-  //   console.log(x, y); // image space
-
   if (imageWidth > imageHeight) {
     x -= (imageWidth - imageHeight) / 2;
   } else if (imageHeight > imageWidth) {
     y -= (imageHeight - imageWidth) / 2;
   }
 
-  //   console.log(x, y); // largest central square image space
-
   x = (canvasPositionAndSize.width * x) / Math.min(imageWidth, imageHeight);
   y = (canvasPositionAndSize.height * y) / Math.min(imageWidth, imageHeight);
-
-  //   console.log(x, y); // original canvas space
 
   return { x: x, y: y };
 }
 
-export function originalCanvastoMinimap(
+export function originalCanvasToMinimap(
   imageWidth: number,
   imageHeight: number,
   scaleAndPan: {

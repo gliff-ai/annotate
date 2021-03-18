@@ -78,7 +78,6 @@ export class BaseCanvas extends Component<Props> {
     for (const entry of entries) {
       const { width, height } = entry.contentRect;
       this.setCanvasSize(width, height);
-      //   console.log(width, height);
     }
   };
 
@@ -110,7 +109,7 @@ export class BaseCanvas extends Component<Props> {
 
     // x and y are now in canvas space
 
-    console.log("Double mouse click at coordinate x: " + x, " y: " + y);
+    // console.log("Double mouse click at coordinate x: " + x, " y: " + y);
 
     // DO STUFF HERE
 
@@ -128,7 +127,7 @@ export class BaseCanvas extends Component<Props> {
 
     // x and y are now in canvas space
 
-    console.log("Mouse click at coordinate x: " + x, " y: " + y);
+    // console.log("Mouse click at coordinate x: " + x, " y: " + y);
 
     // DO STUFF HERE
 
@@ -142,7 +141,7 @@ export class BaseCanvas extends Component<Props> {
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
 
-    console.log("Mouse down at coordinate x: " + x, " y: " + y);
+    // console.log("Mouse down at coordinate x: " + x, " y: " + y);
 
     // DO STUFF HERE
 
@@ -156,7 +155,7 @@ export class BaseCanvas extends Component<Props> {
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
 
-    console.log("Mouse move at coordinate x: " + x, " y: " + y);
+    // console.log("Mouse move at coordinate x: " + x, " y: " + y);
 
     // DO STUFF HERE
 
@@ -170,7 +169,7 @@ export class BaseCanvas extends Component<Props> {
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
 
-    console.log("Mouse up at coordinate x: " + x, " y: " + y);
+    // console.log("Mouse up at coordinate x: " + x, " y: " + y);
 
     // DO STUFF HERE
 
@@ -188,7 +187,7 @@ export class BaseCanvas extends Component<Props> {
 
     // x and y are now in canvas space
 
-    console.log("Mouse right click at coordinate x: " + x, " y: " + y);
+    // console.log("Mouse right click at coordinate x: " + x, " y: " + y);
 
     // DO STUFF HERE
 
@@ -218,6 +217,9 @@ export class BaseCanvas extends Component<Props> {
           width={this.props.canvasPositionAndSize.width} // can use "100%" here
           height={this.props.canvasPositionAndSize.height}
           onClick={this.onClickHandler}
+          onMouseDown={this.onMouseDownHandler}
+          onMouseMove={this.onMouseMoveHandler}
+          onMouseUp={this.onMouseUpHandler}
           key={this.name}
           id={`${this.name}-canvas`}
           ref={(canvas) => {
