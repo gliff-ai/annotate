@@ -13,6 +13,7 @@ export interface Props {
     y: number;
     scale: number;
   };
+
   cursor?: "crosshair" | "move" | "none";
   onDoubleClick?: (x: number, y: number) => void;
   onClick?: (x: number, y: number) => void;
@@ -78,7 +79,6 @@ export class BaseCanvas extends Component<Props> {
     for (const entry of entries) {
       const { width, height } = entry.contentRect;
       this.setCanvasSize(width, height);
-      //   console.log(width, height);
     }
   };
 
@@ -218,6 +218,9 @@ export class BaseCanvas extends Component<Props> {
       >
         <canvas
           onClick={this.onClickHandler}
+          onMouseDown={this.onMouseDownHandler}
+          onMouseMove={this.onMouseMoveHandler}
+          onMouseUp={this.onMouseUpHandler}
           key={this.name}
           id={`${this.name}-canvas`}
           ref={(canvas) => {

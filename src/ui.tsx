@@ -8,6 +8,7 @@ import { ButtonToolbar, ButtonGroup } from "reactstrap";
 
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
+import { PaintbrushCanvas } from "./toolboxes/paintbrush";
 
 export class UserInterface extends Component {
   state: {
@@ -16,10 +17,13 @@ export class UserInterface extends Component {
       y: number;
       scale: number;
     };
-    activeTool?: "spline";
+    activeTool?: "spline" | "paintbrush";
     imageWidth: number;
     imageHeight: number;
     activeAnnotationID: number;
+
+    brushSize: number;
+
     canvasPositionAndSize: {
       top: number;
       left: number;
@@ -49,6 +53,9 @@ export class UserInterface extends Component {
       imageHeight: 0,
       activeTool: null,
       activeAnnotationID: null,
+
+      brushSize: 20,
+
       canvasPositionAndSize: { top: 150, left: 0, width: 400, height: 400 },
       minimapPositionAndSize: { top: 0, left: 450, width: 200, height: 200 },
     };
@@ -105,6 +112,11 @@ export class UserInterface extends Component {
     this.setScaleAndPan({ y: this.state.scaleAndPan.y + 10 });
   };
 
+  incrementBrush = () => {
+    console.log(this.state.brushSize);
+    this.setState({ brushSize: this.state.brushSize + 10 });
+  };
+
   updateImageDimensions(imageWidth: number, imageHeight: number) {
     this.setState({
       imageWidth: imageWidth,
@@ -112,13 +124,21 @@ export class UserInterface extends Component {
     });
   }
 
-  toggleSpline() {
+  toggleSpline = () => {
     if (this.state.activeTool === "spline") {
       this.setState({ activeTool: null });
     } else {
       this.setState({ activeTool: "spline" });
     }
-  }
+  };
+
+  togglePaintbrush = () => {
+    if (this.state.activeTool === "paintbrush") {
+      this.setState({ activeTool: null });
+    } else {
+      this.setState({ activeTool: "paintbrush" });
+    }
+  };
 
   addAnnotation = () => {
     this.annotationsObject.addAnnotation(this.state.activeTool);
@@ -189,9 +209,24 @@ export class UserInterface extends Component {
           <BaseButton
             tooltip={"Activate Spline"}
             icon={"fa-bezier-curve"}
-            name={"splint"}
+            name={"spline"}
             onClick={this.toggleSpline}
           />
+
+          <BaseButton
+          tooltip={"increase paintbrush size"}
+          icon={"fa-brush"}
+          name={"brushradius"}
+          onClick={this.incrementBrush}
+        />
+
+
+        <BaseButton
+          tooltip={"Activate Paintbrush"}
+          icon={"fa-paint-brush"}
+          name={"paintbrush"}
+          onClick={this.togglePaintbrush}
+        />
         </ButtonToolbar>
 
         <BackgroundCanvas
@@ -223,6 +258,16 @@ export class UserInterface extends Component {
             width: 200,
             height: 200,
           }}
+        />
+
+        <PaintbrushCanvas
+          scaleAndPan={this.state.scaleAndPan}
+          isActive={this.state.activeTool === "paintbrush"}
+          annotationsObject={this.annotationsObject}
+          imageWidth={this.state.imageWidth}
+          imageHeight={this.state.imageHeight}
+          brushRadius={this.state.brushSize}
+          canvasPositionAndSize={this.state.canvasPositionAndSize}
         />
       </div>
     );
