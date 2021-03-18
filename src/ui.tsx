@@ -51,7 +51,7 @@ export class UserInterface extends Component {
       },
       imageWidth: 0,
       imageHeight: 0,
-      activeTool: null,
+      activeTool: "paintbrush",
       activeAnnotationID: null,
 
       brushSize: 20,
@@ -60,6 +60,7 @@ export class UserInterface extends Component {
       minimapPositionAndSize: { top: 0, left: 450, width: 200, height: 200 },
     };
     this.updateImageDimensions = this.updateImageDimensions.bind(this);
+    this.annotationsObject.addAnnotation(this.state.activeTool)
   }
 
   setScaleAndPan = (scaleAndPan: {
