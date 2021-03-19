@@ -45,12 +45,13 @@ export class UserInterface extends Component {
       },
       imageWidth: 0,
       imageHeight: 0,
-      activeTool: null,
+      activeTool: "paintbrush",
       activeAnnotationID: null,
       brushSize: 20,
       canvasPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
     };
     this.updateImageDimensions = this.updateImageDimensions.bind(this);
+    this.annotationsObject.addAnnotation(this.state.activeTool)
   }
 
   setScaleAndPan = (scaleAndPan: {
