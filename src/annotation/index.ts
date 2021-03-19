@@ -61,6 +61,10 @@ export class Annotations {
   setAnnotationCoordinates = (newCoordinates: XYPoint[]): void => {
     this.data[this.activeAnnotationID]["coordinates"] = newCoordinates;
   };
+
+  getAllAnnotations = (): AnnotationsDataArray => {
+    return this.data;
+  };
 }
 
 export function canvasToImage(

@@ -105,7 +105,6 @@ export class UserInterface extends Component {
   };
 
   incrementBrush = () => {
-    console.log(this.state.brushSize);
     this.setState({ brushSize: this.state.brushSize + 10 });
   };
 
@@ -186,6 +185,16 @@ export class UserInterface extends Component {
               annotationsObject={this.annotationsObject}
               imageWidth={this.state.imageWidth}
               imageHeight={this.state.imageHeight}
+              canvasPositionAndSize={this.state.canvasPositionAndSize}
+            />
+
+            <PaintbrushCanvas
+              scaleAndPan={this.state.scaleAndPan}
+              isActive={this.state.activeTool === "paintbrush"}
+              annotationsObject={this.annotationsObject}
+              imageWidth={this.state.imageWidth}
+              imageHeight={this.state.imageHeight}
+              brushRadius={this.state.brushSize}
               canvasPositionAndSize={this.state.canvasPositionAndSize}
             />
           </Col>

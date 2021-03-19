@@ -38,8 +38,6 @@ export class BaseCanvas extends Component<Props> {
   constructor(props: Props) {
     super(props);
     this.name = props.name;
-
-    this.onClickHandler = this.onClickHandler.bind(this);
   }
 
   private clearWindow = (): void => {
@@ -100,18 +98,18 @@ export class BaseCanvas extends Component<Props> {
     this.canvasObserver.unobserve(this.canvasContainer);
   };
 
-  onDoubleClickHandler = (e: React.MouseEvent): void => {
-    // x and y start out in window space
+  windowToCanvas = (e: React.MouseEvent): XYPoint => {
+    // returns the mouse coordinates from e, transformed from window to canvas space
 
     let rect = this.canvas.getBoundingClientRect();
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
 
-    // x and y are now in canvas space
+    return { x: x, y: y };
+  };
 
-    // console.log("Double mouse click at coordinate x: " + x, " y: " + y);
-
-    // DO STUFF HERE
+  onDoubleClickHandler = (e: React.MouseEvent): void => {
+    const { x: x, y: y } = this.windowToCanvas(e);
 
     if (this.props.onDoubleClick) {
       this.props.onDoubleClick(x, y);
@@ -119,17 +117,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onClickHandler = (e: React.MouseEvent): void => {
-    // x and y start out in window space
-
-    let rect = this.canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
-
-    // x and y are now in canvas space
-
-    // console.log("Mouse click at coordinate x: " + x, " y: " + y);
-
-    // DO STUFF HERE
+    const { x: x, y: y } = this.windowToCanvas(e);
 
     if (this.props.onClick) {
       this.props.onClick(x, y);
@@ -137,13 +125,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onMouseDownHandler = (e: React.MouseEvent): void => {
-    let rect = this.canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
-
-    // console.log("Mouse down at coordinate x: " + x, " y: " + y);
-
-    // DO STUFF HERE
+    const { x: x, y: y } = this.windowToCanvas(e);
 
     if (this.props.onMouseDown) {
       this.props.onMouseDown(x, y);
@@ -151,13 +133,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onMouseMoveHandler = (e: React.MouseEvent): void => {
-    let rect = this.canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
-
-    // console.log("Mouse move at coordinate x: " + x, " y: " + y);
-
-    // DO STUFF HERE
+    const { x: x, y: y } = this.windowToCanvas(e);
 
     if (this.props.onMouseMove) {
       this.props.onMouseMove(x, y);
@@ -165,13 +141,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onMouseUpHandler = (e: React.MouseEvent): void => {
-    let rect = this.canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
-
-    // console.log("Mouse up at coordinate x: " + x, " y: " + y);
-
-    // DO STUFF HERE
+    const { x: x, y: y } = this.windowToCanvas(e);
 
     if (this.props.onMouseUp) {
       this.props.onMouseUp(x, y);
@@ -179,17 +149,9 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onContextMenuHandler = (e: React.MouseEvent): void => {
-    // x and y start out in window space
-
-    let rect = this.canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
+    const { x: x, y: y } = this.windowToCanvas(e);
 
     // x and y are now in canvas space
-
-    // console.log("Mouse right click at coordinate x: " + x, " y: " + y);
-
-    // DO STUFF HERE
 
     if (this.props.onContextMenu) {
       this.props.onContextMenu(x, y);
@@ -201,6 +163,7 @@ export class BaseCanvas extends Component<Props> {
       <div
         ref={(canvasContainer) => (this.canvasContainer = canvasContainer)}
         style={{
+          pointerEvents: "inherit",
           display: "block",
           touchAction: "none",
           width: this.props.canvasPositionAndSize.width, // can use "100%" here
@@ -214,12 +177,14 @@ export class BaseCanvas extends Component<Props> {
         }}
       >
         <canvas
+          style={{ pointerEvents: "inherit" }}
           width={this.props.canvasPositionAndSize.width} // can use "100%" here
           height={this.props.canvasPositionAndSize.height}
           onClick={this.onClickHandler}
           onMouseDown={this.onMouseDownHandler}
           onMouseMove={this.onMouseMoveHandler}
           onMouseUp={this.onMouseUpHandler}
+          onDoubleClick={this.onDoubleClickHandler}
           key={this.name}
           id={`${this.name}-canvas`}
           ref={(canvas) => {
