@@ -77,19 +77,22 @@ export class UserInterface extends Component {
       },
       imageWidth: 0,
       imageHeight: 0,
-      activeTool: null,
+      activeTool: "paintbrush",
       activeAnnotationID: null,
       brushSize: 20,
       canvasPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       expanded: false,
     };
     this.updateImageDimensions = this.updateImageDimensions.bind(this);
+
     this.theme = createMuiTheme({
       palette: {
         type: "dark",
       },
     });
     this.imageSource = "public/zebrafish-heart.jpg";
+
+    this.annotationsObject.addAnnotation(this.state.activeTool)
   }
 
   setScaleAndPan = (scaleAndPan: {
@@ -143,7 +146,6 @@ export class UserInterface extends Component {
   };
 
   incrementBrush = () => {
-    console.log(this.state.brushSize);
     this.setState({ brushSize: this.state.brushSize + 10 });
   };
 
