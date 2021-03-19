@@ -62,9 +62,9 @@ export class Annotations {
     this.data[this.activeAnnotationID]["coordinates"] = newCoordinates;
   };
 
-  getData = (): AnnotationsDataArray => {
+  getAllAnnotations = (): AnnotationsDataArray => {
     return this.data;
-  }
+  };
 }
 
 export function canvasToImage(

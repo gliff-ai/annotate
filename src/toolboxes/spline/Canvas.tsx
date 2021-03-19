@@ -108,7 +108,7 @@ export class SplineCanvas extends Component<Props> {
 
     // Draw all the splines:
     this.props.annotationsObject
-      .getData()
+      .getAllAnnotations()
       .forEach((annotation: Annotation, i: number) => {
         if (annotation.toolbox === "spline") {
           this.drawSplineVector(
