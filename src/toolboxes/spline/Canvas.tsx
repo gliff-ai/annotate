@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import { Component } from "react";
+import keyBindings from "./keybindings.json";
 
 // import { SplineVector } from "./interfaces";
 import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
@@ -120,17 +121,32 @@ export class SplineCanvas extends Component<Props> {
     // Handle single-key events.
     // TODO: move this to ui
     console.log(event);
-    switch (event.code) {
-      case "Delete": // Delete selected point
-        this.deleteSelectedPoint();
-        break;
-      case "Minus": // Delete selected point
-        this.deleteSelectedPoint();
-        break;
-      case "Escape": // Escape selected point
-        // TODO: add function for removing selection
-        break;
-    }
+
+    let keyString =
+      (event.ctrlKey ? "ctrl+" : "") +
+      (event.shiftKey ? "shift+" : "") +
+      (event.altKey ? "alt+" : "") +
+      event.key.toLowerCase();
+
+    console.log(keyString);
+
+    const methodName = keyBindings["ctrl+delete"];
+
+    this[methodName]();
+
+    // eval("this." + methodName + "()");
+
+    // switch (event.code) {
+    //   case "Delete": // Delete selected point
+    //     this.deleteSelectedPoint();
+    //     break;
+    //   case "Minus": // Delete selected point
+    //     this.deleteSelectedPoint();
+    //     break;
+    //   case "Escape": // Escape selected point
+    //     // TODO: add function for removing selection
+    //     break;
+    // }
   };
 
   deleteSelectedPoint = (): void => {
