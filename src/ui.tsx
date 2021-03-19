@@ -134,22 +134,22 @@ export class UserInterface extends Component {
 
   incrementPanX = (): void => {
     // negative is left, +ve is right...
-    this.setScaleAndPan({ x: this.state.scaleAndPan.x - 10 });
+    this.setScaleAndPan({ x: this.state.scaleAndPan.x + 10 });
   };
 
   decrementPanX = (): void => {
     // negative is left, +ve is right...
-    this.setScaleAndPan({ x: this.state.scaleAndPan.x + 10 });
+    this.setScaleAndPan({ x: this.state.scaleAndPan.x - 10 });
   };
 
   incrementPanY = (): void => {
     // negative is up, +ve is down...
-    this.setScaleAndPan({ y: this.state.scaleAndPan.y - 10 });
+    this.setScaleAndPan({ y: this.state.scaleAndPan.y + 10 });
   };
 
   decrementPanY = (): void => {
     // negative is up, +ve is down...
-    this.setScaleAndPan({ y: this.state.scaleAndPan.y + 10 });
+    this.setScaleAndPan({ y: this.state.scaleAndPan.y - 10 });
   };
 
   incrementBrush = () => {
