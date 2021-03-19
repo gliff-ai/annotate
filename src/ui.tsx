@@ -50,7 +50,7 @@ export class UserInterface extends Component {
 
     brushSize: number;
 
-    canvasPositionAndSize: {
+    viewportPositionAndSize: {
       top: number;
       left: number;
       width: number;
@@ -80,7 +80,7 @@ export class UserInterface extends Component {
       activeTool: "paintbrush",
       activeAnnotationID: null,
       brushSize: 20,
-      canvasPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
+      viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       expanded: false,
     };
     this.updateImageDimensions = this.updateImageDimensions.bind(this);
@@ -95,21 +95,28 @@ export class UserInterface extends Component {
     this.annotationsObject.addAnnotation(this.state.activeTool)
   }
 
+  setViewportPositionAndSize = (viewportPositionAndSize: {
+    top?: number;
+    left?: number;
+    width?: number;
+    height?: number;
+  }): void => {
+    viewportPositionAndSize.top ??= this.state.viewportPositionAndSize.top;
+    viewportPositionAndSize.left ??= this.state.viewportPositionAndSize.left;
+    viewportPositionAndSize.width ??= this.state.viewportPositionAndSize.width;
+    viewportPositionAndSize.height ??= this.state.viewportPositionAndSize.height;
+    this.setState({ viewportPositionAndSize: viewportPositionAndSize});
+  };
+
   setScaleAndPan = (scaleAndPan: {
     scale?: number;
     x?: number;
     y?: number;
   }): void => {
     // the is for passing down to the minimap
-    if (scaleAndPan.scale === undefined) {
-      scaleAndPan.scale = this.state.scaleAndPan.scale;
-    }
-    if (scaleAndPan.x === undefined) {
-      scaleAndPan.x = this.state.scaleAndPan.x;
-    }
-    if (scaleAndPan.y === undefined) {
-      scaleAndPan.y = this.state.scaleAndPan.y;
-    }
+      scaleAndPan.scale ??= this.state.scaleAndPan.scale;
+      scaleAndPan.x ??= this.state.scaleAndPan.x;
+      scaleAndPan.y ??= this.state.scaleAndPan.y;
     this.setState({ scaleAndPan: scaleAndPan });
   };
 
@@ -208,7 +215,8 @@ export class UserInterface extends Component {
                 scaleAndPan={this.state.scaleAndPan}
                 imgSrc={this.imageSource}
                 updateImageDimensions={this.updateImageDimensions}
-                canvasPositionAndSize={this.state.canvasPositionAndSize}
+                canvasPositionAndSize={this.state.viewportPositionAndSize}
+                setCanvasPositionAndSize={this.setViewportPositionAndSize}
               />
 
               <SplineCanvas
@@ -217,7 +225,8 @@ export class UserInterface extends Component {
                 annotationsObject={this.annotationsObject}
                 imageWidth={this.state.imageWidth}
                 imageHeight={this.state.imageHeight}
-                canvasPositionAndSize={this.state.canvasPositionAndSize}
+                canvasPositionAndSize={this.state.viewportPositionAndSize}
+                setCanvasPositionAndSize={this.setViewportPositionAndSize}
               />
 
               <PaintbrushCanvas
@@ -227,7 +236,8 @@ export class UserInterface extends Component {
                 imageWidth={this.state.imageWidth}
                 imageHeight={this.state.imageHeight}
                 brushRadius={this.state.brushSize}
-                canvasPositionAndSize={this.state.canvasPositionAndSize}
+                canvasPositionAndSize={this.state.viewportPositionAndSize}
+                setCanvasPositionAndSize={this.setViewportPositionAndSize}
               />
             </Grid>
 
@@ -239,7 +249,7 @@ export class UserInterface extends Component {
                   imgSrc={this.imageSource}
                   imageWidth={this.state.imageWidth}
                   imageHeight={this.state.imageHeight}
-                  canvasPositionAndSize={this.state.canvasPositionAndSize}
+                  canvasPositionAndSize={this.state.viewportPositionAndSize}
                   minimapPositionAndSize={{
                     top: 0,
                     left: 0,

@@ -364,6 +364,7 @@ export class SplineCanvas extends Component<Props> {
           name="spline"
           scaleAndPan={this.props.scaleAndPan}
           canvasPositionAndSize={this.props.canvasPositionAndSize}
+          setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
         />
       </div>
     );

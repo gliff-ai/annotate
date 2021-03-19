@@ -26,6 +26,12 @@ export interface Props {
     width: number;
     height: number;
   };
+  setCanvasPositionAndSize?: (canvasPositionAndSize: {
+    top?: number;
+    left?: number;
+    width?: number;
+    height?: number;
+  }) => void;
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
@@ -84,6 +90,7 @@ export class BaseCanvas extends Component<Props> {
     this.canvas.height = height;
     this.canvas.style.width = `${width}px`;
     this.canvas.style.height = `${height}px`;
+    this.props.setCanvasPositionAndSize({width: width, height: height});
   };
 
   componentDidMount = (): void => {
