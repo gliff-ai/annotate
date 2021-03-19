@@ -26,6 +26,12 @@ export interface Props {
     width: number;
     height: number;
   };
+  setCanvasPositionAndSize?: (canvasPositionAndSize: {
+    top?: number;
+    left?: number;
+    width?: number;
+    height?: number;
+  }) => void;
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
@@ -84,6 +90,7 @@ export class BaseCanvas extends Component<Props> {
     this.canvas.height = height;
     this.canvas.style.width = `${width}px`;
     this.canvas.style.height = `${height}px`;
+    this.props.setCanvasPositionAndSize({width: width, height: height});
   };
 
   componentDidMount = (): void => {
@@ -159,6 +166,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   render = (): ReactNode => {
+    console.log("Rendered " + this.name);
     return (
       <div
         ref={(canvasContainer) => (this.canvasContainer = canvasContainer)}
@@ -166,19 +174,19 @@ export class BaseCanvas extends Component<Props> {
           pointerEvents: "inherit",
           display: "block",
           touchAction: "none",
-          width: this.props.canvasPositionAndSize.width, // can use "100%" here
+          width: "100%",
           height: this.props.canvasPositionAndSize.height,
           zIndex: 100,
+          cursor: this.props.cursor || "pointer",
+          //   border: "1px solid gray",
           top: this.props.canvasPositionAndSize.top,
           left: this.props.canvasPositionAndSize.left,
           position: "absolute",
-          cursor: this.props.cursor || "pointer",
-          border: "1px solid gray",
         }}
       >
         <canvas
           style={{ pointerEvents: "inherit" }}
-          width={this.props.canvasPositionAndSize.width} // can use "100%" here
+          width="100%"
           height={this.props.canvasPositionAndSize.height}
           onClick={this.onClickHandler}
           onMouseDown={this.onMouseDownHandler}

@@ -214,6 +214,7 @@ export class PaintbrushCanvas extends Component<Props> {
           name="paintbrush"
           scaleAndPan={this.props.scaleAndPan}
           canvasPositionAndSize={this.props.canvasPositionAndSize}
+          setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
         />
       </div>
     );
