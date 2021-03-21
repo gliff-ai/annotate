@@ -22,7 +22,7 @@ export class PaintbrushCanvas extends Component<Props> {
   private backCanvas: BaseCanvas;
   private isPressing: boolean;
   private isDrawing: boolean;
-  private points: [number, number][];
+  private points: XYPoint[];
 
   state: {
     cursor: "crosshair" | "none";
@@ -49,12 +49,12 @@ export class PaintbrushCanvas extends Component<Props> {
     if (this.isPressing && !this.isDrawing) {
       // Start drawing and add point
       this.isDrawing = true;
-      this.points.push([x, y]);
+      this.points.push({x, y});
     }
 
     if (this.isDrawing) {
       // Add new point
-      this.points.push([x, y]);
+      this.points.push({x, y});
 
       // Draw current points
       this.drawPoints(
@@ -68,7 +68,7 @@ export class PaintbrushCanvas extends Component<Props> {
   };
 
   drawPoints = (
-    imagePoints: [number, number][],
+    imagePoints: XYPoint[],
     brushColor: string,
     brushRadius: number,
     clearCanvas = true,
@@ -76,7 +76,7 @@ export class PaintbrushCanvas extends Component<Props> {
   ): void => {
     const points = imagePoints.map((point): XYPoint => {
       const { x, y } = imageToOriginalCanvas(
-        point[0],
+        point.x,
         point.y,
         this.props.imageWidth,
         this.props.imageHeight,
