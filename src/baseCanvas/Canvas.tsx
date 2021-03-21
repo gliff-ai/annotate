@@ -62,7 +62,7 @@ export class BaseCanvas extends Component<Props> {
     }
   };
 
-  componentDidUpdate() {
+  componentDidUpdate = (): void => {
     this.applyView();
   }
 
@@ -107,10 +107,8 @@ export class BaseCanvas extends Component<Props> {
 
   windowToCanvas = (e: React.MouseEvent): XYPoint => {
     // returns the mouse coordinates from e, transformed from window to canvas space
-
-    let rect = this.canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
+    const x = e.clientX - this.canvas.getBoundingClientRect().left;
+    const y = e.clientY - this.canvas.getBoundingClientRect().top;
 
     return { x: x, y: y };
   };
