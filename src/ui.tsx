@@ -83,7 +83,6 @@ export class UserInterface extends Component {
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       expanded: false,
     };
-    this.updateImageDimensions = this.updateImageDimensions.bind(this);
 
     this.theme = createMuiTheme({
       palette: {
@@ -152,18 +151,18 @@ export class UserInterface extends Component {
     this.setScaleAndPan({ y: this.state.scaleAndPan.y - 10 });
   };
 
-  incrementBrush = () => {
+  incrementBrush = (): void => {
     this.setState({ brushSize: this.state.brushSize + 10 });
   };
 
-  updateImageDimensions(imageWidth: number, imageHeight: number) {
+  updateImageDimensions = (imageWidth: number, imageHeight: number):void=> {
     this.setState({
       imageWidth: imageWidth,
       imageHeight: imageHeight,
     });
   }
 
-  toggleSpline = () => {
+  toggleSpline = (): void => {
     if (this.state.activeTool === "spline") {
       this.setState({ activeTool: null });
     } else {
@@ -171,7 +170,7 @@ export class UserInterface extends Component {
     }
   };
 
-  togglePaintbrush = () => {
+  togglePaintbrush = (): void => {
     if (this.state.activeTool === "paintbrush") {
       this.setState({ activeTool: null });
     } else {
@@ -179,7 +178,7 @@ export class UserInterface extends Component {
     }
   };
 
-  addAnnotation = () => {
+  addAnnotation = (): void => {
     this.annotationsObject.addAnnotation(this.state.activeTool);
     this.setState({
       activeAnnotationID: this.annotationsObject.getActiveAnnotationID(),
@@ -189,11 +188,11 @@ export class UserInterface extends Component {
   handleToolboxChange = (panel: string) => (
     event: ChangeEvent,
     isExpanded: boolean
-  ) => {
+  ): void => {
     this.setState({ expanded: isExpanded ? panel : false });
   };
 
-  render() {
+  render = (): ReactNode => {
     return (
       <ThemeProvider theme={this.theme}>
         <CssBaseline />
