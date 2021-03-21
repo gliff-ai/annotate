@@ -38,7 +38,7 @@ export class BaseCanvas extends Component<Props> {
   private canvas: HTMLCanvasElement;
   private canvasContainer: HTMLDivElement;
 
-  private canvasContext: CanvasRenderingContext2D;
+  public canvasContext: CanvasRenderingContext2D;
   private canvasObserver: ResizeObserver;
 
   constructor(props: Props) {
@@ -46,7 +46,7 @@ export class BaseCanvas extends Component<Props> {
     this.name = props.name;
   }
 
-  private clearWindow = (): void => {
+  public clearWindow = (): void => {
     this.canvasContext.save();
     this.canvasContext.setTransform(1, 0, 0, 1, 0, 0); // identity matrix
 
@@ -157,14 +157,12 @@ export class BaseCanvas extends Component<Props> {
     const { x: x, y: y } = this.windowToCanvas(e);
 
     // x and y are now in canvas space
-
     if (this.props.onContextMenu) {
       this.props.onContextMenu(x, y);
     }
   };
 
   render = (): ReactNode => {
-    console.log("Rendered " + this.name);
     return (
       <div
         ref={(canvasContainer) => (this.canvasContainer = canvasContainer)}

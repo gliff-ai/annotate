@@ -21,7 +21,7 @@ export interface Props extends BaseProps {
 }
 
 export class BaseMinimap extends React.Component<Props> {
-  private baseCanvas: BaseCanvas;
+  public baseCanvas: BaseCanvas;
   private boundingRect: PositionAndSize;
 
   constructor(props: Props) {
