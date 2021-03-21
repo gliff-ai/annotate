@@ -5,6 +5,7 @@ import {
   ZTPoint,
   XYPoint,
   BrushStrokes,
+  PositionAndSize,
 } from "./interfaces";
 
 export class Annotations {
@@ -83,8 +84,8 @@ export function canvasToImage(
     width: number;
     height: number;
   }
-) {
-  let { x: translateX, y: translateY, scale: scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
+): XYPoint {
+  const { x: translateX, y: translateY, scale: scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
 
   // transform from canvas space to original canvas space:
   let x = (canvasX - translateX) / scale;
@@ -119,8 +120,8 @@ export function imageToCanvas(
     width: number;
     height: number;
   }
-) {
-  let { x: translateX, y: translateY, scale: scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
+): XYPoint {
+  const { x: translateX, y: translateY, scale: scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
 
   let x = imageX,
     y = imageY;
@@ -149,20 +150,13 @@ export function imageToOriginalCanvas(
   imageY: number,
   imageWidth: number,
   imageHeight: number,
-  scaleAndPan: {
-    x: number;
-    y: number;
-    scale: number;
-  },
   canvasPositionAndSize: {
     top: number;
     left: number;
     width: number;
     height: number;
   }
-) {
-  let { x: translateX, y: translateY, scale: scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
-
+): XYPoint {
   let x = imageX,
     y = imageY;
 
@@ -186,21 +180,9 @@ export function originalCanvasToMinimap(
     y: number;
     scale: number;
   },
-  canvasPositionAndSize: {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  },
-  minimapPositionAndSize: {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  }
-) {
-  let { x: translateX, y: translateY, scale: scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
-
+  canvasPositionAndSize: PositionAndSize,
+  minimapPositionAndSize: PositionAndSize
+): PositionAndSize {
   let x = scaleAndPan.x,
     y = scaleAndPan.y;
 
@@ -212,23 +194,20 @@ export function originalCanvasToMinimap(
   }
 
   // convert width and height
-  let viewfinderWidth = minimapPositionAndSize.width / scaleAndPan.scale;
-  let viewfinderHeight = minimapPositionAndSize.width / scaleAndPan.scale;
+  const viewfinderWidth = minimapPositionAndSize.width / scaleAndPan.scale;
+  const viewfinderHeight = minimapPositionAndSize.width / scaleAndPan.scale;
 
   // convert X and Y into minimap space
-  let viewfinderX =
+  const viewfinderX =
     (viewfinderWidth * -x) /
     Math.min(canvasPositionAndSize.width, canvasPositionAndSize.height);
-  let viewfinderY =
+  const viewfinderY =
     (viewfinderHeight * -y) /
     Math.min(canvasPositionAndSize.width, canvasPositionAndSize.height);
 
-  //   console.log(scaleAndPan.x, scaleAndPan.y, scaleAndPan.scale);
-  //   console.log(viewfinderX, viewfinderY, viewfinderWidth, viewfinderHeight);
-
   return {
-    x: viewfinderX,
-    y: viewfinderY,
+    top: viewfinderX,
+    left: viewfinderY,
     width: viewfinderWidth,
     height: viewfinderHeight,
   };
@@ -242,21 +221,9 @@ export function minimapToOriginalCanvas(
     y: number;
     scale: number;
   },
-  canvasPositionAndSize: {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  },
-  minimapPositionAndSize: {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  }
-) {
-  let { x: translateX, y: translateY, scale: scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
-
+  canvasPositionAndSize: PositionAndSize,
+  minimapPositionAndSize: PositionAndSize
+): XYPoint {
   // transform from canvas space to original canvas space:
   let x = minimapX; // * (canvasPositionAndSize.width / minimapPositionAndSize.width);
   let y = minimapY; // * (canvasPositionAndSize.height / minimapPositionAndSize.height);
