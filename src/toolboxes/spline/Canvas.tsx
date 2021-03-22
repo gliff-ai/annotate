@@ -1,7 +1,6 @@
 import React, { ReactNode } from "react";
 import { Component } from "react";
 
-// import { SplineVector } from "./interfaces";
 import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
 import {
   Annotations,
@@ -22,7 +21,20 @@ enum Mode {
   edit,
 }
 
+// Here we define the methods that are exposed to be called by keyboard shortcuts
+// We should maybe namespace them so we don't get conflicting methods across toolboxes.
+export const events = [
+  "deleteSelectedPoint",
+  "changeSplineModeToEdit",
+  "removePointSelection",
+] as const;
+interface Event extends CustomEvent {
+  type: typeof events[number];
+}
+
 export class SplineCanvas extends Component<Props> {
+  readonly name: "spline";
+
   private baseCanvas: BaseCanvas;
   private selectedPointIndex: number;
   private isDragging: boolean;
@@ -36,8 +48,6 @@ export class SplineCanvas extends Component<Props> {
     this.selectedPointIndex = -1;
     this.isDragging = false;
     this.mode = Mode.draw;
-
-    document.addEventListener("keydown", this.handleSingleKeydown);
   }
 
   drawSplineVector = (splineVector: XYPoint[], isActive = false): void => {
@@ -131,28 +141,15 @@ export class SplineCanvas extends Component<Props> {
       });
   };
 
-  private handleSingleKeydown = (event: KeyboardEvent) => {
-    // Handle single-key events.
-    // TODO: move this to ui
-    //console.log(event);
-    switch (event.code) {
-      case "Delete":
-        this.deleteSelectedPoint();
-        break;
-      case "Minus":
-        this.deleteSelectedPoint();
-        break;
-      case "Enter":
-        // TODO: add keyboard shortcuts for switching between modes
-        this.mode = Mode.edit; // Change mode to edit mode
-        this.selectedPointIndex = -1; // Remove point selection
-        this.drawAllSplines();
-        break;
-      case "Escape":
-        this.selectedPointIndex = -1; // Remove point selection
-        this.drawAllSplines();
-        break;
-    }
+  private changeSplineModeToEdit = () => {
+    // TODO: add keyboard shortcuts for switching between modes
+    this.mode = Mode.edit; // Change mode to edit mode
+    this.removePointSelection();
+  };
+
+  private removePointSelection = () => {
+    this.selectedPointIndex = -1;
+    this.drawAllSplines();
   };
 
   deleteSelectedPoint = (): void => {
@@ -409,6 +406,25 @@ export class SplineCanvas extends Component<Props> {
 
     if (activeAnnotation?.coordinates) {
       this.drawAllSplines();
+    }
+  }
+
+  handleEvent = (event: Event) => {
+    const method = event.type;
+    if (this[method]) {
+      this[method].call(this);
+    }
+  };
+
+  componentDidMount(): void {
+    for (const event of events) {
+      document.addEventListener(event, this.handleEvent);
+    }
+  }
+
+  componentWillUnmount(): void {
+    for (const event of events) {
+      document.removeEventListener(event, this.handleEvent);
     }
   }
 
