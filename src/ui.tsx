@@ -38,6 +38,12 @@ import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
 import { PaintbrushCanvas } from "./toolboxes/paintbrush";
 
+// Define all mutually exclusive tools
+enum Tools {
+  paintbrush = "paintbrush",
+  spline = "spline",
+}
+
 export class UserInterface extends Component {
   state: {
     scaleAndPan: {
@@ -45,7 +51,7 @@ export class UserInterface extends Component {
       y: number;
       scale: number;
     };
-    activeTool?: "spline" | "paintbrush";
+    activeTool?: Tools;
     imageWidth: number;
     imageHeight: number;
     activeAnnotationID: number;
@@ -63,9 +69,7 @@ export class UserInterface extends Component {
   };
 
   annotationsObject: Annotations;
-
   theme: Theme;
-
   imageSource: string;
 
   constructor(props: never) {
@@ -79,7 +83,7 @@ export class UserInterface extends Component {
       },
       imageWidth: 0,
       imageHeight: 0,
-      activeTool: "paintbrush",
+      activeTool: Tools.paintbrush,
       activeAnnotationID: null,
       brushSize: 20,
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
@@ -92,8 +96,7 @@ export class UserInterface extends Component {
       },
     });
     this.imageSource = "public/zebrafish-heart.jpg";
-
-    this.annotationsObject.addAnnotation(this.state.activeTool);
+    this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
   }
 
   setViewportPositionAndSize = (viewportPositionAndSize: {
@@ -167,27 +170,39 @@ export class UserInterface extends Component {
     });
   };
 
-  toggleSpline = (): void => {
-    if (this.state.activeTool === "spline") {
-      this.setState({ activeTool: null });
-    } else {
-      this.setState({ activeTool: "spline" });
+  selectSplineTool = (): void => {
+    // Change active tool to spline.
+    if (this.state.activeTool != Tools.spline) {
+      this.setState({ activeTool: Tools.spline }, () => {
+        this.reuseEmptyAnnotation();
+      });
     }
   };
 
-  togglePaintbrush = (): void => {
-    if (this.state.activeTool === "paintbrush") {
-      this.setState({ activeTool: null });
-    } else {
-      this.setState({ activeTool: "paintbrush" });
+  selectPaintbrushTool = (): void => {
+    // Change active tool to paintbrush.
+    if (this.state.activeTool != Tools.paintbrush) {
+      this.setState({ activeTool: Tools.paintbrush }, () => {
+        this.reuseEmptyAnnotation();
+      });
     }
   };
 
   addAnnotation = (): void => {
-    this.annotationsObject.addAnnotation(this.state.activeTool);
+    this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
     this.setState({
       activeAnnotationID: this.annotationsObject.getActiveAnnotationID(),
     });
+  };
+
+  reuseEmptyAnnotation = (): void => {
+    /* If the active annotation object is empty, change the value of toolbox 
+    to match the active tool. */
+    if (this.annotationsObject.isActiveAnnotationEmpty()) {
+      this.annotationsObject.setActiveAnnotationToolbox(
+        Tools[this.state.activeTool]
+      );
+    }
   };
 
   handleToolboxChange = (panel: string) => (
@@ -233,7 +248,7 @@ export class UserInterface extends Component {
 
               <SplineCanvas
                 scaleAndPan={this.state.scaleAndPan}
-                isActive={this.state.activeTool === "spline"}
+                isActive={this.state.activeTool === Tools.spline}
                 annotationsObject={this.annotationsObject}
                 imageWidth={this.state.imageWidth}
                 imageHeight={this.state.imageHeight}
@@ -243,7 +258,7 @@ export class UserInterface extends Component {
 
               <PaintbrushCanvas
                 scaleAndPan={this.state.scaleAndPan}
-                isActive={this.state.activeTool === "paintbrush"}
+                isActive={this.state.activeTool === Tools.paintbrush}
                 annotationsObject={this.annotationsObject}
                 imageWidth={this.state.imageWidth}
                 imageHeight={this.state.imageHeight}
@@ -330,7 +345,7 @@ export class UserInterface extends Component {
                   <Tooltip title="Activate paintbrush">
                     <IconButton
                       id={"activate-paintbrush"}
-                      onClick={this.togglePaintbrush}
+                      onClick={this.selectPaintbrushTool}
                     >
                       <Brush />
                     </IconButton>
@@ -359,7 +374,7 @@ export class UserInterface extends Component {
                   <Tooltip title="Activate spline">
                     <IconButton
                       id={"activate-spline"}
-                      onClick={this.toggleSpline}
+                      onClick={this.selectSplineTool}
                     >
                       <Brush />
                     </IconButton>
