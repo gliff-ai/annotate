@@ -27,7 +27,11 @@ export class BackgroundCanvas extends Component<Props> {
     if (this.image && this.image.complete) {
       this.baseCanvas.canvasContext.globalCompositeOperation =
         "destination-over";
-      drawImageOnCanvas(this.baseCanvas.canvasContext, this.image);
+      drawImageOnCanvas(
+        this.baseCanvas.canvasContext,
+        this.image,
+        this.props.scaleAndPan
+      );
     }
   };
 
@@ -66,5 +70,5 @@ export class BackgroundCanvas extends Component<Props> {
         canvasPositionAndSize={this.props.canvasPositionAndSize}
       />
     );
-  }
+  };
 }

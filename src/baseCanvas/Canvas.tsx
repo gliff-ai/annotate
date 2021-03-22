@@ -48,7 +48,7 @@ export class BaseCanvas extends Component<Props> {
 
   public clearWindow = (): void => {
     this.canvasContext.save();
-    this.canvasContext.setTransform(1, 0, 0, 1, 0, 0); // identity matrix
+    // this.canvasContext.setTransform(1, 0, 0, 1, 0, 0); // identity matrix
 
     try {
       this.canvasContext.clearRect(
@@ -64,18 +64,18 @@ export class BaseCanvas extends Component<Props> {
 
   componentDidUpdate = (): void => {
     this.applyView();
-  }
+  };
 
   private applyView = (): void => {
     this.clearWindow();
-    this.canvasContext.setTransform(
-      this.props.scaleAndPan.scale,
-      0,
-      0,
-      this.props.scaleAndPan.scale,
-      this.props.scaleAndPan.x,
-      this.props.scaleAndPan.y
-    );
+    // this.canvasContext.setTransform(
+    //   this.props.scaleAndPan.scale,
+    //   0,
+    //   0,
+    //   this.props.scaleAndPan.scale,
+    //   this.props.scaleAndPan.x,
+    //   this.props.scaleAndPan.y
+    // );
   };
 
   private handleCanvasResize = (entries: ResizeObserverEntry[]): void => {
@@ -90,7 +90,7 @@ export class BaseCanvas extends Component<Props> {
     this.canvas.height = height;
     this.canvas.style.width = `${width}px`;
     this.canvas.style.height = `${height}px`;
-    this.props.setCanvasPositionAndSize({width: width, height: height});
+    this.props.setCanvasPositionAndSize({ width: width, height: height });
   };
 
   componentDidMount = (): void => {

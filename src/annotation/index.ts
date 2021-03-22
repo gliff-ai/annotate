@@ -86,29 +86,28 @@ export function canvasToImage(
   }
 ): XYPoint {
   const { x: translateX, y: translateY, scale: scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
-  // console.log(`canvasToImage: (${canvasX}, ${canvasY})`);
+
   // transform from canvas space to original canvas space:
-  let x = (canvasX - translateX) / scale;
-  let y = (canvasY - translateY) / scale;
+  let x = canvasX - translateX;
+  let y = canvasY - translateY;
+  // scale towards center of image:
+  x += (canvasPositionAndSize.width / 2 - x) * (1 - 1 / scale);
+  y += (canvasPositionAndSize.height / 2 - y) * (1 - 1 / scale);
 
   // chop off the transparent bars so that canvas space has the same aspect ratio as image space:
   let imageScalingFactor = Math.min(
     canvasPositionAndSize.height / imageHeight,
     canvasPositionAndSize.width / imageWidth
   );
-  // console.log(`canvasToImage: (${x}, ${y})`);
   if (imageScalingFactor * imageWidth < canvasPositionAndSize.width) {
     x -= (canvasPositionAndSize.width - imageScalingFactor * imageWidth) / 2;
   } else if (imageScalingFactor * imageHeight < canvasPositionAndSize.height) {
     y -= (canvasPositionAndSize.height - imageScalingFactor * imageHeight) / 2;
   }
-  // console.log(`canvasToImage: (${x}, ${y})`);
 
   // unscale the image:
   x = x / imageScalingFactor;
   y = y / imageScalingFactor;
-
-  // console.log(`canvasToImage: (${x}, ${y})`);
 
   return { x: x, y: y };
 }
@@ -140,7 +139,6 @@ export function imageToCanvas(
     canvasPositionAndSize.height / imageHeight,
     canvasPositionAndSize.width / imageWidth
   );
-  // console.log(`imageToCanvas: (${x}, ${y})`);
   x = x * imageScalingFactor;
   y = y * imageScalingFactor;
 
@@ -150,46 +148,11 @@ export function imageToCanvas(
   } else if (imageScalingFactor * imageHeight < canvasPositionAndSize.height) {
     y += (canvasPositionAndSize.height - imageScalingFactor * imageHeight) / 2;
   }
-  // console.log(`imageToCanvas: (${x}, ${y})`);
 
-  x = x * scale + translateX;
-  y = y * scale + translateY;
-
-  // console.log(`imageToCanvas: (${x}, ${y})`);
-
-  return { x: x, y: y };
-}
-
-export function imageToOriginalCanvas(
-  imageX: number,
-  imageY: number,
-  imageWidth: number,
-  imageHeight: number,
-  canvasPositionAndSize: {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  }
-): XYPoint {
-  let x = imageX,
-    y = imageY;
-
-  // apply image scaling factor:
-  let imageScalingFactor = Math.min(
-    canvasPositionAndSize.height / imageHeight,
-    canvasPositionAndSize.width / imageWidth
-  );
-  // console.log(`imageToCanvas: (${x}, ${y})`);
-  x = x * imageScalingFactor;
-  y = y * imageScalingFactor;
-
-  // apply transparent bars to make the canvas the correct size:
-  if (imageScalingFactor * imageWidth < canvasPositionAndSize.width) {
-    x += (canvasPositionAndSize.width - imageScalingFactor * imageWidth) / 2;
-  } else if (imageScalingFactor * imageHeight < canvasPositionAndSize.height) {
-    y += (canvasPositionAndSize.height - imageScalingFactor * imageHeight) / 2;
-  }
+  // now in original canvas space, scale and translate to get canvas space:
+  x = x + (x - canvasPositionAndSize.width / 2) * (scale - 1) + translateX;
+  y = y + (y - canvasPositionAndSize.height / 2) * (scale - 1) + translateY;
+  //      ^------------ scaling away from center ------------^
 
   return { x: x, y: y };
 }

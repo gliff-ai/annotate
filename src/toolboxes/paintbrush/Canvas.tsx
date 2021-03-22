@@ -2,11 +2,7 @@ import React, { ReactNode } from "react";
 import { Component } from "react";
 
 import { BaseCanvas, CanvasProps } from "../../baseCanvas";
-import {
-  Annotations,
-  canvasToImage,
-  imageToOriginalCanvas,
-} from "../../annotation";
+import { Annotations, canvasToImage, imageToCanvas } from "../../annotation";
 import { XYPoint } from "../../annotation/interfaces";
 
 interface Props extends CanvasProps {
@@ -49,12 +45,12 @@ export class PaintbrushCanvas extends Component<Props> {
     if (this.isPressing && !this.isDrawing) {
       // Start drawing and add point
       this.isDrawing = true;
-      this.points.push({x, y});
+      this.points.push({ x, y });
     }
 
     if (this.isDrawing) {
       // Add new point
-      this.points.push({x, y});
+      this.points.push({ x, y });
 
       // Draw current points
       this.drawPoints(
@@ -74,16 +70,19 @@ export class PaintbrushCanvas extends Component<Props> {
     clearCanvas = true,
     context: CanvasRenderingContext2D
   ): void => {
-    const points = imagePoints.map((point): XYPoint => {
-      const { x, y } = imageToOriginalCanvas(
-        point.x,
-        point.y,
-        this.props.imageWidth,
-        this.props.imageHeight,
-        this.props.canvasPositionAndSize
-      );
-      return {x: x, y: y};
-    });
+    const points = imagePoints.map(
+      (point): XYPoint => {
+        const { x, y } = imageToCanvas(
+          point.x,
+          point.y,
+          this.props.imageWidth,
+          this.props.imageHeight,
+          this.props.scaleAndPan,
+          this.props.canvasPositionAndSize
+        );
+        return { x: x, y: y };
+      }
+    );
 
     function midPointBetween(p1: XYPoint, p2: XYPoint) {
       return {
@@ -218,5 +217,5 @@ export class PaintbrushCanvas extends Component<Props> {
         />
       </div>
     );
-  }
+  };
 }
