@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from "react";
-import { Component } from "react";
+import { Component, ReactNode } from "react";
 
 import { Annotations } from "./annotation";
 
@@ -83,7 +83,6 @@ export class UserInterface extends Component {
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       expanded: false,
     };
-    this.updateImageDimensions = this.updateImageDimensions.bind(this);
 
     this.theme = createMuiTheme({
       palette: {
@@ -92,7 +91,7 @@ export class UserInterface extends Component {
     });
     this.imageSource = "public/zebrafish-heart.jpg";
 
-    this.annotationsObject.addAnnotation(this.state.activeTool)
+    this.annotationsObject.addAnnotation(this.state.activeTool);
   }
 
   setViewportPositionAndSize = (viewportPositionAndSize: {
@@ -105,7 +104,7 @@ export class UserInterface extends Component {
     viewportPositionAndSize.left ??= this.state.viewportPositionAndSize.left;
     viewportPositionAndSize.width ??= this.state.viewportPositionAndSize.width;
     viewportPositionAndSize.height ??= this.state.viewportPositionAndSize.height;
-    this.setState({ viewportPositionAndSize: viewportPositionAndSize});
+    this.setState({ viewportPositionAndSize: viewportPositionAndSize });
   };
 
   setScaleAndPan = (scaleAndPan: {
@@ -114,9 +113,9 @@ export class UserInterface extends Component {
     y?: number;
   }): void => {
     // the is for passing down to the minimap
-      scaleAndPan.scale ??= this.state.scaleAndPan.scale;
-      scaleAndPan.x ??= this.state.scaleAndPan.x;
-      scaleAndPan.y ??= this.state.scaleAndPan.y;
+    scaleAndPan.scale ??= this.state.scaleAndPan.scale;
+    scaleAndPan.x ??= this.state.scaleAndPan.x;
+    scaleAndPan.y ??= this.state.scaleAndPan.y;
     this.setState({ scaleAndPan: scaleAndPan });
   };
 
@@ -155,18 +154,18 @@ export class UserInterface extends Component {
     this.setScaleAndPan({ y: this.state.scaleAndPan.y - 10 });
   };
 
-  incrementBrush = () => {
+  incrementBrush = (): void => {
     this.setState({ brushSize: this.state.brushSize + 10 });
   };
 
-  updateImageDimensions(imageWidth: number, imageHeight: number) {
+  updateImageDimensions = (imageWidth: number, imageHeight: number): void => {
     this.setState({
       imageWidth: imageWidth,
       imageHeight: imageHeight,
     });
-  }
+  };
 
-  toggleSpline = () => {
+  toggleSpline = (): void => {
     if (this.state.activeTool === "spline") {
       this.setState({ activeTool: null });
     } else {
@@ -174,7 +173,7 @@ export class UserInterface extends Component {
     }
   };
 
-  togglePaintbrush = () => {
+  togglePaintbrush = (): void => {
     if (this.state.activeTool === "paintbrush") {
       this.setState({ activeTool: null });
     } else {
@@ -182,7 +181,7 @@ export class UserInterface extends Component {
     }
   };
 
-  addAnnotation = () => {
+  addAnnotation = (): void => {
     this.annotationsObject.addAnnotation(this.state.activeTool);
     this.setState({
       activeAnnotationID: this.annotationsObject.getActiveAnnotationID(),
@@ -192,11 +191,11 @@ export class UserInterface extends Component {
   handleToolboxChange = (panel: string) => (
     event: ChangeEvent,
     isExpanded: boolean
-  ) => {
+  ): void => {
     this.setState({ expanded: isExpanded ? panel : false });
   };
 
-  render() {
+  render = (): ReactNode => {
     return (
       <ThemeProvider theme={this.theme}>
         <CssBaseline />
@@ -362,5 +361,5 @@ export class UserInterface extends Component {
         </Container>
       </ThemeProvider>
     );
-  }
+  };
 }
