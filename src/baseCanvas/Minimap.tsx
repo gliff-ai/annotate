@@ -1,10 +1,7 @@
 import React from "react";
 import { ReactNode } from "react";
 import { Props as BaseProps, BaseCanvas } from "./Canvas";
-import {
-  originalCanvasToMinimap,
-  minimapToOriginalCanvas,
-} from "../annotation";
+import { getMinimapViewFinder, minimapToOriginalCanvas } from "../annotation";
 import { PositionAndSize } from "../annotation/interfaces";
 
 export interface Props extends BaseProps {
@@ -37,7 +34,7 @@ export class BaseMinimap extends React.Component<Props> {
   };
 
   private applyView = (): void => {
-    this.boundingRect = originalCanvasToMinimap(
+    this.boundingRect = getMinimapViewFinder(
       this.props.imageWidth,
       this.props.imageHeight,
       this.props.scaleAndPan,
@@ -58,7 +55,7 @@ export class BaseMinimap extends React.Component<Props> {
 
   /*** Mouse events ****/
   onDoubleClick = (canvasX: number, canvasY: number): void => {
-      // DO STUFF
+    // DO STUFF
   };
 
   onClick = (canvasX: number, canvasY: number): void => {
@@ -88,19 +85,19 @@ export class BaseMinimap extends React.Component<Props> {
   };
 
   onMouseDown = (canvasX: number, canvasY: number): void => {
-      // DO STUFF
+    // DO STUFF
   };
 
   onMouseMove = (canvasX: number, canvasY: number): void => {
-      // DO STUFF
+    // DO STUFF
   };
 
   onMouseUp = (canvasX: number, canvasY: number): void => {
-      // DO STUFF
+    // DO STUFF
   };
 
   onContextMenu = (canvasX: number, canvasY: number): void => {
-      // DO STUFF
+    // DO STUFF
   };
 
   render = (): ReactNode => {

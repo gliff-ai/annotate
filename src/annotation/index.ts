@@ -100,8 +100,10 @@ export function canvasToImage(
     canvasPositionAndSize.width / imageWidth
   );
   if (imageScalingFactor * imageWidth < canvasPositionAndSize.width) {
+    // vertical bars either side
     x -= (canvasPositionAndSize.width - imageScalingFactor * imageWidth) / 2;
   } else if (imageScalingFactor * imageHeight < canvasPositionAndSize.height) {
+    // horizontal bars top and bottom
     y -= (canvasPositionAndSize.height - imageScalingFactor * imageHeight) / 2;
   }
 
@@ -157,7 +159,7 @@ export function imageToCanvas(
   return { x: x, y: y };
 }
 
-export function originalCanvasToMinimap(
+export function getMinimapViewFinder(
   imageWidth: number,
   imageHeight: number,
   scaleAndPan: {
@@ -168,33 +170,61 @@ export function originalCanvasToMinimap(
   canvasPositionAndSize: PositionAndSize,
   minimapPositionAndSize: PositionAndSize
 ): PositionAndSize {
-  let x = scaleAndPan.x,
-    y = scaleAndPan.y;
+  // transform canvas corners into image space:
+  let topLeft: XYPoint = canvasToImage(
+    0,
+    0,
+    imageWidth,
+    imageHeight,
+    scaleAndPan,
+    canvasPositionAndSize
+  );
+  let bottomRight: XYPoint = canvasToImage(
+    canvasPositionAndSize.width,
+    canvasPositionAndSize.height,
+    imageWidth,
+    imageHeight,
+    scaleAndPan,
+    canvasPositionAndSize
+  );
 
-  // move x and y to the largest central square
-  if (canvasPositionAndSize.width > canvasPositionAndSize.height) {
-    x -= (canvasPositionAndSize.width - canvasPositionAndSize.height) / 2;
-  } else if (canvasPositionAndSize.height > canvasPositionAndSize.width) {
-    y -= (canvasPositionAndSize.width - canvasPositionAndSize.height) / 2;
+  // clip:
+  topLeft = {
+    x: Math.max(0, topLeft.x),
+    y: Math.max(0, topLeft.y),
+  };
+  bottomRight = {
+    x: Math.min(imageWidth, bottomRight.x),
+    y: Math.min(imageHeight, bottomRight.y),
+  };
+
+  // scale down to minimap size:
+  let scalingFactor = Math.min(
+    minimapPositionAndSize.height / imageHeight,
+    minimapPositionAndSize.width / imageWidth
+  );
+  topLeft = { x: topLeft.x * scalingFactor, y: topLeft.y * scalingFactor };
+  bottomRight = {
+    x: bottomRight.x * scalingFactor,
+    y: bottomRight.y * scalingFactor,
+  };
+
+  // chop off ears:
+  if (bottomRight.x < minimapPositionAndSize.width) {
+    topLeft.x += (minimapPositionAndSize.width - bottomRight.x) / 2;
+    bottomRight.x += (minimapPositionAndSize.width - bottomRight.x) / 2;
+  } else if (bottomRight.y < minimapPositionAndSize.height) {
+    topLeft.y += (minimapPositionAndSize.height - bottomRight.y) / 2;
+    bottomRight.y += (minimapPositionAndSize.height - bottomRight.y) / 2;
   }
 
-  // convert width and height
-  const viewfinderWidth = minimapPositionAndSize.width / scaleAndPan.scale;
-  const viewfinderHeight = minimapPositionAndSize.width / scaleAndPan.scale;
-
-  // convert X and Y into minimap space
-  const viewfinderX =
-    (viewfinderWidth * -x) /
-    Math.min(canvasPositionAndSize.width, canvasPositionAndSize.height);
-  const viewfinderY =
-    (viewfinderHeight * -y) /
-    Math.min(canvasPositionAndSize.width, canvasPositionAndSize.height);
+  console.log(topLeft, bottomRight);
 
   return {
-    top: viewfinderX,
-    left: viewfinderY,
-    width: viewfinderWidth,
-    height: viewfinderHeight,
+    left: topLeft.x,
+    top: topLeft.y,
+    width: bottomRight.x - topLeft.x,
+    height: bottomRight.y - topLeft.y,
   };
 }
 

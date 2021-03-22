@@ -26,11 +26,11 @@ export class BackgroundMinimap extends Component<Props> {
     if (this.image && this.image.complete) {
       this.baseMinimap.baseCanvas.canvasContext.globalCompositeOperation =
         "destination-over";
-      drawImageOnCanvas(
-        this.baseMinimap.baseCanvas.canvasContext,
-        this.image,
-        this.props.scaleAndPan
-      );
+      drawImageOnCanvas(this.baseMinimap.baseCanvas.canvasContext, this.image, {
+        x: 0,
+        y: 0,
+        scale: 1,
+      });
     }
   };
 
