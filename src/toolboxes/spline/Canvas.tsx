@@ -17,10 +17,16 @@ interface Props extends BaseProps {
   imageHeight: number;
 }
 
+// Here we define the methods that are exposed to be called by keyboard shortcuts
+// We should maybe namespace them so we don't get conflicting methods across toolboxes.
 export const events = ["deleteSelectedPoint"] as const;
-export type Events = typeof events[number];
+interface Event extends CustomEvent {
+  type: typeof events[number];
+}
 
 export class SplineCanvas extends Component<Props> {
+  readonly name: "spline";
+
   private baseCanvas: BaseCanvas;
   private selectedPointIndex: number;
   private isDragging: boolean;
@@ -115,38 +121,6 @@ export class SplineCanvas extends Component<Props> {
         }
       });
   };
-
-  // private handleSingleKeydown = (event: KeyboardEvent) => {
-  //   // Handle single-key events.
-  //   // TODO: move this to ui
-  //   console.log(event);
-  //
-  //   let keyString =
-  //     (event.ctrlKey ? "ctrl+" : "") +
-  //     (event.shiftKey ? "shift+" : "") +
-  //     (event.altKey ? "alt+" : "") +
-  //     event.key.toLowerCase();
-  //
-  //   console.log(keyString);
-  //
-  //   const methodName = keyBindings["ctrl+delete"];
-  //
-  //   this[methodName]();
-  //
-  //   // eval("this." + methodName + "()");
-  //
-  //   // switch (event.code) {
-  //   //   case "Delete": // Delete selected point
-  //   //     this.deleteSelectedPoint();
-  //   //     break;
-  //   //   case "Minus": // Delete selected point
-  //   //     this.deleteSelectedPoint();
-  //   //     break;
-  //   //   case "Escape": // Escape selected point
-  //   //     // TODO: add function for removing selection
-  //   //     break;
-  //   // }
-  // };
 
   deleteSelectedPoint = (): void => {
     if (this.selectedPointIndex === -1) return;
@@ -365,9 +339,11 @@ export class SplineCanvas extends Component<Props> {
     }
   }
 
-  handleEvent = (event: any) => {
-    console.log(event);
-    this[event.type].call(this);
+  handleEvent = (event: Event) => {
+    const method = event.type;
+    if (this[method]) {
+      this[method].call(this);
+    }
   };
 
   componentDidMount(): void {

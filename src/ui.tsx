@@ -1,4 +1,5 @@
 import React, { Component, ChangeEvent, ReactNode } from "react";
+import { keybindings } from "./keybindings";
 
 import { Annotations } from "./annotation";
 
@@ -198,9 +199,8 @@ export class UserInterface extends Component {
 
   componentDidMount = () => {
     document.addEventListener("keydown", (event) => {
-      // Make these an external map
-      if (event.code === "ArrowDown") {
-        document.dispatchEvent(new Event("deleteSelectedPoint"));
+      if (keybindings[event.code]) {
+        document.dispatchEvent(new Event(keybindings[event.code]));
       }
     });
   };
