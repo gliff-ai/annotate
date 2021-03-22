@@ -1,5 +1,5 @@
-import React, { ChangeEvent } from "react";
-import { Component, ReactNode } from "react";
+import React, { Component, ChangeEvent, ReactNode } from "react";
+
 
 import { Annotations } from "./annotation";
 

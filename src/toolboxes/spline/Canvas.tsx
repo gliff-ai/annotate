@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { Component } from "react";
 
 // import { SplineVector } from "./interfaces";
@@ -19,7 +19,7 @@ interface Props extends BaseProps {
 }
 
 export class SplineCanvas extends Component<Props> {
-  private baseCanvas: any;
+  private baseCanvas: BaseCanvas;
   private selectedPointIndex: number;
   private isDragging: boolean;
   state: {
@@ -34,10 +34,10 @@ export class SplineCanvas extends Component<Props> {
     document.addEventListener("keydown", this.handleSingleKeydown);
   }
 
-  drawSplineVector = (splineVector: XYPoint[], isActive = false) => {
+  drawSplineVector = (splineVector: XYPoint[], isActive = false): void => {
     if (splineVector.length < 2) return;
 
-    const { canvasContext: context, canvas } = this.baseCanvas;
+    const { canvasContext: context } = this.baseCanvas;
     const lineWidth = isActive ? 2 : 1;
 
     // Clear the canvas
@@ -54,7 +54,6 @@ export class SplineCanvas extends Component<Props> {
       firstPoint.y,
       this.props.imageWidth,
       this.props.imageHeight,
-      this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
 
@@ -68,7 +67,6 @@ export class SplineCanvas extends Component<Props> {
         y,
         this.props.imageWidth,
         this.props.imageHeight,
-        this.props.scaleAndPan,
         this.props.canvasPositionAndSize
       );
       context.lineTo(nextPoint.x, nextPoint.y);
@@ -85,7 +83,6 @@ export class SplineCanvas extends Component<Props> {
           y,
           this.props.imageWidth,
           this.props.imageHeight,
-          this.props.scaleAndPan,
           this.props.canvasPositionAndSize
         );
         if (this.selectedPointIndex === i && isActive) {
@@ -102,9 +99,9 @@ export class SplineCanvas extends Component<Props> {
     // Draw all the splines
 
     // Clear all the splines:
-    const { canvasContext: context, canvas } = this.baseCanvas;
+    const { canvasContext: context } = this.baseCanvas;
     const activeAnnotationID = this.props.annotationsObject.getActiveAnnotationID();
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
     // Draw all the splines:
     this.props.annotationsObject
@@ -136,10 +133,10 @@ export class SplineCanvas extends Component<Props> {
     }
   };
 
-  deleteSelectedPoint = () => {
+  deleteSelectedPoint = (): void => {
     if (this.selectedPointIndex === -1) return;
     console.log("deleting point");
-    let coordinates = this.props.annotationsObject.getActiveAnnotation()
+    const coordinates = this.props.annotationsObject.getActiveAnnotation()
       .coordinates;
     const isClosed = this.isClosed(coordinates);
 
@@ -175,7 +172,7 @@ export class SplineCanvas extends Component<Props> {
     // clickPoint and splineVector are both expected to be in image space
     // returns -1 if no point was within distance 25
 
-    let { x: clickPointX, y: clickPointY } = imageToCanvas(
+    const { x: clickPointX, y: clickPointY } = imageToCanvas(
       clickPoint.x,
       clickPoint.y,
       this.props.imageWidth,
@@ -196,7 +193,7 @@ export class SplineCanvas extends Component<Props> {
         this.props.canvasPositionAndSize
       );
 
-      let distanceToPoint = Math.sqrt(
+      const distanceToPoint = Math.sqrt(
         (point.x - clickPointX) ** 2 + (point.y - clickPointY) ** 2
       );
 
@@ -212,7 +209,7 @@ export class SplineCanvas extends Component<Props> {
       coordinates: currentSplineVector,
     } = this.props.annotationsObject.getActiveAnnotation();
 
-    let { x: imageX, y: imageY } = canvasToImage(
+    const { x: imageX, y: imageY } = canvasToImage(
       x,
       y,
       this.props.imageWidth,
@@ -222,14 +219,14 @@ export class SplineCanvas extends Component<Props> {
     );
 
     // check if we clicked within the nudge radius of an existing point:
-    let nudgePointIdx = this.clickNearPoint(
+    const nudgePointIdx = this.clickNearPoint(
       { x: imageX, y: imageY },
       currentSplineVector
     );
     const isClosed = this.isClosed(currentSplineVector);
 
     if (nudgePointIdx !== -1) {
-      let nudgePoint = currentSplineVector[nudgePointIdx];
+      const nudgePoint = currentSplineVector[nudgePointIdx];
 
       this.updateXYPoint(
         (nudgePoint.x + imageX) / 2,
@@ -258,7 +255,7 @@ export class SplineCanvas extends Component<Props> {
     this.drawAllSplines();
   };
 
-  updateXYPoint = (newX: number, newY: number, index: number) => {
+  updateXYPoint = (newX: number, newY: number, index: number): void => {
     const coordinates = this.props.annotationsObject.getActiveAnnotation()
       .coordinates;
     coordinates[index] = { x: newX, y: newY };
@@ -284,7 +281,7 @@ export class SplineCanvas extends Component<Props> {
   };
 
   onMouseDown = (x: number, y: number): void => {
-    let clickPoint = canvasToImage(
+    const clickPoint = canvasToImage(
       x,
       y,
       this.props.imageWidth,
@@ -292,9 +289,9 @@ export class SplineCanvas extends Component<Props> {
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
-    let annotationData = this.props.annotationsObject.getActiveAnnotation();
+    const annotationData = this.props.annotationsObject.getActiveAnnotation();
 
-    let nearPoint = this.clickNearPoint(clickPoint, annotationData.coordinates);
+    const nearPoint = this.clickNearPoint(clickPoint, annotationData.coordinates);
     if (nearPoint !== -1) {
       this.selectedPointIndex = nearPoint;
       this.isDragging = true;
@@ -305,7 +302,7 @@ export class SplineCanvas extends Component<Props> {
     if (!this.isDragging) return;
 
     // Replace update the coordinates for the point dragged
-    let clickPoint = canvasToImage(
+    const clickPoint = canvasToImage(
       x,
       y,
       this.props.imageWidth,
@@ -315,7 +312,7 @@ export class SplineCanvas extends Component<Props> {
     );
 
     // If dragging first point, update also last
-    let activeSpline = this.props.annotationsObject.getActiveAnnotation()
+    const activeSpline = this.props.annotationsObject.getActiveAnnotation()
       .coordinates;
     if (this.selectedPointIndex === 0 && this.isClosed(activeSpline)) {
       this.updateXYPoint(clickPoint.x, clickPoint.y, activeSpline.length - 1);
@@ -350,7 +347,7 @@ export class SplineCanvas extends Component<Props> {
     }
   }
 
-  render() {
+  render = (): ReactNode => {
     return (
       <div style={{ pointerEvents: this.props.isActive ? "auto" : "none" }}>
         <BaseCanvas
