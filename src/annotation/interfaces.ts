@@ -1,7 +1,7 @@
 export interface AnnotationsDataArray extends Array<Annotation> {}
 
 export interface BrushStrokes {
-  coordinates: [number, number][];
+  coordinates: XYPoint[];
   brushColor: string;
   brushRadius: number;
 }
@@ -24,4 +24,11 @@ export interface XYPoint {
 export interface ZTPoint {
   z: number;
   t: number;
+}
+
+export interface PositionAndSize {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
 }

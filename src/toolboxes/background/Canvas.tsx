@@ -1,21 +1,22 @@
 import React from "react";
-import { Component } from "react";
+import { Component, ReactNode } from "react";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
-import drawImageProp from "./drawImage";
+import drawImageOnCanvas from "./drawImage";
 
 interface Props extends BaseProps {
   imgSrc?: string;
   updateImageDimensions: (imageWidth: number, imageHeight: number) => void;
 }
 
-interface State {
-  brightness: number;
-  contrast: number;
-}
+// TODO add brightness and contrast controls
+// interface State {
+//   brightness: number;
+//   contrast: number;
+// }
 
 export class BackgroundCanvas extends Component<Props> {
-  private baseCanvas: any;
+  private baseCanvas: BaseCanvas;
   private image: HTMLImageElement;
 
   constructor(props: Props) {
@@ -26,7 +27,7 @@ export class BackgroundCanvas extends Component<Props> {
     if (this.image && this.image.complete) {
       this.baseCanvas.canvasContext.globalCompositeOperation =
         "destination-over";
-      drawImageProp(this.baseCanvas.canvasContext, this.image);
+      drawImageOnCanvas(this.baseCanvas.canvasContext, this.image);
     }
   };
 
@@ -55,7 +56,7 @@ export class BackgroundCanvas extends Component<Props> {
     this.redrawImage();
   }
 
-  render() {
+  render = (): ReactNode => {
     return (
       <BaseCanvas
         ref={(baseCanvas) => (this.baseCanvas = baseCanvas)}

@@ -1,20 +1,21 @@
 import React from "react";
-import { Component } from "react";
+import { Component, ReactNode } from "react";
 
 import { BaseMinimap, MinimapProps as BaseProps } from "../../baseCanvas";
-import drawImageProp from "./drawImage";
+import drawImageOnCanvas from "./drawImage";
 
 interface Props extends BaseProps {
   imgSrc?: string;
 }
 
-interface State {
-  brightness: number;
-  contrast: number;
-}
+// TODO add brightness and contrast to props not state
+// interface State {
+//   brightness: number;
+//   contrast: number;
+// }
 
 export class BackgroundMinimap extends Component<Props> {
-  private baseMinimap: any;
+  private baseMinimap: BaseMinimap;
   private image: HTMLImageElement;
 
   constructor(props: Props) {
@@ -25,7 +26,7 @@ export class BackgroundMinimap extends Component<Props> {
     if (this.image && this.image.complete) {
       this.baseMinimap.baseCanvas.canvasContext.globalCompositeOperation =
         "destination-over";
-      drawImageProp(this.baseMinimap.baseCanvas.canvasContext, this.image);
+      drawImageOnCanvas(this.baseMinimap.baseCanvas.canvasContext, this.image);
     }
   };
 
@@ -51,7 +52,7 @@ export class BackgroundMinimap extends Component<Props> {
     this.redrawImage();
   }
 
-  render() {
+  render = (): ReactNode => {
     return (
       <BaseMinimap
         scaleAndPan={this.props.scaleAndPan}
