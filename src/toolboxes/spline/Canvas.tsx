@@ -116,10 +116,6 @@ export class SplineCanvas extends Component<Props> {
       });
   };
 
-  public handleShortcut = (event: Events) => {
-    this[event].call(this);
-  };
-
   // private handleSingleKeydown = (event: KeyboardEvent) => {
   //   // Handle single-key events.
   //   // TODO: move this to ui
@@ -366,6 +362,23 @@ export class SplineCanvas extends Component<Props> {
     const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
     if (activeAnnotation?.coordinates) {
       this.drawAllSplines();
+    }
+  }
+
+  handleEvent = (event: any) => {
+    console.log(event);
+    this[event.type].call(this);
+  };
+
+  componentDidMount(): void {
+    for (const event of events) {
+      document.addEventListener(event, this.handleEvent);
+    }
+  }
+
+  componentWillUnmount(): void {
+    for (const event of events) {
+      document.removeEventListener(event, this.handleEvent);
     }
   }
 

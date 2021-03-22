@@ -1,6 +1,5 @@
 import React, { Component, ChangeEvent, ReactNode } from "react";
 
-
 import { Annotations } from "./annotation";
 
 import {
@@ -17,6 +16,7 @@ import {
   AccordionDetails,
   CssBaseline,
 } from "@material-ui/core";
+
 import {
   Add,
   ZoomOut,
@@ -30,6 +30,7 @@ import {
   AllOut,
   Brush,
 } from "@material-ui/icons";
+
 import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
 
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
@@ -104,7 +105,7 @@ export class UserInterface extends Component {
     viewportPositionAndSize.left ??= this.state.viewportPositionAndSize.left;
     viewportPositionAndSize.width ??= this.state.viewportPositionAndSize.width;
     viewportPositionAndSize.height ??= this.state.viewportPositionAndSize.height;
-    this.setState({ viewportPositionAndSize: viewportPositionAndSize });
+    this.setState({ viewportPositionAndSize });
   };
 
   setScaleAndPan = (scaleAndPan: {
@@ -116,7 +117,7 @@ export class UserInterface extends Component {
     scaleAndPan.scale ??= this.state.scaleAndPan.scale;
     scaleAndPan.x ??= this.state.scaleAndPan.x;
     scaleAndPan.y ??= this.state.scaleAndPan.y;
-    this.setState({ scaleAndPan: scaleAndPan });
+    this.setState({ scaleAndPan });
   };
 
   resetScaleAndPan = (): void => {
@@ -193,6 +194,15 @@ export class UserInterface extends Component {
     isExpanded: boolean
   ): void => {
     this.setState({ expanded: isExpanded ? panel : false });
+  };
+
+  componentDidMount = () => {
+    document.addEventListener("keydown", (event) => {
+      // Make these an external map
+      if (event.code === "ArrowDown") {
+        document.dispatchEvent(new Event("deleteSelectedPoint"));
+      }
+    });
   };
 
   render = (): ReactNode => {

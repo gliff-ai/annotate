@@ -35,7 +35,7 @@ export interface Props {
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
-  private canvas: HTMLCanvasElement;
+  public canvas: HTMLCanvasElement;
   private canvasContainer: HTMLDivElement;
 
   public canvasContext: CanvasRenderingContext2D;
@@ -64,7 +64,7 @@ export class BaseCanvas extends Component<Props> {
 
   componentDidUpdate = (): void => {
     this.applyView();
-  }
+  };
 
   private applyView = (): void => {
     this.clearWindow();
@@ -90,7 +90,9 @@ export class BaseCanvas extends Component<Props> {
     this.canvas.height = height;
     this.canvas.style.width = `${width}px`;
     this.canvas.style.height = `${height}px`;
-    this.props.setCanvasPositionAndSize({width: width, height: height});
+    if (this.props.setCanvasPositionAndSize) {
+      this.props.setCanvasPositionAndSize({ width, height });
+    }
   };
 
   componentDidMount = (): void => {
