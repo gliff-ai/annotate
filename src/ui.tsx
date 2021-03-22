@@ -39,6 +39,7 @@ import { PaintbrushCanvas } from "./toolboxes/paintbrush";
 enum Tools {
   paintbrush = "paintbrush",
   spline = "spline",
+  eraser = "eraser"
 }
 
 export class UserInterface extends Component {
@@ -191,6 +192,17 @@ export class UserInterface extends Component {
     }
   };
 
+  selectEraserTool = (): void => {
+    // Change active tool to paintbrush.
+    if (this.state.activeTool != Tools.eraser) {
+      this.setState({ activeTool: Tools.eraser }, () => {
+        this.reuseEmptyAnnotation();
+      });
+    }
+  };
+
+ 
+
   addAnnotation = (): void => {
     this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
     this.setState({
@@ -326,6 +338,7 @@ export class UserInterface extends Component {
                 </ButtonGroup>
               </Grid>
 
+
               <Accordion
                 expanded={this.state.expanded === "paintbrush-toolbox"}
                 onChange={this.handleToolboxChange("paintbrush-toolbox")}
@@ -353,6 +366,16 @@ export class UserInterface extends Component {
                       <AllOut />
                     </IconButton>
                   </Tooltip>
+
+                  <Tooltip title="Activate Eraser">
+                    <IconButton
+                      id={"activate-eraser"}
+                      onClick={this.selectEraserTool}
+                    >
+                      <Brush />
+                    </IconButton>
+                  </Tooltip>
+
                 </AccordionDetails>
               </Accordion>
               <Accordion
@@ -374,6 +397,9 @@ export class UserInterface extends Component {
                       <Brush />
                     </IconButton>
                   </Tooltip>
+
+                
+                  
                 </AccordionDetails>
               </Accordion>
             </Grid>

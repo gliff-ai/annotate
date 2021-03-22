@@ -171,19 +171,18 @@ export class PaintbrushCanvas extends Component<Props> {
 
   /*** Mouse events ****/
   onMouseDown = (canvasX: number, canvasY: number): void => {
-    // Start drawing
-    // if(this.props.brushType === "eraser"){
-    //   const sourceData = this.drawingCanvas.canvasContext.getImageData(0, 0, this.drawingCanvas.canvas.width, this.drawingCanvas.canvas.width)
 
-    //   console.log(sourceData)
+    console.log(this.drawingCanvas)
 
-    //   const context = this.baseCanvas.canvasContext;
+    //Start drawing
+    if(this.props.brushType === "eraser"){
+      const sourceData = this.drawingCanvas.canvasContext.getImageData(0, 0, this.props.canvasPositionAndSize.width, this.props.canvasPositionAndSize.height)
 
-    //   context.putImageData(sourceData, 0, 0);
-
-
-    //   this.setState({hideBackCanvas: true})
-    // }
+      console.log(sourceData)
+      const context = this.baseCanvas.canvasContext;
+      context.putImageData(sourceData, 0, 0);
+      this.setState({hideBackCanvas: true})
+    }
 
     this.isPressing = true;
 
@@ -236,7 +235,6 @@ export class PaintbrushCanvas extends Component<Props> {
     return (
       //We have two canvases in order to be able to erase stuff. 
       <div style={{ pointerEvents: this.props.brushType == "paintbrush" ? "auto" : "none" }}>       
-
             <BaseCanvas
           cursor={"none"}
           ref={(drawingCanvas) => (this.drawingCanvas = drawingCanvas)}
@@ -257,9 +255,7 @@ export class PaintbrushCanvas extends Component<Props> {
           name="paintbrush"
           scaleAndPan={this.props.scaleAndPan}
           canvasPositionAndSize={this.props.canvasPositionAndSize}
-          setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
-
-/>
+          setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}/>
       </div>
     );
   }
