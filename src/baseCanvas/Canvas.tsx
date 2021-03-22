@@ -35,7 +35,7 @@ export interface Props {
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
-  public canvas: HTMLCanvasElement;
+  private canvas: HTMLCanvasElement;
   private canvasContainer: HTMLDivElement;
 
   public canvasContext: CanvasRenderingContext2D;
