@@ -86,20 +86,29 @@ export function canvasToImage(
   }
 ): XYPoint {
   const { x: translateX, y: translateY, scale: scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
-
+  // console.log(`canvasToImage: (${canvasX}, ${canvasY})`);
   // transform from canvas space to original canvas space:
   let x = (canvasX - translateX) / scale;
   let y = (canvasY - translateY) / scale;
 
-  // original canvas to image transform:
-  x = (x / canvasPositionAndSize.width) * Math.min(imageWidth, imageHeight);
-  y = (y / canvasPositionAndSize.height) * Math.min(imageWidth, imageHeight);
-
-  if (imageWidth > imageHeight) {
-    x += (imageWidth - imageHeight) / 2;
-  } else if (imageHeight > imageWidth) {
-    y += (imageHeight - imageWidth) / 2;
+  // chop off the transparent bars so that canvas space has the same aspect ratio as image space:
+  let imageScalingFactor = Math.min(
+    canvasPositionAndSize.height / imageHeight,
+    canvasPositionAndSize.width / imageWidth
+  );
+  // console.log(`canvasToImage: (${x}, ${y})`);
+  if (imageScalingFactor * imageWidth < canvasPositionAndSize.width) {
+    x -= (canvasPositionAndSize.width - imageScalingFactor * imageWidth) / 2;
+  } else if (imageScalingFactor * imageHeight < canvasPositionAndSize.height) {
+    y -= (canvasPositionAndSize.height - imageScalingFactor * imageHeight) / 2;
   }
+  // console.log(`canvasToImage: (${x}, ${y})`);
+
+  // unscale the image:
+  x = x / imageScalingFactor;
+  y = y / imageScalingFactor;
+
+  // console.log(`canvasToImage: (${x}, ${y})`);
 
   return { x: x, y: y };
 }
@@ -126,21 +135,27 @@ export function imageToCanvas(
   let x = imageX,
     y = imageY;
 
-  if (imageWidth > imageHeight) {
-    x -= (imageWidth - imageHeight) / 2;
-  } else if (imageHeight > imageWidth) {
-    y -= (imageHeight - imageWidth) / 2;
+  // apply image scaling factor:
+  let imageScalingFactor = Math.min(
+    canvasPositionAndSize.height / imageHeight,
+    canvasPositionAndSize.width / imageWidth
+  );
+  // console.log(`imageToCanvas: (${x}, ${y})`);
+  x = x * imageScalingFactor;
+  y = y * imageScalingFactor;
+
+  // apply transparent bars to make the canvas the correct size:
+  if (imageScalingFactor * imageWidth < canvasPositionAndSize.width) {
+    x += (canvasPositionAndSize.width - imageScalingFactor * imageWidth) / 2;
+  } else if (imageScalingFactor * imageHeight < canvasPositionAndSize.height) {
+    y += (canvasPositionAndSize.height - imageScalingFactor * imageHeight) / 2;
   }
-
-  //   console.log(x, y) // largest central square image space
-
-  x = (canvasPositionAndSize.width * x) / Math.min(imageWidth, imageHeight);
-  y = (canvasPositionAndSize.height * y) / Math.min(imageWidth, imageHeight);
-
-  //   console.log(x, y) // original canvas space
+  // console.log(`imageToCanvas: (${x}, ${y})`);
 
   x = x * scale + translateX;
   y = y * scale + translateY;
+
+  // console.log(`imageToCanvas: (${x}, ${y})`);
 
   return { x: x, y: y };
 }
@@ -160,14 +175,21 @@ export function imageToOriginalCanvas(
   let x = imageX,
     y = imageY;
 
-  if (imageWidth > imageHeight) {
-    x -= (imageWidth - imageHeight) / 2;
-  } else if (imageHeight > imageWidth) {
-    y -= (imageHeight - imageWidth) / 2;
-  }
+  // apply image scaling factor:
+  let imageScalingFactor = Math.min(
+    canvasPositionAndSize.height / imageHeight,
+    canvasPositionAndSize.width / imageWidth
+  );
+  // console.log(`imageToCanvas: (${x}, ${y})`);
+  x = x * imageScalingFactor;
+  y = y * imageScalingFactor;
 
-  x = (canvasPositionAndSize.width * x) / Math.min(imageWidth, imageHeight);
-  y = (canvasPositionAndSize.height * y) / Math.min(imageWidth, imageHeight);
+  // apply transparent bars to make the canvas the correct size:
+  if (imageScalingFactor * imageWidth < canvasPositionAndSize.width) {
+    x += (canvasPositionAndSize.width - imageScalingFactor * imageWidth) / 2;
+  } else if (imageScalingFactor * imageHeight < canvasPositionAndSize.height) {
+    y += (canvasPositionAndSize.height - imageScalingFactor * imageHeight) / 2;
+  }
 
   return { x: x, y: y };
 }
