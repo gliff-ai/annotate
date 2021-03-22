@@ -66,9 +66,7 @@ export class UserInterface extends Component {
   };
 
   annotationsObject: Annotations;
-
   theme: Theme;
-
   imageSource: string;
 
   constructor(props: never) {
@@ -172,22 +170,36 @@ export class UserInterface extends Component {
   selectSplineTool = (): void => {
     // Change active tool to spline.
     if (this.state.activeTool != Tools.spline) {
-      this.setState({ activeTool: Tools.spline });
+      this.setState({ activeTool: Tools.spline }, () => {
+        this.reuseEmptyAnnotation();
+      });
     }
   };
 
   selectPaintbrushTool = (): void => {
     // Change active tool to paintbrush.
     if (this.state.activeTool != Tools.paintbrush) {
-      this.setState({ activeTool: Tools.paintbrush });
+      this.setState({ activeTool: Tools.paintbrush }, () => {
+        this.reuseEmptyAnnotation();
+      });
     }
   };
 
   addAnnotation = (): void => {
-    this.annotationsObject.addAnnotation(this.state.activeTool);
+    this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
     this.setState({
       activeAnnotationID: this.annotationsObject.getActiveAnnotationID(),
     });
+  };
+
+  reuseEmptyAnnotation = (): void => {
+    /* If the active annotation object is empty, change the value of toolbox 
+    to match the active tool. */
+    if (this.annotationsObject.isActiveAnnotationEmpty()) {
+      this.annotationsObject.setActiveAnnotationToolbox(
+        Tools[this.state.activeTool]
+      );
+    }
   };
 
   handleToolboxChange = (panel: string) => (
