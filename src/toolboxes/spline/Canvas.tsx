@@ -17,11 +17,16 @@ interface Props extends BaseProps {
   imageWidth: number;
   imageHeight: number;
 }
+enum Mode {
+  draw,
+  edit,
+}
 
 export class SplineCanvas extends Component<Props> {
   private baseCanvas: BaseCanvas;
   private selectedPointIndex: number;
   private isDragging: boolean;
+  private mode: number;
   state: {
     cursor: "crosshair" | "none";
   };
@@ -30,6 +35,7 @@ export class SplineCanvas extends Component<Props> {
     super(props);
     this.selectedPointIndex = -1;
     this.isDragging = false;
+    this.mode = Mode.draw;
 
     document.addEventListener("keydown", this.handleSingleKeydown);
   }
@@ -44,6 +50,7 @@ export class SplineCanvas extends Component<Props> {
     context.lineWidth = lineWidth;
     context.strokeStyle = "#ff0000";
     context.fillStyle = "#0000ff";
+    const pointSize = 6;
 
     context.beginPath();
 
@@ -86,9 +93,19 @@ export class SplineCanvas extends Component<Props> {
           this.props.canvasPositionAndSize
         );
         if (this.selectedPointIndex === i && isActive) {
-          context.fillRect(nextPoint.x - 3, nextPoint.y - 3, 6, 6); // draw a filled square to mark the point as selected
+          context.fillRect(
+            nextPoint.x - pointSize / 2,
+            nextPoint.y - pointSize / 2,
+            pointSize,
+            pointSize
+          ); // draw a filled square to mark the point as selected
         } else {
-          context.rect(nextPoint.x - 3, nextPoint.y - 3, 6, 6); // draw a square to mark the point
+          context.rect(
+            nextPoint.x - pointSize / 2,
+            nextPoint.y - pointSize / 2,
+            pointSize,
+            pointSize
+          ); // draw a square to mark the point
         }
       }
     });
@@ -119,16 +136,23 @@ export class SplineCanvas extends Component<Props> {
   private handleSingleKeydown = (event: KeyboardEvent) => {
     // Handle single-key events.
     // TODO: move this to ui
-    console.log(event);
+    //console.log(event);
     switch (event.code) {
-      case "Delete": // Delete selected point
+      case "Delete":
         this.deleteSelectedPoint();
         break;
-      case "Minus": // Delete selected point
+      case "Minus":
         this.deleteSelectedPoint();
         break;
-      case "Escape": // Escape selected point
-        // TODO: add function for removing selection
+      case "Enter":
+        // TODO: add keyboard shortcuts for switching between modes
+        this.mode = Mode.edit; // Change mode to edit mode
+        this.selectedPointIndex = -1; // Remove point selection
+        this.drawAllSplines();
+        break;
+      case "Escape":
+        this.selectedPointIndex = -1; // Remove point selection
+        this.drawAllSplines();
         break;
     }
   };
@@ -225,6 +249,7 @@ export class SplineCanvas extends Component<Props> {
     );
     const isClosed = this.isClosed(currentSplineVector);
 
+    // If the mouse click was near an existing point, nudge that point
     if (nudgePointIdx !== -1) {
       const nudgePoint = currentSplineVector[nudgePointIdx];
 
@@ -245,11 +270,12 @@ export class SplineCanvas extends Component<Props> {
       }
 
       // If the spline is not closed, append a new point
-    } else if (!isClosed) {
+    } else if (this.mode === Mode.draw && !isClosed) {
       // Add coordinates to the current spline
-      console.log("Adding point", { x: imageX, y: imageY });
       currentSplineVector.push({ x: imageX, y: imageY });
       this.selectedPointIndex = currentSplineVector.length - 1;
+    } else if (this.mode === Mode.edit) {
+      this.addNewPointNearSpline(imageX, imageY);
     }
 
     this.drawAllSplines();
@@ -291,7 +317,10 @@ export class SplineCanvas extends Component<Props> {
     );
     const annotationData = this.props.annotationsObject.getActiveAnnotation();
 
-    const nearPoint = this.clickNearPoint(clickPoint, annotationData.coordinates);
+    const nearPoint = this.clickNearPoint(
+      clickPoint,
+      annotationData.coordinates
+    );
     if (nearPoint !== -1) {
       this.selectedPointIndex = nearPoint;
       this.isDragging = true;
@@ -326,7 +355,6 @@ export class SplineCanvas extends Component<Props> {
 
   onMouseUp = (): void => {
     // Works as part of drag and drop for points.
-    // TODO: add shortcut for setting selectedPointIndex = -1
     this.isDragging = false;
   };
 
@@ -339,9 +367,42 @@ export class SplineCanvas extends Component<Props> {
     );
   };
 
+  private addNewPointNearSpline = (x: number, y: number): void => {
+    // Add a new point near the spline.
+    let coordinates = this.props.annotationsObject.getActiveAnnotation()
+      .coordinates;
+
+    const dist = (x1: number, y1: number, x2: number, y2: number): number => {
+      // Calculate Euclidean distance between two points (x1, y1) and (x2, y2).
+      return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+    };
+
+    let newPointIndex: number; // Index at which the new point is inserted
+    let minDist = Number.MAX_VALUE; // Minimum distance
+    for (let i = 1; i < coordinates.length; i++) {
+      // For each pair of consecutive points
+      const prevPoint = coordinates[i - 1];
+      const nextPoint = coordinates[i];
+      // Calculate the euclidean distance from the new point
+      const newDist =
+        dist(x, y, prevPoint.x, prevPoint.y) +
+        dist(x, y, nextPoint.x, nextPoint.y);
+      // If the calculated distance is smaller than the min distance so far
+      if (minDist > newDist) {
+        // Update minimum distance and new point index
+        minDist = newDist;
+        newPointIndex = i;
+      }
+    }
+    coordinates.splice(newPointIndex, 0, { x: x, y: y }); // Add new point to the coordinates array
+    this.props.annotationsObject.setAnnotationCoordinates(coordinates); // Save new coordinates inside active annotation
+  };
+
   componentDidUpdate(): void {
     // Redraw if we change pan or zoom
     const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
+    this.mode = Mode.draw; // At change of active annotation, set mode to drawing mode (default)
+
     if (activeAnnotation?.coordinates) {
       this.drawAllSplines();
     }
@@ -365,5 +426,5 @@ export class SplineCanvas extends Component<Props> {
         />
       </div>
     );
-  }
+  };
 }
