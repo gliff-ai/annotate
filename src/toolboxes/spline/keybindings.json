@@ -1,0 +1,6 @@
+{
+  "backspace": "deleteSelectedPoint",
+  "-": "deleteSelectedPoint",
+  "escape": "unselectPoint",
+  "enter": "closeLoop"
+}
