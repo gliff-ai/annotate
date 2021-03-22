@@ -159,36 +159,35 @@ export class SplineCanvas extends Component<Props> {
 
   deleteSelectedPoint = (): void => {
     if (this.selectedPointIndex === -1) return;
-    console.log("deleting point");
     const coordinates = this.props.annotationsObject.getActiveAnnotation()
       .coordinates;
     const isClosed = this.isClosed(coordinates);
 
-    console.log(this.selectedPointIndex);
-    console.log(coordinates);
+    // If close spline
+    if (isClosed) {
+      // If selected index is last index, change selected index to first index
+      if (this.selectedPointIndex === coordinates.length - 1) {
+        this.selectedPointIndex = 0;
+      }
 
-    if (this.selectedPointIndex === coordinates.length - 1) {
-      this.selectedPointIndex = 0;
+      // Delete x,y point at selected index
+      coordinates.splice(this.selectedPointIndex, 1);
+
+      // If selected index is first index, delete also point at last index
+      if (this.selectedPointIndex === 0) {
+        this.updateXYPoint(
+          coordinates[0].x,
+          coordinates[0].y,
+          coordinates.length - 1
+        );
+      }
+    } else {
+      // Delete x,y point at selected index
+      coordinates.splice(this.selectedPointIndex, 1);
     }
-    coordinates.splice(this.selectedPointIndex, 1);
 
-    if (this.selectedPointIndex === 0 && isClosed) {
-      console.log("updating last point");
-      this.updateXYPoint(
-        coordinates[0].x,
-        coordinates[0].y,
-        coordinates.length - 1
-      );
-    }
-
-    if (this.selectedPointIndex === coordinates.length - 1) {
-      this.selectedPointIndex = 0;
-    }
-
+    this.selectedPointIndex -= 1;
     this.drawAllSplines();
-
-    console.log(this.selectedPointIndex);
-    console.log(coordinates);
   };
 
   clickNearPoint = (clickPoint: XYPoint, splineVector: XYPoint[]): number => {
@@ -287,7 +286,7 @@ export class SplineCanvas extends Component<Props> {
     coordinates[index] = { x: newX, y: newY };
   };
 
-  onDoubleClick = (x: number, y: number): void => {
+  onDoubleClick = (): void => {
     // Append the first spline point to the end, making a closed polygon
 
     const currentSplineVector = this.props.annotationsObject.getActiveAnnotation()
@@ -369,7 +368,7 @@ export class SplineCanvas extends Component<Props> {
 
   private addNewPointNearSpline = (x: number, y: number): void => {
     // Add a new point near the spline.
-    let coordinates = this.props.annotationsObject.getActiveAnnotation()
+    const coordinates = this.props.annotationsObject.getActiveAnnotation()
       .coordinates;
 
     const dist = (x1: number, y1: number, x2: number, y2: number): number => {
