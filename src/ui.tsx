@@ -1,5 +1,5 @@
-import React, { ChangeEvent, ReactNode } from "react";
-import { Component } from "react";
+import React, { Component, ChangeEvent, ReactNode } from "react";
+
 
 import { Annotations } from "./annotation";
 
@@ -91,7 +91,7 @@ export class UserInterface extends Component {
     });
     this.imageSource = "public/zebrafish-heart.jpg";
 
-    this.annotationsObject.addAnnotation(this.state.activeTool)
+    this.annotationsObject.addAnnotation(this.state.activeTool);
   }
 
   setViewportPositionAndSize = (viewportPositionAndSize: {
@@ -104,7 +104,7 @@ export class UserInterface extends Component {
     viewportPositionAndSize.left ??= this.state.viewportPositionAndSize.left;
     viewportPositionAndSize.width ??= this.state.viewportPositionAndSize.width;
     viewportPositionAndSize.height ??= this.state.viewportPositionAndSize.height;
-    this.setState({ viewportPositionAndSize: viewportPositionAndSize});
+    this.setState({ viewportPositionAndSize: viewportPositionAndSize });
   };
 
   setScaleAndPan = (scaleAndPan: {
@@ -113,9 +113,9 @@ export class UserInterface extends Component {
     y?: number;
   }): void => {
     // the is for passing down to the minimap
-      scaleAndPan.scale ??= this.state.scaleAndPan.scale;
-      scaleAndPan.x ??= this.state.scaleAndPan.x;
-      scaleAndPan.y ??= this.state.scaleAndPan.y;
+    scaleAndPan.scale ??= this.state.scaleAndPan.scale;
+    scaleAndPan.x ??= this.state.scaleAndPan.x;
+    scaleAndPan.y ??= this.state.scaleAndPan.y;
     this.setState({ scaleAndPan: scaleAndPan });
   };
 
@@ -128,7 +128,10 @@ export class UserInterface extends Component {
   };
 
   decrementScale = (): void => {
-    this.setScaleAndPan({ scale: this.state.scaleAndPan.scale + -1 });
+    // Zoom out only if zoomed in.
+    if (this.state.scaleAndPan.scale > 1) {
+      this.setScaleAndPan({ scale: this.state.scaleAndPan.scale + -1 });
+    }
   };
 
   incrementPanX = (): void => {
@@ -155,12 +158,12 @@ export class UserInterface extends Component {
     this.setState({ brushSize: this.state.brushSize + 10 });
   };
 
-  updateImageDimensions = (imageWidth: number, imageHeight: number):void=> {
+  updateImageDimensions = (imageWidth: number, imageHeight: number): void => {
     this.setState({
       imageWidth: imageWidth,
       imageHeight: imageHeight,
     });
-  }
+  };
 
   toggleSpline = (): void => {
     if (this.state.activeTool === "spline") {
@@ -358,5 +361,5 @@ export class UserInterface extends Component {
         </Container>
       </ThemeProvider>
     );
-  }
+  };
 }
