@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { Component } from "react";
 
 import { BaseCanvas, CanvasProps } from "../../baseCanvas";
@@ -7,6 +7,7 @@ import {
   canvasToImage,
   imageToOriginalCanvas,
 } from "../../annotation";
+import { XYPoint } from "../../annotation/interfaces";
 
 interface Props extends CanvasProps {
   brushType: string;
@@ -18,11 +19,11 @@ interface Props extends CanvasProps {
 
 
 export class PaintbrushCanvas extends Component<Props> {
-  private baseCanvas: any;
-  private drawingCanvas: any;
+  private baseCanvas: BaseCanvas;
+  private drawingCanvas: BaseCanvas;
   private isPressing: boolean;
   private isDrawing: boolean;
-  private points: [number, number][];
+  private points: XYPoint[];
 
   state: {
     cursor: "crosshair" | "none" | "not-allowed";
@@ -35,10 +36,10 @@ export class PaintbrushCanvas extends Component<Props> {
     this.isPressing = false;
     this.isDrawing = false;
     this.points = [];
-    this.state = {}
+    this.state = {cursor: "none", hideBackCanvas: false}
   }
 
-  handlePointerMove = (canvasX: number, canvasY: number) => {
+  handlePointerMove = (canvasX: number, canvasY: number): void => {
     const { x, y } = canvasToImage(
       canvasX,
       canvasY,
@@ -51,12 +52,12 @@ export class PaintbrushCanvas extends Component<Props> {
     if (this.isPressing && !this.isDrawing) {
       // Start drawing and add point
       this.isDrawing = true;
-      this.points.push([x, y]);
+      this.points.push({x, y});
     }
 
     if (this.isDrawing) {
       // Add new point
-      this.points.push([x, y]);
+      this.points.push({x, y});
 
       // Draw current points
       this.drawPoints(
@@ -71,29 +72,28 @@ export class PaintbrushCanvas extends Component<Props> {
   };
 
   drawPoints = (
-    imagePoints: [number, number][],
+    imagePoints: XYPoint[],
     brushColor: string,
     brushRadius: number,
     brushType: string,
     clearCanvas: boolean = true,
-    context: any
-  ) => {
-    const points = imagePoints.map((point) => {
+    context: CanvasRenderingContext2D
+  ): void => {
+    const points = imagePoints.map((point):XYPoint => {
       const { x, y } = imageToOriginalCanvas(
-        point[0],
-        point[1],
+        point.x,
+        point.y,
         this.props.imageWidth,
         this.props.imageHeight,
-        this.props.scaleAndPan,
         this.props.canvasPositionAndSize
       );
-      return [x, y];
+      return {x: x, y: y};
     });
 
-    function midPointBetween(p1: [number, number], p2: [number, number]) {
+    function midPointBetween(p1: XYPoint, p2: XYPoint) {
       return {
-        x: p1[0] + (p2[0] - p1[0]) / 2,
-        y: p1[1] + (p2[1] - p1[1]) / 2,
+        x: p1.x + (p2.x - p1.x) / 2,
+        y: p1.y + (p2.y - p1.y) / 2,
       };
     }
     
@@ -107,10 +107,10 @@ export class PaintbrushCanvas extends Component<Props> {
     }
     context.lineWidth = brushRadius * 2;
 
-    let p1 = points[0] as [number, number];
-    let p2 = points[1] as [number, number];
+    let p1 = points[0];
+    let p2 = points[1];
 
-    context.moveTo(p2[0], p2[1]);
+    context.moveTo(p2.x, p2.y);
     context.beginPath();
 
     for (let i = 1, len = points.length; i < len; i++) {
@@ -118,19 +118,19 @@ export class PaintbrushCanvas extends Component<Props> {
       // end point and p1 as our control point
       const midPoint = midPointBetween(p1, p2);
 
-      context.quadraticCurveTo(p1[0], p1[1], midPoint.x, midPoint.y);
-      p1 = points[i] as [number, number];
-      p2 = points[i + 1] as [number, number];
+      context.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
+      p1 = points[i];
+      p2 = points[i + 1];
     }
 
     // Draw last line as a straight line while
     // we wait for the next point to be able to calculate
     // the bezier control point
-    context.lineTo(p1[0], p1[1]);
+    context.lineTo(p1.x, p1.y);
     context.stroke();
   };
 
-  drawAllStrokes = () => {
+  drawAllStrokes = (): void => {
     const { brushStrokes } = this.props.annotationsObject.getActiveAnnotation();
 
     console.log(this.drawingCanvas)
@@ -149,7 +149,7 @@ export class PaintbrushCanvas extends Component<Props> {
 
 
 
-  saveLine = (brushRadius = 20, brushColor = "#00ff00") => {
+  saveLine = (brushRadius = 20, brushColor = "#00ff00"): void => {
     if (this.points.length < 2) return;
 
     const { brushStrokes } = this.props.annotationsObject.getActiveAnnotation();
@@ -232,10 +232,10 @@ export class PaintbrushCanvas extends Component<Props> {
     return "none"
   }
 //
-  render() {
+  render = (): ReactNode => {
     return (
       //We have two canvases in order to be able to erase stuff. 
-      <div>       
+      <div style={{ pointerEvents: this.props.brushType == "paintbrush" ? "auto" : "none" }}>       
 
             <BaseCanvas
           cursor={"none"}
@@ -243,6 +243,8 @@ export class PaintbrushCanvas extends Component<Props> {
           name="drawingCanvas"
           scaleAndPan={this.props.scaleAndPan}
           canvasPositionAndSize={this.props.canvasPositionAndSize}
+          setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
+
         />
         
       
@@ -255,7 +257,9 @@ export class PaintbrushCanvas extends Component<Props> {
           name="paintbrush"
           scaleAndPan={this.props.scaleAndPan}
           canvasPositionAndSize={this.props.canvasPositionAndSize}
-        />
+          setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
+
+/>
       </div>
     );
   }

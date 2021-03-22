@@ -5,23 +5,14 @@ import {
   originalCanvasToMinimap,
   minimapToOriginalCanvas,
 } from "../annotation";
+import { PositionAndSize } from "../annotation/interfaces";
 
 export interface Props extends BaseProps {
   cursor?: "move";
   imageWidth: number;
   imageHeight: number;
-  canvasPositionAndSize: {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  };
-  minimapPositionAndSize: {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  };
+  canvasPositionAndSize: PositionAndSize;
+  minimapPositionAndSize: PositionAndSize;
   setScaleAndPan: (scaleAndPan: {
     scale?: number;
     x?: number;
@@ -30,13 +21,8 @@ export interface Props extends BaseProps {
 }
 
 export class BaseMinimap extends React.Component<Props> {
-  private baseCanvas: any;
-  private boundingRect: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
+  public baseCanvas: BaseCanvas;
+  private boundingRect: PositionAndSize;
 
   constructor(props: Props) {
     super(props);
@@ -60,51 +46,38 @@ export class BaseMinimap extends React.Component<Props> {
     );
     this.baseCanvas.clearWindow();
     this.baseCanvas.canvasContext.beginPath();
-    this.baseCanvas.canvasContext.strokeStyle = "#666666";
+    this.baseCanvas.canvasContext.strokeStyle = "#FFFFFF";
     this.baseCanvas.canvasContext.lineWidth = 3;
     this.baseCanvas.canvasContext.strokeRect(
-      this.boundingRect.x,
-      this.boundingRect.y,
+      this.boundingRect.left,
+      this.boundingRect.top,
       this.boundingRect.width,
       this.boundingRect.height
     );
   };
 
   /*** Mouse events ****/
-  onDoubleClick = (canvasX: number, canvasY: number): void => {};
+  onDoubleClick = (canvasX: number, canvasY: number): void => {
+      // DO STUFF
+  };
 
   onClick = (canvasX: number, canvasY: number): void => {
     // convert minimap click into viewport coordinate frame
-    let { x: viewportX, y: viewportY } = minimapToOriginalCanvas(
+    const { x: viewportX, y: viewportY } = minimapToOriginalCanvas(
       canvasX,
       canvasY,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize,
       this.props.minimapPositionAndSize
     );
-    // console.log(
-    //   "Translates to viewpoint coordinate x: " + viewportX,
-    //   " y: " + viewportY + " when scale is " + this.props.scaleAndPan.scale
-    // );
 
     // calculate top left for zoom centred on these coordinates
-    let left =
+    const left =
       viewportX * this.props.scaleAndPan.scale -
       this.props.canvasPositionAndSize.width / 2;
-    let top =
+    const top =
       viewportY * this.props.scaleAndPan.scale -
       this.props.canvasPositionAndSize.height / 2;
-
-    // console.log(
-    //   "So our box, which is currently " +
-    //     this.props.canvasPositionAndSize.width / this.props.scaleAndPan.scale +
-    //     " wide and " +
-    //     this.props.canvasPositionAndSize.height / this.props.scaleAndPan.scale +
-    //     " high should be at left: " +
-    //     left +
-    //     " and top: " +
-    //     top
-    // );
 
     // update scaleAndPan using the method passed down from UI
     this.props.setScaleAndPan({
@@ -114,13 +87,21 @@ export class BaseMinimap extends React.Component<Props> {
     });
   };
 
-  onMouseDown = (canvasX: number, canvasY: number): void => {};
+  onMouseDown = (canvasX: number, canvasY: number): void => {
+      // DO STUFF
+  };
 
-  onMouseMove = (canvasX: number, canvasY: number): void => {};
+  onMouseMove = (canvasX: number, canvasY: number): void => {
+      // DO STUFF
+  };
 
-  onMouseUp = (canvasX: number, canvasY: number): void => {};
+  onMouseUp = (canvasX: number, canvasY: number): void => {
+      // DO STUFF
+  };
 
-  onContextMenu = (canvasX: number, canvasY: number): void => {};
+  onContextMenu = (canvasX: number, canvasY: number): void => {
+      // DO STUFF
+  };
 
   render = (): ReactNode => {
     return (

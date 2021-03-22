@@ -26,23 +26,27 @@ export interface Props {
     width: number;
     height: number;
   };
+  setCanvasPositionAndSize?: (canvasPositionAndSize: {
+    top?: number;
+    left?: number;
+    width?: number;
+    height?: number;
+  }) => void;
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
   private canvas: HTMLCanvasElement;
   private canvasContainer: HTMLDivElement;
 
-  private canvasContext: CanvasRenderingContext2D;
+  public canvasContext: CanvasRenderingContext2D;
   private canvasObserver: ResizeObserver;
 
   constructor(props: Props) {
     super(props);
     this.name = props.name;
-
-    this.onClickHandler = this.onClickHandler.bind(this);
   }
 
-  private clearWindow = (): void => {
+  public clearWindow = (): void => {
     this.canvasContext.save();
     this.canvasContext.setTransform(1, 0, 0, 1, 0, 0); // identity matrix
 
@@ -58,7 +62,7 @@ export class BaseCanvas extends Component<Props> {
     }
   };
 
-  componentDidUpdate() {
+  componentDidUpdate = (): void => {
     this.applyView();
   }
 
@@ -86,6 +90,7 @@ export class BaseCanvas extends Component<Props> {
     this.canvas.height = height;
     this.canvas.style.width = `${width}px`;
     this.canvas.style.height = `${height}px`;
+    this.props.setCanvasPositionAndSize({width: width, height: height});
   };
 
   componentDidMount = (): void => {
@@ -100,18 +105,16 @@ export class BaseCanvas extends Component<Props> {
     this.canvasObserver.unobserve(this.canvasContainer);
   };
 
+  windowToCanvas = (e: React.MouseEvent): XYPoint => {
+    // returns the mouse coordinates from e, transformed from window to canvas space
+    const x = e.clientX - this.canvas.getBoundingClientRect().left;
+    const y = e.clientY - this.canvas.getBoundingClientRect().top;
+
+    return { x: x, y: y };
+  };
+
   onDoubleClickHandler = (e: React.MouseEvent): void => {
-    // x and y start out in window space
-
-    let rect = this.canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
-
-    // x and y are now in canvas space
-
-    // console.log("Double mouse click at coordinate x: " + x, " y: " + y);
-
-    // DO STUFF HERE
+    const { x: x, y: y } = this.windowToCanvas(e);
 
     if (this.props.onDoubleClick) {
       this.props.onDoubleClick(x, y);
@@ -119,19 +122,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onClickHandler = (e: React.MouseEvent): void => {
-    // x and y start out in window space
-
-    let rect = this.canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
-
-    console.log(this.props.cursor)
-
-    // x and y are now in canvas space
-
-    // console.log("Mouse click at coordinate x: " + x, " y: " + y);
-
-    // DO STUFF HERE
+    const { x: x, y: y } = this.windowToCanvas(e);
 
     if (this.props.onClick) {
       this.props.onClick(x, y);
@@ -139,13 +130,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onMouseDownHandler = (e: React.MouseEvent): void => {
-    let rect = this.canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
-
-    // console.log("Mouse down at coordinate x: " + x, " y: " + y);
-
-    // DO STUFF HERE
+    const { x: x, y: y } = this.windowToCanvas(e);
 
     if (this.props.onMouseDown) {
       this.props.onMouseDown(x, y);
@@ -153,13 +138,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onMouseMoveHandler = (e: React.MouseEvent): void => {
-    let rect = this.canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
-
-    // console.log("Mouse move at coordinate x: " + x, " y: " + y);
-
-    // DO STUFF HERE
+    const { x: x, y: y } = this.windowToCanvas(e);
 
     if (this.props.onMouseMove) {
       this.props.onMouseMove(x, y);
@@ -167,13 +146,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onMouseUpHandler = (e: React.MouseEvent): void => {
-    let rect = this.canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
-
-    // console.log("Mouse up at coordinate x: " + x, " y: " + y);
-
-    // DO STUFF HERE
+    const { x: x, y: y } = this.windowToCanvas(e);
 
     if (this.props.onMouseUp) {
       this.props.onMouseUp(x, y);
@@ -181,18 +154,9 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onContextMenuHandler = (e: React.MouseEvent): void => {
-    // x and y start out in window space
-
-    let rect = this.canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
+    const { x: x, y: y } = this.windowToCanvas(e);
 
     // x and y are now in canvas space
-
-    // console.log("Mouse right click at coordinate x: " + x, " y: " + y);
-
-    // DO STUFF HERE
-
     if (this.props.onContextMenu) {
       this.props.onContextMenu(x, y);
     }
@@ -203,25 +167,28 @@ export class BaseCanvas extends Component<Props> {
       <div
         ref={(canvasContainer) => (this.canvasContainer = canvasContainer)}
         style={{
+          pointerEvents: "inherit",
           display: "block",
           touchAction: "none",
-          width: this.props.canvasPositionAndSize.width, // can use "100%" here
+          width: "100%",
           height: this.props.canvasPositionAndSize.height,
           zIndex: 100,
+          cursor: this.props.cursor || "pointer",
+          //   border: "1px solid gray",
           top: this.props.canvasPositionAndSize.top,
           left: this.props.canvasPositionAndSize.left,
           position: "absolute",
-          cursor: this.props.cursor || "pointer",
-          border: "1px solid gray",
         }}
       >
         <canvas
-          width={this.props.canvasPositionAndSize.width} // can use "100%" here
+          style={{ pointerEvents: "inherit" }}
+          width="100%"
           height={this.props.canvasPositionAndSize.height}
           onClick={this.onClickHandler}
           onMouseDown={this.onMouseDownHandler}
           onMouseMove={this.onMouseMoveHandler}
           onMouseUp={this.onMouseUpHandler}
+          onDoubleClick={this.onDoubleClickHandler}
           key={this.name}
           id={`${this.name}-canvas`}
           ref={(canvas) => {
