@@ -154,8 +154,9 @@ export class SplineCanvas extends Component<Props> {
 
   deleteSelectedPoint = (): void => {
     if (this.selectedPointIndex === -1) return;
-    const coordinates = this.props.annotationsObject.getActiveAnnotation()
-      .coordinates;
+    const {
+      coordinates: coordinates,
+    } = this.props.annotationsObject.getActiveAnnotation();
     const isClosed = this.isClosed(coordinates);
 
     // If close spline
@@ -370,8 +371,9 @@ export class SplineCanvas extends Component<Props> {
 
   private addNewPointNearSpline = (x: number, y: number): void => {
     // Add a new point near the spline.
-    const coordinates = this.props.annotationsObject.getActiveAnnotation()
-      .coordinates;
+    const {
+      coordinates: coordinates,
+    } = this.props.annotationsObject.getActiveAnnotation();
 
     const dist = (x1: number, y1: number, x2: number, y2: number): number => {
       // Calculate Euclidean distance between two points (x1, y1) and (x2, y2).
@@ -395,7 +397,7 @@ export class SplineCanvas extends Component<Props> {
         newPointIndex = i;
       }
     }
-    coordinates.splice(newPointIndex, 0, { x: x, y: y }); // Add new point to the coordinates array
+    coordinates.splice(newPointIndex, 0, { x, y }); // Add new point to the coordinates array
     this.props.annotationsObject.setAnnotationCoordinates(coordinates); // Save new coordinates inside active annotation
   };
 
