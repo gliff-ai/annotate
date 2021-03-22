@@ -129,7 +129,10 @@ export class UserInterface extends Component {
   };
 
   decrementScale = (): void => {
-    this.setScaleAndPan({ scale: this.state.scaleAndPan.scale + -1 });
+    // Zoom out only if zoomed in.
+    if (this.state.scaleAndPan.scale > 1) {
+      this.setScaleAndPan({ scale: this.state.scaleAndPan.scale + -1 });
+    }
   };
 
   incrementPanX = (): void => {
