@@ -409,7 +409,7 @@ export class SplineCanvas extends Component<Props> {
     }
   }
 
-  handleEvent = (event: Event) => {
+  handleEvent = (event: Event): void => {
     const method = event.type;
     if (this[method]) {
       this[method].call(this);
