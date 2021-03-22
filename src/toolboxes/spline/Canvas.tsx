@@ -1,8 +1,6 @@
 import React, { ReactNode } from "react";
 import { Component } from "react";
-import keyBindings from "./keybindings.json";
 
-// import { SplineVector } from "./interfaces";
 import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
 import {
   Annotations,
@@ -19,6 +17,9 @@ interface Props extends BaseProps {
   imageHeight: number;
 }
 
+export const events = ["deleteSelectedPoint"] as const;
+export type Events = typeof events[number];
+
 export class SplineCanvas extends Component<Props> {
   private baseCanvas: BaseCanvas;
   private selectedPointIndex: number;
@@ -31,8 +32,6 @@ export class SplineCanvas extends Component<Props> {
     super(props);
     this.selectedPointIndex = -1;
     this.isDragging = false;
-
-    document.addEventListener("keydown", this.handleSingleKeydown);
   }
 
   drawSplineVector = (splineVector: XYPoint[], isActive = false): void => {
@@ -117,37 +116,41 @@ export class SplineCanvas extends Component<Props> {
       });
   };
 
-  private handleSingleKeydown = (event: KeyboardEvent) => {
-    // Handle single-key events.
-    // TODO: move this to ui
-    console.log(event);
-
-    let keyString =
-      (event.ctrlKey ? "ctrl+" : "") +
-      (event.shiftKey ? "shift+" : "") +
-      (event.altKey ? "alt+" : "") +
-      event.key.toLowerCase();
-
-    console.log(keyString);
-
-    const methodName = keyBindings["ctrl+delete"];
-
-    this[methodName]();
-
-    // eval("this." + methodName + "()");
-
-    // switch (event.code) {
-    //   case "Delete": // Delete selected point
-    //     this.deleteSelectedPoint();
-    //     break;
-    //   case "Minus": // Delete selected point
-    //     this.deleteSelectedPoint();
-    //     break;
-    //   case "Escape": // Escape selected point
-    //     // TODO: add function for removing selection
-    //     break;
-    // }
+  public handleShortcut = (event: Events) => {
+    this[event].call(this);
   };
+
+  // private handleSingleKeydown = (event: KeyboardEvent) => {
+  //   // Handle single-key events.
+  //   // TODO: move this to ui
+  //   console.log(event);
+  //
+  //   let keyString =
+  //     (event.ctrlKey ? "ctrl+" : "") +
+  //     (event.shiftKey ? "shift+" : "") +
+  //     (event.altKey ? "alt+" : "") +
+  //     event.key.toLowerCase();
+  //
+  //   console.log(keyString);
+  //
+  //   const methodName = keyBindings["ctrl+delete"];
+  //
+  //   this[methodName]();
+  //
+  //   // eval("this." + methodName + "()");
+  //
+  //   // switch (event.code) {
+  //   //   case "Delete": // Delete selected point
+  //   //     this.deleteSelectedPoint();
+  //   //     break;
+  //   //   case "Minus": // Delete selected point
+  //   //     this.deleteSelectedPoint();
+  //   //     break;
+  //   //   case "Escape": // Escape selected point
+  //   //     // TODO: add function for removing selection
+  //   //     break;
+  //   // }
+  // };
 
   deleteSelectedPoint = (): void => {
     if (this.selectedPointIndex === -1) return;
@@ -307,7 +310,10 @@ export class SplineCanvas extends Component<Props> {
     );
     const annotationData = this.props.annotationsObject.getActiveAnnotation();
 
-    const nearPoint = this.clickNearPoint(clickPoint, annotationData.coordinates);
+    const nearPoint = this.clickNearPoint(
+      clickPoint,
+      annotationData.coordinates
+    );
     if (nearPoint !== -1) {
       this.selectedPointIndex = nearPoint;
       this.isDragging = true;
@@ -381,5 +387,5 @@ export class SplineCanvas extends Component<Props> {
         />
       </div>
     );
-  }
+  };
 }
