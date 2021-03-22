@@ -41,45 +41,43 @@ export class SplineCanvas extends Component<Props> {
   }
 
   drawSplineVector = (splineVector: XYPoint[], isActive = false): void => {
-    if (splineVector.length < 2) return;
+    if (splineVector.length === 0) return;
 
     const { canvasContext: context } = this.baseCanvas;
     const lineWidth = isActive ? 2 : 1;
-
-    // Clear the canvas
     context.lineWidth = lineWidth;
     context.strokeStyle = "#ff0000";
     context.fillStyle = "#0000ff";
     const pointSize = 6;
-
-    context.beginPath();
-
-    // Go to the first point
-    let firstPoint: XYPoint = splineVector[0];
-    firstPoint = imageToOriginalCanvas(
-      firstPoint.x,
-      firstPoint.y,
-      this.props.imageWidth,
-      this.props.imageHeight,
-      this.props.canvasPositionAndSize
-    );
-
-    context.moveTo(firstPoint.x, firstPoint.y);
-
-    // Draw each point by taking our raw coordinates and applying the transform so they fit on our canvas
     let nextPoint;
-    for (const { x, y } of splineVector) {
-      nextPoint = imageToOriginalCanvas(
-        x,
-        y,
+
+    if (splineVector.length > 1) {
+      // Go to the first point
+      let firstPoint: XYPoint = splineVector[0];
+      firstPoint = imageToOriginalCanvas(
+        firstPoint.x,
+        firstPoint.y,
         this.props.imageWidth,
         this.props.imageHeight,
         this.props.canvasPositionAndSize
       );
-      context.lineTo(nextPoint.x, nextPoint.y);
-    }
 
-    context.stroke();
+      context.beginPath();
+      context.moveTo(firstPoint.x, firstPoint.y);
+
+      // Draw each point by taking our raw coordinates and applying the transform so they fit on our canvas
+      for (const { x, y } of splineVector) {
+        nextPoint = imageToOriginalCanvas(
+          x,
+          y,
+          this.props.imageWidth,
+          this.props.imageHeight,
+          this.props.canvasPositionAndSize
+        );
+        context.lineTo(nextPoint.x, nextPoint.y);
+      }
+      context.stroke();
+    }
 
     // Draw all points
     context.beginPath();
@@ -175,15 +173,22 @@ export class SplineCanvas extends Component<Props> {
 
       // If selected index is first index, delete also point at last index
       if (this.selectedPointIndex === 0) {
-        this.updateXYPoint(
-          coordinates[0].x,
-          coordinates[0].y,
-          coordinates.length - 1
-        );
+        if (coordinates.length === 1) {
+          this.props.annotationsObject.setAnnotationCoordinates([]);
+        } else {
+          this.updateXYPoint(
+            coordinates[0].x,
+            coordinates[0].y,
+            coordinates.length - 1
+          );
+        }
       }
     } else {
       // Delete x,y point at selected index
       coordinates.splice(this.selectedPointIndex, 1);
+    }
+    if (coordinates.length === 0) {
+      this.mode = Mode.draw;
     }
 
     this.selectedPointIndex -= 1;
