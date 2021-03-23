@@ -1,6 +1,6 @@
 import React, { Component, ChangeEvent, ReactNode } from "react";
 
-import { Annotations } from "./annotation";
+import { Annotations, imageToCanvas } from "./annotation";
 
 import {
   AppBar,
@@ -34,6 +34,7 @@ import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
 import { PaintbrushCanvas } from "./toolboxes/paintbrush";
+import { canvasToImage } from "./annotation/index";
 
 export class UserInterface extends Component {
   state: {
@@ -115,7 +116,43 @@ export class UserInterface extends Component {
     scaleAndPan.scale ??= this.state.scaleAndPan.scale;
     scaleAndPan.x ??= this.state.scaleAndPan.x;
     scaleAndPan.y ??= this.state.scaleAndPan.y;
-    this.setState({ scaleAndPan: scaleAndPan });
+    this.setState({ scaleAndPan: scaleAndPan }, this.limitPan); // this sets limitPan as a callback after state update, ensuring it will use the new scaleAndPan
+  };
+
+  limitPan = (): void => {
+    // adjust pan such that image borders are not inside the canvas
+
+    // calculate how much bigger the image is than the canvas, in canvas space:
+    let imageScalingFactor = Math.min(
+      this.state.viewportPositionAndSize.width / this.state.imageWidth,
+      this.state.viewportPositionAndSize.height / this.state.imageHeight
+    );
+    let xMargin =
+      this.state.imageWidth *
+        imageScalingFactor *
+        this.state.scaleAndPan.scale -
+      this.state.viewportPositionAndSize.width;
+    let yMargin =
+      this.state.imageHeight *
+        imageScalingFactor *
+        this.state.scaleAndPan.scale -
+      this.state.viewportPositionAndSize.height;
+
+    // now calculate the allowable pan range:
+    let panRangeX = Math.max(0, xMargin / 2); // scaleAndPan.x can be +-panRangeX
+    let panRangeY = Math.max(0, yMargin / 2); // scaleAndPan.y can be +-panRangeY
+
+    console.log(`panRangeX = ${panRangeX}, panRangeY = ${panRangeY}`);
+
+    // move pan into the allowable range:
+    let panX = this.state.scaleAndPan.x;
+    let panY = this.state.scaleAndPan.y;
+    panX = Math.min(panRangeX, Math.abs(panX)) * Math.sign(panX);
+    panY = Math.min(panRangeY, Math.abs(panY)) * Math.sign(panY);
+
+    this.setState({
+      scaleAndPan: { x: panX, y: panY, scale: this.state.scaleAndPan.scale },
+    });
   };
 
   resetScaleAndPan = (): void => {
@@ -147,22 +184,22 @@ export class UserInterface extends Component {
 
   incrementPanX = (): void => {
     // negative is left, +ve is right...
-    this.setScaleAndPan({ x: this.state.scaleAndPan.x + 10 });
+    this.setScaleAndPan({ x: this.state.scaleAndPan.x + 20 });
   };
 
   decrementPanX = (): void => {
     // negative is left, +ve is right...
-    this.setScaleAndPan({ x: this.state.scaleAndPan.x - 10 });
+    this.setScaleAndPan({ x: this.state.scaleAndPan.x - 20 });
   };
 
   incrementPanY = (): void => {
     // negative is up, +ve is down...
-    this.setScaleAndPan({ y: this.state.scaleAndPan.y + 10 });
+    this.setScaleAndPan({ y: this.state.scaleAndPan.y + 20 });
   };
 
   decrementPanY = (): void => {
     // negative is up, +ve is down...
-    this.setScaleAndPan({ y: this.state.scaleAndPan.y - 10 });
+    this.setScaleAndPan({ y: this.state.scaleAndPan.y - 20 });
   };
 
   incrementBrush = (): void => {
