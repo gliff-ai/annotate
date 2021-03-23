@@ -267,6 +267,7 @@ export class UserInterface extends Component {
                 imageHeight={this.state.imageHeight}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                theme={this.theme}
               />
 
               <PaintbrushCanvas
