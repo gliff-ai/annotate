@@ -18,6 +18,8 @@ import {
   CssBaseline,
 } from "@material-ui/core";
 
+
+
 import {
   Add,
   ZoomOut,
@@ -30,6 +32,7 @@ import {
   ExpandMore,
   AllOut,
   Brush,
+  RadioButtonUncheckedSharp
 } from "@material-ui/icons";
 
 import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
@@ -388,7 +391,7 @@ export class UserInterface extends Component {
                       id={"activate-eraser"}
                       onClick={this.selectEraserTool}
                     >
-                      <Brush />
+                      <RadioButtonUncheckedSharp />
                     </IconButton>
                   </Tooltip>
 
@@ -418,9 +421,6 @@ export class UserInterface extends Component {
                       <Brush />
                     </IconButton>
                   </Tooltip>
-
-                
-                  
                 </AccordionDetails>
               </Accordion>
             </Grid>
