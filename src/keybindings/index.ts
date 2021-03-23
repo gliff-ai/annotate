@@ -4,16 +4,16 @@ const keydownListener = (
   event: KeyboardEvent,
   keybindingsMap = keybindings
 ) => {
-  console.log("keydown");
-  console.log(event.code);
-  console.log(keybindingsMap);
-  console.log(keybindingsMap[event.code]);
-
   // Lookup event
-  if (keybindingsMap[event.code]) {
-    console.log("dispatching!");
-    console.log(keybindingsMap[event.code]);
-    document.dispatchEvent(new Event(keybindingsMap[event.code]));
+  let code = event.code;
+
+  if (event.shiftKey) code = `shift+${code}`;
+  if (event.metaKey) code = `meta+${code}`;
+  if (event.ctrlKey) code = `ctrl+${code}`;
+  if (event.altKey) code = `alt+${code}`;
+
+  if (keybindingsMap[code]) {
+    document.dispatchEvent(new Event(keybindingsMap[code]));
   }
 };
 

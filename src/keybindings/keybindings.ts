@@ -1,6 +1,13 @@
-import { Keybindings } from "./interfaces";
+// Keys are defined here: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values
+// Modifiers are added by prefixing "alt" | "ctrl" | "meta" | "shift" and then + the main key
+// eg ctrl+KeyA
+// Modifiers can be combined, but the order of modifier keys matters, they should be in alphabetical order
+// eg alt+shift+KeyA
 
 export const keybindings = {
   Backspace: "deleteSelectedPoint",
-  "ctrl+a": "deleteSelectedPoint",
-} as Readonly<Keybindings>;
+  Enter: "changeSplineModeToEdit",
+  Escape: "deselectPoint",
+} as Readonly<{
+  [key: string]: string;
+}>;
