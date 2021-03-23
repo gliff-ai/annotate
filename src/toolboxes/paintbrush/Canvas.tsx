@@ -39,6 +39,7 @@ export class PaintbrushCanvas extends Component<Props> {
     this.state = { cursor: "none", hideBackCanvas: false };
   }
 
+
   handlePointerMove = (canvasX: number, canvasY: number): void => {
     const { x, y } = canvasToImage(
       canvasX,
@@ -46,7 +47,7 @@ export class PaintbrushCanvas extends Component<Props> {
       this.props.imageWidth,
       this.props.imageHeight,
       this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
+      this.props.canvasPositionAndSize,
     );
 
     if (this.isPressing && !this.isDrawing) {
@@ -55,8 +56,27 @@ export class PaintbrushCanvas extends Component<Props> {
       this.points.push({ x, y });
     }
 
-    if (this.isDrawing) {
-      // Add new point
+
+    if (this.props.brushType == "eraser") {
+      if (this.isDrawing) {
+        // Add new point
+        this.points.push({ x, y });
+
+        // Draw current points
+        this.drawPoints(
+          this.points,
+          "#0000FF",
+          this.props.brushRadius,
+          this.props.brushType,
+          true,
+          this.baseCanvas.canvasContext,
+          this.props.brushType === "eraser" ? "destination-out" : "source-over"
+        );
+      }
+
+      this.baseCanvas.canvasContext.globalCompositeOperation = "destination-out";
+    }
+    else {
       this.points.push({ x, y });
 
       // Draw current points
@@ -70,7 +90,7 @@ export class PaintbrushCanvas extends Component<Props> {
         this.props.brushType === "eraser" ? "destination-out" : "source-over"
       );
     }
-  };
+  }
 
   drawPoints = (
     imagePoints: XYPoint[],
@@ -107,20 +127,17 @@ export class PaintbrushCanvas extends Component<Props> {
     context.lineCap = "round";
     context.strokeStyle = brushColor;
 
-    if (brushType == "eraser") {
-      // context.arc(10, 10, 10, 0, 2 * Math.PI);
-      // context.fill();
-      context.strokeStyle = "#ff0000";
-      context.globalCompositeOperation = "destination-out";
-    }
+    let p1 = points[0];
+    let p2 = points[1];
+
+
 
     if (clearCanvas) {
       context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     }
     context.lineWidth = brushRadius * 2;
 
-    let p1 = points[0];
-    let p2 = points[1];
+
 
     context.moveTo(p2.x, p2.y);
     context.beginPath();
@@ -183,7 +200,7 @@ export class PaintbrushCanvas extends Component<Props> {
     if (this.props.brushType === "eraser") {
       // Copy the current BACK strokes to the front canvas
       this.drawAllStrokes(this.baseCanvas.canvasContext);
-      this.setState({ hideBackCanvas: true });
+      this.setState({ hideBackCanvas: false });
     }
 
     this.isPressing = true;
@@ -239,7 +256,7 @@ export class PaintbrushCanvas extends Component<Props> {
         style={{
           pointerEvents:
             this.props.brushType == "paintbrush" ||
-            this.props.brushType == "eraser"
+              this.props.brushType == "eraser"
               ? "auto"
               : "none",
         }}
