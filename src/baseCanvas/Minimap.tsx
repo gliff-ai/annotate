@@ -44,13 +44,13 @@ export class BaseMinimap extends React.Component<Props> {
     this.baseCanvas.clearWindow();
     this.baseCanvas.canvasContext.beginPath();
     this.baseCanvas.canvasContext.strokeStyle = "#FFFFFF";
-    this.baseCanvas.canvasContext.lineWidth = 3;
+    this.baseCanvas.canvasContext.lineWidth = 2;
     this.baseCanvas.canvasContext.strokeRect(
-      this.boundingRect.left,
-      this.boundingRect.top,
-      this.boundingRect.width,
-      this.boundingRect.height
-    );
+      this.boundingRect.left + 1,
+      this.boundingRect.top + 1,
+      this.boundingRect.width - 2,
+      this.boundingRect.height - 2
+    ); // +1 and -2 shift the box's centerline so the outer edge of the drawn box will trace the viewfinder
   };
 
   /*** Mouse events ****/

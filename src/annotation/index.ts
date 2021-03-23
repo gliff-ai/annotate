@@ -198,25 +198,22 @@ export function getMinimapViewFinder(
     y: Math.min(imageHeight, bottomRight.y),
   };
 
-  // scale down to minimap size:
-  let scalingFactor = Math.min(
-    minimapPositionAndSize.height / imageHeight,
-    minimapPositionAndSize.width / imageWidth
+  topLeft = imageToCanvas(
+    topLeft.x,
+    topLeft.y,
+    imageWidth,
+    imageHeight,
+    { x: 0, y: 0, scale: 1 },
+    minimapPositionAndSize
   );
-  topLeft = { x: topLeft.x * scalingFactor, y: topLeft.y * scalingFactor };
-  bottomRight = {
-    x: bottomRight.x * scalingFactor,
-    y: bottomRight.y * scalingFactor,
-  };
-
-  // chop off ears:
-  if (bottomRight.x < minimapPositionAndSize.width) {
-    topLeft.x += (minimapPositionAndSize.width - bottomRight.x) / 2;
-    bottomRight.x += (minimapPositionAndSize.width - bottomRight.x) / 2;
-  } else if (bottomRight.y < minimapPositionAndSize.height) {
-    topLeft.y += (minimapPositionAndSize.height - bottomRight.y) / 2;
-    bottomRight.y += (minimapPositionAndSize.height - bottomRight.y) / 2;
-  }
+  bottomRight = imageToCanvas(
+    bottomRight.x,
+    bottomRight.y,
+    imageWidth,
+    imageHeight,
+    { x: 0, y: 0, scale: 1 },
+    minimapPositionAndSize
+  );
 
   console.log(topLeft, bottomRight);
 
