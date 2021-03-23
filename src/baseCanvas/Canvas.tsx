@@ -64,7 +64,7 @@ export class BaseCanvas extends Component<Props> {
 
   componentDidUpdate = (): void => {
     this.applyView();
-  }
+  };
 
   private applyView = (): void => {
     this.clearWindow();
@@ -90,7 +90,7 @@ export class BaseCanvas extends Component<Props> {
     this.canvas.height = height;
     this.canvas.style.width = `${width}px`;
     this.canvas.style.height = `${height}px`;
-    this.props.setCanvasPositionAndSize({width: width, height: height});
+    this.props?.setCanvasPositionAndSize?.({ width, height });
   };
 
   componentDidMount = (): void => {

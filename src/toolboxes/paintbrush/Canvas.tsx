@@ -17,7 +17,6 @@ interface Props extends CanvasProps {
   brushRadius: number;
 }
 
-
 export class PaintbrushCanvas extends Component<Props> {
   private baseCanvas: BaseCanvas;
   private drawingCanvas: BaseCanvas;
@@ -36,7 +35,8 @@ export class PaintbrushCanvas extends Component<Props> {
     this.isPressing = false;
     this.isDrawing = false;
     this.points = [];
-    this.state = {cursor: "none", hideBackCanvas: false}
+
+    this.state = { cursor: "none", hideBackCanvas: false };
   }
 
   handlePointerMove = (canvasX: number, canvasY: number): void => {
@@ -52,12 +52,12 @@ export class PaintbrushCanvas extends Component<Props> {
     if (this.isPressing && !this.isDrawing) {
       // Start drawing and add point
       this.isDrawing = true;
-      this.points.push({x, y});
+      this.points.push({ x, y });
     }
 
     if (this.isDrawing) {
       // Add new point
-      this.points.push({x, y});
+      this.points.push({ x, y });
 
       // Draw current points
       this.drawPoints(
@@ -66,7 +66,8 @@ export class PaintbrushCanvas extends Component<Props> {
         this.props.brushRadius,
         this.props.brushType,
         true,
-        this.baseCanvas.canvasContext
+        this.baseCanvas.canvasContext,
+        this.props.brushType === "eraser" ? "destination-out" : "source-over"
       );
     }
   };
@@ -77,18 +78,21 @@ export class PaintbrushCanvas extends Component<Props> {
     brushRadius: number,
     brushType: string,
     clearCanvas: boolean = true,
-    context: CanvasRenderingContext2D
+    context: CanvasRenderingContext2D,
+    globalCompositeOperation: "destination-out" | "source-over" = "source-over"
   ): void => {
-    const points = imagePoints.map((point):XYPoint => {
-      const { x, y } = imageToOriginalCanvas(
-        point.x,
-        point.y,
-        this.props.imageWidth,
-        this.props.imageHeight,
-        this.props.canvasPositionAndSize
-      );
-      return {x: x, y: y};
-    });
+    const points = imagePoints.map(
+      (point): XYPoint => {
+        const { x, y } = imageToOriginalCanvas(
+          point.x,
+          point.y,
+          this.props.imageWidth,
+          this.props.imageHeight,
+          this.props.canvasPositionAndSize
+        );
+        return { x: x, y: y };
+      }
+    );
 
     function midPointBetween(p1: XYPoint, p2: XYPoint) {
       return {
@@ -96,17 +100,18 @@ export class PaintbrushCanvas extends Component<Props> {
         y: p1.y + (p2.y - p1.y) / 2,
       };
     }
-    
-    
+
+    context.globalCompositeOperation = globalCompositeOperation;
+
     context.lineJoin = "round";
     context.lineCap = "round";
     context.strokeStyle = brushColor;
 
-    if(brushType == "eraser"){
-      context.globalCompositeOperation="destination-out";
+    if (brushType == "eraser") {
       // context.arc(10, 10, 10, 0, 2 * Math.PI);
       // context.fill();
-      // context.strokeStyle = "#fff0f0";
+      context.strokeStyle = "#ff0000";
+      context.globalCompositeOperation = "destination-out";
     }
 
     if (clearCanvas) {
@@ -137,9 +142,8 @@ export class PaintbrushCanvas extends Component<Props> {
     context.stroke();
   };
 
-  drawAllStrokes = (): void => {
+  drawAllStrokes = (context = this.drawingCanvas.canvasContext): void => {
     const { brushStrokes } = this.props.annotationsObject.getActiveAnnotation();
-
 
     for (let i = 0; i < brushStrokes.length; i++) {
       this.drawPoints(
@@ -148,12 +152,10 @@ export class PaintbrushCanvas extends Component<Props> {
         brushStrokes[i].brushRadius,
         brushStrokes[i].brushType,
         false,
-        this.drawingCanvas.canvasContext
+        context
       );
     }
   };
-
-
 
   saveLine = (brushRadius = 20, brushColor = "#00ff00"): void => {
     if (this.points.length < 2) return;
@@ -164,7 +166,7 @@ export class PaintbrushCanvas extends Component<Props> {
       brushColor,
       brushRadius,
       coordinates: [...this.points],
-      brushType: this.props.brushType
+      brushType: this.props.brushType,
     });
 
     // Reset points array
@@ -177,36 +179,17 @@ export class PaintbrushCanvas extends Component<Props> {
 
   /*** Mouse events ****/
   onMouseDown = (canvasX: number, canvasY: number): void => {
-
-    console.log(this.drawingCanvas)
-
     //Start drawing
-    if(this.props.brushType === "eraser"){
-
-      // const context = this.baseCanvas.canvasContext;
-
-      // context.globalCompositeOperation="source-over";
-
-      // context.moveTo(lastX,lastY);
-      // context.lineTo(mouseX,mouseY);
-      // context.stroke();
-
-      // const sourceData = this.drawingCanvas.canvasContext.getImageData(0, 0, this.props.canvasPositionAndSize.width, this.props.canvasPositionAndSize.height)
-      // console.log(sourceData)
-      // const context = this.baseCanvas.canvasContext;
-      // context.putImageData(sourceData, 0, 0);
-      this.setState({hideBackCanvas: true})
-
-
-
-
+    if (this.props.brushType === "eraser") {
+      // Copy the current BACK strokes to the front canvas
+      this.drawAllStrokes(this.baseCanvas.canvasContext);
+      this.setState({ hideBackCanvas: true });
     }
 
     this.isPressing = true;
 
     // Ensure the initial down position gets added to our line
     this.handlePointerMove(canvasX, canvasY);
-
   };
 
   onMouseMove = (canvasX: number, canvasY: number): void => {
@@ -238,35 +221,40 @@ export class PaintbrushCanvas extends Component<Props> {
     }
   }
 
-  getCursor = () =>{
-    console.log(this.props.brushType)
-    if(this.props.brushType == "paintbrush"){
-      return "crosshair"
+  getCursor = () => {
+    console.log(this.props.brushType);
+    if (this.props.brushType == "paintbrush") {
+      return "crosshair";
+    } else if (this.props.brushType == "eraser") {
+      return "not-allowed";
     }
-    else if (this.props.brushType == "eraser"){
-      return "not-allowed"
-    }
-    return "none"
-  }
-//
+    return "none";
+  };
+  //
   render = (): ReactNode => {
     return (
-      //We have two canvases in order to be able to erase stuff. 
+      //We have two canvases in order to be able to erase stuff.
 
-      <div style={{ pointerEvents: this.props.brushType == "paintbrush" || this.props.brushType == "eraser" ? "auto" : "none" }}>    
+      <div
+        style={{
+          pointerEvents:
+            this.props.brushType == "paintbrush" ||
+            this.props.brushType == "eraser"
+              ? "auto"
+              : "none",
+        }}
+      >
         <div style={{ opacity: this.state.hideBackCanvas ? "none" : "block" }}>
-              <BaseCanvas
+          <BaseCanvas
             cursor={"none"}
             ref={(drawingCanvas) => (this.drawingCanvas = drawingCanvas)}
             name="drawingCanvas"
             scaleAndPan={this.props.scaleAndPan}
             canvasPositionAndSize={this.props.canvasPositionAndSize}
             setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
-
           />
-        </div>   
-        
-      
+        </div>
+
         <BaseCanvas
           onMouseDown={this.onMouseDown}
           onMouseMove={this.onMouseMove}
@@ -276,8 +264,9 @@ export class PaintbrushCanvas extends Component<Props> {
           name="paintbrush"
           scaleAndPan={this.props.scaleAndPan}
           canvasPositionAndSize={this.props.canvasPositionAndSize}
-          setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}/>
+          setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
+        />
       </div>
     );
-  }
+  };
 }
