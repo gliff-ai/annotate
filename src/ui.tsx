@@ -196,7 +196,7 @@ export class UserInterface extends Component {
   };
 
   reuseEmptyAnnotation = (): void => {
-    /* If the active annotation object is empty, change the value of toolbox 
+    /* If the active annotation object is empty, change the value of toolbox
     to match the active tool. */
     if (this.annotationsObject.isActiveAnnotationEmpty()) {
       this.annotationsObject.setActiveAnnotationToolbox(
@@ -347,6 +347,11 @@ export class UserInterface extends Component {
                     <IconButton
                       id={"activate-paintbrush"}
                       onClick={this.selectPaintbrushTool}
+                      color={
+                        Tools[this.state.activeTool] === Tools.paintbrush
+                          ? "secondary"
+                          : "default"
+                      }
                     >
                       <Brush />
                     </IconButton>
@@ -375,7 +380,13 @@ export class UserInterface extends Component {
                   <Tooltip title="Activate spline">
                     <IconButton
                       id={"activate-spline"}
-                      onClick={this.selectSplineTool}                    >
+                      onClick={this.selectSplineTool}
+                      color={
+                        Tools[this.state.activeTool] === Tools.spline
+                          ? "secondary"
+                          : "default"
+                      }
+                    >
                       <Brush />
                     </IconButton>
                   </Tooltip>
