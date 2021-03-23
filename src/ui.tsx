@@ -1,4 +1,5 @@
 import React, { Component, ChangeEvent, ReactNode } from "react";
+import { keybindings } from "./keybindings";
 
 import { Annotations } from "./annotation";
 
@@ -16,6 +17,7 @@ import {
   AccordionDetails,
   CssBaseline,
 } from "@material-ui/core";
+
 import {
   Add,
   ZoomOut,
@@ -29,6 +31,7 @@ import {
   AllOut,
   Brush,
 } from "@material-ui/icons";
+
 import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
 
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
@@ -107,7 +110,7 @@ export class UserInterface extends Component {
     viewportPositionAndSize.left ??= this.state.viewportPositionAndSize.left;
     viewportPositionAndSize.width ??= this.state.viewportPositionAndSize.width;
     viewportPositionAndSize.height ??= this.state.viewportPositionAndSize.height;
-    this.setState({ viewportPositionAndSize: viewportPositionAndSize });
+    this.setState({ viewportPositionAndSize });
   };
 
   setScaleAndPan = (scaleAndPan: {
@@ -119,7 +122,7 @@ export class UserInterface extends Component {
     scaleAndPan.scale ??= this.state.scaleAndPan.scale;
     scaleAndPan.x ??= this.state.scaleAndPan.x;
     scaleAndPan.y ??= this.state.scaleAndPan.y;
-    this.setState({ scaleAndPan: scaleAndPan });
+    this.setState({ scaleAndPan });
   };
 
   resetScaleAndPan = (): void => {
@@ -211,7 +214,7 @@ export class UserInterface extends Component {
   };
 
   reuseEmptyAnnotation = (): void => {
-    /* If the active annotation object is empty, change the value of toolbox 
+    /* If the active annotation object is empty, change the value of toolbox
     to match the active tool. */
     if (this.annotationsObject.isActiveAnnotationEmpty()) {
       this.annotationsObject.setActiveAnnotationToolbox(
@@ -225,6 +228,14 @@ export class UserInterface extends Component {
     isExpanded: boolean
   ): void => {
     this.setState({ expanded: isExpanded ? panel : false });
+  };
+
+  componentDidMount = () => {
+    document.addEventListener("keydown", (event) => {
+      if (keybindings[event.code]) {
+        document.dispatchEvent(new Event(keybindings[event.code]));
+      }
+    });
   };
 
   render = (): ReactNode => {
@@ -354,6 +365,11 @@ export class UserInterface extends Component {
                     <IconButton
                       id={"activate-paintbrush"}
                       onClick={this.selectPaintbrushTool}
+                      color={
+                        Tools[this.state.activeTool] === Tools.paintbrush
+                          ? "secondary"
+                          : "default"
+                      }
                     >
                       <Brush />
                     </IconButton>
@@ -393,6 +409,11 @@ export class UserInterface extends Component {
                     <IconButton
                       id={"activate-spline"}
                       onClick={this.selectSplineTool}
+                      color={
+                        Tools[this.state.activeTool] === Tools.spline
+                          ? "secondary"
+                          : "default"
+                      }
                     >
                       <Brush />
                     </IconButton>

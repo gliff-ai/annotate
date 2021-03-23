@@ -1,7 +1,6 @@
 import React, { ReactNode } from "react";
 import { Component } from "react";
 
-// import { SplineVector } from "./interfaces";
 import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
 import {
   Annotations,
@@ -18,7 +17,16 @@ interface Props extends BaseProps {
   imageHeight: number;
 }
 
+// Here we define the methods that are exposed to be called by keyboard shortcuts
+// We should maybe namespace them so we don't get conflicting methods across toolboxes.
+export const events = ["deleteSelectedPoint"] as const;
+interface Event extends CustomEvent {
+  type: typeof events[number];
+}
+
 export class SplineCanvas extends Component<Props> {
+  readonly name: "spline";
+
   private baseCanvas: BaseCanvas;
   private selectedPointIndex: number;
   private isDragging: boolean;
@@ -30,8 +38,6 @@ export class SplineCanvas extends Component<Props> {
     super(props);
     this.selectedPointIndex = -1;
     this.isDragging = false;
-
-    document.addEventListener("keydown", this.handleSingleKeydown);
   }
 
   drawSplineVector = (splineVector: XYPoint[], isActive = false): void => {
@@ -114,23 +120,6 @@ export class SplineCanvas extends Component<Props> {
           );
         }
       });
-  };
-
-  private handleSingleKeydown = (event: KeyboardEvent) => {
-    // Handle single-key events.
-    // TODO: move this to ui
-    console.log(event);
-    switch (event.code) {
-      case "Delete": // Delete selected point
-        this.deleteSelectedPoint();
-        break;
-      case "Minus": // Delete selected point
-        this.deleteSelectedPoint();
-        break;
-      case "Escape": // Escape selected point
-        // TODO: add function for removing selection
-        break;
-    }
   };
 
   deleteSelectedPoint = (): void => {
@@ -291,7 +280,10 @@ export class SplineCanvas extends Component<Props> {
     );
     const annotationData = this.props.annotationsObject.getActiveAnnotation();
 
-    const nearPoint = this.clickNearPoint(clickPoint, annotationData.coordinates);
+    const nearPoint = this.clickNearPoint(
+      clickPoint,
+      annotationData.coordinates
+    );
     if (nearPoint !== -1) {
       this.selectedPointIndex = nearPoint;
       this.isDragging = true;
@@ -347,6 +339,25 @@ export class SplineCanvas extends Component<Props> {
     }
   }
 
+  handleEvent = (event: Event) => {
+    const method = event.type;
+    if (this[method]) {
+      this[method].call(this);
+    }
+  };
+
+  componentDidMount(): void {
+    for (const event of events) {
+      document.addEventListener(event, this.handleEvent);
+    }
+  }
+
+  componentWillUnmount(): void {
+    for (const event of events) {
+      document.removeEventListener(event, this.handleEvent);
+    }
+  }
+
   render = (): ReactNode => {
     return (
       <div style={{ pointerEvents: this.props.isActive ? "auto" : "none" }}>
@@ -365,5 +376,5 @@ export class SplineCanvas extends Component<Props> {
         />
       </div>
     );
-  }
+  };
 }
