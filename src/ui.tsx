@@ -1,5 +1,5 @@
 import React, { Component, ChangeEvent, ReactNode } from "react";
-import { keybindings } from "./keybindings";
+import { keybindings } from "./keybindings/keybindings";
 
 import { Annotations } from "./annotation";
 
@@ -37,6 +37,7 @@ import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
 import { PaintbrushCanvas } from "./toolboxes/paintbrush";
+import { keydownListener } from "./keybindings";
 
 // Define all mutually exclusive tools
 enum Tools {
@@ -213,11 +214,7 @@ export class UserInterface extends Component {
   };
 
   componentDidMount = () => {
-    document.addEventListener("keydown", (event) => {
-      if (keybindings[event.code]) {
-        document.dispatchEvent(new Event(keybindings[event.code]));
-      }
-    });
+    document.addEventListener("keydown", keydownListener);
   };
 
   render = (): ReactNode => {
