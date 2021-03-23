@@ -1,5 +1,4 @@
 import React, { Component, ChangeEvent, ReactNode } from "react";
-import { keybindings } from "./keybindings/keybindings";
 
 import { Annotations } from "./annotation";
 
@@ -251,6 +250,7 @@ export class UserInterface extends Component {
                 imageHeight={this.state.imageHeight}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                theme={this.theme}
               />
 
               <PaintbrushCanvas
