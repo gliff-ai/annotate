@@ -63,6 +63,19 @@ export class Annotations {
     this.data[this.activeAnnotationID]["coordinates"] = newCoordinates;
   };
 
+  setActiveAnnotationToolbox = (newToolbox: string): void => {
+    this.data[this.activeAnnotationID].toolbox = newToolbox;
+  };
+
+  isActiveAnnotationEmpty = (): boolean => {
+    // Check whether the active annotation object contains any
+    // paintbrush or spline annotations.
+    return (
+      this.data[this.activeAnnotationID].coordinates.length === 0 &&
+      this.data[this.activeAnnotationID].brushStrokes.length === 0
+    );
+  };
+
   getAllAnnotations = (): AnnotationsDataArray => {
     return this.data;
   };
