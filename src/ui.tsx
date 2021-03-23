@@ -288,7 +288,7 @@ export class UserInterface extends Component {
               </div>
 
               <Grid container justify="center">
-                <ButtonGroup>
+                <div>
                   <Tooltip title="Zoom out">
                     <IconButton id={"zoom-out"} onClick={this.decrementScale}>
                       <ZoomOut />
@@ -304,32 +304,30 @@ export class UserInterface extends Component {
                       <ZoomIn />
                     </IconButton>
                   </Tooltip>
-                </ButtonGroup>
+                </div>
 
-                <ButtonGroup orientation="vertical">
+                <div>
                   <Tooltip title="Pan up">
                     <IconButton id={"pan-up"} onClick={this.incrementPanY}>
                       <KeyboardArrowUp />
                     </IconButton>
                   </Tooltip>
-                  <ButtonGroup>
-                    <Tooltip title="Pan left">
-                      <IconButton id={"pan-left"} onClick={this.incrementPanX}>
-                        <KeyboardArrowLeft />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Pan right">
-                      <IconButton id={"pan-right"} onClick={this.decrementPanX}>
-                        <KeyboardArrowRight />
-                      </IconButton>
-                    </Tooltip>
-                  </ButtonGroup>
+                  <Tooltip title="Pan left">
+                    <IconButton id={"pan-left"} onClick={this.incrementPanX}>
+                      <KeyboardArrowLeft />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Pan right">
+                    <IconButton id={"pan-right"} onClick={this.decrementPanX}>
+                      <KeyboardArrowRight />
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip title="Pan down">
                     <IconButton id={"pan-down"} onClick={this.decrementPanY}>
                       <KeyboardArrowDown />
                     </IconButton>
                   </Tooltip>
-                </ButtonGroup>
+                </div>
               </Grid>
 
               <Accordion
