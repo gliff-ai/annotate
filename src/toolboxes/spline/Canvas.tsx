@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import { Component } from "react";
+import { Theme } from "@material-ui/core/styles";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
 import {
@@ -15,6 +16,7 @@ interface Props extends BaseProps {
   annotationsObject: Annotations;
   imageWidth: number;
   imageHeight: number;
+  theme: Theme;
 }
 enum Mode {
   draw,
@@ -56,8 +58,8 @@ export class SplineCanvas extends Component<Props> {
     const { canvasContext: context } = this.baseCanvas;
     const lineWidth = isActive ? 2 : 1;
     context.lineWidth = lineWidth;
-    context.strokeStyle = "#ff0000";
-    context.fillStyle = "#0000ff";
+    context.strokeStyle = this.props.theme.palette.secondary.dark;
+    context.fillStyle = this.props.theme.palette.primary.dark;
     const pointSize = 6;
     let nextPoint;
 

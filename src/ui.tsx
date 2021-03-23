@@ -254,6 +254,7 @@ export class UserInterface extends Component {
                 imageHeight={this.state.imageHeight}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                theme={this.theme}
               />
 
               <PaintbrushCanvas
@@ -374,8 +375,7 @@ export class UserInterface extends Component {
                   <Tooltip title="Activate spline">
                     <IconButton
                       id={"activate-spline"}
-                      onClick={this.selectSplineTool}
-                    >
+                      onClick={this.selectSplineTool}                    >
                       <Brush />
                     </IconButton>
                   </Tooltip>
