@@ -5,5 +5,5 @@ interface Keybindings {
 export const keybindings = {
   Backspace: "deleteSelectedPoint",
   Enter: "changeSplineModeToEdit",
-  Escape: "removePointSelection",
+  Escape: "deselectPoint",
 } as Keybindings;

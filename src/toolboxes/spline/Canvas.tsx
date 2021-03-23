@@ -26,7 +26,7 @@ enum Mode {
 export const events = [
   "deleteSelectedPoint",
   "changeSplineModeToEdit",
-  "removePointSelection",
+  "deselectPoint",
 ] as const;
 interface Event extends CustomEvent {
   type: typeof events[number];
@@ -144,10 +144,10 @@ export class SplineCanvas extends Component<Props> {
   private changeSplineModeToEdit = () => {
     // TODO: add keyboard shortcuts for switching between modes
     this.mode = Mode.edit; // Change mode to edit mode
-    this.removePointSelection();
+    this.deselectPoint();
   };
 
-  private removePointSelection = () => {
+  private deselectPoint = () => {
     this.selectedPointIndex = -1;
     this.drawAllSplines();
   };
