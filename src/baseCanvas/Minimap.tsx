@@ -20,6 +20,7 @@ export interface Props extends BaseProps {
 export class BaseMinimap extends React.Component<Props> {
   public baseCanvas: BaseCanvas;
   private boundingRect: PositionAndSize;
+  private isDragging: boolean;
 
   constructor(props: Props) {
     super(props);
@@ -54,15 +55,15 @@ export class BaseMinimap extends React.Component<Props> {
   };
 
   /*** Mouse events ****/
-  onDoubleClick = (canvasX: number, canvasY: number): void => {
+  onDoubleClick = (minimapX: number, minimapY: number): void => {
     // DO STUFF
   };
 
-  onClick = (canvasX: number, canvasY: number): void => {
+  panToMinimapTarget = (minimapX: number, minimapY: number) => {
     // convert minimap click into viewport coordinate frame
     const { x: targetX, y: targetY } = minimapToCanvas(
-      canvasX,
-      canvasY,
+      minimapX,
+      minimapY,
       this.props.imageWidth,
       this.props.imageHeight,
       this.props.scaleAndPan,
@@ -70,7 +71,7 @@ export class BaseMinimap extends React.Component<Props> {
       this.props.minimapPositionAndSize
     );
 
-    // calculate the vector from the current canvas centre to the requested position:
+    // calculate the vector from the current canvas centre to the target position:
     const translateX = targetX - this.props.canvasPositionAndSize.width / 2;
     const translateY = targetY - this.props.canvasPositionAndSize.height / 2;
 
@@ -82,19 +83,25 @@ export class BaseMinimap extends React.Component<Props> {
     });
   };
 
-  onMouseDown = (canvasX: number, canvasY: number): void => {
-    // DO STUFF
+  onClick = (minimapX: number, minimapY: number): void => {
+    this.panToMinimapTarget(minimapX, minimapY);
   };
 
-  onMouseMove = (canvasX: number, canvasY: number): void => {
-    // DO STUFF
+  onMouseDown = (minimapX: number, minimapY: number): void => {
+    this.isDragging = true;
   };
 
-  onMouseUp = (canvasX: number, canvasY: number): void => {
-    // DO STUFF
+  onMouseMove = (minimapX: number, minimapY: number): void => {
+    if (this.isDragging) {
+      this.panToMinimapTarget(minimapX, minimapY);
+    }
   };
 
-  onContextMenu = (canvasX: number, canvasY: number): void => {
+  onMouseUp = (minimapX: number, minimapY: number): void => {
+    this.isDragging = false;
+  };
+
+  onContextMenu = (minimapX: number, minimapY: number): void => {
     // DO STUFF
   };
 
