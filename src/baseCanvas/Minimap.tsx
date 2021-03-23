@@ -1,7 +1,7 @@
 import React from "react";
 import { ReactNode } from "react";
 import { Props as BaseProps, BaseCanvas } from "./Canvas";
-import { getMinimapViewFinder, minimapToOriginalCanvas } from "../annotation";
+import { getMinimapViewFinder, minimapToCanvas } from "../annotation";
 import { PositionAndSize } from "../annotation/interfaces";
 
 export interface Props extends BaseProps {
@@ -60,27 +60,25 @@ export class BaseMinimap extends React.Component<Props> {
 
   onClick = (canvasX: number, canvasY: number): void => {
     // convert minimap click into viewport coordinate frame
-    const { x: viewportX, y: viewportY } = minimapToOriginalCanvas(
+    const { x: targetX, y: targetY } = minimapToCanvas(
       canvasX,
       canvasY,
+      this.props.imageWidth,
+      this.props.imageHeight,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize,
       this.props.minimapPositionAndSize
     );
 
-    // calculate top left for zoom centred on these coordinates
-    const left =
-      viewportX * this.props.scaleAndPan.scale -
-      this.props.canvasPositionAndSize.width / 2;
-    const top =
-      viewportY * this.props.scaleAndPan.scale -
-      this.props.canvasPositionAndSize.height / 2;
+    // calculate the vector from the current canvas centre to the requested position:
+    const translateX = targetX - this.props.canvasPositionAndSize.width / 2;
+    const translateY = targetY - this.props.canvasPositionAndSize.height / 2;
 
     // update scaleAndPan using the method passed down from UI
     this.props.setScaleAndPan({
       scale: this.props.scaleAndPan.scale,
-      x: -left,
-      y: -top,
+      x: this.props.scaleAndPan.x - translateX,
+      y: this.props.scaleAndPan.y - translateY,
     });
   };
 

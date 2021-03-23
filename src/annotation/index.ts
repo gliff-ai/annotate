@@ -225,9 +225,11 @@ export function getMinimapViewFinder(
   };
 }
 
-export function minimapToOriginalCanvas(
+export function minimapToCanvas(
   minimapX: number,
   minimapY: number,
+  imageWidth: number,
+  imageHeight: number,
   scaleAndPan: {
     x: number;
     y: number;
@@ -236,23 +238,25 @@ export function minimapToOriginalCanvas(
   canvasPositionAndSize: PositionAndSize,
   minimapPositionAndSize: PositionAndSize
 ): XYPoint {
-  // transform from canvas space to original canvas space:
-  let x = minimapX; // * (canvasPositionAndSize.width / minimapPositionAndSize.width);
-  let y = minimapY; // * (canvasPositionAndSize.height / minimapPositionAndSize.height);
+  // transform from minimap space to image space:
+  let { x: x, y: y } = canvasToImage(
+    minimapX,
+    minimapY,
+    imageWidth,
+    imageHeight,
+    { x: 0, y: 0, scale: 1 },
+    minimapPositionAndSize
+  );
 
-  // original canvas to image transform:
-  x =
-    (x / minimapPositionAndSize.width) *
-    Math.min(canvasPositionAndSize.width, canvasPositionAndSize.height);
-  y =
-    (y / minimapPositionAndSize.height) *
-    Math.min(canvasPositionAndSize.width, canvasPositionAndSize.height);
-
-  if (canvasPositionAndSize.width > canvasPositionAndSize.height) {
-    x -= (canvasPositionAndSize.width - canvasPositionAndSize.height) / 2;
-  } else if (canvasPositionAndSize.height > canvasPositionAndSize.width) {
-    y -= (canvasPositionAndSize.height - canvasPositionAndSize.width) / 2;
-  }
+  // transform from image space to canvas space:
+  ({ x: x, y: y } = imageToCanvas(
+    x,
+    y,
+    imageWidth,
+    imageHeight,
+    scaleAndPan,
+    canvasPositionAndSize
+  ));
 
   return { x: x, y: y };
 }
