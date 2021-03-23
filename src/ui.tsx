@@ -37,7 +37,6 @@ import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
 import { PaintbrushCanvas } from "./toolboxes/paintbrush";
-import { canvasToImage } from "./annotation/index";
 
 // Define all mutually exclusive tools
 enum Tools {

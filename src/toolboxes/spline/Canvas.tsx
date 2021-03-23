@@ -3,7 +3,8 @@ import { Component } from "react";
 import { Theme } from "@material-ui/core/styles";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
-import { Annotations, canvasToImage, imageToCanvas } from "../../annotation";
+import { Annotations } from "../../annotation";
+import { canvasToImage, imageToCanvas } from "../../transforms";
 import { Annotation, XYPoint } from "../../annotation/interfaces";
 
 interface Props extends BaseProps {
