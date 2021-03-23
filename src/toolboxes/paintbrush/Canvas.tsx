@@ -102,6 +102,13 @@ export class PaintbrushCanvas extends Component<Props> {
     context.lineCap = "round";
     context.strokeStyle = brushColor;
 
+    if(brushType == "eraser"){
+      context.globalCompositeOperation="destination-out";
+      // context.arc(10, 10, 10, 0, 2 * Math.PI);
+      // context.fill();
+      // context.strokeStyle = "#fff0f0";
+    }
+
     if (clearCanvas) {
       context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     }
@@ -133,7 +140,6 @@ export class PaintbrushCanvas extends Component<Props> {
   drawAllStrokes = (): void => {
     const { brushStrokes } = this.props.annotationsObject.getActiveAnnotation();
 
-    console.log(this.drawingCanvas)
 
     for (let i = 0; i < brushStrokes.length; i++) {
       this.drawPoints(
@@ -176,12 +182,24 @@ export class PaintbrushCanvas extends Component<Props> {
 
     //Start drawing
     if(this.props.brushType === "eraser"){
-      const sourceData = this.drawingCanvas.canvasContext.getImageData(0, 0, this.props.canvasPositionAndSize.width, this.props.canvasPositionAndSize.height)
 
-      console.log(sourceData)
-      const context = this.baseCanvas.canvasContext;
-      context.putImageData(sourceData, 0, 0);
+      // const context = this.baseCanvas.canvasContext;
+
+      // context.globalCompositeOperation="source-over";
+
+      // context.moveTo(lastX,lastY);
+      // context.lineTo(mouseX,mouseY);
+      // context.stroke();
+
+      // const sourceData = this.drawingCanvas.canvasContext.getImageData(0, 0, this.props.canvasPositionAndSize.width, this.props.canvasPositionAndSize.height)
+      // console.log(sourceData)
+      // const context = this.baseCanvas.canvasContext;
+      // context.putImageData(sourceData, 0, 0);
       this.setState({hideBackCanvas: true})
+
+
+
+
     }
 
     this.isPressing = true;
@@ -234,16 +252,19 @@ export class PaintbrushCanvas extends Component<Props> {
   render = (): ReactNode => {
     return (
       //We have two canvases in order to be able to erase stuff. 
-      <div style={{ pointerEvents: this.props.brushType == "paintbrush" ? "auto" : "none" }}>       
-            <BaseCanvas
-          cursor={"none"}
-          ref={(drawingCanvas) => (this.drawingCanvas = drawingCanvas)}
-          name="drawingCanvas"
-          scaleAndPan={this.props.scaleAndPan}
-          canvasPositionAndSize={this.props.canvasPositionAndSize}
-          setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
 
-        />
+      <div style={{ pointerEvents: this.props.brushType == "paintbrush" || this.props.brushType == "eraser" ? "auto" : "none" }}>    
+        <div style={{ opacity: this.state.hideBackCanvas ? "none" : "block" }}>
+              <BaseCanvas
+            cursor={"none"}
+            ref={(drawingCanvas) => (this.drawingCanvas = drawingCanvas)}
+            name="drawingCanvas"
+            scaleAndPan={this.props.scaleAndPan}
+            canvasPositionAndSize={this.props.canvasPositionAndSize}
+            setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
+
+          />
+        </div>   
         
       
         <BaseCanvas
