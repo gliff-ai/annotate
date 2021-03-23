@@ -2,7 +2,8 @@ import React, { ReactNode } from "react";
 import { Component } from "react";
 
 import { BaseCanvas, CanvasProps } from "../../baseCanvas";
-import { Annotations, canvasToImage, imageToCanvas } from "../../annotation";
+import { Annotations } from "../../annotation";
+import { canvasToImage, imageToCanvas } from "../../transforms";
 import { XYPoint } from "../../annotation/interfaces";
 
 interface Props extends CanvasProps {
