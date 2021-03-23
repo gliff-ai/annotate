@@ -1,6 +1,5 @@
 import React, { Component, ChangeEvent, ReactNode } from "react";
 
-
 import { Annotations } from "./annotation";
 
 import {
@@ -124,13 +123,25 @@ export class UserInterface extends Component {
   };
 
   incrementScale = (): void => {
-    this.setScaleAndPan({ scale: this.state.scaleAndPan.scale + 1 });
+    let panMultiplier =
+      (1 + this.state.scaleAndPan.scale) / this.state.scaleAndPan.scale;
+    this.setScaleAndPan({
+      x: this.state.scaleAndPan.x * panMultiplier,
+      y: this.state.scaleAndPan.y * panMultiplier,
+      scale: this.state.scaleAndPan.scale + 1,
+    });
   };
 
   decrementScale = (): void => {
     // Zoom out only if zoomed in.
     if (this.state.scaleAndPan.scale > 1) {
-      this.setScaleAndPan({ scale: this.state.scaleAndPan.scale + -1 });
+      let panMultiplier =
+        (this.state.scaleAndPan.scale - 1) / this.state.scaleAndPan.scale;
+      this.setScaleAndPan({
+        x: this.state.scaleAndPan.x * panMultiplier,
+        y: this.state.scaleAndPan.y * panMultiplier,
+        scale: this.state.scaleAndPan.scale - 1,
+      });
     }
   };
 
