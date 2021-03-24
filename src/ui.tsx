@@ -39,6 +39,8 @@ import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
 import { PaintbrushCanvas } from "./toolboxes/paintbrush";
+import { BaseSlider } from "./components/BaseSlider";
+import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { keydownListener } from "./keybindings";
 
 // Define all mutually exclusive tools
@@ -59,8 +61,9 @@ export class UserInterface extends Component {
     imageWidth: number;
     imageHeight: number;
     activeAnnotationID: number;
-
     brushSize: number;
+    contrast: number;
+    brightness: number;
 
     viewportPositionAndSize: {
       top: number;
@@ -92,6 +95,8 @@ export class UserInterface extends Component {
       brushSize: 20,
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       expanded: false,
+      brightness: SLIDER_CONFIG[Sliders.brightness].initial,
+      contrast: SLIDER_CONFIG[Sliders.contrast].initial,
     };
 
     this.theme = createMuiTheme({
@@ -233,7 +238,14 @@ export class UserInterface extends Component {
     this.setState({ expanded: isExpanded ? panel : false });
   };
 
-  componentDidMount = () => {
+  handleSliderChange = (state: string) => (
+    event: ChangeEvent,
+    value: number
+  ): void => {
+    this.setState({ [state]: value });
+  };
+
+  componentDidMount = (): void => {
     document.addEventListener("keydown", keydownListener);
   };
 
@@ -261,6 +273,8 @@ export class UserInterface extends Component {
                 updateImageDimensions={this.updateImageDimensions}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                contrast={this.state.contrast}
+                brightness={this.state.brightness}
               />
 
               <SplineCanvas
@@ -302,6 +316,8 @@ export class UserInterface extends Component {
                     width: 200,
                     height: 200,
                   }}
+                  contrast={this.state.contrast}
+                  brightness={this.state.brightness}
                 />
               </div>
 
@@ -351,6 +367,33 @@ export class UserInterface extends Component {
               </Grid>
 
 
+              <Accordion
+                expanded={this.state.expanded === "background-toolbox"}
+                onChange={this.handleToolboxChange("background-toolbox")}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMore />}
+                  id="background-toolbox"
+                >
+                  <Typography>Background</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container spacing={0} justify="center" wrap="nowrap">
+                    <Grid item style={{ width: "85%", position: "relative" }}>
+                      <BaseSlider
+                        value={this.state.contrast}
+                        config={SLIDER_CONFIG[Sliders.contrast]}
+                        onChange={this.handleSliderChange}
+                      />
+                      <BaseSlider
+                        value={this.state.brightness}
+                        config={SLIDER_CONFIG[Sliders.brightness]}
+                        onChange={this.handleSliderChange}
+                      />
+                    </Grid>
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
               <Accordion
                 expanded={this.state.expanded === "paintbrush-toolbox"}
                 onChange={this.handleToolboxChange("paintbrush-toolbox")}
