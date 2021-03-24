@@ -13,7 +13,7 @@ export interface Props {
     y: number;
     scale: number;
   };
-  cursor?: "crosshair" | "move" | "pointer" | "none";
+  cursor?: "crosshair" | "move" | "pointer" | "none" | "not-allowed";
   onDoubleClick?: (x: number, y: number) => void;
   onClick?: (x: number, y: number) => void;
   onMouseDown?: (x: number, y: number) => void;
@@ -90,9 +90,7 @@ export class BaseCanvas extends Component<Props> {
     this.canvas.height = height;
     this.canvas.style.width = `${width}px`;
     this.canvas.style.height = `${height}px`;
-    if (this.props.setCanvasPositionAndSize) {
-      this.props.setCanvasPositionAndSize({ width, height });
-    }
+    this.props?.setCanvasPositionAndSize?.({ width, height });
   };
 
   componentDidMount = (): void => {
