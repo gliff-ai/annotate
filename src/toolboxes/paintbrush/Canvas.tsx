@@ -39,7 +39,6 @@ export class PaintbrushCanvas extends Component<Props> {
     this.state = { cursor: "none", hideBackCanvas: false };
   }
 
-
   handlePointerMove = (canvasX: number, canvasY: number): void => {
     const { x, y } = canvasToImage(
       canvasX,
@@ -47,7 +46,7 @@ export class PaintbrushCanvas extends Component<Props> {
       this.props.imageWidth,
       this.props.imageHeight,
       this.props.scaleAndPan,
-      this.props.canvasPositionAndSize,
+      this.props.canvasPositionAndSize
     );
 
     if (this.isPressing && !this.isDrawing) {
@@ -56,27 +55,8 @@ export class PaintbrushCanvas extends Component<Props> {
       this.points.push({ x, y });
     }
 
-
-    if (this.props.brushType == "eraser") {
-      if (this.isDrawing) {
-        // Add new point
-        this.points.push({ x, y });
-
-        // Draw current points
-        this.drawPoints(
-          this.points,
-          "#0000FF",
-          this.props.brushRadius,
-          this.props.brushType,
-          true,
-          this.baseCanvas.canvasContext,
-          this.props.brushType === "eraser" ? "destination-out" : "source-over"
-        );
-      }
-
-      this.baseCanvas.canvasContext.globalCompositeOperation = "destination-out";
-    }
-    else {
+    if (this.isDrawing) {
+      // Add new point
       this.points.push({ x, y });
 
       // Draw current points
@@ -90,7 +70,9 @@ export class PaintbrushCanvas extends Component<Props> {
         this.props.brushType === "eraser" ? "destination-out" : "source-over"
       );
     }
-  }
+
+    this.baseCanvas.canvasContext.globalCompositeOperation = "destination-out";
+  };
 
   drawPoints = (
     imagePoints: XYPoint[],
@@ -130,14 +112,10 @@ export class PaintbrushCanvas extends Component<Props> {
     let p1 = points[0];
     let p2 = points[1];
 
-
-
     if (clearCanvas) {
       context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     }
     context.lineWidth = brushRadius * 2;
-
-
 
     context.moveTo(p2.x, p2.y);
     context.beginPath();
@@ -256,7 +234,7 @@ export class PaintbrushCanvas extends Component<Props> {
         style={{
           pointerEvents:
             this.props.brushType == "paintbrush" ||
-              this.props.brushType == "eraser"
+            this.props.brushType == "eraser"
               ? "auto"
               : "none",
         }}
