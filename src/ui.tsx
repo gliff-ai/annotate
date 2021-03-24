@@ -37,6 +37,7 @@ import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
 import { PaintbrushCanvas } from "./toolboxes/paintbrush";
+import { Labels } from "./components/Labels";
 
 // Define all mutually exclusive tools
 enum Tools {
@@ -71,6 +72,7 @@ export class UserInterface extends Component {
   annotationsObject: Annotations;
   theme: Theme;
   imageSource: string;
+  private presetLabels: string[];
 
   constructor(props: never) {
     super(props);
@@ -97,6 +99,7 @@ export class UserInterface extends Component {
     });
     this.imageSource = "public/zebrafish-heart.jpg";
     this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
+    this.presetLabels = ["label-1", "label-2", "label-3"]; //TODO: find a place for this
   }
 
   setViewportPositionAndSize = (viewportPositionAndSize: {
@@ -390,6 +393,24 @@ export class UserInterface extends Component {
                       <Brush />
                     </IconButton>
                   </Tooltip>
+                </AccordionDetails>
+              </Accordion>
+              <Accordion
+                expanded={this.state.expanded === "labels-toolbox"}
+                onChange={this.handleToolboxChange("labels-toolbox")}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMore />}
+                  id="labels-toolbox"
+                >
+                  <Typography>Labels</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Labels
+                    annotationObject={this.annotationsObject}
+                    presetLabels={this.presetLabels}
+                    theme={this.theme}
+                  />
                 </AccordionDetails>
               </Accordion>
             </Grid>
