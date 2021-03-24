@@ -15,6 +15,7 @@ interface Props extends CanvasProps {
   imageWidth: number;
   imageHeight: number;
   brushRadius: number;
+  theme:  any
 }
 
 export class PaintbrushCanvas extends Component<Props> {
@@ -62,7 +63,7 @@ export class PaintbrushCanvas extends Component<Props> {
       // Draw current points
       this.drawPoints(
         this.points,
-        "#0000FF",
+        this.props.theme.palette.secondary.dark,
         this.props.brushRadius,
         this.props.brushType,
         true,
@@ -108,9 +109,6 @@ export class PaintbrushCanvas extends Component<Props> {
     context.strokeStyle = brushColor;
 
     if (brushType == "eraser") {
-      // context.arc(10, 10, 10, 0, 2 * Math.PI);
-      // context.fill();
-      context.strokeStyle = "#ff0000";
       context.globalCompositeOperation = "destination-out";
     }
 
@@ -157,7 +155,7 @@ export class PaintbrushCanvas extends Component<Props> {
     }
   };
 
-  saveLine = (brushRadius = 20, brushColor = "#00ff00"): void => {
+  saveLine = (brushRadius = 20, brushColor = this.props.theme.palette.primary.dark): void => {
     if (this.points.length < 2) return;
 
     const { brushStrokes } = this.props.annotationsObject.getActiveAnnotation();

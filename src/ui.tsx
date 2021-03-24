@@ -286,6 +286,7 @@ export class UserInterface extends Component {
                 brushRadius={this.state.brushSize}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                theme={this.theme}
               />
             </Grid>
 
