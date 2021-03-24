@@ -17,6 +17,8 @@ import {
   CssBaseline,
 } from "@material-ui/core";
 
+
+
 import {
   Add,
   ZoomOut,
@@ -29,6 +31,7 @@ import {
   ExpandMore,
   AllOut,
   Brush,
+  RadioButtonUncheckedSharp
 } from "@material-ui/icons";
 
 import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
@@ -44,6 +47,7 @@ import { keydownListener } from "./keybindings";
 enum Tools {
   paintbrush = "paintbrush",
   spline = "spline",
+  eraser = "eraser"
 }
 
 export class UserInterface extends Component {
@@ -168,7 +172,13 @@ export class UserInterface extends Component {
     this.setState({ brushSize: this.state.brushSize + 10 });
   };
 
-  updateImageDimensions = (imageWidth: number, imageHeight: number): void => {
+ 
+  toggleEraser = ():void => {
+      this.setState({ activeTool: "eraser" });
+  };
+
+
+  updateImageDimensions = (imageWidth: number, imageHeight: number):void => {
     this.setState({
       imageWidth: imageWidth,
       imageHeight: imageHeight,
@@ -192,6 +202,17 @@ export class UserInterface extends Component {
       });
     }
   };
+
+  selectEraserTool = (): void => {
+    // Change active tool to paintbrush.
+    if (this.state.activeTool != Tools.eraser) {
+      this.setState({ activeTool: Tools.eraser }, () => {
+        this.reuseEmptyAnnotation();
+      });
+    }
+  };
+
+ 
 
   addAnnotation = (): void => {
     this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
@@ -269,7 +290,7 @@ export class UserInterface extends Component {
 
               <PaintbrushCanvas
                 scaleAndPan={this.state.scaleAndPan}
-                isActive={this.state.activeTool === Tools.paintbrush}
+                brushType={this.state.activeTool}
                 annotationsObject={this.annotationsObject}
                 imageWidth={this.state.imageWidth}
                 imageHeight={this.state.imageHeight}
@@ -344,6 +365,7 @@ export class UserInterface extends Component {
                 </ButtonGroup>
               </Grid>
 
+
               <Accordion
                 expanded={this.state.expanded === "background-toolbox"}
                 onChange={this.handleToolboxChange("background-toolbox")}
@@ -403,6 +425,16 @@ export class UserInterface extends Component {
                       <AllOut />
                     </IconButton>
                   </Tooltip>
+
+                  <Tooltip title="Activate Eraser">
+                    <IconButton
+                      id={"activate-eraser"}
+                      onClick={this.selectEraserTool}
+                    >
+                      <RadioButtonUncheckedSharp />
+                    </IconButton>
+                  </Tooltip>
+
                 </AccordionDetails>
               </Accordion>
               <Accordion
