@@ -22,7 +22,11 @@ export class BackgroundMinimap extends Component<Props> {
       this.baseMinimap.baseCanvas.canvasContext.filter = `contrast(${this.props.contrast}%) brightness(${this.props.brightness}%)`;
       this.baseMinimap.baseCanvas.canvasContext.globalCompositeOperation =
         "destination-over";
-      drawImageOnCanvas(this.baseMinimap.baseCanvas.canvasContext, this.image);
+      drawImageOnCanvas(this.baseMinimap.baseCanvas.canvasContext, this.image, {
+        x: 0,
+        y: 0,
+        scale: 1,
+      });
     }
   };
 

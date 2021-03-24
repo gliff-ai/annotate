@@ -2,11 +2,8 @@ import React, { ReactNode } from "react";
 import { Component } from "react";
 
 import { BaseCanvas, CanvasProps } from "../../baseCanvas";
-import {
-  Annotations,
-  canvasToImage,
-  imageToOriginalCanvas,
-} from "../../annotation";
+import { Annotations } from "../../annotation";
+import { canvasToImage, imageToCanvas } from "../../transforms";
 import { XYPoint } from "../../annotation/interfaces";
 import { Theme } from "@material-ui/core";
 
@@ -16,7 +13,7 @@ interface Props extends CanvasProps {
   imageWidth: number;
   imageHeight: number;
   brushRadius: number;
-  theme: Theme
+  theme: Theme;
 }
 
 export class PaintbrushCanvas extends Component<Props> {
@@ -85,11 +82,12 @@ export class PaintbrushCanvas extends Component<Props> {
   ): void => {
     const points = imagePoints.map(
       (point): XYPoint => {
-        const { x, y } = imageToOriginalCanvas(
+        const { x, y } = imageToCanvas(
           point.x,
           point.y,
           this.props.imageWidth,
           this.props.imageHeight,
+          this.props.scaleAndPan,
           this.props.canvasPositionAndSize
         );
         return { x: x, y: y };
@@ -156,7 +154,10 @@ export class PaintbrushCanvas extends Component<Props> {
     }
   };
 
-  saveLine = (brushRadius = 20, brushColor = this.props.theme.palette.primary.dark): void => {
+  saveLine = (
+    brushRadius = 20,
+    brushColor = this.props.theme.palette.primary.dark
+  ): void => {
     if (this.points.length < 2) return;
 
     const { brushStrokes } = this.props.annotationsObject.getActiveAnnotation();
