@@ -36,15 +36,20 @@ export class Annotations {
       }) - 1;
   };
 
-  addLabel = (activeAnnotation: number, newLabel: string): void => {
-    this.data[activeAnnotation]["labels"].push(newLabel);
-    // this.data[activeAnnotation]["labels"] = unique(this.data[activeAnnotation]["labels"]); // TODO
+  addLabel = (newLabel: string): void => {
+    if (!this.data[this.activeAnnotationID]["labels"].includes(newLabel)) {
+      this.data[this.activeAnnotationID]["labels"].push(newLabel);
+    }
   };
 
-  removeLabel = (activeAnnotation: number, existingLabel: string): void => {
-    this.data[activeAnnotation]["labels"] = this.data[activeAnnotation][
-      "labels"
-    ].filter((label) => label != existingLabel);
+  removeLabel = (existingLabel: string): void => {
+    this.data[this.activeAnnotationID]["labels"] = this.data[
+      this.activeAnnotationID
+    ]["labels"].filter((label) => label != existingLabel);
+  };
+
+  getLabels = (): string[] => {
+    return this.data[this.activeAnnotationID]["labels"];
   };
 
   getActiveAnnotationID = (): number => {
