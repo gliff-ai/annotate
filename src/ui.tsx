@@ -1,5 +1,4 @@
 import React, { Component, ChangeEvent, ReactNode } from "react";
-import { keybindings } from "./keybindings";
 
 import { Annotations } from "./annotation";
 
@@ -39,6 +38,7 @@ import { SplineCanvas } from "./toolboxes/spline";
 import { PaintbrushCanvas } from "./toolboxes/paintbrush";
 import { BaseSlider } from "./components/BaseSlider";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
+import { keydownListener } from "./keybindings";
 
 // Define all mutually exclusive tools
 enum Tools {
@@ -225,11 +225,7 @@ export class UserInterface extends Component {
   };
 
   componentDidMount = (): void => {
-    document.addEventListener("keydown", (event) => {
-      if (keybindings[event.code]) {
-        document.dispatchEvent(new Event(keybindings[event.code]));
-      }
-    });
+    document.addEventListener("keydown", keydownListener);
   };
 
   render = (): ReactNode => {
