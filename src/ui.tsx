@@ -230,7 +230,7 @@ export class UserInterface extends Component {
     this.setState({ expanded: isExpanded ? panel : false });
   };
 
-  componentDidMount = () => {
+  componentDidMount = (): void => {
     document.addEventListener("keydown", keydownListener);
   };
 
