@@ -1,5 +1,4 @@
 import React, { Component, ChangeEvent, ReactNode } from "react";
-import { keybindings } from "./keybindings";
 
 import { Annotations } from "./annotation";
 
@@ -30,6 +29,7 @@ import {
   ExpandMore,
   AllOut,
   Brush,
+  RadioButtonUncheckedSharp,
 } from "@material-ui/icons";
 
 import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
@@ -38,11 +38,13 @@ import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
 import { PaintbrushCanvas } from "./toolboxes/paintbrush";
 import { Labels } from "./components/Labels";
+import { keydownListener } from "./keybindings";
 
 // Define all mutually exclusive tools
 enum Tools {
   paintbrush = "paintbrush",
   spline = "spline",
+  eraser = "eraser",
 }
 
 export class UserInterface extends Component {
@@ -166,6 +168,10 @@ export class UserInterface extends Component {
     this.setState({ brushSize: this.state.brushSize + 10 });
   };
 
+  toggleEraser = (): void => {
+    this.setState({ activeTool: "eraser" });
+  };
+
   updateImageDimensions = (imageWidth: number, imageHeight: number): void => {
     this.setState({
       imageWidth: imageWidth,
@@ -186,6 +192,15 @@ export class UserInterface extends Component {
     // Change active tool to paintbrush.
     if (this.state.activeTool != Tools.paintbrush) {
       this.setState({ activeTool: Tools.paintbrush }, () => {
+        this.reuseEmptyAnnotation();
+      });
+    }
+  };
+
+  selectEraserTool = (): void => {
+    // Change active tool to paintbrush.
+    if (this.state.activeTool != Tools.eraser) {
+      this.setState({ activeTool: Tools.eraser }, () => {
         this.reuseEmptyAnnotation();
       });
     }
@@ -216,11 +231,7 @@ export class UserInterface extends Component {
   };
 
   componentDidMount = () => {
-    document.addEventListener("keydown", (event) => {
-      if (keybindings[event.code]) {
-        document.dispatchEvent(new Event(keybindings[event.code]));
-      }
-    });
+    document.addEventListener("keydown", keydownListener);
   };
 
   render = (): ReactNode => {
@@ -262,7 +273,7 @@ export class UserInterface extends Component {
 
               <PaintbrushCanvas
                 scaleAndPan={this.state.scaleAndPan}
-                isActive={this.state.activeTool === Tools.paintbrush}
+                brushType={this.state.activeTool}
                 annotationsObject={this.annotationsObject}
                 imageWidth={this.state.imageWidth}
                 imageHeight={this.state.imageHeight}
@@ -365,6 +376,15 @@ export class UserInterface extends Component {
                       onClick={this.incrementBrush}
                     >
                       <AllOut />
+                    </IconButton>
+                  </Tooltip>
+
+                  <Tooltip title="Activate Eraser">
+                    <IconButton
+                      id={"activate-eraser"}
+                      onClick={this.selectEraserTool}
+                    >
+                      <RadioButtonUncheckedSharp />
                     </IconButton>
                   </Tooltip>
                 </AccordionDetails>
