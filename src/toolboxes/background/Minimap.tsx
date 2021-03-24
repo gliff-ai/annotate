@@ -12,14 +12,9 @@ interface Props extends BaseProps {
     width?: number;
     height?: number;
   }) => void;
+  contrast: number;
+  brightness: number;
 }
-
-// TODO add brightness and contrast to props not state
-// interface State {
-//   brightness: number;
-//   contrast: number;
-// }
-
 export class BackgroundMinimap extends Component<Props> {
   private baseMinimap: BaseMinimap;
   private image: HTMLImageElement;
@@ -30,9 +25,14 @@ export class BackgroundMinimap extends Component<Props> {
 
   private redrawImage = () => {
     if (this.image && this.image.complete) {
+      this.baseMinimap.baseCanvas.canvasContext.filter = `contrast(${this.props.contrast}%) brightness(${this.props.brightness}%)`;
       this.baseMinimap.baseCanvas.canvasContext.globalCompositeOperation =
         "destination-over";
-      drawImageOnCanvas(this.baseMinimap.baseCanvas.canvasContext, this.image);
+      drawImageOnCanvas(this.baseMinimap.baseCanvas.canvasContext, this.image, {
+        x: 0,
+        y: 0,
+        scale: 1,
+      });
     }
   };
 

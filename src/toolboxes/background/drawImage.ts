@@ -1,6 +1,11 @@
 export default function drawImageOnCanvas(
   ctx: CanvasRenderingContext2D,
-  img: HTMLImageElement
+  img: HTMLImageElement,
+  scaleAndPan: {
+    x: number;
+    y: number;
+    scale: number;
+  }
 ): void {
   // Defaults
   const w = ctx.canvas.width;
@@ -11,14 +16,14 @@ export default function drawImageOnCanvas(
   const imageHeight = img.height;
   const ratio = Math.min(w / imageWidth, h / imageHeight);
 
-  const newWidth = imageWidth * ratio; // scaled image width;
-  const newHeight = imageHeight * ratio; // scaled image height
+  let newWidth = imageWidth * ratio; // scaled image width;
+  let newHeight = imageHeight * ratio; // scaled image height
 
-  // deal with any offsets
-  let offsetX = 0;
-  let offsetY = 0;
-  if (newWidth < w) offsetX = (w - newWidth) / 2;
-  if (newHeight < h) offsetY = (h - newHeight) / 2;
+  newWidth *= scaleAndPan.scale;
+  newHeight *= scaleAndPan.scale;
+
+  let offsetX = w / 2 - newWidth / 2 + scaleAndPan.x;
+  let offsetY = h / 2 - newHeight / 2 + scaleAndPan.y;
 
   // fill image in dest. rectangle
   ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);

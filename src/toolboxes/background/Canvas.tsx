@@ -7,13 +7,9 @@ import drawImageOnCanvas from "./drawImage";
 interface Props extends BaseProps {
   imgSrc?: string;
   updateImageDimensions: (imageWidth: number, imageHeight: number) => void;
+  contrast: number;
+  brightness: number;
 }
-
-// TODO add brightness and contrast controls
-// interface State {
-//   brightness: number;
-//   contrast: number;
-// }
 
 export class BackgroundCanvas extends Component<Props> {
   private baseCanvas: BaseCanvas;
@@ -25,9 +21,14 @@ export class BackgroundCanvas extends Component<Props> {
 
   private redrawImage = () => {
     if (this.image && this.image.complete) {
+      this.baseCanvas.canvasContext.filter = `contrast(${this.props.contrast}%) brightness(${this.props.brightness}%)`;
       this.baseCanvas.canvasContext.globalCompositeOperation =
         "destination-over";
-      drawImageOnCanvas(this.baseCanvas.canvasContext, this.image);
+      drawImageOnCanvas(
+        this.baseCanvas.canvasContext,
+        this.image,
+        this.props.scaleAndPan
+      );
     }
   };
 
@@ -66,5 +67,5 @@ export class BackgroundCanvas extends Component<Props> {
         canvasPositionAndSize={this.props.canvasPositionAndSize}
       />
     );
-  }
+  };
 }
