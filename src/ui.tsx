@@ -17,8 +17,6 @@ import {
   CssBaseline,
 } from "@material-ui/core";
 
-
-
 import {
   Add,
   ZoomOut,
@@ -31,7 +29,7 @@ import {
   ExpandMore,
   AllOut,
   Brush,
-  RadioButtonUncheckedSharp
+  RadioButtonUncheckedSharp,
 } from "@material-ui/icons";
 
 import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
@@ -39,6 +37,7 @@ import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
 import { PaintbrushCanvas } from "./toolboxes/paintbrush";
+import { Labels } from "./components/Labels";
 import { BaseSlider } from "./components/BaseSlider";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { keydownListener } from "./keybindings";
@@ -47,7 +46,7 @@ import { keydownListener } from "./keybindings";
 enum Tools {
   paintbrush = "paintbrush",
   spline = "spline",
-  eraser = "eraser"
+  eraser = "eraser",
 }
 
 export class UserInterface extends Component {
@@ -78,6 +77,7 @@ export class UserInterface extends Component {
   annotationsObject: Annotations;
   theme: Theme;
   imageSource: string;
+  private presetLabels: string[];
 
   constructor(props: never) {
     super(props);
@@ -106,6 +106,7 @@ export class UserInterface extends Component {
     });
     this.imageSource = "public/zebrafish-heart.jpg";
     this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
+    this.presetLabels = ["label-1", "label-2", "label-3"]; //TODO: find a place for this
   }
 
   setViewportPositionAndSize = (viewportPositionAndSize: {
@@ -220,13 +221,11 @@ export class UserInterface extends Component {
     this.setState({ brushSize: this.state.brushSize + 10 });
   };
 
- 
-  toggleEraser = ():void => {
-      this.setState({ activeTool: "eraser" });
+  toggleEraser = (): void => {
+    this.setState({ activeTool: "eraser" });
   };
 
-
-  updateImageDimensions = (imageWidth: number, imageHeight: number):void => {
+  updateImageDimensions = (imageWidth: number, imageHeight: number): void => {
     this.setState({
       imageWidth: imageWidth,
       imageHeight: imageHeight,
@@ -259,8 +258,6 @@ export class UserInterface extends Component {
       });
     }
   };
-
- 
 
   addAnnotation = (): void => {
     this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
@@ -414,7 +411,6 @@ export class UserInterface extends Component {
                 </ButtonGroup>
               </Grid>
 
-
               <Accordion
                 expanded={this.state.expanded === "background-toolbox"}
                 onChange={this.handleToolboxChange("background-toolbox")}
@@ -483,7 +479,6 @@ export class UserInterface extends Component {
                       <RadioButtonUncheckedSharp />
                     </IconButton>
                   </Tooltip>
-
                 </AccordionDetails>
               </Accordion>
               <Accordion
@@ -510,6 +505,24 @@ export class UserInterface extends Component {
                       <Brush />
                     </IconButton>
                   </Tooltip>
+                </AccordionDetails>
+              </Accordion>
+              <Accordion
+                expanded={this.state.expanded === "labels-toolbox"}
+                onChange={this.handleToolboxChange("labels-toolbox")}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMore />}
+                  id="labels-toolbox"
+                >
+                  <Typography>Labels</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Labels
+                    annotationObject={this.annotationsObject}
+                    presetLabels={this.presetLabels}
+                    theme={this.theme}
+                  />
                 </AccordionDetails>
               </Accordion>
             </Grid>
