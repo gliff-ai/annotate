@@ -24,7 +24,11 @@ export class BackgroundCanvas extends Component<Props> {
       this.baseCanvas.canvasContext.filter = `contrast(${this.props.contrast}%) brightness(${this.props.brightness}%)`;
       this.baseCanvas.canvasContext.globalCompositeOperation =
         "destination-over";
-      drawImageOnCanvas(this.baseCanvas.canvasContext, this.image);
+      drawImageOnCanvas(
+        this.baseCanvas.canvasContext,
+        this.image,
+        this.props.scaleAndPan
+      );
     }
   };
 
