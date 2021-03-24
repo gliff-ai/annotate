@@ -6,6 +6,12 @@ import drawImageOnCanvas from "./drawImage";
 
 interface Props extends BaseProps {
   imgSrc?: string;
+  setMinimapPositionAndSize?: (minimapPositionAndSize: {
+    top?: number;
+    left?: number;
+    width?: number;
+    height?: number;
+  }) => void;
 }
 
 // TODO add brightness and contrast to props not state
@@ -63,7 +69,8 @@ export class BackgroundMinimap extends Component<Props> {
         imageHeight={this.props.imageHeight}
         canvasPositionAndSize={this.props.canvasPositionAndSize}
         minimapPositionAndSize={this.props.minimapPositionAndSize}
+        setMinimapPositionAndSize={this.props.setMinimapPositionAndSize}
       />
     );
-  }
+  };
 }

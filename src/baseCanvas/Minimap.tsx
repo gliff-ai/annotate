@@ -18,6 +18,12 @@ export interface Props extends BaseProps {
     x?: number;
     y?: number;
   }) => void;
+  setMinimapPositionAndSize?: (minimapPositionAndSize: {
+    top?: number;
+    left?: number;
+    width?: number;
+    height?: number;
+  }) => void;
 }
 
 export class BaseMinimap extends React.Component<Props> {
@@ -58,7 +64,7 @@ export class BaseMinimap extends React.Component<Props> {
 
   /*** Mouse events ****/
   onDoubleClick = (canvasX: number, canvasY: number): void => {
-      // DO STUFF
+    // DO STUFF
   };
 
   onClick = (canvasX: number, canvasY: number): void => {
@@ -88,19 +94,19 @@ export class BaseMinimap extends React.Component<Props> {
   };
 
   onMouseDown = (canvasX: number, canvasY: number): void => {
-      // DO STUFF
+    // DO STUFF
   };
 
   onMouseMove = (canvasX: number, canvasY: number): void => {
-      // DO STUFF
+    // DO STUFF
   };
 
   onMouseUp = (canvasX: number, canvasY: number): void => {
-      // DO STUFF
+    // DO STUFF
   };
 
   onContextMenu = (canvasX: number, canvasY: number): void => {
-      // DO STUFF
+    // DO STUFF
   };
 
   render = (): ReactNode => {
@@ -116,6 +122,7 @@ export class BaseMinimap extends React.Component<Props> {
         name={this.props.name}
         scaleAndPan={{ x: 0, y: 0, scale: 1 }}
         canvasPositionAndSize={this.props.minimapPositionAndSize}
+        setCanvasPositionAndSize={this.props.setMinimapPositionAndSize}
         ref={(baseCanvas) => (this.baseCanvas = baseCanvas)}
       />
     );

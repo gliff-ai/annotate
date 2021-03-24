@@ -17,8 +17,6 @@ import {
   CssBaseline,
 } from "@material-ui/core";
 
-
-
 import {
   Add,
   ZoomOut,
@@ -31,7 +29,7 @@ import {
   ExpandMore,
   AllOut,
   Brush,
-  RadioButtonUncheckedSharp
+  RadioButtonUncheckedSharp,
 } from "@material-ui/icons";
 
 import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
@@ -45,7 +43,7 @@ import { keydownListener } from "./keybindings";
 enum Tools {
   paintbrush = "paintbrush",
   spline = "spline",
-  eraser = "eraser"
+  eraser = "eraser",
 }
 
 export class UserInterface extends Component {
@@ -63,6 +61,13 @@ export class UserInterface extends Component {
     brushSize: number;
 
     viewportPositionAndSize: {
+      top: number;
+      left: number;
+      width: number;
+      height: number;
+    };
+
+    minimapPositionAndSize: {
       top: number;
       left: number;
       width: number;
@@ -91,6 +96,7 @@ export class UserInterface extends Component {
       activeAnnotationID: null,
       brushSize: 20,
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
+      minimapPositionAndSize: { top: 0, left: 0, width: 200, height: 200 },
       expanded: false,
     };
 
@@ -114,6 +120,19 @@ export class UserInterface extends Component {
     viewportPositionAndSize.width ??= this.state.viewportPositionAndSize.width;
     viewportPositionAndSize.height ??= this.state.viewportPositionAndSize.height;
     this.setState({ viewportPositionAndSize });
+  };
+
+  setMinimapPositionAndSize = (minimapPositionAndSize: {
+    top?: number;
+    left?: number;
+    width?: number;
+    height?: number;
+  }): void => {
+    minimapPositionAndSize.top ??= this.state.minimapPositionAndSize.top;
+    minimapPositionAndSize.left ??= this.state.minimapPositionAndSize.left;
+    minimapPositionAndSize.width ??= this.state.minimapPositionAndSize.width;
+    minimapPositionAndSize.height ??= this.state.minimapPositionAndSize.height;
+    this.setState({ minimapPositionAndSize });
   };
 
   setScaleAndPan = (scaleAndPan: {
@@ -167,13 +186,11 @@ export class UserInterface extends Component {
     this.setState({ brushSize: this.state.brushSize + 10 });
   };
 
- 
-  toggleEraser = ():void => {
-      this.setState({ activeTool: "eraser" });
+  toggleEraser = (): void => {
+    this.setState({ activeTool: "eraser" });
   };
 
-
-  updateImageDimensions = (imageWidth: number, imageHeight: number):void => {
+  updateImageDimensions = (imageWidth: number, imageHeight: number): void => {
     this.setState({
       imageWidth: imageWidth,
       imageHeight: imageHeight,
@@ -206,8 +223,6 @@ export class UserInterface extends Component {
       });
     }
   };
-
- 
 
   addAnnotation = (): void => {
     this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
@@ -295,12 +310,8 @@ export class UserInterface extends Component {
                   imageWidth={this.state.imageWidth}
                   imageHeight={this.state.imageHeight}
                   canvasPositionAndSize={this.state.viewportPositionAndSize}
-                  minimapPositionAndSize={{
-                    top: 0,
-                    left: 0,
-                    width: 200,
-                    height: 200,
-                  }}
+                  minimapPositionAndSize={this.state.minimapPositionAndSize}
+                  setMinimapPositionAndSize={this.setMinimapPositionAndSize}
                 />
               </div>
 
@@ -349,7 +360,6 @@ export class UserInterface extends Component {
                 </ButtonGroup>
               </Grid>
 
-
               <Accordion
                 expanded={this.state.expanded === "paintbrush-toolbox"}
                 onChange={this.handleToolboxChange("paintbrush-toolbox")}
@@ -391,7 +401,6 @@ export class UserInterface extends Component {
                       <RadioButtonUncheckedSharp />
                     </IconButton>
                   </Tooltip>
-
                 </AccordionDetails>
               </Accordion>
               <Accordion
