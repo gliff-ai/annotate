@@ -37,7 +37,8 @@ import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
 import { PaintbrushCanvas } from "./toolboxes/paintbrush";
-import { BaseSlider, Sliders, sliderConfig } from "./components/BaseSlider";
+import { BaseSlider } from "./components/BaseSlider";
+import { Sliders, SLIDER_CONFIG } from "./configSlider";
 
 // Define all mutually exclusive tools
 enum Tools {
@@ -90,8 +91,8 @@ export class UserInterface extends Component {
       brushSize: 20,
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       expanded: false,
-      brightness: sliderConfig[Sliders.brightness].initial,
-      contrast: sliderConfig[Sliders.contrast].initial,
+      brightness: SLIDER_CONFIG[Sliders.brightness].initial,
+      contrast: SLIDER_CONFIG[Sliders.contrast].initial,
     };
 
     this.theme = createMuiTheme({
@@ -362,12 +363,12 @@ export class UserInterface extends Component {
                     <Grid item style={{ width: "85%", position: "relative" }}>
                       <BaseSlider
                         value={this.state.contrast}
-                        slider={Sliders.contrast}
+                        config={SLIDER_CONFIG[Sliders.contrast]}
                         onChange={this.handleSliderChange}
                       />
                       <BaseSlider
                         value={this.state.brightness}
-                        slider={Sliders.brightness}
+                        config={SLIDER_CONFIG[Sliders.brightness]}
                         onChange={this.handleSliderChange}
                       />
                     </Grid>

@@ -1,52 +1,43 @@
 import React, { ChangeEvent, FunctionComponent, ReactElement } from "react";
-import { Typography, Slider } from "@material-ui/core";
-
-export enum Sliders {
-  contrast,
-  brightness,
-}
-
-export const sliderConfig: {
-  [id: number]: SliderConfigItem;
-} = {
-  [Sliders.contrast]: {
-    name: "contrast",
-    initial: 100,
-    min: 0,
-    max: 200,
-  },
-
-  [Sliders.brightness]: {
-    name: "brightness",
-    initial: 100,
-    min: 0,
-    max: 200,
-  },
-};
-
-interface SliderConfigItem {
+import { Slider, Typography } from "@material-ui/core";
+export interface Config {
   name: string;
+  id: string;
   initial: number;
+  step: number;
   min: number;
   max: number;
+  unit: string;
 }
 
+type marks = Array<{ value: number; label: string }>;
 interface Props {
   value: number;
+  config: Config;
   onChange: (arg0: string) => (arg1: ChangeEvent, arg2: number) => void;
-  slider: Sliders;
+}
+
+function getAriaValueText(value: number): string {
+  return `${value}`;
+}
+
+function getMarks(config: Config): marks {
+  return [config.min, config.initial, config.max].map((value) => ({
+    value: value,
+    label: `${value} ${config.unit}`,
+  }));
 }
 
 export const BaseSlider: FunctionComponent<Props> = ({
   value,
-  slider,
+  config,
   onChange,
 }): ReactElement => {
-  const config = sliderConfig[slider];
+  const marks = getMarks(config);
   return (
     <>
       <Typography
-        id="continuous-slider"
+        id={config.id}
         gutterBottom
         style={{ textTransform: "capitalize" }}
       >
@@ -55,9 +46,12 @@ export const BaseSlider: FunctionComponent<Props> = ({
       <Slider
         value={value}
         onChange={onChange(config.name)}
+        aria-labelledby={config.id}
+        step={config.step}
         min={config.min}
         max={config.max}
-        aria-labelledby="continuous-slider"
+        marks={marks}
+        getAriaValueText={getAriaValueText}
         valueLabelDisplay="auto"
       />
     </>
