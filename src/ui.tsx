@@ -1,5 +1,4 @@
 import React, { Component, ChangeEvent, ReactNode } from "react";
-import { keybindings } from "./keybindings";
 
 import { Annotations } from "./annotation";
 
@@ -36,6 +35,7 @@ import {
   ExpandMore,
   AllOut,
   Brush,
+  RadioButtonUncheckedSharp
 } from "@material-ui/icons";
 
 import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
@@ -43,11 +43,13 @@ import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
 import { PaintbrushCanvas } from "./toolboxes/paintbrush";
+import { keydownListener } from "./keybindings";
 
 // Define all mutually exclusive tools
 enum Tools {
   paintbrush = "paintbrush",
   spline = "spline",
+  eraser = "eraser"
 }
 
 export class UserInterface extends Component {
@@ -180,7 +182,13 @@ export class UserInterface extends Component {
     this.setState({ brushSize: this.state.brushSize + 10 });
   };
 
-  updateImageDimensions = (imageWidth: number, imageHeight: number): void => {
+ 
+  toggleEraser = ():void => {
+      this.setState({ activeTool: "eraser" });
+  };
+
+
+  updateImageDimensions = (imageWidth: number, imageHeight: number):void => {
     this.setState({
       imageWidth: imageWidth,
       imageHeight: imageHeight,
@@ -204,6 +212,17 @@ export class UserInterface extends Component {
       });
     }
   };
+
+  selectEraserTool = (): void => {
+    // Change active tool to paintbrush.
+    if (this.state.activeTool != Tools.eraser) {
+      this.setState({ activeTool: Tools.eraser }, () => {
+        this.reuseEmptyAnnotation();
+      });
+    }
+  };
+
+ 
 
   addAnnotation = (): void => {
     this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
@@ -230,11 +249,7 @@ export class UserInterface extends Component {
   };
 
   componentDidMount = () => {
-    document.addEventListener("keydown", (event) => {
-      if (keybindings[event.code]) {
-        document.dispatchEvent(new Event(keybindings[event.code]));
-      }
-    });
+    document.addEventListener("keydown", keydownListener);
   };
 
   uploadImage = ():void => {
@@ -281,13 +296,14 @@ export class UserInterface extends Component {
 
               <PaintbrushCanvas
                 scaleAndPan={this.state.scaleAndPan}
-                isActive={this.state.activeTool === Tools.paintbrush}
+                brushType={this.state.activeTool}
                 annotationsObject={this.annotationsObject}
                 imageWidth={this.state.imageWidth}
                 imageHeight={this.state.imageHeight}
                 brushRadius={this.state.brushSize}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                theme={this.theme}
               />
             </Grid>
 
@@ -354,6 +370,7 @@ export class UserInterface extends Component {
                 </ButtonGroup>
               </Grid>
 
+
               <Accordion
                 expanded={this.state.expanded === "paintbrush-toolbox"}
                 onChange={this.handleToolboxChange("paintbrush-toolbox")}
@@ -386,6 +403,16 @@ export class UserInterface extends Component {
                       <AllOut />
                     </IconButton>
                   </Tooltip>
+
+                  <Tooltip title="Activate Eraser">
+                    <IconButton
+                      id={"activate-eraser"}
+                      onClick={this.selectEraserTool}
+                    >
+                      <RadioButtonUncheckedSharp />
+                    </IconButton>
+                  </Tooltip>
+
                 </AccordionDetails>
               </Accordion>
               <Accordion
