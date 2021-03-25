@@ -60,7 +60,7 @@ export const Labels: FunctionComponent<Props> = ({
     annotationObject.getLabels()
   );
   const [menuLabels, setMenuLabels] = useState(getMenuLabels());
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     // Re-render assigned labels at change of active annotation ID.
