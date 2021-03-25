@@ -87,7 +87,7 @@ interface State {
   expanded: string | boolean;
 }
 
-export class UserInterface extends Component<never, State> {
+export class UserInterface extends Component<any, State> {
   annotationsObject: Annotations;
 
   theme: Theme;
@@ -132,11 +132,16 @@ export class UserInterface extends Component<never, State> {
   ): void => {
     this.setState((prevState: State) => {
       const { viewportPositionAndSize } = prevState;
-      viewportPositionAndSize.top ??= newViewportPositionAndSize.top;
-      viewportPositionAndSize.left ??= newViewportPositionAndSize.left;
-      viewportPositionAndSize.width ??= newViewportPositionAndSize.width;
-      viewportPositionAndSize.height ??= newViewportPositionAndSize.height;
-      return { viewportPositionAndSize };
+      return {
+        minimapPositionAndSize: {
+          top: newViewportPositionAndSize.top || viewportPositionAndSize.top,
+          left: newViewportPositionAndSize.left || viewportPositionAndSize.left,
+          width:
+            newViewportPositionAndSize.width || viewportPositionAndSize.width,
+          height:
+            newViewportPositionAndSize.height || viewportPositionAndSize.height,
+        },
+      };
     });
   };
 
@@ -145,11 +150,16 @@ export class UserInterface extends Component<never, State> {
   ): void => {
     this.setState((prevState: State) => {
       const { minimapPositionAndSize } = prevState;
-      minimapPositionAndSize.top ??= newMinimapPositionAndSize.top;
-      minimapPositionAndSize.left ??= newMinimapPositionAndSize.left;
-      minimapPositionAndSize.width ??= newMinimapPositionAndSize.width;
-      minimapPositionAndSize.height ??= newMinimapPositionAndSize.height;
-      return { minimapPositionAndSize };
+      return {
+        minimapPositionAndSize: {
+          top: newMinimapPositionAndSize.top || minimapPositionAndSize.top,
+          left: newMinimapPositionAndSize.left || minimapPositionAndSize.left,
+          width:
+            newMinimapPositionAndSize.width || minimapPositionAndSize.width,
+          height:
+            newMinimapPositionAndSize.height || minimapPositionAndSize.height,
+        },
+      };
     });
   };
 
@@ -160,11 +170,13 @@ export class UserInterface extends Component<never, State> {
   }): void => {
     this.setState((prevState: State) => {
       const { scaleAndPan } = prevState;
-      scaleAndPan.scale ??= newScaleAndPan.scale;
-      scaleAndPan.x ??= newScaleAndPan.x;
-      scaleAndPan.y ??= newScaleAndPan.y;
-
-      return { scaleAndPan };
+      return {
+        scaleAndPan: {
+          x: newScaleAndPan.x || scaleAndPan.x,
+          y: newScaleAndPan.y || scaleAndPan.y,
+          scale: newScaleAndPan.scale || scaleAndPan.scale,
+        },
+      };
     }, this.limitPan); // this sets limitPan as a callback after state update, ensuring it will use the new scaleAndPan
   };
 
@@ -329,12 +341,11 @@ export class UserInterface extends Component<never, State> {
     this.setState({ expanded: isExpanded ? panel : false });
   };
 
-  handleSliderChange = (key: "contrast" | "brightness") => (
+  handleSliderChange = (state: string) => (
     event: ChangeEvent,
     value: number
   ): void => {
-    // @ts-ignore
-    this.setState({ [key]: value });
+    this.setState({ [state]: value });
   };
 
   componentDidMount = (): void => {
