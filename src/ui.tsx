@@ -13,6 +13,7 @@ import {
   Toolbar,
   Tooltip,
   IconButton,
+  Button,
   ButtonGroup,
   Grid,
   Accordion,
@@ -78,6 +79,13 @@ export class UserInterface extends Component {
       height: number;
     };
 
+    minimapPositionAndSize: {
+      top: number;
+      left: number;
+      width: number;
+      height: number;
+    };
+
     expanded: string | boolean;
   };
 
@@ -98,9 +106,10 @@ export class UserInterface extends Component {
       imageWidth: 0,
       imageHeight: 0,
       activeTool: Tools.paintbrush,
-      activeAnnotationID: null,
+      activeAnnotationID: 0,
       brushSize: 20,
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
+      minimapPositionAndSize: { top: 0, left: 0, width: 200, height: 200 },
       expanded: false,
       brightness: SLIDER_CONFIG[Sliders.brightness].initial,
       contrast: SLIDER_CONFIG[Sliders.contrast].initial,
@@ -111,7 +120,7 @@ export class UserInterface extends Component {
         type: "dark",
       },
     });
-    this.imageSource = "public/zebrafish-heart.jpg";
+    this.imageSource = "zebrafish-heart.jpg";
     this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
     this.presetLabels = ["label-1", "label-2", "label-3"]; //TODO: find a place for this
   }
@@ -127,6 +136,19 @@ export class UserInterface extends Component {
     viewportPositionAndSize.width ??= this.state.viewportPositionAndSize.width;
     viewportPositionAndSize.height ??= this.state.viewportPositionAndSize.height;
     this.setState({ viewportPositionAndSize });
+  };
+
+  setMinimapPositionAndSize = (minimapPositionAndSize: {
+    top?: number;
+    left?: number;
+    width?: number;
+    height?: number;
+  }): void => {
+    minimapPositionAndSize.top ??= this.state.minimapPositionAndSize.top;
+    minimapPositionAndSize.left ??= this.state.minimapPositionAndSize.left;
+    minimapPositionAndSize.width ??= this.state.minimapPositionAndSize.width;
+    minimapPositionAndSize.height ??= this.state.minimapPositionAndSize.height;
+    this.setState({ minimapPositionAndSize });
   };
 
   setScaleAndPan = (scaleAndPan: {
@@ -149,6 +171,7 @@ export class UserInterface extends Component {
       this.state.viewportPositionAndSize.width / this.state.imageWidth,
       this.state.viewportPositionAndSize.height / this.state.imageHeight
     );
+
     let xMargin =
       this.state.imageWidth *
         imageScalingFactor *
@@ -362,58 +385,54 @@ export class UserInterface extends Component {
                   imageWidth={this.state.imageWidth}
                   imageHeight={this.state.imageHeight}
                   canvasPositionAndSize={this.state.viewportPositionAndSize}
-                  minimapPositionAndSize={{
-                    top: 0,
-                    left: 0,
-                    width: 200,
-                    height: 200,
-                  }}
+                  minimapPositionAndSize={this.state.minimapPositionAndSize}
+                  setMinimapPositionAndSize={this.setMinimapPositionAndSize}
                   contrast={this.state.contrast}
                   brightness={this.state.brightness}
                 />
               </div>
 
               <Grid container justify="center">
-                <ButtonGroup>
+                <ButtonGroup size="small" style={{ margin: "5px" }}>
                   <Tooltip title="Zoom out">
-                    <IconButton id={"zoom-out"} onClick={this.decrementScale}>
+                    <Button id={"zoom-out"} onClick={this.decrementScale}>
                       <ZoomOut />
-                    </IconButton>
+                    </Button>
                   </Tooltip>
                   <Tooltip title="Reset zoom and pan">
-                    <IconButton id={"reset"} onClick={this.resetScaleAndPan}>
+                    <Button id={"reset"} onClick={this.resetScaleAndPan}>
                       <AspectRatio />
-                    </IconButton>
+                    </Button>
                   </Tooltip>
                   <Tooltip title="Zoom in">
-                    <IconButton id={"zoom-in"} onClick={this.incrementScale}>
+                    <Button id={"zoom-in"} onClick={this.incrementScale}>
                       <ZoomIn />
-                    </IconButton>
+                    </Button>
                   </Tooltip>
                 </ButtonGroup>
 
-                <ButtonGroup orientation="vertical">
+                <ButtonGroup size="small" style={{ marginBottom: "5px" }}>
                   <Tooltip title="Pan up">
-                    <IconButton id={"pan-up"} onClick={this.incrementPanY}>
+                    <Button id={"pan-up"} onClick={this.incrementPanY}>
                       <KeyboardArrowUp />
-                    </IconButton>
+                    </Button>
                   </Tooltip>
-                  <ButtonGroup>
+                  <ButtonGroup size="small">
                     <Tooltip title="Pan left">
-                      <IconButton id={"pan-left"} onClick={this.incrementPanX}>
+                      <Button id={"pan-left"} onClick={this.incrementPanX}>
                         <KeyboardArrowLeft />
-                      </IconButton>
+                      </Button>
                     </Tooltip>
                     <Tooltip title="Pan right">
-                      <IconButton id={"pan-right"} onClick={this.decrementPanX}>
+                      <Button id={"pan-right"} onClick={this.decrementPanX}>
                         <KeyboardArrowRight />
-                      </IconButton>
+                      </Button>
                     </Tooltip>
                   </ButtonGroup>
                   <Tooltip title="Pan down">
-                    <IconButton id={"pan-down"} onClick={this.decrementPanY}>
+                    <Button id={"pan-down"} onClick={this.decrementPanY}>
                       <KeyboardArrowDown />
-                    </IconButton>
+                    </Button>
                   </Tooltip>
                 </ButtonGroup>
               </Grid>
@@ -529,6 +548,7 @@ export class UserInterface extends Component {
                   <Labels
                     annotationObject={this.annotationsObject}
                     presetLabels={this.presetLabels}
+                    activeAnnotationID={this.state.activeAnnotationID}
                     theme={this.theme}
                   />
                 </AccordionDetails>

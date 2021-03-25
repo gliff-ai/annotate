@@ -26,34 +26,37 @@ import { Annotations } from "../annotation";
 interface Props {
   annotationObject: Annotations;
   presetLabels: string[];
+  activeAnnotationID: number;
   theme: Theme;
 }
 
 export const Labels: FunctionComponent<Props> = ({
   annotationObject,
   presetLabels,
+  activeAnnotationID,
   theme,
 }): ReactElement => {
-  const getMenuLabels = (): string[] => {
-    return presetLabels.filter((label) => !assignedLabels.includes(label));
+  const getMenuLabels = (labels: string[]): string[] => {
+    return presetLabels.filter((label) => !labels.includes(label));
   };
 
   const handleAddLabel = (label: string) => (): void => {
     // Add a label to active annotation object and update some states.
     annotationObject.addLabel(label);
-    setAssignedLabels(annotationObject.getLabels());
+    updateAllLabels();
+  };
+
+  const updateAllLabels = (): void => {
+    const labels = annotationObject.getLabels();
+    setAssignedLabels(labels);
+    setMenuLabels(getMenuLabels(labels));
   };
 
   const handleRemoveLabel = (label: string) => (): void => {
     // Remove a label from active annotation object and update some states.
     annotationObject.removeLabel(label);
-    setAssignedLabels(annotationObject.getLabels());
+    updateAllLabels();
   };
-
-  useEffect(() => {
-    // Update menuLabels after assignedLabels has been reset.
-    setMenuLabels(getMenuLabels());
-  });
 
   const handleClick = () => {
     setIsOpen(!isOpen);
@@ -62,8 +65,15 @@ export const Labels: FunctionComponent<Props> = ({
   const [assignedLabels, setAssignedLabels] = useState(
     annotationObject.getLabels()
   );
-  const [menuLabels, setMenuLabels] = useState(getMenuLabels());
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [menuLabels, setMenuLabels] = useState(
+    getMenuLabels(annotationObject.getLabels())
+  );
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    // Re-render assigned labels at change of active annotation ID.
+    updateAllLabels();
+  }, [activeAnnotationID]);
 
   return (
     <List style={{ width: "100%" }}>

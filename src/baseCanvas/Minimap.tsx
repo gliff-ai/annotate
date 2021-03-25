@@ -15,6 +15,12 @@ export interface Props extends BaseProps {
     x?: number;
     y?: number;
   }) => void;
+  setMinimapPositionAndSize?: (minimapPositionAndSize: {
+    top?: number;
+    left?: number;
+    width?: number;
+    height?: number;
+  }) => void;
 }
 
 export class BaseMinimap extends React.Component<Props> {
@@ -118,6 +124,7 @@ export class BaseMinimap extends React.Component<Props> {
         name={this.props.name}
         scaleAndPan={{ x: 0, y: 0, scale: 1 }}
         canvasPositionAndSize={this.props.minimapPositionAndSize}
+        setCanvasPositionAndSize={this.props.setMinimapPositionAndSize}
         ref={(baseCanvas) => (this.baseCanvas = baseCanvas)}
       />
     );
