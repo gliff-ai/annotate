@@ -13,7 +13,8 @@ const keydownListener = (
   if (event.altKey) code = `alt+${code}`;
 
   if (keybindingsMap[code]) {
-    document.dispatchEvent(new Event(keybindingsMap[code]));
+    const [namespace, method] = keybindingsMap[code].split(".");
+    document.dispatchEvent(new CustomEvent(method, { detail: namespace }));
   }
 };
 

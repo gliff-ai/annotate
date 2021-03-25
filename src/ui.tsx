@@ -142,6 +142,7 @@ export class UserInterface extends Component {
       this.state.viewportPositionAndSize.width / this.state.imageWidth,
       this.state.viewportPositionAndSize.height / this.state.imageHeight
     );
+
     let xMargin =
       this.state.imageWidth *
         imageScalingFactor *
