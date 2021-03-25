@@ -72,6 +72,13 @@ export class UserInterface extends Component {
       height: number;
     };
 
+    minimapPositionAndSize: {
+      top: number;
+      left: number;
+      width: number;
+      height: number;
+    };
+
     expanded: string | boolean;
   };
 
@@ -95,6 +102,7 @@ export class UserInterface extends Component {
       activeAnnotationID: 0,
       brushSize: 20,
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
+      minimapPositionAndSize: { top: 0, left: 0, width: 200, height: 200 },
       expanded: false,
       brightness: SLIDER_CONFIG[Sliders.brightness].initial,
       contrast: SLIDER_CONFIG[Sliders.contrast].initial,
@@ -121,6 +129,19 @@ export class UserInterface extends Component {
     viewportPositionAndSize.width ??= this.state.viewportPositionAndSize.width;
     viewportPositionAndSize.height ??= this.state.viewportPositionAndSize.height;
     this.setState({ viewportPositionAndSize });
+  };
+
+  setMinimapPositionAndSize = (minimapPositionAndSize: {
+    top?: number;
+    left?: number;
+    width?: number;
+    height?: number;
+  }): void => {
+    minimapPositionAndSize.top ??= this.state.minimapPositionAndSize.top;
+    minimapPositionAndSize.left ??= this.state.minimapPositionAndSize.left;
+    minimapPositionAndSize.width ??= this.state.minimapPositionAndSize.width;
+    minimapPositionAndSize.height ??= this.state.minimapPositionAndSize.height;
+    this.setState({ minimapPositionAndSize });
   };
 
   setScaleAndPan = (scaleAndPan: {
@@ -357,12 +378,8 @@ export class UserInterface extends Component {
                   imageWidth={this.state.imageWidth}
                   imageHeight={this.state.imageHeight}
                   canvasPositionAndSize={this.state.viewportPositionAndSize}
-                  minimapPositionAndSize={{
-                    top: 0,
-                    left: 0,
-                    width: 200,
-                    height: 200,
-                  }}
+                  minimapPositionAndSize={this.state.minimapPositionAndSize}
+                  setMinimapPositionAndSize={this.setMinimapPositionAndSize}
                   contrast={this.state.contrast}
                   brightness={this.state.brightness}
                 />
