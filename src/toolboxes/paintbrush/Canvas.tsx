@@ -1,11 +1,10 @@
 import React, { ReactNode } from "react";
 import { Component } from "react";
-
 import { BaseCanvas, CanvasProps } from "../../baseCanvas";
 import { Annotations } from "../../annotation";
 import { canvasToImage, imageToCanvas } from "../../transforms";
 import { XYPoint } from "../../annotation/interfaces";
-import { Theme } from "@material-ui/core";
+import { theme } from "../../ui";
 
 interface Props extends CanvasProps {
   brushType: string;
@@ -13,7 +12,6 @@ interface Props extends CanvasProps {
   imageWidth: number;
   imageHeight: number;
   brushRadius: number;
-  theme: Theme;
 }
 
 export class PaintbrushCanvas extends Component<Props> {
@@ -61,7 +59,7 @@ export class PaintbrushCanvas extends Component<Props> {
       // Draw current points
       this.drawPoints(
         this.points,
-        this.props.theme.palette.secondary.dark,
+        theme.palette.secondary.dark,
         this.props.brushRadius,
         this.props.brushType,
         true,
@@ -156,7 +154,7 @@ export class PaintbrushCanvas extends Component<Props> {
 
   saveLine = (
     brushRadius = 20,
-    brushColor = this.props.theme.palette.primary.dark
+    brushColor = theme.palette.primary.dark
   ): void => {
     if (this.points.length < 2) return;
 
