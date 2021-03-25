@@ -105,7 +105,7 @@ export class UserInterface extends Component {
         type: "dark",
       },
     });
-    this.imageSource = "public/zebrafish-heart.jpg";
+    this.imageSource = `${process.env.PUBLIC_URL}/zebrafish-heart.jpg`;
     this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
     this.presetLabels = ["label-1", "label-2", "label-3"]; //TODO: find a place for this
   }
