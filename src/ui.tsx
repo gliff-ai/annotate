@@ -2,6 +2,8 @@ import React, { Component, ChangeEvent, ReactNode } from "react";
 
 import { Annotations } from "./annotation";
 
+import UploadButtons from "./upload3DImage"
+
 import { makeStyles } from '@material-ui/core/styles';
 
 
@@ -20,7 +22,6 @@ import {
   CssBaseline,
 } from "@material-ui/core";
 
-import PhotoCamera from '@material-ui/icons/PhotoCamera';
 
 
 import {
@@ -300,11 +301,6 @@ export class UserInterface extends Component {
     document.addEventListener("keydown", keydownListener);
   };
 
-  uploadImage = ():void => {
-
-  }
- 
-
   render = (): ReactNode => {
     return (
       <ThemeProvider theme={this.theme}>
@@ -518,13 +514,7 @@ export class UserInterface extends Component {
                   </Tooltip>
                 </AccordionDetails>
               </Accordion>
-              <Tooltip title="Upload photo">
-                <IconButton aria-label="upload picture" component="span"
-                  onClick={this.uploadImage}
-                >                      
-                <PhotoCamera />
-                </IconButton>
-                </Tooltip>
+         
               <Accordion
                 expanded={this.state.expanded === "labels-toolbox"}
                 onChange={this.handleToolboxChange("labels-toolbox")}
@@ -543,6 +533,8 @@ export class UserInterface extends Component {
                   />
                 </AccordionDetails>
               </Accordion>
+              {/* TODO: move this to somewhere appropriate */}
+              <UploadButtons/>
             </Grid>
           </Grid>
         </Container>
