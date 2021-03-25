@@ -11,7 +11,8 @@ export interface Config {
   unit: string;
 }
 
-type marks = Array<{ value: number; label: string }>;
+type Marks = Array<{ value: number; label: string }>;
+
 interface Props {
   value: number;
   config: Config;
@@ -22,7 +23,7 @@ function getAriaValueText(value: number): string {
   return `${value}`;
 }
 
-function getMarks(config: Config): marks {
+function getMarks(config: Config): Marks {
   return [config.min, config.initial, config.max].map((value) => ({
     value,
     label: `${value} ${config.unit}`,
@@ -33,7 +34,7 @@ export const BaseSlider: FunctionComponent<Props> = ({
   value,
   config,
   onChange,
-}): ReactElement => {
+}: Props): ReactElement => {
   const marks = getMarks(config);
   return (
     <>
