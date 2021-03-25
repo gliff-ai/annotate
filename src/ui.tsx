@@ -3,6 +3,9 @@ import { keybindings } from "./keybindings";
 
 import { Annotations } from "./annotation";
 
+import { makeStyles } from '@material-ui/core/styles';
+
+
 import {
   AppBar,
   Container,
@@ -17,6 +20,9 @@ import {
   AccordionDetails,
   CssBaseline,
 } from "@material-ui/core";
+
+import PhotoCamera from '@material-ui/icons/PhotoCamera';
+
 
 import {
   Add,
@@ -97,6 +103,17 @@ export class UserInterface extends Component {
     });
     this.imageSource = "public/zebrafish-heart.jpg";
     this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
+
+    const useStyles = makeStyles((theme) => ({
+      root: {
+        '& > *': {
+          margin: theme.spacing(1),
+        },
+      },
+      input: {
+        display: 'none',
+      },
+    }));
   }
 
   setViewportPositionAndSize = (viewportPositionAndSize: {
@@ -219,6 +236,11 @@ export class UserInterface extends Component {
       }
     });
   };
+
+  uploadImage = ():void => {
+
+  }
+ 
 
   render = (): ReactNode => {
     return (
@@ -392,6 +414,13 @@ export class UserInterface extends Component {
                   </Tooltip>
                 </AccordionDetails>
               </Accordion>
+              <Tooltip title="Upload photo">
+                <IconButton aria-label="upload picture" component="span"
+                  onClick={this.uploadImage}
+                >                      
+                <PhotoCamera />
+                </IconButton>
+                </Tooltip>
             </Grid>
           </Grid>
         </Container>
