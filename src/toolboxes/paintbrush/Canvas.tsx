@@ -18,11 +18,13 @@ interface Props extends CanvasProps {
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
 // We should maybe namespace them so we don't get conflicting methods across toolboxes.
-export const events = [] as const;
+export const events = ["saveLine"] as const;
 
 interface Event extends CustomEvent {
   type: typeof events[number];
 }
+
+type Cursor = "crosshair" | "none" | "not-allowed";
 
 export class PaintbrushCanvas extends Component<Props> {
   readonly name = "paintbrush";
@@ -33,7 +35,7 @@ export class PaintbrushCanvas extends Component<Props> {
   private points: XYPoint[];
 
   state: {
-    cursor: "crosshair" | "none" | "not-allowed";
+    cursor: Cursor;
     hideBackCanvas: boolean;
   };
 
@@ -85,7 +87,7 @@ export class PaintbrushCanvas extends Component<Props> {
     brushColor: string,
     brushRadius: number,
     brushType: string,
-    clearCanvas: boolean = true,
+    clearCanvas = true,
     context: CanvasRenderingContext2D,
     globalCompositeOperation: "destination-out" | "source-over" = "source-over"
   ): void => {
@@ -205,7 +207,7 @@ export class PaintbrushCanvas extends Component<Props> {
     this.handlePointerMove(canvasX, canvasY);
   };
 
-  onMouseUp = (canvasX: number, canvasY: number): void => {
+  onMouseUp = (): void => {
     // End painting & save painting
     this.isPressing = false;
 
@@ -219,10 +221,10 @@ export class PaintbrushCanvas extends Component<Props> {
     this.drawAllStrokes();
   };
 
-  getCursor = () => {
-    if (this.props.brushType == "paintbrush") {
+  getCursor = (): Cursor => {
+    if (this.props.brushType === "paintbrush") {
       return "crosshair";
-    } else if (this.props.brushType == "eraser") {
+    } else if (this.props.brushType === "eraser") {
       return "not-allowed";
     }
     return "none";
@@ -230,7 +232,6 @@ export class PaintbrushCanvas extends Component<Props> {
 
   handleEvent = (event: Event): void => {
     if (event.detail === this.name) {
-      // @ts-ignore (This is needed if there's no keybindings!)
       this[event.type]?.call(this);
     }
   };

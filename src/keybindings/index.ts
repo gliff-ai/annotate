@@ -3,7 +3,7 @@ import { keybindings } from "./keybindings";
 const keydownListener = (
   event: KeyboardEvent,
   keybindingsMap = keybindings
-) => {
+): void => {
   // Lookup event
   let code = event.code;
 

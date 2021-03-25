@@ -1,15 +1,7 @@
-import {
-  AnnotationsDataArray,
-  Annotation,
-  AnnotationParameters,
-  ZTPoint,
-  XYPoint,
-  BrushStrokes,
-  PositionAndSize,
-} from "./interfaces";
+import { Annotation, ZTPoint, XYPoint, BrushStrokes } from "./interfaces";
 
 export class Annotations {
-  private data: AnnotationsDataArray;
+  private data: Array<Annotation>;
   private activeAnnotationID: number;
 
   constructor() {
@@ -23,7 +15,7 @@ export class Annotations {
     spaceTimeInfo: ZTPoint = { z: 0, t: 0 },
     coordinates: XYPoint[] = [],
     brushStrokes: BrushStrokes[] = [],
-    parameters: AnnotationParameters[] = []
+    parameters: Annotation["parameters"] = {}
   ): void => {
     this.activeAnnotationID =
       this.data.push({
@@ -81,7 +73,7 @@ export class Annotations {
     );
   };
 
-  getAllAnnotations = (): AnnotationsDataArray => {
+  getAllAnnotations = (): Annotation[] => {
     return this.data;
   };
 }

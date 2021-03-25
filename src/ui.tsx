@@ -160,25 +160,26 @@ export class UserInterface extends Component {
     // adjust pan such that image borders are not inside the canvas
 
     // calculate how much bigger the image is than the canvas, in canvas space:
-    let imageScalingFactor = Math.min(
+    const imageScalingFactor = Math.min(
       this.state.viewportPositionAndSize.width / this.state.imageWidth,
       this.state.viewportPositionAndSize.height / this.state.imageHeight
     );
 
-    let xMargin =
+    const xMargin =
       this.state.imageWidth *
         imageScalingFactor *
         this.state.scaleAndPan.scale -
       this.state.viewportPositionAndSize.width;
-    let yMargin =
+
+    const yMargin =
       this.state.imageHeight *
         imageScalingFactor *
         this.state.scaleAndPan.scale -
       this.state.viewportPositionAndSize.height;
 
     // now calculate the allowable pan range:
-    let panRangeX = Math.max(0, xMargin / 2); // scaleAndPan.x can be +-panRangeX
-    let panRangeY = Math.max(0, yMargin / 2); // scaleAndPan.y can be +-panRangeY
+    const panRangeX = Math.max(0, xMargin / 2); // scaleAndPan.x can be +-panRangeX
+    const panRangeY = Math.max(0, yMargin / 2); // scaleAndPan.y can be +-panRangeY
 
     console.log(`panRangeX = ${panRangeX}, panRangeY = ${panRangeY}`);
 
@@ -198,7 +199,7 @@ export class UserInterface extends Component {
   };
 
   incrementScale = (): void => {
-    let panMultiplier =
+    const panMultiplier =
       (1 + this.state.scaleAndPan.scale) / this.state.scaleAndPan.scale;
     this.setScaleAndPan({
       x: this.state.scaleAndPan.x * panMultiplier,
@@ -210,7 +211,7 @@ export class UserInterface extends Component {
   decrementScale = (): void => {
     // Zoom out only if zoomed in.
     if (this.state.scaleAndPan.scale > 1) {
-      let panMultiplier =
+      const panMultiplier =
         (this.state.scaleAndPan.scale - 1) / this.state.scaleAndPan.scale;
       this.setScaleAndPan({
         x: this.state.scaleAndPan.x * panMultiplier,

@@ -6,15 +6,15 @@ const bindings = {
   "ctrl+shift+keyA": "test.Ctrl + Shift + A",
 };
 
-test("Handles standard keys", (done: any) => {
-  document.addEventListener("Only A", () => done());
+test("Handles standard keys", (done: any): void => {
+  document.addEventListener("Only A", (): void => done());
 
   const event = new KeyboardEvent("keypress", { code: "keyA" });
   keydownListener(event, bindings);
 });
 
-test("Handles Namespacing", (done: any) => {
-  document.addEventListener("Only A", (e: CustomEvent) => {
+test("Handles Namespacing", (done: any): void => {
+  document.addEventListener("Only A", (e: CustomEvent): void => {
     expect(e.detail).toEqual("test");
     done();
   });
@@ -23,18 +23,18 @@ test("Handles Namespacing", (done: any) => {
   keydownListener(event, bindings);
 });
 
-test("Handles modifier keys", (done: any) => {
-  document.addEventListener("Only A", () => done("badCall"));
-  document.addEventListener("Ctrl + A", () => done());
+test("Handles modifier keys", (done: any): void => {
+  document.addEventListener("Only A", (): void => done("badCall"));
+  document.addEventListener("Ctrl + A", (): void => done());
 
   const event = new KeyboardEvent("keypress", { code: "keyA", ctrlKey: true });
   keydownListener(event, bindings);
 });
 
-test("Handles multiple modifier keys", (done: any) => {
-  document.addEventListener("Only A", () => done("badCall"));
-  document.addEventListener("Ctrl + A", () => done("badCall"));
-  document.addEventListener("Ctrl + Shift + A", () => done());
+test("Handles multiple modifier keys", (done: any): void => {
+  document.addEventListener("Only A", (): void => done("badCall"));
+  document.addEventListener("Ctrl + A", (): void => done("badCall"));
+  document.addEventListener("Ctrl + Shift + A", (): void => done());
 
   const event = new KeyboardEvent("keypress", {
     code: "keyA",

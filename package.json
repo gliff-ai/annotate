@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "webpack --progress --config webpack.config.js",
-    "lint": "npm run lint:ts && npm run lint:css",
+    "lint": "npm run lint:ts",
     "lint:ts": "npx eslint \"**/*.ts*\"",
     "serve": "webpack serve --config webpack.config.js",
      "test": "jest --coverage"
