@@ -25,6 +25,7 @@ export const events = [
   "deleteSelectedPoint",
   "changeSplineModeToEdit",
   "deselectPoint",
+  "closeLoop",
 ] as const;
 
 interface Event extends CustomEvent {
@@ -291,7 +292,7 @@ export class SplineCanvas extends Component<Props> {
     coordinates[index] = { x: newX, y: newY };
   };
 
-  onDoubleClick = (): void => {
+  closeLoop = (): void => {
     // Append the first spline point to the end, making a closed polygon
 
     const currentSplineVector = this.props.annotationsObject.getActiveAnnotation()
@@ -436,7 +437,6 @@ export class SplineCanvas extends Component<Props> {
       <div style={{ pointerEvents: this.props.isActive ? "auto" : "none" }}>
         <BaseCanvas
           onClick={this.onClick}
-          onDoubleClick={this.onDoubleClick}
           onMouseDown={this.onMouseDown}
           onMouseMove={this.onMouseMove}
           onMouseUp={this.onMouseUp}
