@@ -329,11 +329,12 @@ export class UserInterface extends Component<never, State> {
     this.setState({ expanded: isExpanded ? panel : false });
   };
 
-  handleSliderChange = (state: string) => (
+  handleSliderChange = (key: "contrast" | "brightness") => (
     event: ChangeEvent,
     value: number
   ): void => {
-    this.setState({ [state]: value });
+    // @ts-ignore
+    this.setState({ [key]: value });
   };
 
   componentDidMount = (): void => {
