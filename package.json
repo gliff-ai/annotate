@@ -11,7 +11,8 @@
     "build": "webpack --progress --config webpack.config.js",
     "lint": "npm run lint:ts && npm run lint:css",
     "lint:ts": "npx eslint \"**/*.ts*\"",
-    "serve": "webpack serve --config webpack.config.js"
+    "serve": "webpack serve --config webpack.config.js",
+     "test": "jest --coverage"
   },
   "license": "AGPL-3.0-only",
   "devDependencies": {

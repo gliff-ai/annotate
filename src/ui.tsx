@@ -35,7 +35,7 @@ import {
   ExpandMore,
   AllOut,
   Brush,
-  RadioButtonUncheckedSharp
+  RadioButtonUncheckedSharp,
 } from "@material-ui/icons";
 
 import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
@@ -43,13 +43,16 @@ import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
 import { PaintbrushCanvas } from "./toolboxes/paintbrush";
+import { Labels } from "./components/Labels";
+import { BaseSlider } from "./components/BaseSlider";
+import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { keydownListener } from "./keybindings";
 
 // Define all mutually exclusive tools
 enum Tools {
   paintbrush = "paintbrush",
   spline = "spline",
-  eraser = "eraser"
+  eraser = "eraser",
 }
 
 export class UserInterface extends Component {
@@ -63,8 +66,9 @@ export class UserInterface extends Component {
     imageWidth: number;
     imageHeight: number;
     activeAnnotationID: number;
-
     brushSize: number;
+    contrast: number;
+    brightness: number;
 
     viewportPositionAndSize: {
       top: number;
@@ -79,6 +83,7 @@ export class UserInterface extends Component {
   annotationsObject: Annotations;
   theme: Theme;
   imageSource: string;
+  private presetLabels: string[];
 
   constructor(props: never) {
     super(props);
@@ -96,6 +101,8 @@ export class UserInterface extends Component {
       brushSize: 20,
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       expanded: false,
+      brightness: SLIDER_CONFIG[Sliders.brightness].initial,
+      contrast: SLIDER_CONFIG[Sliders.contrast].initial,
     };
 
     this.theme = createMuiTheme({
@@ -105,17 +112,7 @@ export class UserInterface extends Component {
     });
     this.imageSource = "public/zebrafish-heart.jpg";
     this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
-
-    const useStyles = makeStyles((theme) => ({
-      root: {
-        '& > *': {
-          margin: theme.spacing(1),
-        },
-      },
-      input: {
-        display: 'none',
-      },
-    }));
+    this.presetLabels = ["label-1", "label-2", "label-3"]; //TODO: find a place for this
   }
 
   setViewportPositionAndSize = (viewportPositionAndSize: {
@@ -140,7 +137,43 @@ export class UserInterface extends Component {
     scaleAndPan.scale ??= this.state.scaleAndPan.scale;
     scaleAndPan.x ??= this.state.scaleAndPan.x;
     scaleAndPan.y ??= this.state.scaleAndPan.y;
-    this.setState({ scaleAndPan });
+    this.setState({ scaleAndPan }, this.limitPan); // this sets limitPan as a callback after state update, ensuring it will use the new scaleAndPan
+  };
+
+  limitPan = (): void => {
+    // adjust pan such that image borders are not inside the canvas
+
+    // calculate how much bigger the image is than the canvas, in canvas space:
+    let imageScalingFactor = Math.min(
+      this.state.viewportPositionAndSize.width / this.state.imageWidth,
+      this.state.viewportPositionAndSize.height / this.state.imageHeight
+    );
+    let xMargin =
+      this.state.imageWidth *
+        imageScalingFactor *
+        this.state.scaleAndPan.scale -
+      this.state.viewportPositionAndSize.width;
+    let yMargin =
+      this.state.imageHeight *
+        imageScalingFactor *
+        this.state.scaleAndPan.scale -
+      this.state.viewportPositionAndSize.height;
+
+    // now calculate the allowable pan range:
+    let panRangeX = Math.max(0, xMargin / 2); // scaleAndPan.x can be +-panRangeX
+    let panRangeY = Math.max(0, yMargin / 2); // scaleAndPan.y can be +-panRangeY
+
+    console.log(`panRangeX = ${panRangeX}, panRangeY = ${panRangeY}`);
+
+    // move pan into the allowable range:
+    let panX = this.state.scaleAndPan.x;
+    let panY = this.state.scaleAndPan.y;
+    panX = Math.min(panRangeX, Math.abs(panX)) * Math.sign(panX);
+    panY = Math.min(panRangeY, Math.abs(panY)) * Math.sign(panY);
+
+    this.setState({
+      scaleAndPan: { x: panX, y: panY, scale: this.state.scaleAndPan.scale },
+    });
   };
 
   resetScaleAndPan = (): void => {
@@ -148,47 +181,57 @@ export class UserInterface extends Component {
   };
 
   incrementScale = (): void => {
-    this.setScaleAndPan({ scale: this.state.scaleAndPan.scale + 1 });
+    let panMultiplier =
+      (1 + this.state.scaleAndPan.scale) / this.state.scaleAndPan.scale;
+    this.setScaleAndPan({
+      x: this.state.scaleAndPan.x * panMultiplier,
+      y: this.state.scaleAndPan.y * panMultiplier,
+      scale: this.state.scaleAndPan.scale + 1,
+    });
   };
 
   decrementScale = (): void => {
     // Zoom out only if zoomed in.
     if (this.state.scaleAndPan.scale > 1) {
-      this.setScaleAndPan({ scale: this.state.scaleAndPan.scale + -1 });
+      let panMultiplier =
+        (this.state.scaleAndPan.scale - 1) / this.state.scaleAndPan.scale;
+      this.setScaleAndPan({
+        x: this.state.scaleAndPan.x * panMultiplier,
+        y: this.state.scaleAndPan.y * panMultiplier,
+        scale: this.state.scaleAndPan.scale - 1,
+      });
     }
   };
 
   incrementPanX = (): void => {
     // negative is left, +ve is right...
-    this.setScaleAndPan({ x: this.state.scaleAndPan.x + 10 });
+    this.setScaleAndPan({ x: this.state.scaleAndPan.x + 20 });
   };
 
   decrementPanX = (): void => {
     // negative is left, +ve is right...
-    this.setScaleAndPan({ x: this.state.scaleAndPan.x - 10 });
+    this.setScaleAndPan({ x: this.state.scaleAndPan.x - 20 });
   };
 
   incrementPanY = (): void => {
     // negative is up, +ve is down...
-    this.setScaleAndPan({ y: this.state.scaleAndPan.y + 10 });
+    this.setScaleAndPan({ y: this.state.scaleAndPan.y + 20 });
   };
 
   decrementPanY = (): void => {
     // negative is up, +ve is down...
-    this.setScaleAndPan({ y: this.state.scaleAndPan.y - 10 });
+    this.setScaleAndPan({ y: this.state.scaleAndPan.y - 20 });
   };
 
   incrementBrush = (): void => {
     this.setState({ brushSize: this.state.brushSize + 10 });
   };
 
- 
-  toggleEraser = ():void => {
-      this.setState({ activeTool: "eraser" });
+  toggleEraser = (): void => {
+    this.setState({ activeTool: "eraser" });
   };
 
-
-  updateImageDimensions = (imageWidth: number, imageHeight: number):void => {
+  updateImageDimensions = (imageWidth: number, imageHeight: number): void => {
     this.setState({
       imageWidth: imageWidth,
       imageHeight: imageHeight,
@@ -222,8 +265,6 @@ export class UserInterface extends Component {
     }
   };
 
- 
-
   addAnnotation = (): void => {
     this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
     this.setState({
@@ -248,7 +289,14 @@ export class UserInterface extends Component {
     this.setState({ expanded: isExpanded ? panel : false });
   };
 
-  componentDidMount = () => {
+  handleSliderChange = (state: string) => (
+    event: ChangeEvent,
+    value: number
+  ): void => {
+    this.setState({ [state]: value });
+  };
+
+  componentDidMount = (): void => {
     document.addEventListener("keydown", keydownListener);
   };
 
@@ -281,6 +329,8 @@ export class UserInterface extends Component {
                 updateImageDimensions={this.updateImageDimensions}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                contrast={this.state.contrast}
+                brightness={this.state.brightness}
               />
 
               <SplineCanvas
@@ -322,6 +372,8 @@ export class UserInterface extends Component {
                     width: 200,
                     height: 200,
                   }}
+                  contrast={this.state.contrast}
+                  brightness={this.state.brightness}
                 />
               </div>
 
@@ -370,7 +422,33 @@ export class UserInterface extends Component {
                 </ButtonGroup>
               </Grid>
 
-
+              <Accordion
+                expanded={this.state.expanded === "background-toolbox"}
+                onChange={this.handleToolboxChange("background-toolbox")}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMore />}
+                  id="background-toolbox"
+                >
+                  <Typography>Background</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container spacing={0} justify="center" wrap="nowrap">
+                    <Grid item style={{ width: "85%", position: "relative" }}>
+                      <BaseSlider
+                        value={this.state.contrast}
+                        config={SLIDER_CONFIG[Sliders.contrast]}
+                        onChange={this.handleSliderChange}
+                      />
+                      <BaseSlider
+                        value={this.state.brightness}
+                        config={SLIDER_CONFIG[Sliders.brightness]}
+                        onChange={this.handleSliderChange}
+                      />
+                    </Grid>
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
               <Accordion
                 expanded={this.state.expanded === "paintbrush-toolbox"}
                 onChange={this.handleToolboxChange("paintbrush-toolbox")}
@@ -412,7 +490,6 @@ export class UserInterface extends Component {
                       <RadioButtonUncheckedSharp />
                     </IconButton>
                   </Tooltip>
-
                 </AccordionDetails>
               </Accordion>
               <Accordion
@@ -448,6 +525,24 @@ export class UserInterface extends Component {
                 <PhotoCamera />
                 </IconButton>
                 </Tooltip>
+              <Accordion
+                expanded={this.state.expanded === "labels-toolbox"}
+                onChange={this.handleToolboxChange("labels-toolbox")}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMore />}
+                  id="labels-toolbox"
+                >
+                  <Typography>Labels</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Labels
+                    annotationObject={this.annotationsObject}
+                    presetLabels={this.presetLabels}
+                    theme={this.theme}
+                  />
+                </AccordionDetails>
+              </Accordion>
             </Grid>
           </Grid>
         </Container>
