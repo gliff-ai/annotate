@@ -26,12 +26,14 @@ import { Annotations } from "../annotation";
 interface Props {
   annotationObject: Annotations;
   presetLabels: string[];
+  activeAnnotationID: number;
   theme: Theme;
 }
 
 export const Labels: FunctionComponent<Props> = ({
   annotationObject,
   presetLabels,
+  activeAnnotationID,
   theme,
 }): ReactElement => {
   const getMenuLabels = (): string[] => {
@@ -50,11 +52,6 @@ export const Labels: FunctionComponent<Props> = ({
     setAssignedLabels(annotationObject.getLabels());
   };
 
-  useEffect(() => {
-    // Update menuLabels after assignedLabels has been reset.
-    setMenuLabels(getMenuLabels());
-  });
-
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
@@ -64,6 +61,16 @@ export const Labels: FunctionComponent<Props> = ({
   );
   const [menuLabels, setMenuLabels] = useState(getMenuLabels());
   const [isOpen, setIsOpen] = React.useState(false);
+
+  useEffect(() => {
+    // Re-render assigned labels at change of active annotation ID.
+    setAssignedLabels(annotationObject.getLabels());
+  }, [activeAnnotationID]);
+
+  useEffect(() => {
+    // Re-render menu labels at change of assigned labels.
+    setMenuLabels(getMenuLabels());
+  });
 
   return (
     <List style={{ width: "100%" }}>

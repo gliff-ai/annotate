@@ -91,7 +91,7 @@ export class UserInterface extends Component {
       imageWidth: 0,
       imageHeight: 0,
       activeTool: Tools.paintbrush,
-      activeAnnotationID: null,
+      activeAnnotationID: 0,
       brushSize: 20,
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       expanded: false,
@@ -521,6 +521,7 @@ export class UserInterface extends Component {
                   <Labels
                     annotationObject={this.annotationsObject}
                     presetLabels={this.presetLabels}
+                    activeAnnotationID={this.state.activeAnnotationID}
                     theme={this.theme}
                   />
                 </AccordionDetails>
