@@ -55,7 +55,7 @@ export const Labels: FunctionComponent<Props> = ({
   const handleRemoveLabel = (label: string) => (): void => {
     // Remove a label from active annotation object and update some states.
     annotationObject.removeLabel(label);
-    setAssignedLabels(annotationObject.getLabels());
+    updateAllLabels();
   };
 
   const handleClick = () => {
