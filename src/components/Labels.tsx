@@ -35,21 +35,29 @@ export const Labels: FunctionComponent<Props> = ({
   presetLabels,
   activeAnnotationID,
   theme,
-}): ReactElement => {
-  const getMenuLabels = (labels: string[]): string[] => {
-    return presetLabels.filter((label) => !labels.includes(label));
+}: Props): ReactElement => {
+  const getMenuLabels = (labels: string[]): string[] =>
+    presetLabels.filter((label) => !labels.includes(label));
+
+  const [assignedLabels, setAssignedLabels] = useState(
+    annotationObject.getLabels()
+  );
+  const [menuLabels, setMenuLabels] = useState(
+    getMenuLabels(annotationObject.getLabels())
+  );
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  const updateAllLabels = (): void => {
+    const labels = annotationObject.getLabels();
+    setAssignedLabels(labels);
+    setMenuLabels(getMenuLabels(labels));
   };
 
   const handleAddLabel = (label: string) => (): void => {
     // Add a label to active annotation object and update some states.
     annotationObject.addLabel(label);
     updateAllLabels();
-  };
-
-  const updateAllLabels = (): void => {
-    const labels = annotationObject.getLabels();
-    setAssignedLabels(labels);
-    setMenuLabels(getMenuLabels(labels));
   };
 
   const handleRemoveLabel = (label: string) => (): void => {
@@ -61,14 +69,6 @@ export const Labels: FunctionComponent<Props> = ({
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
-
-  const [assignedLabels, setAssignedLabels] = useState(
-    annotationObject.getLabels()
-  );
-  const [menuLabels, setMenuLabels] = useState(
-    getMenuLabels(annotationObject.getLabels())
-  );
-  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     // Re-render assigned labels at change of active annotation ID.

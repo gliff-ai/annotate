@@ -1,5 +1,5 @@
-import React, { ReactNode } from "react";
-import { Component } from "react";
+import React, { ReactNode , Component } from "react";
+
 import { Theme } from "@material-ui/core/styles";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
@@ -35,9 +35,13 @@ export class SplineCanvas extends Component<Props> {
   readonly name = "spline";
 
   private baseCanvas: BaseCanvas;
+
   private selectedPointIndex: number;
+
   private isDragging: boolean;
+
   private mode: number;
+
   state: {
     cursor: "crosshair" | "none";
   };
@@ -157,7 +161,7 @@ export class SplineCanvas extends Component<Props> {
   deleteSelectedPoint = (): void => {
     if (this.selectedPointIndex === -1) return;
     const {
-      coordinates: coordinates,
+      coordinates,
     } = this.props.annotationsObject.getActiveAnnotation();
     const isClosed = this.isClosed(coordinates);
 
@@ -286,8 +290,7 @@ export class SplineCanvas extends Component<Props> {
   };
 
   updateXYPoint = (newX: number, newY: number, index: number): void => {
-    const coordinates = this.props.annotationsObject.getActiveAnnotation()
-      .coordinates;
+    const {coordinates} = this.props.annotationsObject.getActiveAnnotation();
     coordinates[index] = { x: newX, y: newY };
   };
 
@@ -362,25 +365,25 @@ export class SplineCanvas extends Component<Props> {
     this.isDragging = false;
   };
 
-  isClosed = (splineVector: XYPoint[]): boolean => {
+  isClosed = (splineVector: XYPoint[]): boolean => 
     // Check whether the spline is a closed loop.
-    return (
+     (
       splineVector.length > 1 &&
       splineVector[0].x === splineVector[splineVector.length - 1].x &&
       splineVector[0].y === splineVector[splineVector.length - 1].y
-    );
-  };
+    )
+  ;
 
   private addNewPointNearSpline = (x: number, y: number): void => {
     // Add a new point near the spline.
     const {
-      coordinates: coordinates,
+      coordinates,
     } = this.props.annotationsObject.getActiveAnnotation();
 
-    const dist = (x1: number, y1: number, x2: number, y2: number): number => {
+    const dist = (x1: number, y1: number, x2: number, y2: number): number => 
       // Calculate Euclidean distance between two points (x1, y1) and (x2, y2).
-      return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-    };
+       Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2))
+    ;
 
     let newPointIndex: number; // Index at which the new point is inserted
     let minDist = Number.MAX_VALUE; // Minimum distance
@@ -431,23 +434,21 @@ export class SplineCanvas extends Component<Props> {
     }
   }
 
-  render = (): ReactNode => {
-    return (
-      <div style={{ pointerEvents: this.props.isActive ? "auto" : "none" }}>
-        <BaseCanvas
-          onClick={this.onClick}
-          onDoubleClick={this.onDoubleClick}
-          onMouseDown={this.onMouseDown}
-          onMouseMove={this.onMouseMove}
-          onMouseUp={this.onMouseUp}
-          cursor={this.props.isActive ? "crosshair" : "none"}
-          ref={(baseCanvas) => (this.baseCanvas = baseCanvas)}
-          name="spline"
-          scaleAndPan={this.props.scaleAndPan}
-          canvasPositionAndSize={this.props.canvasPositionAndSize}
-          setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
-        />
-      </div>
+  render = (): ReactNode => (
+    <div style={{ pointerEvents: this.props.isActive ? "auto" : "none" }}>
+      <BaseCanvas
+        onClick={this.onClick}
+        onDoubleClick={this.onDoubleClick}
+        onMouseDown={this.onMouseDown}
+        onMouseMove={this.onMouseMove}
+        onMouseUp={this.onMouseUp}
+        cursor={this.props.isActive ? "crosshair" : "none"}
+        ref={(baseCanvas) => (this.baseCanvas = baseCanvas)}
+        name="spline"
+        scaleAndPan={this.props.scaleAndPan}
+        canvasPositionAndSize={this.props.canvasPositionAndSize}
+        setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
+      />
+    </div>
     );
-  };
 }

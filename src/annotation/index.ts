@@ -2,6 +2,7 @@ import { Annotation, ZTPoint, XYPoint, BrushStrokes } from "./interfaces";
 
 export class Annotations {
   private data: Array<Annotation>;
+
   private activeAnnotationID: number;
 
   constructor() {
@@ -29,51 +30,38 @@ export class Annotations {
   };
 
   addLabel = (newLabel: string): void => {
-    if (!this.data[this.activeAnnotationID]["labels"].includes(newLabel)) {
-      this.data[this.activeAnnotationID]["labels"].push(newLabel);
+    if (!this.data[this.activeAnnotationID].labels.includes(newLabel)) {
+      this.data[this.activeAnnotationID].labels.push(newLabel);
     }
   };
 
   removeLabel = (existingLabel: string): void => {
-    this.data[this.activeAnnotationID]["labels"] = this.data[
+    this.data[this.activeAnnotationID].labels = this.data[
       this.activeAnnotationID
-    ]["labels"].filter((label) => label != existingLabel);
+    ].labels.filter((label) => label !== existingLabel);
   };
 
-  getLabels = (): string[] => {
-    return this.data[this.activeAnnotationID]["labels"];
-  };
+  getLabels = (): string[] => this.data[this.activeAnnotationID].labels;
 
-  getActiveAnnotationID = (): number => {
-    return this.activeAnnotationID;
-  };
+  getActiveAnnotationID = (): number => this.activeAnnotationID;
 
-  getActiveAnnotation = (): Annotation => {
-    return this.data[this.activeAnnotationID];
-  };
+  getActiveAnnotation = (): Annotation => this.data[this.activeAnnotationID];
 
-  length = (): number => {
-    return this.data.length;
-  };
+  length = (): number => this.data.length;
 
   setAnnotationCoordinates = (newCoordinates: XYPoint[]): void => {
-    this.data[this.activeAnnotationID]["coordinates"] = newCoordinates;
+    this.data[this.activeAnnotationID].coordinates = newCoordinates;
   };
 
   setActiveAnnotationToolbox = (newToolbox: string): void => {
     this.data[this.activeAnnotationID].toolbox = newToolbox;
   };
 
-  isActiveAnnotationEmpty = (): boolean => {
+  isActiveAnnotationEmpty = (): boolean =>
     // Check whether the active annotation object contains any
     // paintbrush or spline annotations.
-    return (
-      this.data[this.activeAnnotationID].coordinates.length === 0 &&
-      this.data[this.activeAnnotationID].brushStrokes.length === 0
-    );
-  };
+    this.data[this.activeAnnotationID].coordinates.length === 0 &&
+    this.data[this.activeAnnotationID].brushStrokes.length === 0;
 
-  getAllAnnotations = (): Annotation[] => {
-    return this.data;
-  };
+  getAllAnnotations = (): Annotation[] => this.data;
 }

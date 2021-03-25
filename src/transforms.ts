@@ -40,8 +40,8 @@ export function canvasToImage(
   }
 
   // unscale the image:
-  x = x / imageScalingFactor;
-  y = y / imageScalingFactor;
+  x /= imageScalingFactor;
+  y /= imageScalingFactor;
 
   return { x, y };
 }
@@ -74,8 +74,8 @@ export function imageToCanvas(
     canvasPositionAndSize.width / imageWidth
   );
 
-  x = x * imageScalingFactor;
-  y = y * imageScalingFactor;
+  x *= imageScalingFactor;
+  y *= imageScalingFactor;
 
   // apply transparent bars to make the canvas the correct size:
   if (imageScalingFactor * imageWidth < canvasPositionAndSize.width) {
@@ -147,8 +147,6 @@ export function getMinimapViewFinder(
     { x: 0, y: 0, scale: 1 },
     minimapPositionAndSize
   );
-
-  console.log(topLeft, bottomRight);
 
   return {
     left: topLeft.x,

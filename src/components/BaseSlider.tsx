@@ -1,5 +1,6 @@
 import React, { ChangeEvent, FunctionComponent, ReactElement } from "react";
 import { Slider, Typography } from "@material-ui/core";
+
 export interface Config {
   name: string;
   id: string;
@@ -23,7 +24,7 @@ function getAriaValueText(value: number): string {
 
 function getMarks(config: Config): marks {
   return [config.min, config.initial, config.max].map((value) => ({
-    value: value,
+    value,
     label: `${value} ${config.unit}`,
   }));
 }
