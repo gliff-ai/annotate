@@ -1,13 +1,23 @@
 import { keydownListener } from "./index";
 
 const bindings = {
-  keyA: "Only A",
-  "ctrl+keyA": "Ctrl + A",
-  "ctrl+shift+keyA": "Ctrl + Shift + A",
+  keyA: "test.Only A",
+  "ctrl+keyA": "test.Ctrl + A",
+  "ctrl+shift+keyA": "test.Ctrl + Shift + A",
 };
 
 test("Handles standard keys", (done: any) => {
   document.addEventListener("Only A", () => done());
+
+  const event = new KeyboardEvent("keypress", { code: "keyA" });
+  keydownListener(event, bindings);
+});
+
+test("Handles Namespacing", (done: any) => {
+  document.addEventListener("Only A", (e: CustomEvent) => {
+    expect(e.detail).toEqual("test");
+    done();
+  });
 
   const event = new KeyboardEvent("keypress", { code: "keyA" });
   keydownListener(event, bindings);

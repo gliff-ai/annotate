@@ -25,12 +25,13 @@ export const events = [
   "changeSplineModeToEdit",
   "deselectPoint",
 ] as const;
+
 interface Event extends CustomEvent {
   type: typeof events[number];
 }
 
 export class SplineCanvas extends Component<Props> {
-  readonly name: "spline";
+  readonly name = "spline";
 
   private baseCanvas: BaseCanvas;
   private selectedPointIndex: number;
@@ -412,9 +413,8 @@ export class SplineCanvas extends Component<Props> {
   }
 
   handleEvent = (event: Event): void => {
-    const method = event.type;
-    if (this[method]) {
-      this[method].call(this);
+    if (event.detail === this.name) {
+      this[event.type]?.call(this);
     }
   };
 

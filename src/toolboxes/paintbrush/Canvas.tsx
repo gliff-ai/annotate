@@ -14,7 +14,16 @@ interface Props extends CanvasProps {
   brushRadius: number;
 }
 
+// Here we define the methods that are exposed to be called by keyboard shortcuts
+// We should maybe namespace them so we don't get conflicting methods across toolboxes.
+export const events = [] as const;
+
+interface Event extends CustomEvent {
+  type: typeof events[number];
+}
+
 export class PaintbrushCanvas extends Component<Props> {
+  readonly name = "paintbrush";
   private baseCanvas: BaseCanvas;
   private drawingCanvas: BaseCanvas;
   private isPressing: boolean;
@@ -208,19 +217,7 @@ export class PaintbrushCanvas extends Component<Props> {
     this.drawAllStrokes();
   };
 
-  componentDidUpdate(): void {
-    // Redraw if we change pan or zoom
-    const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
-
-    if (activeAnnotation?.brushStrokes.length > 0) {
-      //this.drawSplineVector(activeAnnotation.coordinates);
-      //repaint
-      this.drawAllStrokes();
-    }
-  }
-
   getCursor = () => {
-    console.log(this.props.brushType);
     if (this.props.brushType == "paintbrush") {
       return "crosshair";
     } else if (this.props.brushType == "eraser") {
@@ -228,16 +225,43 @@ export class PaintbrushCanvas extends Component<Props> {
     }
     return "none";
   };
-  //
+
+  handleEvent = (event: Event): void => {
+    if (event.detail === this.name) {
+      // @ts-ignore (This is needed if there's no keybindings!)
+      this[event.type]?.call(this);
+    }
+  };
+
+  componentDidMount(): void {
+    for (const event of events) {
+      document.addEventListener(event, this.handleEvent);
+    }
+  }
+
+  componentWillUnmount(): void {
+    for (const event of events) {
+      document.removeEventListener(event, this.handleEvent);
+    }
+  }
+
+  componentDidUpdate(): void {
+    // Redraw if we change pan or zoom
+    const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
+
+    if (activeAnnotation?.brushStrokes.length > 0) {
+      this.drawAllStrokes();
+    }
+  }
+
   render = (): ReactNode => {
     return (
       //We have two canvases in order to be able to erase stuff.
-
       <div
         style={{
           pointerEvents:
-            this.props.brushType == "paintbrush" ||
-            this.props.brushType == "eraser"
+            this.props.brushType === "paintbrush" ||
+            this.props.brushType === "eraser"
               ? "auto"
               : "none",
         }}

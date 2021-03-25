@@ -1,1 +1,1 @@
-export { SplineCanvas } from "./Canvas";
+export { SplineCanvas, events } from "./Canvas";
