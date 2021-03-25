@@ -8,6 +8,7 @@ import {
   Toolbar,
   Tooltip,
   IconButton,
+  Button,
   ButtonGroup,
   Grid,
   Accordion,
@@ -367,46 +368,48 @@ export class UserInterface extends Component {
               </div>
 
               <Grid container justify="center">
-                <div>
+                <ButtonGroup size="small" style={{ margin: "5px" }}>
                   <Tooltip title="Zoom out">
-                    <IconButton id={"zoom-out"} onClick={this.decrementScale}>
+                    <Button id={"zoom-out"} onClick={this.decrementScale}>
                       <ZoomOut />
-                    </IconButton>
+                    </Button>
                   </Tooltip>
                   <Tooltip title="Reset zoom and pan">
-                    <IconButton id={"reset"} onClick={this.resetScaleAndPan}>
+                    <Button id={"reset"} onClick={this.resetScaleAndPan}>
                       <AspectRatio />
-                    </IconButton>
+                    </Button>
                   </Tooltip>
                   <Tooltip title="Zoom in">
-                    <IconButton id={"zoom-in"} onClick={this.incrementScale}>
+                    <Button id={"zoom-in"} onClick={this.incrementScale}>
                       <ZoomIn />
-                    </IconButton>
+                    </Button>
                   </Tooltip>
-                </div>
+                </ButtonGroup>
 
-                <div>
+                <ButtonGroup size="small" style={{ marginBottom: "5px" }}>
                   <Tooltip title="Pan up">
-                    <IconButton id={"pan-up"} onClick={this.incrementPanY}>
+                    <Button id={"pan-up"} onClick={this.incrementPanY}>
                       <KeyboardArrowUp />
-                    </IconButton>
+                    </Button>
                   </Tooltip>
-                  <Tooltip title="Pan left">
-                    <IconButton id={"pan-left"} onClick={this.incrementPanX}>
-                      <KeyboardArrowLeft />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Pan right">
-                    <IconButton id={"pan-right"} onClick={this.decrementPanX}>
-                      <KeyboardArrowRight />
-                    </IconButton>
-                  </Tooltip>
+                  <ButtonGroup size="small">
+                    <Tooltip title="Pan left">
+                      <Button id={"pan-left"} onClick={this.incrementPanX}>
+                        <KeyboardArrowLeft />
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title="Pan right">
+                      <Button id={"pan-right"} onClick={this.decrementPanX}>
+                        <KeyboardArrowRight />
+                      </Button>
+                    </Tooltip>
+                  </ButtonGroup>
                   <Tooltip title="Pan down">
-                    <IconButton id={"pan-down"} onClick={this.decrementPanY}>
+                    <Button id={"pan-down"} onClick={this.decrementPanY}>
                       <KeyboardArrowDown />
-                    </IconButton>
+                    </Button>
                   </Tooltip>
-                </div>
+                </ButtonGroup>
               </Grid>
 
               <Accordion
