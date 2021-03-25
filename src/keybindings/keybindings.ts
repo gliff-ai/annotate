@@ -5,9 +5,9 @@
 // eg alt+shift+KeyA
 
 export const keybindings = {
-  Backspace: "deleteSelectedPoint",
-  Enter: "changeSplineModeToEdit",
-  Escape: "deselectPoint",
+  Backspace: "spline.deleteSelectedPoint",
+  Enter: "spline.changeSplineModeToEdit",
+  Escape: "spline.deselectPoint",
 } as Readonly<{
   [key: string]: string;
 }>;
