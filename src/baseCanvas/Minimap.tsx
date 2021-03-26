@@ -6,8 +6,6 @@ import { PositionAndSize } from "../annotation/interfaces";
 
 export interface Props extends BaseProps {
   cursor?: "move";
-  imageWidth: number;
-  imageHeight: number;
   canvasPositionAndSize: PositionAndSize;
   minimapPositionAndSize: PositionAndSize;
   setScaleAndPan: (scaleAndPan: {
@@ -41,9 +39,10 @@ export class BaseMinimap extends React.Component<Props> {
   };
 
   private applyView = (): void => {
+    if (this.props.imageData) {
     this.boundingRect = getMinimapViewFinder(
-      this.props.imageWidth,
-      this.props.imageHeight,
+      this.props.imageData.width,
+      this.props.imageData.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize,
       this.props.minimapPositionAndSize
@@ -58,6 +57,7 @@ export class BaseMinimap extends React.Component<Props> {
       this.boundingRect.width - 2,
       this.boundingRect.height - 2
     ); // +1 and -2 shift the box's centerline so the outer edge of the drawn box will trace the viewfinder
+    }
   };
 
   /*** Mouse events ****/
@@ -70,8 +70,8 @@ export class BaseMinimap extends React.Component<Props> {
     const { x: targetX, y: targetY } = minimapToCanvas(
       minimapX,
       minimapY,
-      this.props.imageWidth,
-      this.props.imageHeight,
+      this.props.imageData.width,
+      this.props.imageData.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize,
       this.props.minimapPositionAndSize

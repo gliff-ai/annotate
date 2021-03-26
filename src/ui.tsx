@@ -58,8 +58,7 @@ export class UserInterface extends Component {
       scale: number;
     };
     activeTool?: Tools;
-    imageWidth: number;
-    imageHeight: number;
+    imageData?: ImageData;
     activeAnnotationID: number;
     brushSize: number;
     contrast: number;
@@ -96,8 +95,6 @@ export class UserInterface extends Component {
         x: 0,
         y: 0,
       },
-      imageWidth: 0,
-      imageHeight: 0,
       activeTool: Tools.paintbrush,
       activeAnnotationID: 0,
       brushSize: 20,
@@ -248,10 +245,9 @@ export class UserInterface extends Component {
     this.setState({ activeTool: "eraser" });
   };
 
-  updateImageDimensions = (imageWidth: number, imageHeight: number): void => {
+  updateImageData = (imageData: ImageData): void => {
     this.setState({
-      imageWidth: imageWidth,
-      imageHeight: imageHeight,
+      imageData: imageData
     });
   };
 
@@ -338,7 +334,7 @@ export class UserInterface extends Component {
               <BackgroundCanvas
                 scaleAndPan={this.state.scaleAndPan}
                 imgSrc={this.imageSource}
-                updateImageDimensions={this.updateImageDimensions}
+                updateImageData={this.updateImageData}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}
                 contrast={this.state.contrast}
@@ -349,8 +345,7 @@ export class UserInterface extends Component {
                 scaleAndPan={this.state.scaleAndPan}
                 isActive={this.state.activeTool === Tools.spline}
                 annotationsObject={this.annotationsObject}
-                imageWidth={this.state.imageWidth}
-                imageHeight={this.state.imageHeight}
+                imageData={this.state.imageData}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}
                 theme={this.theme}
@@ -360,8 +355,7 @@ export class UserInterface extends Component {
                 scaleAndPan={this.state.scaleAndPan}
                 brushType={this.state.activeTool}
                 annotationsObject={this.annotationsObject}
-                imageWidth={this.state.imageWidth}
-                imageHeight={this.state.imageHeight}
+                imageData={this.state.imageData}
                 brushRadius={this.state.brushSize}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}
@@ -375,8 +369,7 @@ export class UserInterface extends Component {
                   scaleAndPan={this.state.scaleAndPan}
                   setScaleAndPan={this.setScaleAndPan}
                   imgSrc={this.imageSource}
-                  imageWidth={this.state.imageWidth}
-                  imageHeight={this.state.imageHeight}
+                  imageData={this.state.imageData}
                   canvasPositionAndSize={this.state.viewportPositionAndSize}
                   minimapPositionAndSize={this.state.minimapPositionAndSize}
                   setMinimapPositionAndSize={this.setMinimapPositionAndSize}

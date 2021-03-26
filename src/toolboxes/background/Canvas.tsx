@@ -6,7 +6,8 @@ import drawImageOnCanvas from "./drawImage";
 
 interface Props extends BaseProps {
   imgSrc?: string;
-  updateImageDimensions: (imageWidth: number, imageHeight: number) => void;
+  updateImageData: (image: ImageData) => void;
+//   updateImageDimensions: (imageWidth: number, imageHeight: number) => void;
   contrast: number;
   brightness: number;
 }
@@ -44,7 +45,8 @@ export class BackgroundCanvas extends Component<Props> {
     // Draw the image once loaded
     this.image.onload = () => {
       this.redrawImage();
-      this.props.updateImageDimensions(this.image.width, this.image.height);
+    //   this.props.updateImageDimensions(this.image.width, this.image.height);
+      this.props.updateImageData(this.baseCanvas.canvasContext.getImageData(0,0,this.image.width, this.image.height))
     };
     this.image.src = this.props.imgSrc;
   };

@@ -65,8 +65,7 @@ export class BackgroundMinimap extends Component<Props> {
         setScaleAndPan={this.props.setScaleAndPan}
         ref={(baseMinimap) => (this.baseMinimap = baseMinimap)}
         name="background-minimap"
-        imageWidth={this.props.imageWidth}
-        imageHeight={this.props.imageHeight}
+        imageData={this.props.imageData}
         canvasPositionAndSize={this.props.canvasPositionAndSize}
         minimapPositionAndSize={this.props.minimapPositionAndSize}
         setMinimapPositionAndSize={this.props.setMinimapPositionAndSize}

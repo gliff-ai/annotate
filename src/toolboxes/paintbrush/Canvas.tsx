@@ -10,8 +10,6 @@ import { Theme } from "@material-ui/core";
 interface Props extends CanvasProps {
   brushType: string;
   annotationsObject: Annotations;
-  imageWidth: number;
-  imageHeight: number;
   brushRadius: number;
   theme: Theme;
 }
@@ -51,8 +49,8 @@ export class PaintbrushCanvas extends Component<Props> {
     const { x, y } = canvasToImage(
       canvasX,
       canvasY,
-      this.props.imageWidth,
-      this.props.imageHeight,
+      this.props.imageData.width,
+      this.props.imageData.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
@@ -94,8 +92,8 @@ export class PaintbrushCanvas extends Component<Props> {
         const { x, y } = imageToCanvas(
           point.x,
           point.y,
-          this.props.imageWidth,
-          this.props.imageHeight,
+          this.props.imageData.width,
+          this.props.imageData.height,
           this.props.scaleAndPan,
           this.props.canvasPositionAndSize
         );

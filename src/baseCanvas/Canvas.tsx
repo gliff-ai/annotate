@@ -32,6 +32,7 @@ export interface Props {
     width?: number;
     height?: number;
   }) => void;
+  imageData?: ImageData;
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;

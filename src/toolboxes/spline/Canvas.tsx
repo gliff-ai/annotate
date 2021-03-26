@@ -10,8 +10,6 @@ import { Annotation, XYPoint } from "../../annotation/interfaces";
 interface Props extends BaseProps {
   isActive: boolean;
   annotationsObject: Annotations;
-  imageWidth: number;
-  imageHeight: number;
   theme: Theme;
 }
 enum Mode {
@@ -66,8 +64,8 @@ export class SplineCanvas extends Component<Props> {
       firstPoint = imageToCanvas(
         firstPoint.x,
         firstPoint.y,
-        this.props.imageWidth,
-        this.props.imageHeight,
+        this.props.imageData.width,
+        this.props.imageData.height,
         this.props.scaleAndPan,
         this.props.canvasPositionAndSize
       );
@@ -80,8 +78,8 @@ export class SplineCanvas extends Component<Props> {
         nextPoint = imageToCanvas(
           x,
           y,
-          this.props.imageWidth,
-          this.props.imageHeight,
+          this.props.imageData.width,
+          this.props.imageData.height,
           this.props.scaleAndPan,
           this.props.canvasPositionAndSize
         );
@@ -97,8 +95,8 @@ export class SplineCanvas extends Component<Props> {
         nextPoint = imageToCanvas(
           x,
           y,
-          this.props.imageWidth,
-          this.props.imageHeight,
+          this.props.imageData.width,
+          this.props.imageData.height,
           this.props.scaleAndPan,
           this.props.canvasPositionAndSize
         );
@@ -203,8 +201,8 @@ export class SplineCanvas extends Component<Props> {
     const { x: clickPointX, y: clickPointY } = imageToCanvas(
       clickPoint.x,
       clickPoint.y,
-      this.props.imageWidth,
-      this.props.imageHeight,
+      this.props.imageData.width,
+      this.props.imageData.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
@@ -215,8 +213,8 @@ export class SplineCanvas extends Component<Props> {
       point = imageToCanvas(
         point.x,
         point.y,
-        this.props.imageWidth,
-        this.props.imageHeight,
+        this.props.imageData.width,
+        this.props.imageData.height,
         this.props.scaleAndPan,
         this.props.canvasPositionAndSize
       );
@@ -240,8 +238,8 @@ export class SplineCanvas extends Component<Props> {
     const { x: imageX, y: imageY } = canvasToImage(
       x,
       y,
-      this.props.imageWidth,
-      this.props.imageHeight,
+      this.props.imageData.width,
+      this.props.imageData.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
@@ -314,12 +312,8 @@ export class SplineCanvas extends Component<Props> {
     const clickPoint = canvasToImage(
       x,
       y,
-      this.props.imageWidth,
-      this.props.imageHeight,
-      this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
-    );
-    const annotationData = this.props.annotationsObject.getActiveAnnotation();
+        this.props.imageData.width,
+        this.props.imageData.height,
 
     const nearPoint = this.clickNearPoint(
       clickPoint,
@@ -338,8 +332,8 @@ export class SplineCanvas extends Component<Props> {
     const clickPoint = canvasToImage(
       x,
       y,
-      this.props.imageWidth,
-      this.props.imageHeight,
+      this.props.imageData.width,
+      this.props.imageData.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
