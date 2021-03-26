@@ -55,6 +55,15 @@ export const theme: Theme = createMuiTheme({
   },
 });
 
+interface Event extends CustomEvent {
+  type: typeof events[number];
+}
+
+// Here we define the methods that are exposed to be called by keyboard shortcuts
+// We should maybe namespace them so we don't get conflicting methods across toolboxes.
+export const events = ["nextAnnotation", "previousAnnotation"] as const;
+
+
 export class UserInterface extends Component {
   state: {
     scaleAndPan: {
@@ -117,6 +126,12 @@ export class UserInterface extends Component {
     this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
     this.presetLabels = ["label-1", "label-2", "label-3"]; //TODO: find a place for this
   }
+
+  handleEvent = (event: Event): void => {
+    if (event.detail == "ui") {
+      this[event.type]?.call(this);
+    }
+  };
 
   setViewportPositionAndSize = (viewportPositionAndSize: {
     top?: number;
@@ -289,6 +304,31 @@ export class UserInterface extends Component {
     });
   };
 
+  nextAnnotation = (): void => {
+    this.cycleActiveAnnotation(true);
+  };
+
+  previousAnnotation = (): void => {
+    this.cycleActiveAnnotation(false);
+  };
+
+  cycleActiveAnnotation = (forward: boolean = true): void => {
+    const data = this.annotationsObject.getAllAnnotations();
+    let i = this.state.activeAnnotationID;
+    let inc = forward ? 1 : -1;
+
+    // cycle i forward or backward until we reach another annotation whose toolbox attribute matches the current activeTool:
+    do {
+      // increment or decrement i by 1, wrapping around if we go above the length of the array(-1) or below 0:
+      i =
+        (i + inc + this.annotationsObject.length()) %
+        this.annotationsObject.length();
+    } while (data[i].toolbox !== Tools[this.state.activeTool]);
+
+    this.annotationsObject.setActiveAnnotationID(i);
+    this.setState({ activeAnnotationID: i });
+  };
+
   reuseEmptyAnnotation = (): void => {
     /* If the active annotation object is empty, change the value of toolbox
     to match the active tool. */
@@ -315,7 +355,16 @@ export class UserInterface extends Component {
 
   componentDidMount = (): void => {
     document.addEventListener("keydown", keydownListener);
+    for (const event of events) {
+      document.addEventListener(event, this.handleEvent);
+    }
   };
+
+  componentWillUnmount(): void {
+    for (const event of events) {
+      document.removeEventListener(event, this.handleEvent);
+    }
+  }
 
   render = (): ReactNode => {
     return (
