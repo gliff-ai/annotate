@@ -4,7 +4,6 @@ import React, {
   useState,
   useEffect,
 } from "react";
-import { Theme } from "@material-ui/core/styles";
 
 import {
   Collapse,
@@ -22,19 +21,18 @@ import ExpandMore from "@material-ui/icons/ExpandMore";
 import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
 
 import { Annotations } from "../annotation";
+import { theme } from "../ui";
 
 interface Props {
   annotationObject: Annotations;
   presetLabels: string[];
   activeAnnotationID: number;
-  theme: Theme;
 }
 
 export const Labels: FunctionComponent<Props> = ({
   annotationObject,
   presetLabels,
   activeAnnotationID,
-  theme,
 }): ReactElement => {
   const getMenuLabels = (labels: string[]): string[] => {
     return presetLabels.filter((label) => !labels.includes(label));

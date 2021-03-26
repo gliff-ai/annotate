@@ -34,7 +34,6 @@ import {
 } from "@material-ui/icons";
 
 import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
-
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
 import { PaintbrushCanvas } from "./toolboxes/paintbrush";
@@ -50,6 +49,12 @@ enum Tools {
   eraser = "eraser",
 }
 
+export const theme: Theme = createMuiTheme({
+  palette: {
+    type: "dark",
+  },
+});
+
 interface Event extends CustomEvent {
   type: typeof events[number];
 }
@@ -57,6 +62,7 @@ interface Event extends CustomEvent {
 // Here we define the methods that are exposed to be called by keyboard shortcuts
 // We should maybe namespace them so we don't get conflicting methods across toolboxes.
 export const events = ["nextAnnotation", "previousAnnotation"] as const;
+
 
 export class UserInterface extends Component {
   state: {
@@ -91,7 +97,6 @@ export class UserInterface extends Component {
   };
 
   annotationsObject: Annotations;
-  theme: Theme;
   imageSource: string;
   private presetLabels: string[];
 
@@ -116,12 +121,8 @@ export class UserInterface extends Component {
       contrast: SLIDER_CONFIG[Sliders.contrast].initial,
     };
 
-    this.theme = createMuiTheme({
-      palette: {
-        type: "dark",
-      },
-    });
-    this.imageSource = "zebrafish-heart.jpg";
+    this.imageSource = "public/zebrafish-heart.jpg";
+
     this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
     this.presetLabels = ["label-1", "label-2", "label-3"]; //TODO: find a place for this
   }
@@ -367,7 +368,7 @@ export class UserInterface extends Component {
 
   render = (): ReactNode => {
     return (
-      <ThemeProvider theme={this.theme}>
+      <ThemeProvider theme={theme}>
         <CssBaseline />
         <Container disableGutters={true}>
           <AppBar>
@@ -401,7 +402,6 @@ export class UserInterface extends Component {
                 imageHeight={this.state.imageHeight}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                theme={this.theme}
               />
 
               <PaintbrushCanvas
@@ -413,7 +413,6 @@ export class UserInterface extends Component {
                 brushRadius={this.state.brushSize}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                theme={this.theme}
               />
             </Grid>
 
@@ -589,7 +588,6 @@ export class UserInterface extends Component {
                     annotationObject={this.annotationsObject}
                     presetLabels={this.presetLabels}
                     activeAnnotationID={this.state.activeAnnotationID}
-                    theme={this.theme}
                   />
                 </AccordionDetails>
               </Accordion>
