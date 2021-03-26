@@ -7,11 +7,12 @@ import ImageFileInfo from "./ImageFileInfo";
 
 interface Props {
   imageFile?: File;
-  setImageSlicesData: (data: Array<Uint8Array | Uint8ClampedArray>) => void;
+  setImageFileInfo: (image: ImageFileInfo) => void;
+  imageFileInfo: ImageFileInfo;
 }
+
 export default class Upload3DImage extends Component<Props> {
   private imageFileInfo: ImageFileInfo;
-  private imageSlicesData: Array<Uint8Array | Uint8ClampedArray>;
 
   constructor(props: Props) {
     super(props);
@@ -74,7 +75,7 @@ export default class Upload3DImage extends Component<Props> {
     const extraChannels = this.getNumberOfExtraChannels(descriptions);
 
     if (extraChannels !== 0) {
-      this.imageSlicesData = [];
+      this.imageFileInfo.slicesData = [];
 
       // Loop through each slice
       for (let i = 0; i < ifds.length / extraChannels; i++) {
@@ -98,15 +99,16 @@ export default class Upload3DImage extends Component<Props> {
         }
 
         // Push the slice onto our image stack.
-        this.imageSlicesData.push(rgba);
+        this.imageFileInfo.slicesData.push(rgba);
       }
     } else {
       // Build a list of images (as canvas) that
       // can be draw onto a canvas.
-      this.imageSlicesData = ifds.map(UTIF.toRGBA8).map((rgba) => rgba);
+      this.imageFileInfo.slicesData = ifds
+        .map(UTIF.toRGBA8)
+        .map((rgba) => rgba);
     }
 
-    this.imageFileInfo.slices = this.imageSlicesData.length;
     this.imageFileInfo.width = width;
     this.imageFileInfo.height = height;
   };
@@ -145,8 +147,7 @@ export default class Upload3DImage extends Component<Props> {
           onChange={(e) => {
             console.log(e.target.files[0]);
             this.uploadImage(e.target.files[0]);
-            this.props.setImageSlicesData(this.imageSlicesData);
-            console.log(this.imageSlicesData);
+            this.props.setImageFileInfo(this.imageFileInfo);
           }}
         />
         <label htmlFor="icon-button-file">

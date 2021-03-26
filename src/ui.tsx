@@ -42,6 +42,7 @@ import { BaseSlider } from "./components/BaseSlider";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { keydownListener } from "./keybindings";
 import Upload3DImage from "./upload3DImage";
+import ImageFileInfo from "./imageFileInfo";
 
 // Define all mutually exclusive tools
 enum Tools {
@@ -88,7 +89,7 @@ export class UserInterface extends Component {
   theme: Theme;
   imageSource: string;
   private presetLabels: string[];
-  private imageSlicesData: Array<Uint8Array | Uint8ClampedArray>;
+  private imageFileInfo: ImageFileInfo;
 
   constructor(props: never) {
     super(props);
@@ -269,8 +270,9 @@ export class UserInterface extends Component {
     }
   };
 
-  setImageSlicesData = (data: Array<Uint8Array | Uint8ClampedArray>): void => {
-    this.imageSlicesData = data;
+  setImageFileInfo = (image: ImageFileInfo): void => {
+    this.imageFileInfo = image;
+    this.updateImageDimensions(image.width, image.height);
     this.setState({ imageLoaded: true, imageSlice: 0 });
   };
 
@@ -353,10 +355,9 @@ export class UserInterface extends Component {
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}
                 contrast={this.state.contrast}
                 brightness={this.state.brightness}
-                imageSlice={
-                  this.state.sliceIndex !== -1
-                    ? this.imageSlicesData[this.state.sliceIndex]
-                    : null
+                sliceIndex={this.state.sliceIndex}
+                imageFileInfo={
+                  this.state.sliceIndex !== -1 ? this.imageFileInfo : null
                 }
               />
 
@@ -562,7 +563,7 @@ export class UserInterface extends Component {
                 </AccordionDetails>
               </Accordion>
               {/* TODO: move this to somewhere appropriate */}
-              <Upload3DImage setImageSlicesData={this.setImageSlicesData} />
+              <Upload3DImage setImageFileInfo={this.setImageFileInfo} />
             </Grid>
           </Grid>
         </Container>

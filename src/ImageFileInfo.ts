@@ -6,19 +6,19 @@ class ImageFileInfo {
   public resolution_x: number;
   public resolution_y: number;
   public resolution_z: number;
-  public slices: number; //max number of slices
   public width: number; //grid width boxes
   public height: number; //grid height boxes
+  public slicesData: Array<Uint8Array | Uint8ClampedArray>;
 
   constructor(fileName: string, fileID?: string) {
     this.fileName = fileName;
     this.fileID = fileID || guidGenerator();
-    this.slices = 0;
     this.resolution_x = 0;
     this.resolution_y = 0;
     this.resolution_z = 0;
     this.width = 0;
     this.height = 0;
+    this.slicesData = [];
   }
 
   public getFileID = (): string => {
@@ -35,6 +35,10 @@ class ImageFileInfo {
 
   public setFileID = (newFileID: string): void => {
     this.fileName = newFileID;
+  };
+
+  public getNumOfSlices = (): number => {
+    return this.slicesData.length;
   };
 }
 

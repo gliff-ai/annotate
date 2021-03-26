@@ -3,10 +3,12 @@ import { Component, ReactNode } from "react";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
 import drawImageOnCanvas from "./drawImage";
+import ImageFileInfo from "../../ImageFileInfo";
 
 interface Props extends BaseProps {
   imgSrc: string | null;
-  imageSlice: Uint8Array | Uint8ClampedArray | null;
+  imageFileInfo: ImageFileInfo;
+  sliceIndex: number;
   updateImageDimensions: (imageWidth: number, imageHeight: number) => void;
   contrast: number;
   brightness: number;
@@ -14,29 +16,37 @@ interface Props extends BaseProps {
 
 export class BackgroundCanvas extends Component<Props> {
   private baseCanvas: BaseCanvas;
-  private image: CanvasImageSource;
+  private image: HTMLImageElement | ImageData;
 
   constructor(props: Props) {
     super(props);
   }
 
-  private redrawImage = () => {
+  private drawImage = () => {
+    // Update image brightness and contrast
+    this.baseCanvas.canvasContext.filter = `contrast(${this.props.contrast}%) brightness(${this.props.brightness}%)`;
+
+    // Any annotation that is already on the canvas is put on top of any new annotation
+    this.baseCanvas.canvasContext.globalCompositeOperation = "destination-over";
+
     if (this.props.imgSrc) {
-      if (this.image && this.image.complete) {
-        this.baseCanvas.canvasContext.filter = `contrast(${this.props.contrast}%) brightness(${this.props.brightness}%)`;
-        this.baseCanvas.canvasContext.globalCompositeOperation =
-          "destination-over";
+      if (this.image && (this.image as HTMLImageElement).complete) {
         drawImageOnCanvas(
           this.baseCanvas.canvasContext,
           this.image,
           this.props.scaleAndPan
         );
       }
-    } else if (this.props.imageSlice) {
+    } else if (this.props.imageFileInfo) {
+      drawImageOnCanvas(
+        this.baseCanvas.canvasContext,
+        this.image,
+        this.props.scaleAndPan
+      );
     }
   };
 
-  private drawImage = () => {
+  private loadImage = () => {
     if (this.props.imgSrc) {
       // Load the image
       this.image = new Image();
@@ -44,20 +54,31 @@ export class BackgroundCanvas extends Component<Props> {
       this.image.crossOrigin = "anonymous";
       // Draw the image once loaded
       this.image.onload = () => {
-        this.redrawImage();
-        this.props.updateImageDimensions(this.image.width, this.image.height);
+        this.drawImage();
+        this.props.updateImageDimensions(
+          (this.image as HTMLImageElement).width,
+          (this.image as HTMLImageElement).height
+        );
       };
       this.image.src = this.props.imgSrc;
-    } else if (this.props.imageSlice) {
+    } else if (this.props.imageFileInfo) {
+      this.image = context.createImageData(
+        this.props.imageFileInfo.width,
+        this.props.imageFileInfo.height
+      );
+      this.image.data.set(
+        this.props.imageFileInfo.imageSlicesData[this.props.sliceIndex]
+      );
+      this.drawImage();
     }
   };
 
   componentDidMount = (): void => {
-    this.drawImage();
+    this.loadImage();
   };
 
   componentDidUpdate(): void {
-    this.redrawImage();
+    this.drawImage();
   }
 
   render = (): ReactNode => {
