@@ -16,7 +16,7 @@ interface Props extends BaseProps {
 
 export class BackgroundCanvas extends Component<Props> {
   private baseCanvas: BaseCanvas;
-  private image: HTMLImageElement | ImageData;
+  private image: HTMLImageElement | OffscreenCanvas;
 
   constructor(props: Props) {
     super(props);
@@ -62,18 +62,33 @@ export class BackgroundCanvas extends Component<Props> {
       };
       this.image.src = this.props.imgSrc;
     } else if (this.props.imageFileInfo) {
-      this.image = context.createImageData(
+      console.log("load image");
+      this.image = this.createCanvasFromArray(
+        this.props.imageFileInfo.slicesData[this.props.sliceIndex],
         this.props.imageFileInfo.width,
         this.props.imageFileInfo.height
-      );
-      this.image.data.set(
-        this.props.imageFileInfo.imageSlicesData[this.props.sliceIndex]
       );
       this.drawImage();
     }
   };
 
+  private createCanvasFromArray = (
+    array: Uint8Array | Uint8ClampedArray,
+    width: number,
+    height: number
+  ): OffscreenCanvas => {
+    // Create a canvas element from an array.
+    const canvas = new OffscreenCanvas(width, height);
+    const context = canvas.getContext("2d");
+    const imageData = context.createImageData(width, height);
+
+    imageData.data.set(array);
+    context.putImageData(imageData, 0, 0);
+    return canvas;
+  };
+
   componentDidMount = (): void => {
+    console.log("component did mount");
     this.loadImage();
   };
 

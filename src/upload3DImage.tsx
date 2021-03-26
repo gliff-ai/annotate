@@ -8,7 +8,6 @@ import ImageFileInfo from "./ImageFileInfo";
 interface Props {
   imageFile?: File;
   setImageFileInfo: (image: ImageFileInfo) => void;
-  imageFileInfo: ImageFileInfo;
 }
 
 export default class Upload3DImage extends Component<Props> {
@@ -111,6 +110,8 @@ export default class Upload3DImage extends Component<Props> {
 
     this.imageFileInfo.width = width;
     this.imageFileInfo.height = height;
+
+    this.props.setImageFileInfo(this.imageFileInfo);
   };
 
   private getNumberOfExtraChannels = (descriptions: string[]): number => {
@@ -147,7 +148,6 @@ export default class Upload3DImage extends Component<Props> {
           onChange={(e) => {
             console.log(e.target.files[0]);
             this.uploadImage(e.target.files[0]);
-            this.props.setImageFileInfo(this.imageFileInfo);
           }}
         />
         <label htmlFor="icon-button-file">
