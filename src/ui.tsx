@@ -1,12 +1,5 @@
 import React, { Component, ChangeEvent, ReactNode } from "react";
-
-import { Annotations } from "./annotation";
-
-import UploadButtons from "./upload3DImage"
-
-import { makeStyles } from '@material-ui/core/styles';
-
-
+import { makeStyles } from "@material-ui/core/styles";
 import {
   AppBar,
   Container,
@@ -22,8 +15,6 @@ import {
   AccordionDetails,
   CssBaseline,
 } from "@material-ui/core";
-
-
 
 import {
   Add,
@@ -43,12 +34,14 @@ import {
 import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
 
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
+import { Annotations } from "./annotation";
 import { SplineCanvas } from "./toolboxes/spline";
 import { PaintbrushCanvas } from "./toolboxes/paintbrush";
 import { Labels } from "./components/Labels";
 import { BaseSlider } from "./components/BaseSlider";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { keydownListener } from "./keybindings";
+import Upload3DImage from "./upload3DImage";
 
 // Define all mutually exclusive tools
 enum Tools {
@@ -87,12 +80,15 @@ export class UserInterface extends Component {
     };
 
     expanded: string | boolean;
+    sliceIndex: number;
+    imageLoaded: boolean;
   };
 
   annotationsObject: Annotations;
   theme: Theme;
   imageSource: string;
   private presetLabels: string[];
+  private imageSlicesData: Array<Uint8Array | Uint8ClampedArray>;
 
   constructor(props: never) {
     super(props);
@@ -113,6 +109,8 @@ export class UserInterface extends Component {
       expanded: false,
       brightness: SLIDER_CONFIG[Sliders.brightness].initial,
       contrast: SLIDER_CONFIG[Sliders.contrast].initial,
+      sliceIndex: -1,
+      imageLoaded: false,
     };
 
     this.theme = createMuiTheme({
@@ -271,6 +269,11 @@ export class UserInterface extends Component {
     }
   };
 
+  setImageSlicesData = (data: Array<Uint8Array | Uint8ClampedArray>): void => {
+    this.imageSlicesData = data;
+    this.setState({ imageLoaded: true, imageSlice: 0 });
+  };
+
   selectPaintbrushTool = (): void => {
     // Change active tool to paintbrush.
     if (this.state.activeTool != Tools.paintbrush) {
@@ -344,12 +347,17 @@ export class UserInterface extends Component {
             <Grid item style={{ width: "85%", position: "relative" }}>
               <BackgroundCanvas
                 scaleAndPan={this.state.scaleAndPan}
-                imgSrc={this.imageSource}
+                imgSrc={this.state.imageLoaded ? this.imageSource : null}
                 updateImageDimensions={this.updateImageDimensions}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}
                 contrast={this.state.contrast}
                 brightness={this.state.brightness}
+                imageSlice={
+                  this.state.sliceIndex !== -1
+                    ? this.imageSlicesData[this.state.sliceIndex]
+                    : null
+                }
               />
 
               <SplineCanvas
@@ -533,7 +541,7 @@ export class UserInterface extends Component {
                   </Tooltip>
                 </AccordionDetails>
               </Accordion>
-         
+
               <Accordion
                 expanded={this.state.expanded === "labels-toolbox"}
                 onChange={this.handleToolboxChange("labels-toolbox")}
@@ -554,7 +562,7 @@ export class UserInterface extends Component {
                 </AccordionDetails>
               </Accordion>
               {/* TODO: move this to somewhere appropriate */}
-              <UploadButtons/>
+              <Upload3DImage setImageSlicesData={this.setImageSlicesData} />
             </Grid>
           </Grid>
         </Container>
