@@ -341,11 +341,11 @@ export class UserInterface extends Component<any, State> {
     this.setState({ expanded: isExpanded ? panel : false });
   };
 
-  handleSliderChange = (state: string) => (
+  handleSliderChange = <K extends keyof State>(key: K) => (
     event: ChangeEvent,
-    value: number
-  ): void => {
-    this.setState({ [state]: value });
+    value: State[K]
+  ) => {
+    this.setState({ [key]: value } as Pick<State, K>);
   };
 
   componentDidMount = (): void => {
