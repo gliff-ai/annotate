@@ -148,7 +148,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
     this.setState((prevState: State) => {
       const { viewportPositionAndSize } = prevState;
       return {
-        minimapPositionAndSize: {
+        viewportPositionAndSize: {
           top: newViewportPositionAndSize.top || viewportPositionAndSize.top,
           left: newViewportPositionAndSize.left || viewportPositionAndSize.left,
           width:
