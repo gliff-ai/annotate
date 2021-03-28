@@ -16,7 +16,7 @@ type Marks = Array<{ value: number; label: string }>;
 interface Props {
   value: number;
   config: Config;
-  onChange: (arg0: any) => (arg1: ChangeEvent, arg2: number) => void;
+  onChange: (arg0: string) => (arg1: ChangeEvent, arg2: number) => void;
 }
 
 function getAriaValueText(value: number): string {

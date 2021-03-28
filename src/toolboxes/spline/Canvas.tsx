@@ -1,18 +1,16 @@
 import React, { ReactNode, Component } from "react";
 
-import { Theme } from "@material-ui/core/styles";
-
 import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
 import { Annotations } from "../../annotation";
 import { canvasToImage, imageToCanvas } from "../../transforms";
 import { Annotation, XYPoint } from "../../annotation/interfaces";
+import { theme } from "../../theme";
 
 interface Props extends BaseProps {
   isActive: boolean;
   annotationsObject: Annotations;
   imageWidth: number;
   imageHeight: number;
-  theme: Theme;
 }
 enum Mode {
   draw,
@@ -25,6 +23,7 @@ export const events = [
   "deleteSelectedPoint",
   "changeSplineModeToEdit",
   "deselectPoint",
+  "closeLoop",
 ] as const;
 
 interface Event extends CustomEvent {
@@ -87,8 +86,8 @@ export class SplineCanvas extends Component<Props, State> {
     const { canvasContext: context } = this.baseCanvas;
     const lineWidth = isActive ? 2 : 1;
     context.lineWidth = lineWidth;
-    context.strokeStyle = this.props.theme.palette.secondary.dark;
-    context.fillStyle = this.props.theme.palette.primary.dark;
+    context.strokeStyle = theme.palette.secondary.dark;
+    context.fillStyle = theme.palette.primary.dark;
     const pointSize = 6;
     let nextPoint;
 
@@ -320,7 +319,7 @@ export class SplineCanvas extends Component<Props, State> {
     coordinates[index] = { x: newX, y: newY };
   };
 
-  onDoubleClick = (): void => {
+  closeLoop = (): void => {
     // Append the first spline point to the end, making a closed polygon
 
     const currentSplineVector = this.props.annotationsObject.getActiveAnnotation()
@@ -429,7 +428,6 @@ export class SplineCanvas extends Component<Props, State> {
     <div style={{ pointerEvents: this.props.isActive ? "auto" : "none" }}>
       <BaseCanvas
         onClick={this.onClick}
-        onDoubleClick={this.onDoubleClick}
         onMouseDown={this.onMouseDown}
         onMouseMove={this.onMouseMove}
         onMouseUp={this.onMouseUp}

@@ -31,8 +31,9 @@ import {
   RadioButtonUncheckedSharp,
 } from "@material-ui/icons";
 
-import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
 import { Annotations } from "./annotation";
+
+import { ThemeProvider, theme } from "./theme";
 
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
@@ -55,6 +56,13 @@ interface PositionAndSize {
   width?: number;
   height?: number;
 }
+
+interface Event extends CustomEvent {
+  type: typeof events[number];
+}
+
+// Here we define the methods that are exposed to be called by keyboard shortcuts
+export const events = ["nextAnnotation", "previousAnnotation"] as const;
 
 interface State {
   scaleAndPan: {
@@ -87,10 +95,8 @@ interface State {
   expanded: string | boolean;
 }
 
-export class UserInterface extends Component<any, State> {
+export class UserInterface extends Component<Record<string, never>, State> {
   annotationsObject: Annotations;
-
-  theme: Theme;
 
   imageSource: string;
 
@@ -117,14 +123,23 @@ export class UserInterface extends Component<any, State> {
       contrast: SLIDER_CONFIG[Sliders.contrast].initial,
     };
 
-    this.theme = createMuiTheme({
-      palette: {
-        type: "dark",
-      },
-    });
     this.imageSource = "public/zebrafish-heart.jpg";
+
     this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
     this.presetLabels = ["label-1", "label-2", "label-3"]; // TODO: find a place for this
+  }
+
+  componentDidMount = (): void => {
+    document.addEventListener("keydown", keydownListener);
+    for (const event of events) {
+      document.addEventListener(event, this.handleEvent);
+    }
+  };
+
+  componentWillUnmount(): void {
+    for (const event of events) {
+      document.removeEventListener(event, this.handleEvent);
+    }
   }
 
   setViewportPositionAndSize = (
@@ -143,6 +158,12 @@ export class UserInterface extends Component<any, State> {
         },
       };
     });
+  };
+
+  handleEvent = (event: Event): void => {
+    if (event.detail === "ui") {
+      this[event.type]?.call(this);
+    }
   };
 
   setMinimapPositionAndSize = (
@@ -324,6 +345,33 @@ export class UserInterface extends Component<any, State> {
     });
   };
 
+  nextAnnotation = (): void => {
+    this.cycleActiveAnnotation(true);
+  };
+
+  previousAnnotation = (): void => {
+    this.cycleActiveAnnotation(false);
+  };
+
+  cycleActiveAnnotation = (forward = true): void => {
+    const data = this.annotationsObject.getAllAnnotations();
+    this.setState((prevState) => {
+      let i = prevState.activeAnnotationID;
+      const inc = forward ? 1 : -1;
+
+      // cycle i forward or backward until we reach another annotation whose toolbox attribute matches the current activeTool:
+      do {
+        // increment or decrement i by 1, wrapping around if we go above the length of the array(-1) or below 0:
+        i =
+          (i + inc + this.annotationsObject.length()) %
+          this.annotationsObject.length();
+      } while (data[i].toolbox !== Tools[prevState.activeTool]);
+
+      this.annotationsObject.setActiveAnnotationID(i);
+      return { activeAnnotationID: i };
+    });
+  };
+
   reuseEmptyAnnotation = (): void => {
     /* If the active annotation object is empty, change the value of toolbox
     to match the active tool. */
@@ -344,16 +392,12 @@ export class UserInterface extends Component<any, State> {
   handleSliderChange = <K extends keyof State>(key: K) => (
     event: ChangeEvent,
     value: State[K]
-  ) => {
+  ): void => {
     this.setState({ [key]: value } as Pick<State, K>);
   };
 
-  componentDidMount = (): void => {
-    document.addEventListener("keydown", keydownListener);
-  };
-
   render = (): ReactNode => (
-    <ThemeProvider theme={this.theme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container disableGutters>
         <AppBar>
@@ -387,7 +431,6 @@ export class UserInterface extends Component<any, State> {
               imageHeight={this.state.imageHeight}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
-              theme={this.theme}
             />
 
             <PaintbrushCanvas
@@ -399,7 +442,6 @@ export class UserInterface extends Component<any, State> {
               brushRadius={this.state.brushSize}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
-              theme={this.theme}
             />
           </Grid>
 
@@ -416,6 +458,7 @@ export class UserInterface extends Component<any, State> {
                 setMinimapPositionAndSize={this.setMinimapPositionAndSize}
                 contrast={this.state.contrast}
                 brightness={this.state.brightness}
+                setCanvasPositionAndSize={this.setViewportPositionAndSize}
               />
             </div>
 
@@ -491,6 +534,7 @@ export class UserInterface extends Component<any, State> {
                 </Grid>
               </AccordionDetails>
             </Accordion>
+
             <Accordion
               expanded={this.state.expanded === "paintbrush-toolbox"}
               onChange={this.handleToolboxChange("paintbrush-toolbox")}
@@ -534,6 +578,7 @@ export class UserInterface extends Component<any, State> {
                 </Tooltip>
               </AccordionDetails>
             </Accordion>
+
             <Accordion
               expanded={this.state.expanded === "spline-toolbox"}
               onChange={this.handleToolboxChange("spline-toolbox")}
@@ -557,6 +602,7 @@ export class UserInterface extends Component<any, State> {
                 </Tooltip>
               </AccordionDetails>
             </Accordion>
+
             <Accordion
               expanded={this.state.expanded === "labels-toolbox"}
               onChange={this.handleToolboxChange("labels-toolbox")}
@@ -569,7 +615,6 @@ export class UserInterface extends Component<any, State> {
                   annotationObject={this.annotationsObject}
                   presetLabels={this.presetLabels}
                   activeAnnotationID={this.state.activeAnnotationID}
-                  theme={this.theme}
                 />
               </AccordionDetails>
             </Accordion>

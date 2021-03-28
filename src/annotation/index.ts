@@ -49,6 +49,10 @@ export class Annotations {
 
   length = (): number => this.data.length;
 
+  setActiveAnnotationID = (id: number): void => {
+    this.activeAnnotationID = id;
+  };
+
   setAnnotationCoordinates = (newCoordinates: XYPoint[]): void => {
     this.data[this.activeAnnotationID].coordinates = newCoordinates;
   };

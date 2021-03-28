@@ -1,6 +1,12 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
+const path = require("path");
 
 const port = process.env.PORT || 3000;
+
+function resolve(dir) {
+  return path.join(__dirname, "..", dir);
+}
 
 module.exports = {
   entry: "./src/index.tsx",
@@ -37,6 +43,14 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: "public/index.html",
+    }),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: "public/zebrafish-heart.jpg",
+          to: "zebrafish-heart.jpg",
+        },
+      ],
     }),
   ],
   devServer: {
