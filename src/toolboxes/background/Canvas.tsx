@@ -1,6 +1,6 @@
 import React, { Component, ReactNode } from "react";
 
-import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
+import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
 import drawImageOnCanvas from "./drawImage";
 
 interface Props extends BaseProps {

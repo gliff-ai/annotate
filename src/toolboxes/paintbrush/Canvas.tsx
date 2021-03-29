@@ -1,10 +1,10 @@
 import React, { ReactNode, Component } from "react";
 
-import { BaseCanvas, CanvasProps } from "../../baseCanvas";
-import { Annotations } from "../../annotation";
-import { canvasToImage, imageToCanvas } from "../../transforms";
-import { XYPoint } from "../../annotation/interfaces";
-import { theme } from "../../theme";
+import { BaseCanvas, CanvasProps } from "@/baseCanvas";
+import { Annotations } from "@/annotation";
+import { canvasToImage, imageToCanvas } from "@/transforms";
+import { XYPoint } from "@/annotation/interfaces";
+import { theme } from "@/theme";
 
 interface Props extends CanvasProps {
   brushType: string;

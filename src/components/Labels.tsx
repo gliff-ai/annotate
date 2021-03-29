@@ -20,8 +20,8 @@ import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
 import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
 
-import { Annotations } from "../annotation";
-import { theme } from "../theme";
+import { Annotations } from "@/annotation";
+import { theme } from "@/theme";
 
 interface Props {
   annotationObject: Annotations;

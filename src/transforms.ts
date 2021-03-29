@@ -1,4 +1,4 @@
-import { XYPoint, PositionAndSize } from "./annotation/interfaces";
+import { XYPoint, PositionAndSize } from "@/annotation/interfaces";
 
 export function canvasToImage(
   canvasX: number,
