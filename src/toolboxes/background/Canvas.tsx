@@ -1,7 +1,6 @@
-import React from "react";
-import { Component, ReactNode } from "react";
+import React, { Component, ReactNode } from "react";
 
-import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
+import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
 import drawImageOnCanvas from "./drawImage";
 import ImageFileInfo from "../../ImageFileInfo";
 
@@ -17,10 +16,6 @@ interface Props extends BaseProps {
 export class BackgroundCanvas extends Component<Props> {
   private baseCanvas: BaseCanvas;
   private image: HTMLImageElement | HTMLCanvasElement;
-
-  constructor(props: Props) {
-    super(props);
-  }
 
   private drawImage = () => {
     // Any annotation that is already on the canvas is put on top of any new annotation

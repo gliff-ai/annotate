@@ -1,5 +1,4 @@
-import React from "react";
-import { Component, ReactNode } from "react";
+import React, { Component, ReactNode } from "react";
 
 import { BaseMinimap, MinimapProps as BaseProps } from "../../baseCanvas";
 import drawImageOnCanvas from "./drawImage";
@@ -21,10 +20,6 @@ interface Props extends BaseProps {
 export class BackgroundMinimap extends Component<Props> {
   private baseMinimap: BaseMinimap;
   private image: HTMLImageElement | HTMLCanvasElement;
-
-  constructor(props: Props) {
-    super(props);
-  }
 
   private drawImage = () => {
     // Any annotation that is already on the canvas is put on top of any new annotation

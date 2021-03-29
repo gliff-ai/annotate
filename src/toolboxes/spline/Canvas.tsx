@@ -1,18 +1,16 @@
-import React, { ReactNode } from "react";
-import { Component } from "react";
-import { Theme } from "@material-ui/core/styles";
+import React, { ReactNode, Component } from "react";
 
-import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
-import { Annotations } from "../../annotation";
-import { canvasToImage, imageToCanvas } from "../../transforms";
-import { Annotation, XYPoint } from "../../annotation/interfaces";
+import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
+import { Annotations } from "@/annotation";
+import { canvasToImage, imageToCanvas } from "@/transforms";
+import { Annotation, XYPoint } from "@/annotation/interfaces";
+import { theme } from "@/theme";
 
 interface Props extends BaseProps {
   isActive: boolean;
   annotationsObject: Annotations;
   imageWidth: number;
   imageHeight: number;
-  theme: Theme;
 }
 enum Mode {
   draw,
@@ -25,22 +23,27 @@ export const events = [
   "deleteSelectedPoint",
   "changeSplineModeToEdit",
   "deselectPoint",
+  "closeLoop",
 ] as const;
 
 interface Event extends CustomEvent {
   type: typeof events[number];
 }
 
-export class SplineCanvas extends Component<Props> {
+interface State {
+  cursor: "crosshair" | "none";
+}
+
+export class SplineCanvas extends Component<Props, State> {
   readonly name = "spline";
 
   private baseCanvas: BaseCanvas;
+
   private selectedPointIndex: number;
+
   private isDragging: boolean;
+
   private mode: number;
-  state: {
-    cursor: "crosshair" | "none";
-  };
 
   constructor(props: Props) {
     super(props);
@@ -49,14 +52,42 @@ export class SplineCanvas extends Component<Props> {
     this.mode = Mode.draw;
   }
 
+  componentDidMount(): void {
+    for (const event of events) {
+      document.addEventListener(event, this.handleEvent);
+    }
+  }
+
+  componentDidUpdate(): void {
+    // Redraw if we change pan or zoom
+    const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
+    this.mode = Mode.draw; // At change of active annotation, set mode to drawing mode (default)
+
+    if (activeAnnotation?.coordinates) {
+      this.drawAllSplines();
+    }
+  }
+
+  componentWillUnmount(): void {
+    for (const event of events) {
+      document.removeEventListener(event, this.handleEvent);
+    }
+  }
+
+  handleEvent = (event: Event): void => {
+    if (event.detail === this.name) {
+      this[event.type]?.call(this);
+    }
+  };
+
   drawSplineVector = (splineVector: XYPoint[], isActive = false): void => {
     if (splineVector.length === 0) return;
 
     const { canvasContext: context } = this.baseCanvas;
     const lineWidth = isActive ? 2 : 1;
     context.lineWidth = lineWidth;
-    context.strokeStyle = this.props.theme.palette.secondary.dark;
-    context.fillStyle = this.props.theme.palette.primary.dark;
+    context.strokeStyle = theme.palette.secondary.dark;
+    context.fillStyle = theme.palette.primary.dark;
     const pointSize = 6;
     let nextPoint;
 
@@ -156,9 +187,7 @@ export class SplineCanvas extends Component<Props> {
 
   deleteSelectedPoint = (): void => {
     if (this.selectedPointIndex === -1) return;
-    const {
-      coordinates: coordinates,
-    } = this.props.annotationsObject.getActiveAnnotation();
+    const { coordinates } = this.props.annotationsObject.getActiveAnnotation();
     const isClosed = this.isClosed(coordinates);
 
     // If close spline
@@ -209,7 +238,7 @@ export class SplineCanvas extends Component<Props> {
       this.props.canvasPositionAndSize
     );
 
-    for (let i = 0; i < splineVector.length; i++) {
+    for (let i = 0; i < splineVector.length; i += 1) {
       // transform points into canvas space so the nudge radius won't depend on zoom level:
       let point = splineVector[i];
       point = imageToCanvas(
@@ -286,12 +315,11 @@ export class SplineCanvas extends Component<Props> {
   };
 
   updateXYPoint = (newX: number, newY: number, index: number): void => {
-    const coordinates = this.props.annotationsObject.getActiveAnnotation()
-      .coordinates;
+    const { coordinates } = this.props.annotationsObject.getActiveAnnotation();
     coordinates[index] = { x: newX, y: newY };
   };
 
-  onDoubleClick = (): void => {
+  closeLoop = (): void => {
     // Append the first spline point to the end, making a closed polygon
 
     const currentSplineVector = this.props.annotationsObject.getActiveAnnotation()
@@ -362,29 +390,22 @@ export class SplineCanvas extends Component<Props> {
     this.isDragging = false;
   };
 
-  isClosed = (splineVector: XYPoint[]): boolean => {
+  isClosed = (splineVector: XYPoint[]): boolean =>
     // Check whether the spline is a closed loop.
-    return (
-      splineVector.length > 1 &&
-      splineVector[0].x === splineVector[splineVector.length - 1].x &&
-      splineVector[0].y === splineVector[splineVector.length - 1].y
-    );
-  };
+    splineVector.length > 1 &&
+    splineVector[0].x === splineVector[splineVector.length - 1].x &&
+    splineVector[0].y === splineVector[splineVector.length - 1].y;
 
   private addNewPointNearSpline = (x: number, y: number): void => {
     // Add a new point near the spline.
-    const {
-      coordinates: coordinates,
-    } = this.props.annotationsObject.getActiveAnnotation();
+    const { coordinates } = this.props.annotationsObject.getActiveAnnotation();
 
-    const dist = (x1: number, y1: number, x2: number, y2: number): number => {
+    const dist = (x1: number, y1: number, x2: number, y2: number): number =>
       // Calculate Euclidean distance between two points (x1, y1) and (x2, y2).
-      return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-    };
-
+      Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
     let newPointIndex: number; // Index at which the new point is inserted
     let minDist = Number.MAX_VALUE; // Minimum distance
-    for (let i = 1; i < coordinates.length; i++) {
+    for (let i = 1; i < coordinates.length; i += 1) {
       // For each pair of consecutive points
       const prevPoint = coordinates[i - 1];
       const nextPoint = coordinates[i];
@@ -403,51 +424,22 @@ export class SplineCanvas extends Component<Props> {
     this.props.annotationsObject.setAnnotationCoordinates(coordinates); // Save new coordinates inside active annotation
   };
 
-  componentDidUpdate(): void {
-    // Redraw if we change pan or zoom
-    const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
-    this.mode = Mode.draw; // At change of active annotation, set mode to drawing mode (default)
-
-    if (activeAnnotation?.coordinates) {
-      this.drawAllSplines();
-    }
-  }
-
-  handleEvent = (event: Event): void => {
-    if (event.detail === this.name) {
-      this[event.type]?.call(this);
-    }
-  };
-
-  componentDidMount(): void {
-    for (const event of events) {
-      document.addEventListener(event, this.handleEvent);
-    }
-  }
-
-  componentWillUnmount(): void {
-    for (const event of events) {
-      document.removeEventListener(event, this.handleEvent);
-    }
-  }
-
-  render = (): ReactNode => {
-    return (
-      <div style={{ pointerEvents: this.props.isActive ? "auto" : "none" }}>
-        <BaseCanvas
-          onClick={this.onClick}
-          onDoubleClick={this.onDoubleClick}
-          onMouseDown={this.onMouseDown}
-          onMouseMove={this.onMouseMove}
-          onMouseUp={this.onMouseUp}
-          cursor={this.props.isActive ? "crosshair" : "none"}
-          ref={(baseCanvas) => (this.baseCanvas = baseCanvas)}
-          name="spline"
-          scaleAndPan={this.props.scaleAndPan}
-          canvasPositionAndSize={this.props.canvasPositionAndSize}
-          setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
-        />
-      </div>
-    );
-  };
+  render = (): ReactNode => (
+    <div style={{ pointerEvents: this.props.isActive ? "auto" : "none" }}>
+      <BaseCanvas
+        onClick={this.onClick}
+        onMouseDown={this.onMouseDown}
+        onMouseMove={this.onMouseMove}
+        onMouseUp={this.onMouseUp}
+        cursor={this.props.isActive ? "crosshair" : "none"}
+        ref={(baseCanvas) => {
+          this.baseCanvas = baseCanvas;
+        }}
+        name="spline"
+        scaleAndPan={this.props.scaleAndPan}
+        canvasPositionAndSize={this.props.canvasPositionAndSize}
+        setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
+      />
+    </div>
+  );
 }

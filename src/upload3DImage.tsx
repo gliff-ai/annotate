@@ -6,7 +6,6 @@ import * as UTIF from "utif";
 import ImageFileInfo from "./ImageFileInfo";
 
 interface Props {
-  imageFile?: File;
   setImageFileInfo: (image: ImageFileInfo) => void;
 }
 

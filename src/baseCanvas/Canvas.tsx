@@ -1,6 +1,6 @@
-import React from "react";
-import { Component, ReactNode } from "react";
-import { XYPoint } from "../annotation/interfaces";
+import React, { Component, ReactNode } from "react";
+
+import { XYPoint } from "@/annotation/interfaces";
 
 export interface Props {
   name?: string;
@@ -35,10 +35,13 @@ export interface Props {
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
+
   private canvas: HTMLCanvasElement;
+
   private canvasContainer: HTMLDivElement;
 
   public canvasContext: CanvasRenderingContext2D;
+
   private canvasObserver: ResizeObserver;
 
   constructor(props: Props) {
@@ -79,10 +82,9 @@ export class BaseCanvas extends Component<Props> {
   };
 
   private handleCanvasResize = (entries: ResizeObserverEntry[]): void => {
-    for (const entry of entries) {
-      const { width, height } = entry.contentRect;
+    entries.forEach(({ contentRect: { width, height } }) => {
       this.setCanvasSize(width, height);
-    }
+    });
   };
 
   private setCanvasSize = (width: number, height: number): void => {
@@ -110,11 +112,11 @@ export class BaseCanvas extends Component<Props> {
     const x = e.clientX - this.canvas.getBoundingClientRect().left;
     const y = e.clientY - this.canvas.getBoundingClientRect().top;
 
-    return { x: x, y: y };
+    return { x, y };
   };
 
   onDoubleClickHandler = (e: React.MouseEvent): void => {
-    const { x: x, y: y } = this.windowToCanvas(e);
+    const { x, y } = this.windowToCanvas(e);
 
     if (this.props.onDoubleClick) {
       this.props.onDoubleClick(x, y);
@@ -122,7 +124,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onClickHandler = (e: React.MouseEvent): void => {
-    const { x: x, y: y } = this.windowToCanvas(e);
+    const { x, y } = this.windowToCanvas(e);
 
     if (this.props.onClick) {
       this.props.onClick(x, y);
@@ -130,7 +132,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onMouseDownHandler = (e: React.MouseEvent): void => {
-    const { x: x, y: y } = this.windowToCanvas(e);
+    const { x, y } = this.windowToCanvas(e);
 
     if (this.props.onMouseDown) {
       this.props.onMouseDown(x, y);
@@ -138,7 +140,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onMouseMoveHandler = (e: React.MouseEvent): void => {
-    const { x: x, y: y } = this.windowToCanvas(e);
+    const { x, y } = this.windowToCanvas(e);
 
     if (this.props.onMouseMove) {
       this.props.onMouseMove(x, y);
@@ -146,7 +148,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onMouseUpHandler = (e: React.MouseEvent): void => {
-    const { x: x, y: y } = this.windowToCanvas(e);
+    const { x, y } = this.windowToCanvas(e);
 
     if (this.props.onMouseUp) {
       this.props.onMouseUp(x, y);
@@ -154,7 +156,7 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onContextMenuHandler = (e: React.MouseEvent): void => {
-    const { x: x, y: y } = this.windowToCanvas(e);
+    const { x, y } = this.windowToCanvas(e);
 
     // x and y are now in canvas space
     if (this.props.onContextMenu) {
@@ -162,44 +164,44 @@ export class BaseCanvas extends Component<Props> {
     }
   };
 
-  render = (): ReactNode => {
-    return (
-      <div
-        ref={(canvasContainer) => (this.canvasContainer = canvasContainer)}
-        style={{
-          pointerEvents: "inherit",
-          display: "block",
-          touchAction: "none",
-          width: "100%",
-          height: this.props.canvasPositionAndSize.height,
-          zIndex: 100,
-          cursor: this.props.cursor || "pointer",
-          //   border: "1px solid gray",
-          top: this.props.canvasPositionAndSize.top,
-          left: this.props.canvasPositionAndSize.left,
-          position: "absolute",
+  render = (): ReactNode => (
+    <div
+      ref={(canvasContainer) => {
+        this.canvasContainer = canvasContainer;
+      }}
+      style={{
+        pointerEvents: "inherit",
+        display: "block",
+        touchAction: "none",
+        width: "100%",
+        height: this.props.canvasPositionAndSize.height,
+        zIndex: 100,
+        cursor: this.props.cursor || "pointer",
+        //   border: "1px solid gray",
+        top: this.props.canvasPositionAndSize.top,
+        left: this.props.canvasPositionAndSize.left,
+        position: "absolute",
+      }}
+    >
+      <canvas
+        style={{ pointerEvents: "inherit" }}
+        width="100%"
+        height={this.props.canvasPositionAndSize.height}
+        onClick={this.onClickHandler}
+        onMouseDown={this.onMouseDownHandler}
+        onMouseMove={this.onMouseMoveHandler}
+        onMouseUp={this.onMouseUpHandler}
+        onDoubleClick={this.onDoubleClickHandler}
+        key={this.name}
+        id={`${this.name}-canvas`}
+        ref={(canvas) => {
+          if (canvas) {
+            // Keep this as it is initially null
+            this.canvas = canvas;
+            this.canvasContext = canvas.getContext("2d");
+          }
         }}
-      >
-        <canvas
-          style={{ pointerEvents: "inherit" }}
-          width="100%"
-          height={this.props.canvasPositionAndSize.height}
-          onClick={this.onClickHandler}
-          onMouseDown={this.onMouseDownHandler}
-          onMouseMove={this.onMouseMoveHandler}
-          onMouseUp={this.onMouseUpHandler}
-          onDoubleClick={this.onDoubleClickHandler}
-          key={this.name}
-          id={`${this.name}-canvas`}
-          ref={(canvas) => {
-            if (canvas) {
-              // Keep this as it is initially null
-              this.canvas = canvas;
-              this.canvasContext = canvas.getContext("2d");
-            }
-          }}
-        ></canvas>
-      </div>
-    );
-  };
+      />
+    </div>
+  );
 }
