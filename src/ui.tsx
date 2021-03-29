@@ -26,7 +26,6 @@ import {
   KeyboardArrowRight,
   KeyboardArrowUp,
   ExpandMore,
-  Brush,
 } from "@material-ui/icons";
 
 import { Annotations } from "./annotation";
@@ -34,7 +33,7 @@ import { Annotations } from "./annotation";
 import { ThemeProvider, theme } from "./theme";
 
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
-import { SplineCanvas } from "./toolboxes/spline";
+import { SplineCanvas, SplineUI } from "./toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "./toolboxes/paintbrush";
 import { Labels } from "./components/Labels";
 import { BaseSlider } from "./components/BaseSlider";
@@ -44,6 +43,7 @@ import { keydownListener } from "./keybindings";
 // Define all mutually exclusive tools
 // enum Tools {
 //   paintbrush = "paintbrush",
+
 //   spline = "spline",
 //   eraser = "eraser",
 // }
@@ -521,29 +521,12 @@ export class UserInterface extends Component<Record<string, never>, State> {
               activateTool={this.activateTool}
             />
 
-            <Accordion
+            <SplineUI
               expanded={this.state.expanded === "spline-toolbox"}
+              activeTool={this.state.activeTool}
               onChange={this.handleToolboxChange("spline-toolbox")}
-            >
-              <AccordionSummary expandIcon={<ExpandMore />} id="spline-toolbox">
-                <Typography>Splines</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Tooltip title="Activate spline">
-                  <IconButton
-                    id="activate-spline"
-                    onClick={this.selectSplineTool}
-                    color={
-                      this.state.activeTool === Tools.spline
-                        ? "secondary"
-                        : "default"
-                    }
-                  >
-                    <Brush />
-                  </IconButton>
-                </Tooltip>
-              </AccordionDetails>
-            </Accordion>
+              activateTool={this.activateTool}
+            />
 
             <Accordion
               expanded={this.state.expanded === "labels-toolbox"}
