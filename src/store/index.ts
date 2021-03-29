@@ -11,6 +11,8 @@ export interface UseStoreStateOptions<T> {
   shouldUpdate?: (oldState: T, newState: T) => boolean;
 }
 
+type UpdateState<T> = readonly [T, (newStoreState: T) => void];
+
 function useForceUpdate(): () => void {
   const [, updateComponent] = useState<Record<string, unknown>>({});
 
@@ -32,9 +34,7 @@ function removeArrayElement<T>(arr: T[], elem: T): void {
 export function createStore<T>(
   defaultValue: T
 ): readonly [
-  (
-    options?: UseStoreStateOptions<T>
-  ) => readonly [T, (newStoreState: T) => void],
+  (options?: UseStoreStateOptions<T>) => UpdateState<T>,
   (newStoreState: T) => void
 ] {
   let storeState = defaultValue;
@@ -58,9 +58,7 @@ export function createStore<T>(
     });
   }
 
-  function useStoreState(
-    options?: UseStoreStateOptions<T>
-  ): readonly [T, (newStoreState: T) => void] {
+  function useStoreState(options?: UseStoreStateOptions<T>): UpdateState<T> {
     const forceUpdate = useForceUpdate();
 
     useLayoutEffect(() => {
