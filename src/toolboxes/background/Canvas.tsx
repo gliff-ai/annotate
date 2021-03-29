@@ -1,4 +1,4 @@
-import React, { Component, ReactNode } from "react";
+import React, { Component, ReactNode, ReactElement } from "react";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
 import drawImageOnCanvas from "./drawImage";
@@ -70,7 +70,7 @@ export class BackgroundCanvasClass extends Component<Props> {
 
 export const BackgroundCanvas = (
   props: Omit<Props, "contrast" | "brightness">
-) => {
+): ReactElement => {
   const [background] = useBackgroundStore();
 
   return (

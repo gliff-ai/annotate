@@ -1,4 +1,4 @@
-import React, { Component, ReactNode } from "react";
+import React, { Component, ReactNode, ReactElement } from "react";
 
 import { BaseMinimap, MinimapProps as BaseProps } from "@/baseCanvas";
 import drawImageOnCanvas from "./drawImage";
@@ -75,7 +75,7 @@ export class BackgroundMinimapClass extends Component<Props> {
 
 export const BackgroundMinimap = (
   props: Omit<Props, "contrast" | "brightness">
-) => {
+): ReactElement => {
   const [background] = useBackgroundStore();
 
   return (

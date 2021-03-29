@@ -1,4 +1,4 @@
-import React, { ReactNode, Component } from "react";
+import React, { ReactNode, Component, ReactElement } from "react";
 
 import { BaseCanvas, CanvasProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";
@@ -303,7 +303,9 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
   );
 }
 
-export const PaintbrushCanvas = (props: Omit<Props, "brushRadius">) => {
+export const PaintbrushCanvas = (
+  props: Omit<Props, "brushRadius">
+): ReactElement => {
   const [paintbrush] = usePaintbrushStore();
 
   return (

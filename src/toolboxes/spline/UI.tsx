@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, ReactElement } from "react";
 import {
   Tooltip,
   IconButton,
@@ -19,7 +19,7 @@ interface Props {
   activateTool: (tool: Tool) => void;
 }
 
-const SplineUI = (props: Props) => (
+const SplineUI = (props: Props): ReactElement => (
   <Accordion expanded={props.expanded} onChange={props.onChange}>
     <AccordionSummary expandIcon={<ExpandMore />} id="spline-toolbox">
       <Typography>Splines</Typography>

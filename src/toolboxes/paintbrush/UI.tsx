@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, ReactElement } from "react";
 import {
   Tooltip,
   IconButton,
@@ -26,7 +26,7 @@ interface Props {
   activateTool: (tool: Tool) => void;
 }
 
-const PaintbrushUI = (props: Props) => {
+const PaintbrushUI = (props: Props): ReactElement => {
   const [paintbrush, setPaintbrush] = usePaintbrushStore();
 
   function incrementBrush() {

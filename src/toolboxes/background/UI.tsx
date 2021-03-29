@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, ReactElement } from "react";
 import {
   Grid,
   Accordion,
@@ -19,7 +19,7 @@ interface Props {
   onChange: (event: ChangeEvent, isExpanded: boolean) => void;
 }
 
-const BackgroundUI = (props: Props) => {
+const BackgroundUI = (props: Props): ReactElement => {
   const [background, setBackground] = useBackgroundStore();
 
   function changeContrast(e: ChangeEvent, value: number) {
