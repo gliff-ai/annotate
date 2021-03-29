@@ -17,7 +17,7 @@ export function canvasToImage(
     height: number;
   }
 ): XYPoint {
-  const { x: translateX, y: translateY, scale: scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
+  const { x: translateX, y: translateY, scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
 
   // transform from canvas space to original canvas space:
   let x = canvasX - translateX;
@@ -27,7 +27,7 @@ export function canvasToImage(
   y += (canvasPositionAndSize.height / 2 - y) * (1 - 1 / scale);
 
   // chop off the transparent bars so that canvas space has the same aspect ratio as image space:
-  let imageScalingFactor = Math.min(
+  const imageScalingFactor = Math.min(
     canvasPositionAndSize.height / imageHeight,
     canvasPositionAndSize.width / imageWidth
   );
@@ -40,10 +40,10 @@ export function canvasToImage(
   }
 
   // unscale the image:
-  x = x / imageScalingFactor;
-  y = y / imageScalingFactor;
+  x /= imageScalingFactor;
+  y /= imageScalingFactor;
 
-  return { x: x, y: y };
+  return { x, y };
 }
 
 export function imageToCanvas(
@@ -63,18 +63,19 @@ export function imageToCanvas(
     height: number;
   }
 ): XYPoint {
-  const { x: translateX, y: translateY, scale: scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
+  const { x: translateX, y: translateY, scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
 
-  let x = imageX,
-    y = imageY;
+  let x = imageX;
+  let y = imageY;
 
   // apply image scaling factor:
-  let imageScalingFactor = Math.min(
+  const imageScalingFactor = Math.min(
     canvasPositionAndSize.height / imageHeight,
     canvasPositionAndSize.width / imageWidth
   );
-  x = x * imageScalingFactor;
-  y = y * imageScalingFactor;
+
+  x *= imageScalingFactor;
+  y *= imageScalingFactor;
 
   // apply transparent bars to make the canvas the correct size:
   if (imageScalingFactor * imageWidth < canvasPositionAndSize.width) {
@@ -88,7 +89,7 @@ export function imageToCanvas(
   y = y + (y - canvasPositionAndSize.height / 2) * (scale - 1) + translateY;
   //      ^------------ scaling away from center ------------^
 
-  return { x: x, y: y };
+  return { x, y };
 }
 
 export function getMinimapViewFinder(
@@ -147,8 +148,6 @@ export function getMinimapViewFinder(
     minimapPositionAndSize
   );
 
-  console.log(topLeft, bottomRight);
-
   return {
     left: topLeft.x,
     top: topLeft.y,
@@ -171,7 +170,7 @@ export function minimapToCanvas(
   minimapPositionAndSize: PositionAndSize
 ): XYPoint {
   // transform from minimap space to image space:
-  let { x: x, y: y } = canvasToImage(
+  let { x, y } = canvasToImage(
     minimapX,
     minimapY,
     imageWidth,
@@ -181,7 +180,7 @@ export function minimapToCanvas(
   );
 
   // transform from image space to canvas space:
-  ({ x: x, y: y } = imageToCanvas(
+  ({ x, y } = imageToCanvas(
     x,
     y,
     imageWidth,
@@ -190,5 +189,5 @@ export function minimapToCanvas(
     canvasPositionAndSize
   ));
 
-  return { x: x, y: y };
+  return { x, y };
 }

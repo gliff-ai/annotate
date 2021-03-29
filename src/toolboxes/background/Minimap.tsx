@@ -1,5 +1,4 @@
-import React from "react";
-import { Component, ReactNode } from "react";
+import React, { Component, ReactNode } from "react";
 
 import { BaseMinimap, MinimapProps as BaseProps } from "../../baseCanvas";
 import drawImageOnCanvas from "./drawImage";
@@ -17,11 +16,16 @@ interface Props extends BaseProps {
 }
 export class BackgroundMinimap extends Component<Props> {
   private baseMinimap: BaseMinimap;
+
   private image: HTMLImageElement;
 
-  constructor(props: Props) {
-    super(props);
-  }
+  componentDidMount = (): void => {
+    this.drawImage();
+  };
+
+  componentDidUpdate = (): void => {
+    this.redrawImage();
+  };
 
   private redrawImage = () => {
     if (this.image && this.image.complete) {
@@ -50,27 +54,19 @@ export class BackgroundMinimap extends Component<Props> {
     this.image.src = this.props.imgSrc;
   };
 
-  componentDidMount = (): void => {
-    this.drawImage();
-  };
-
-  componentDidUpdate(): void {
-    this.redrawImage();
-  }
-
-  render = (): ReactNode => {
-    return (
-      <BaseMinimap
-        scaleAndPan={this.props.scaleAndPan}
-        setScaleAndPan={this.props.setScaleAndPan}
-        ref={(baseMinimap) => (this.baseMinimap = baseMinimap)}
-        name="background-minimap"
-        imageWidth={this.props.imageWidth}
-        imageHeight={this.props.imageHeight}
-        canvasPositionAndSize={this.props.canvasPositionAndSize}
-        minimapPositionAndSize={this.props.minimapPositionAndSize}
-        setMinimapPositionAndSize={this.props.setMinimapPositionAndSize}
-      />
-    );
-  };
+  render = (): ReactNode => (
+    <BaseMinimap
+      scaleAndPan={this.props.scaleAndPan}
+      setScaleAndPan={this.props.setScaleAndPan}
+      ref={(baseMinimap) => {
+        this.baseMinimap = baseMinimap;
+      }}
+      name="background-minimap"
+      imageWidth={this.props.imageWidth}
+      imageHeight={this.props.imageHeight}
+      canvasPositionAndSize={this.props.canvasPositionAndSize}
+      minimapPositionAndSize={this.props.minimapPositionAndSize}
+      setMinimapPositionAndSize={this.props.setMinimapPositionAndSize}
+    />
+  );
 }
