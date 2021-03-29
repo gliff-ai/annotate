@@ -115,7 +115,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
       expanded: false,
     };
 
-    this.imageSource = "public/zebrafish-heart.jpg";
+    this.imageSource = "zebrafish-heart.jpg";
 
     this.annotationsObject.addAnnotation(this.state.activeTool);
     this.presetLabels = ["label-1", "label-2", "label-3"]; // TODO: find a place for this
