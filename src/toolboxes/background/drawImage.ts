@@ -1,6 +1,6 @@
 export default function drawImageOnCanvas(
   ctx: CanvasRenderingContext2D,
-  img: HTMLImageElement | OffscreenCanvas,
+  img: HTMLImageElement | HTMLCanvasElement,
   scaleAndPan: {
     x: number;
     y: number;

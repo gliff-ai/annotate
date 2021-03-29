@@ -42,7 +42,7 @@ import { BaseSlider } from "./components/BaseSlider";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { keydownListener } from "./keybindings";
 import Upload3DImage from "./upload3DImage";
-import ImageFileInfo from "./imageFileInfo";
+import ImageFileInfo from "./ImageFileInfo";
 
 // Define all mutually exclusive tools
 enum Tools {
@@ -356,7 +356,7 @@ export class UserInterface extends Component {
                 brightness={this.state.brightness}
                 sliceIndex={this.state.sliceIndex}
                 imageFileInfo={
-                  this.state.sliceIndex !== -1 ? this.imageFileInfo : null
+                  this.state.imageLoaded ? this.imageFileInfo : null
                 }
               />
 
@@ -389,7 +389,7 @@ export class UserInterface extends Component {
                 <BackgroundMinimap
                   scaleAndPan={this.state.scaleAndPan}
                   setScaleAndPan={this.setScaleAndPan}
-                  imgSrc={this.imageSource}
+                  imgSrc={this.state.imageLoaded ? null : this.imageSource}
                   imageWidth={this.state.imageWidth}
                   imageHeight={this.state.imageHeight}
                   canvasPositionAndSize={this.state.viewportPositionAndSize}
@@ -397,6 +397,10 @@ export class UserInterface extends Component {
                   setMinimapPositionAndSize={this.setMinimapPositionAndSize}
                   contrast={this.state.contrast}
                   brightness={this.state.brightness}
+                  sliceIndex={this.state.sliceIndex}
+                  imageFileInfo={
+                    this.state.imageLoaded ? this.imageFileInfo : null
+                  }
                 />
               </div>
 
@@ -561,7 +565,6 @@ export class UserInterface extends Component {
                   />
                 </AccordionDetails>
               </Accordion>
-              {/* TODO: move this to somewhere appropriate */}
               <Upload3DImage setImageFileInfo={this.setImageFileInfo} />
             </Grid>
           </Grid>

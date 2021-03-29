@@ -3,6 +3,7 @@ import { Component, ReactNode } from "react";
 
 import { BaseMinimap, MinimapProps as BaseProps } from "../../baseCanvas";
 import drawImageOnCanvas from "./drawImage";
+import ImageFileInfo from "../../ImageFileInfo";
 
 interface Props extends BaseProps {
   imgSrc?: string;
@@ -14,20 +15,35 @@ interface Props extends BaseProps {
   }) => void;
   contrast: number;
   brightness: number;
+  imageFileInfo: ImageFileInfo;
+  sliceIndex: number;
 }
 export class BackgroundMinimap extends Component<Props> {
   private baseMinimap: BaseMinimap;
-  private image: HTMLImageElement;
+  private image: HTMLImageElement | HTMLCanvasElement;
 
   constructor(props: Props) {
     super(props);
   }
 
-  private redrawImage = () => {
-    if (this.image && this.image.complete) {
-      this.baseMinimap.baseCanvas.canvasContext.filter = `contrast(${this.props.contrast}%) brightness(${this.props.brightness}%)`;
-      this.baseMinimap.baseCanvas.canvasContext.globalCompositeOperation =
-        "destination-over";
+  private drawImage = () => {
+    // Any annotation that is already on the canvas is put on top of any new annotation
+    this.baseMinimap.baseCanvas.canvasContext.globalCompositeOperation =
+      "destination-over";
+
+    if (this.props.imgSrc) {
+      if (this.image && (this.image as HTMLImageElement).complete) {
+        drawImageOnCanvas(
+          this.baseMinimap.baseCanvas.canvasContext,
+          this.image,
+          {
+            x: 0,
+            y: 0,
+            scale: 1,
+          }
+        );
+      }
+    } else if (this.props.imageFileInfo) {
       drawImageOnCanvas(this.baseMinimap.baseCanvas.canvasContext, this.image, {
         x: 0,
         y: 0,
@@ -36,26 +52,64 @@ export class BackgroundMinimap extends Component<Props> {
     }
   };
 
-  private drawImage = () => {
-    if (!this.props.imgSrc) return;
+  private loadImage = () => {
+    if (this.props.imgSrc) {
+      // Load the image
+      this.image = new Image();
+      // Prevent SecurityError "Tainted canvases may not be exported." #70
+      this.image.crossOrigin = "anonymous";
+      // Draw the image once loaded
+      this.image.onload = () => {
+        this.drawImage();
+      };
+      this.image.src = this.props.imgSrc;
+    } else if (this.props.imageFileInfo) {
+      this.image = this.createCanvasFromArray(
+        this.props.imageFileInfo.slicesData[this.props.sliceIndex],
+        this.props.imageFileInfo.width,
+        this.props.imageFileInfo.height
+      );
+      this.drawImage();
+    }
+  };
 
-    // Load the image
-    this.image = new Image();
+  updateBrightnessOrContrast = () => {
+    this.baseMinimap.baseCanvas.canvasContext.filter = `contrast(${this.props.contrast}%) brightness(${this.props.brightness}%)`;
+  };
 
-    // Prevent SecurityError "Tainted canvases may not be exported." #70
-    this.image.crossOrigin = "anonymous";
+  private createCanvasFromArray = (
+    array: Uint8Array | Uint8ClampedArray,
+    width: number,
+    height: number
+  ): HTMLCanvasElement => {
+    // Create a canvas element from an array.
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    canvas.width = width;
+    canvas.height = height;
+    const imageData = context.createImageData(width, height);
 
-    // Draw the image once loaded
-    this.image.onload = this.redrawImage;
-    this.image.src = this.props.imgSrc;
+    imageData.data.set(array);
+    context.putImageData(imageData, 0, 0);
+    return canvas;
   };
 
   componentDidMount = (): void => {
-    this.drawImage();
+    this.loadImage();
   };
 
-  componentDidUpdate(): void {
-    this.redrawImage();
+  componentDidUpdate(prevProps: Props): void {
+    if (prevProps.imageFileInfo != this.props.imageFileInfo) {
+      this.loadImage(); // calls this.drawImage() after image loading
+    } else {
+      this.drawImage();
+    }
+    if (
+      prevProps.brightness != this.props.brightness ||
+      prevProps.contrast != this.props.contrast
+    ) {
+      this.updateBrightnessOrContrast();
+    }
   }
 
   render = (): ReactNode => {

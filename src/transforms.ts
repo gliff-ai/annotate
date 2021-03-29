@@ -147,8 +147,6 @@ export function getMinimapViewFinder(
     minimapPositionAndSize
   );
 
-  console.log(topLeft, bottomRight);
-
   return {
     left: topLeft.x,
     top: topLeft.y,

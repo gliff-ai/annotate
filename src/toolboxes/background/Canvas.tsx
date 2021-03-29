@@ -16,16 +16,13 @@ interface Props extends BaseProps {
 
 export class BackgroundCanvas extends Component<Props> {
   private baseCanvas: BaseCanvas;
-  private image: HTMLImageElement | OffscreenCanvas;
+  private image: HTMLImageElement | HTMLCanvasElement;
 
   constructor(props: Props) {
     super(props);
   }
 
   private drawImage = () => {
-    // Update image brightness and contrast
-    this.baseCanvas.canvasContext.filter = `contrast(${this.props.contrast}%) brightness(${this.props.brightness}%)`;
-
     // Any annotation that is already on the canvas is put on top of any new annotation
     this.baseCanvas.canvasContext.globalCompositeOperation = "destination-over";
 
@@ -54,11 +51,11 @@ export class BackgroundCanvas extends Component<Props> {
       this.image.crossOrigin = "anonymous";
       // Draw the image once loaded
       this.image.onload = () => {
-        this.drawImage();
         this.props.updateImageDimensions(
           (this.image as HTMLImageElement).width,
           (this.image as HTMLImageElement).height
         );
+        this.drawImage();
       };
       this.image.src = this.props.imgSrc;
     } else if (this.props.imageFileInfo) {
@@ -75,10 +72,12 @@ export class BackgroundCanvas extends Component<Props> {
     array: Uint8Array | Uint8ClampedArray,
     width: number,
     height: number
-  ): OffscreenCanvas => {
+  ): HTMLCanvasElement => {
     // Create a canvas element from an array.
-    const canvas = new OffscreenCanvas(width, height);
+    const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
+    canvas.width = width;
+    canvas.height = height;
     const imageData = context.createImageData(width, height);
 
     imageData.data.set(array);
@@ -86,14 +85,28 @@ export class BackgroundCanvas extends Component<Props> {
     return canvas;
   };
 
+  updateBrightnessOrContrast = () => {
+    // Update image brightness and contrast
+    this.baseCanvas.canvasContext.filter = `contrast(${this.props.contrast}%) brightness(${this.props.brightness}%)`;
+  };
+
+  componentDidUpdate(prevProps: Props): void {
+    if (prevProps.imageFileInfo != this.props.imageFileInfo) {
+      this.loadImage(); // calls this.drawImage() after image loading
+    } else {
+      this.drawImage();
+    }
+    if (
+      prevProps.brightness != this.props.brightness ||
+      prevProps.contrast != this.props.contrast
+    ) {
+      this.updateBrightnessOrContrast();
+    }
+  }
+
   componentDidMount = (): void => {
     this.loadImage();
   };
-
-  componentDidUpdate(): void {
-    this.loadImage();
-    //this.drawImage();
-  }
 
   render = (): ReactNode => {
     return (

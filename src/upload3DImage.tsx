@@ -22,9 +22,7 @@ export default class Upload3DImage extends Component<Props> {
     this.readFile(imageFile)
       .then((buffer: ArrayBuffer) => {
         this.imageFileInfo = new ImageFileInfo(imageFile.name);
-        this.loadImageFile(buffer); // load the image file
-        console.log("Slice zero");
-        console.log(this.imageFileInfo.slicesData[0]);
+        this.loadImageFile(buffer);
       })
       .catch((error) => console.log(error));
   };
