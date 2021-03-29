@@ -5,3 +5,4 @@ dist
 
 .*.js
 webpack*.js
+*.spec.ts

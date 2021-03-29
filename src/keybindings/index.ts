@@ -3,9 +3,9 @@ import { keybindings } from "./keybindings";
 const keydownListener = (
   event: KeyboardEvent,
   keybindingsMap = keybindings
-) => {
+): void => {
   // Lookup event
-  let code = event.code;
+  let { code } = event;
 
   if (event.shiftKey) code = `shift+${code}`;
   if (event.metaKey) code = `meta+${code}`;

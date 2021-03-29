@@ -9,7 +9,11 @@
     "allowJs": false,
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   "include": [
     "typings/**/*",
@@ -19,7 +23,5 @@
     "typings/**/*.ts",
     "./jest-setup.ts"
   ],
-  "exclude": [
-    "src/**/*_.tsx",
-  ]
+  "exclude": ["src/**/*_.tsx"]
 }

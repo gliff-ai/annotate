@@ -22,8 +22,8 @@ export default function drawImageOnCanvas(
   newWidth *= scaleAndPan.scale;
   newHeight *= scaleAndPan.scale;
 
-  let offsetX = w / 2 - newWidth / 2 + scaleAndPan.x;
-  let offsetY = h / 2 - newHeight / 2 + scaleAndPan.y;
+  const offsetX = w / 2 - newWidth / 2 + scaleAndPan.x;
+  const offsetY = h / 2 - newHeight / 2 + scaleAndPan.y;
 
   // fill image in dest. rectangle
   ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);

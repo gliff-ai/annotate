@@ -1,5 +1,3 @@
-export interface AnnotationsDataArray extends Array<Annotation> {}
-
 export interface BrushStrokes {
   coordinates: XYPoint[];
   brushColor: string;
@@ -12,10 +10,10 @@ export interface Annotation {
   spaceTimeInfo: ZTPoint;
   coordinates: XYPoint[];
   brushStrokes: BrushStrokes[];
-  parameters: AnnotationParameters;
+  parameters: Record<string, unknown>;
 }
 
-export interface AnnotationParameters {}
+// export interface AnnotationParameters {}
 
 export interface XYPoint {
   x: number;

@@ -1,7 +1,6 @@
-import React from "react";
-import { Component, ReactNode } from "react";
+import React, { Component, ReactNode } from "react";
 
-import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
+import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
 import drawImageOnCanvas from "./drawImage";
 
 interface Props extends BaseProps {
@@ -13,11 +12,16 @@ interface Props extends BaseProps {
 
 export class BackgroundCanvas extends Component<Props> {
   private baseCanvas: BaseCanvas;
+
   private image: HTMLImageElement;
 
-  constructor(props: Props) {
-    super(props);
-  }
+  componentDidMount = (): void => {
+    this.drawImage();
+  };
+
+  componentDidUpdate = (): void => {
+    this.redrawImage();
+  };
 
   private redrawImage = () => {
     if (this.image && this.image.complete) {
@@ -49,23 +53,15 @@ export class BackgroundCanvas extends Component<Props> {
     this.image.src = this.props.imgSrc;
   };
 
-  componentDidMount = (): void => {
-    this.drawImage();
-  };
-
-  componentDidUpdate(): void {
-    this.redrawImage();
-  }
-
-  render = (): ReactNode => {
-    return (
-      <BaseCanvas
-        ref={(baseCanvas) => (this.baseCanvas = baseCanvas)}
-        name="background"
-        scaleAndPan={this.props.scaleAndPan}
-        zoomExtents={{ min: 0.3, max: 3 }}
-        canvasPositionAndSize={this.props.canvasPositionAndSize}
-      />
-    );
-  };
+  render = (): ReactNode => (
+    <BaseCanvas
+      ref={(baseCanvas) => {
+        this.baseCanvas = baseCanvas;
+      }}
+      name="background"
+      scaleAndPan={this.props.scaleAndPan}
+      zoomExtents={{ min: 0.3, max: 3 }}
+      canvasPositionAndSize={this.props.canvasPositionAndSize}
+    />
+  );
 }
