@@ -32,21 +32,15 @@ import { Annotations } from "./annotation";
 
 import { ThemeProvider, theme } from "./theme";
 
-import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
+import {
+  BackgroundCanvas,
+  BackgroundMinimap,
+  BackgroundUI,
+} from "./toolboxes/background";
 import { SplineCanvas, SplineUI } from "./toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "./toolboxes/paintbrush";
 import { Labels } from "./components/Labels";
-import { BaseSlider } from "./components/BaseSlider";
-import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { keydownListener } from "./keybindings";
-
-// Define all mutually exclusive tools
-// enum Tools {
-//   paintbrush = "paintbrush",
-
-//   spline = "spline",
-//   eraser = "eraser",
-// }
 
 import { Tools, Tool } from "./tools";
 
@@ -78,8 +72,6 @@ interface State {
   imageWidth: number;
   imageHeight: number;
   activeAnnotationID: number;
-  contrast: number;
-  brightness: number;
 
   viewportPositionAndSize: {
     top: number;
@@ -121,8 +113,6 @@ export class UserInterface extends Component<Record<string, never>, State> {
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       minimapPositionAndSize: { top: 0, left: 0, width: 200, height: 200 },
       expanded: false,
-      brightness: SLIDER_CONFIG[Sliders.brightness].initial,
-      contrast: SLIDER_CONFIG[Sliders.contrast].initial,
     };
 
     this.imageSource = "public/zebrafish-heart.jpg";
@@ -144,6 +134,12 @@ export class UserInterface extends Component<Record<string, never>, State> {
     }
   }
 
+  handleEvent = (event: Event): void => {
+    if (event.detail === "ui") {
+      this[event.type]?.call(this);
+    }
+  };
+
   setViewportPositionAndSize = (
     newViewportPositionAndSize: PositionAndSize
   ): void => {
@@ -160,12 +156,6 @@ export class UserInterface extends Component<Record<string, never>, State> {
         },
       };
     });
-  };
-
-  handleEvent = (event: Event): void => {
-    if (event.detail === "ui") {
-      this[event.type]?.call(this);
-    }
   };
 
   setMinimapPositionAndSize = (
@@ -305,15 +295,6 @@ export class UserInterface extends Component<Record<string, never>, State> {
     });
   };
 
-  selectSplineTool = (): void => {
-    // Change active tool to spline.
-    if (this.state.activeTool !== Tools.spline) {
-      this.setState({ activeTool: Tools.spline }, () => {
-        this.reuseEmptyAnnotation();
-      });
-    }
-  };
-
   activateTool = (tool: Tool): void => {
     this.setState({ activeTool: tool }, () => {
       this.reuseEmptyAnnotation();
@@ -369,13 +350,6 @@ export class UserInterface extends Component<Record<string, never>, State> {
     this.setState({ expanded: isExpanded ? panel : false });
   };
 
-  handleSliderChange = <K extends keyof State>(key: K) => (
-    event: ChangeEvent,
-    value: State[K]
-  ): void => {
-    this.setState({ [key]: value } as Pick<State, K>);
-  };
-
   render = (): ReactNode => (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -399,8 +373,6 @@ export class UserInterface extends Component<Record<string, never>, State> {
               updateImageDimensions={this.updateImageDimensions}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
-              contrast={this.state.contrast}
-              brightness={this.state.brightness}
             />
 
             <SplineCanvas
@@ -435,8 +407,6 @@ export class UserInterface extends Component<Record<string, never>, State> {
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 minimapPositionAndSize={this.state.minimapPositionAndSize}
                 setMinimapPositionAndSize={this.setMinimapPositionAndSize}
-                contrast={this.state.contrast}
-                brightness={this.state.brightness}
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}
               />
             </div>
@@ -486,33 +456,10 @@ export class UserInterface extends Component<Record<string, never>, State> {
               </ButtonGroup>
             </Grid>
 
-            <Accordion
+            <BackgroundUI
               expanded={this.state.expanded === "background-toolbox"}
               onChange={this.handleToolboxChange("background-toolbox")}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMore />}
-                id="background-toolbox"
-              >
-                <Typography>Background</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Grid container spacing={0} justify="center" wrap="nowrap">
-                  <Grid item style={{ width: "85%", position: "relative" }}>
-                    <BaseSlider
-                      value={this.state.contrast}
-                      config={SLIDER_CONFIG[Sliders.contrast]}
-                      onChange={this.handleSliderChange}
-                    />
-                    <BaseSlider
-                      value={this.state.brightness}
-                      config={SLIDER_CONFIG[Sliders.brightness]}
-                      onChange={this.handleSliderChange}
-                    />
-                  </Grid>
-                </Grid>
-              </AccordionDetails>
-            </Accordion>
+            />
 
             <PaintbrushUI
               expanded={this.state.expanded === "paintbrush-toolbox"}

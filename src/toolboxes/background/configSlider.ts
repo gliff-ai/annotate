@@ -1,4 +1,4 @@
-import { Config } from "./components/BaseSlider";
+import { Config } from "@/components/BaseSlider";
 
 export enum Sliders {
   contrast,

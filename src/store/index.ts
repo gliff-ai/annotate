@@ -44,10 +44,8 @@ export function createStore<T>(
     storeState = newStoreState;
 
     storeListeningComponents.forEach(({ update, options }) => {
-      const shouldUpdate = options?.shouldUpdate?.(
-        oldStoreState,
-        newStoreState
-      );
+      const shouldUpdate =
+        options?.shouldUpdate?.(oldStoreState, newStoreState) !== false;
 
       if (!shouldUpdate) {
         return;

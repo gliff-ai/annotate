@@ -1,7 +1,8 @@
 import React, { Component, ReactNode } from "react";
 
-import { BaseMinimap, MinimapProps as BaseProps } from "../../baseCanvas";
+import { BaseMinimap, MinimapProps as BaseProps } from "@/baseCanvas";
 import drawImageOnCanvas from "./drawImage";
+import { useBackgroundStore } from "./Store";
 
 interface Props extends BaseProps {
   imgSrc?: string;
@@ -14,7 +15,8 @@ interface Props extends BaseProps {
   contrast: number;
   brightness: number;
 }
-export class BackgroundMinimap extends Component<Props> {
+
+export class BackgroundMinimapClass extends Component<Props> {
   private baseMinimap: BaseMinimap;
 
   private image: HTMLImageElement;
@@ -70,3 +72,23 @@ export class BackgroundMinimap extends Component<Props> {
     />
   );
 }
+
+export const BackgroundMinimap = (
+  props: Omit<Props, "contrast" | "brightness">
+) => {
+  const [background] = useBackgroundStore();
+
+  return (
+    <BackgroundMinimapClass
+      contrast={background.contrast}
+      brightness={background.brightness}
+      imgSrc={props.imgSrc}
+      imageWidth={props.imageWidth}
+      imageHeight={props.imageHeight}
+      canvasPositionAndSize={props.canvasPositionAndSize}
+      minimapPositionAndSize={props.minimapPositionAndSize}
+      setScaleAndPan={props.setScaleAndPan}
+      scaleAndPan={props.scaleAndPan}
+    />
+  );
+};
