@@ -318,22 +318,10 @@ export class UserInterface extends Component<Record<string, never>, State> {
     }
   };
 
-  selectPaintbrushTool = (): void => {
-    // Change active tool to paintbrush.
-    if (this.state.activeTool !== Tools.paintbrush) {
-      this.setState({ activeTool: Tools.paintbrush }, () => {
-        this.reuseEmptyAnnotation();
-      });
-    }
-  };
-
-  selectEraserTool = (): void => {
-    // Change active tool to paintbrush.
-    if (this.state.activeTool !== Tools.eraser) {
-      this.setState({ activeTool: Tools.eraser }, () => {
-        this.reuseEmptyAnnotation();
-      });
-    }
+  activateTool = (tool: Tool): void => {
+    this.setState({ activeTool: tool }, () => {
+      this.reuseEmptyAnnotation();
+    });
   };
 
   addAnnotation = (): void => {
@@ -532,13 +520,9 @@ export class UserInterface extends Component<Record<string, never>, State> {
 
             <PaintbrushUI
               expanded={this.state.expanded === "paintbrush-toolbox"}
-              activeTool={
-                this.state.activeTool === Tools.paintbrush
-                  ? "paintbrush"
-                  : "eraser"
-              }
+              activeTool={this.state.activeTool}
               onChange={this.handleToolboxChange("paintbrush-toolbox")}
-              activateTool={this.selectPaintbrushTool}
+              activateTool={this.activateTool}
             />
 
             <Accordion

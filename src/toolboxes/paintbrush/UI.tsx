@@ -15,9 +15,9 @@ import {
   RadioButtonUncheckedSharp,
 } from "@material-ui/icons";
 
-import { usePaintbrushStore } from "./Store";
+import { Tool } from "@/tools";
 
-type Tool = "paintbrush" | "eraser";
+import { usePaintbrushStore } from "./Store";
 
 interface Props {
   expanded: boolean;
