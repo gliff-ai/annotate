@@ -298,10 +298,6 @@ export class UserInterface extends Component<Record<string, never>, State> {
     this.incrementScaleAndPan("y", -CONFIG.PAN_AMOUNT);
   };
 
-  toggleEraser = (): void => {
-    this.setState({ activeTool: Tools.eraser });
-  };
-
   updateImageDimensions = (imageWidth: number, imageHeight: number): void => {
     this.setState({
       imageWidth,
