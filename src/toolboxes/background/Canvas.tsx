@@ -62,7 +62,6 @@ export class BackgroundCanvas extends Component<Props> {
       };
       this.image.src = this.props.imgSrc;
     } else if (this.props.imageFileInfo) {
-      console.log("load image");
       this.image = this.createCanvasFromArray(
         this.props.imageFileInfo.slicesData[this.props.sliceIndex],
         this.props.imageFileInfo.width,
@@ -88,12 +87,12 @@ export class BackgroundCanvas extends Component<Props> {
   };
 
   componentDidMount = (): void => {
-    console.log("component did mount");
     this.loadImage();
   };
 
   componentDidUpdate(): void {
-    this.drawImage();
+    this.loadImage();
+    //this.drawImage();
   }
 
   render = (): ReactNode => {

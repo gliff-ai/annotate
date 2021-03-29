@@ -89,7 +89,7 @@ export class UserInterface extends Component {
   theme: Theme;
   imageSource: string;
   private presetLabels: string[];
-  private imageFileInfo: ImageFileInfo;
+  private imageFileInfo: ImageFileInfo | null;
 
   constructor(props: never) {
     super(props);
@@ -122,6 +122,7 @@ export class UserInterface extends Component {
     this.imageSource = "zebrafish-heart.jpg";
     this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
     this.presetLabels = ["label-1", "label-2", "label-3"]; //TODO: find a place for this
+    this.imageFileInfo = null;
   }
 
   setViewportPositionAndSize = (viewportPositionAndSize: {
@@ -186,8 +187,6 @@ export class UserInterface extends Component {
     let panRangeX = Math.max(0, xMargin / 2); // scaleAndPan.x can be +-panRangeX
     let panRangeY = Math.max(0, yMargin / 2); // scaleAndPan.y can be +-panRangeY
 
-    console.log(`panRangeX = ${panRangeX}, panRangeY = ${panRangeY}`);
-
     // move pan into the allowable range:
     let panX = this.state.scaleAndPan.x;
     let panY = this.state.scaleAndPan.y;
@@ -204,7 +203,7 @@ export class UserInterface extends Component {
   };
 
   incrementScale = (): void => {
-    let panMultiplier =
+    const panMultiplier =
       (1 + this.state.scaleAndPan.scale) / this.state.scaleAndPan.scale;
     this.setScaleAndPan({
       x: this.state.scaleAndPan.x * panMultiplier,
@@ -216,7 +215,7 @@ export class UserInterface extends Component {
   decrementScale = (): void => {
     // Zoom out only if zoomed in.
     if (this.state.scaleAndPan.scale > 1) {
-      let panMultiplier =
+      const panMultiplier =
         (this.state.scaleAndPan.scale - 1) / this.state.scaleAndPan.scale;
       this.setScaleAndPan({
         x: this.state.scaleAndPan.x * panMultiplier,
@@ -273,7 +272,7 @@ export class UserInterface extends Component {
   setImageFileInfo = (image: ImageFileInfo): void => {
     this.imageFileInfo = image;
     this.updateImageDimensions(image.width, image.height);
-    this.setState({ imageLoaded: true, imageSlice: 0 });
+    this.setState({ imageLoaded: true, sliceIndex: 0 });
   };
 
   selectPaintbrushTool = (): void => {
@@ -349,7 +348,7 @@ export class UserInterface extends Component {
             <Grid item style={{ width: "85%", position: "relative" }}>
               <BackgroundCanvas
                 scaleAndPan={this.state.scaleAndPan}
-                imgSrc={this.state.imageLoaded ? this.imageSource : null}
+                imgSrc={this.state.imageLoaded ? null : this.imageSource}
                 updateImageDimensions={this.updateImageDimensions}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}

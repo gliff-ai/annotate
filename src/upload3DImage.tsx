@@ -11,10 +11,11 @@ interface Props {
 }
 
 export default class Upload3DImage extends Component<Props> {
-  private imageFileInfo: ImageFileInfo;
+  private imageFileInfo: ImageFileInfo | null;
 
   constructor(props: Props) {
     super(props);
+    this.imageFileInfo = null;
   }
 
   private uploadImage = (imageFile: File): void => {
@@ -22,6 +23,8 @@ export default class Upload3DImage extends Component<Props> {
       .then((buffer: ArrayBuffer) => {
         this.imageFileInfo = new ImageFileInfo(imageFile.name);
         this.loadImageFile(buffer); // load the image file
+        console.log("Slice zero");
+        console.log(this.imageFileInfo.slicesData[0]);
       })
       .catch((error) => console.log(error));
   };
@@ -146,7 +149,6 @@ export default class Upload3DImage extends Component<Props> {
           type="file"
           style={{ display: "none", textAlign: "center" }}
           onChange={(e) => {
-            console.log(e.target.files[0]);
             this.uploadImage(e.target.files[0]);
           }}
         />
