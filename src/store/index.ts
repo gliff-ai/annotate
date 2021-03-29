@@ -29,7 +29,14 @@ function removeArrayElement<T>(arr: T[], elem: T): void {
   arr.splice(index, 1);
 }
 
-export function createStore<T>(defaultValue: T) {
+export function createStore<T>(
+  defaultValue: T
+): readonly [
+  (
+    options?: UseStoreStateOptions<T>
+  ) => readonly [T, (newStoreState: T) => void],
+  (newStoreState: T) => void
+] {
   let storeState = defaultValue;
   const storeListeningComponents: StoreListeningComponentData<T>[] = [];
 
@@ -51,7 +58,9 @@ export function createStore<T>(defaultValue: T) {
     });
   }
 
-  function useStoreState(options?: UseStoreStateOptions<T>) {
+  function useStoreState(
+    options?: UseStoreStateOptions<T>
+  ): readonly [T, (newStoreState: T) => void] {
     const forceUpdate = useForceUpdate();
 
     useLayoutEffect(() => {
