@@ -2,7 +2,7 @@ import React, { Component, ReactNode } from "react";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
 import drawImageOnCanvas from "./drawImage";
-import ImageFileInfo from "../../ImageFileInfo";
+import ImageFileInfo from "@/ImageFileInfo";
 
 interface Props extends BaseProps {
   imgSrc: string | null;
