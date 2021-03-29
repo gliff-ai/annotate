@@ -1,6 +1,6 @@
 import React, { Component, ChangeEvent, ReactNode } from "react";
 
-import { Annotations } from "./annotation";
+import { Annotations } from "@/annotation";
 
 import {
   AppBar,
@@ -62,7 +62,6 @@ interface Event extends CustomEvent {
 // Here we define the methods that are exposed to be called by keyboard shortcuts
 // We should maybe namespace them so we don't get conflicting methods across toolboxes.
 export const events = ["nextAnnotation", "previousAnnotation"] as const;
-
 
 export class UserInterface extends Component {
   state: {
