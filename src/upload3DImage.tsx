@@ -1,6 +1,5 @@
 import React, { Component, ReactNode } from "react";
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
-import IconButton from "@material-ui/core/IconButton";
+import Button from "@material-ui/core/Button";
 import BackupIcon from "@material-ui/icons/Backup";
 import * as UTIF from "utif";
 import ImageFileInfo from "./ImageFileInfo";
@@ -23,18 +22,17 @@ export default class Upload3DImage extends Component<Props> {
         this.imageFileInfo = new ImageFileInfo(imageFile.name);
         this.loadImageFile(buffer);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {});
   };
 
-  private readFile = (file: File) => {
-    return new Promise((resolve: (buffer: ArrayBuffer) => void) => {
+  private readFile = (file: File) =>
+    new Promise((resolve: (buffer: ArrayBuffer) => void) => {
       const fr = new FileReader();
       fr.onload = () => {
         resolve(fr.result as ArrayBuffer);
       };
       fr.readAsArrayBuffer(file);
-    }).catch((error) => console.log(error));
-  };
+    }).catch((error) => {});
 
   private loadImageFile = (buffer: ArrayBuffer): void => {
     // Decode the images using the UTIF library.
@@ -43,8 +41,7 @@ export default class Upload3DImage extends Component<Props> {
       UTIF.decodeImage(buffer, ifd);
     }
 
-    const width = ifds[0].width;
-    const height = ifds[0].height;
+    const { width, height } = ifds[0];
 
     const resolutionUnitstr = ifds[0].t296 as string[];
 
@@ -77,23 +74,23 @@ export default class Upload3DImage extends Component<Props> {
       this.imageFileInfo.slicesData = [];
 
       // Loop through each slice
-      for (let i = 0; i < ifds.length / extraChannels; i++) {
+      for (let i = 0; i < ifds.length / extraChannels; i += 1) {
         // Allocate a buffer for this slice
         const rgba = new Uint8ClampedArray(width * height * 4);
 
         // For each channel, copy the data for the right IFD into the buffer
-        for (let j = 0; j < extraChannels; j++) {
+        for (let j = 0; j < extraChannels; j += 1) {
           // For some reason, it seems that the channels are inverted
           const srcj = extraChannels - 1 - j;
           const component = UTIF.toRGBA8(ifds[i * extraChannels + srcj]);
           // The single channel will be stored in the green component.
-          for (let k = 0; k < width * height; k++) {
+          for (let k = 0; k < width * height; k += 1) {
             rgba[4 * k + j] = component[4 * k + 1];
           }
         }
 
         // Set the alpha value to opaque.
-        for (let k = 0; k < width * height; k++) {
+        for (let k = 0; k < width * height; k += 1) {
           rgba[4 * k + 3] = 255;
         }
 
@@ -137,9 +134,9 @@ export default class Upload3DImage extends Component<Props> {
     return extraChannels;
   };
 
-  render = (): ReactNode => {
-    return (
-      <div style={{ textAlign: "center" }}>
+  render = (): ReactNode => (
+    <div style={{ textAlign: "center" }}>
+      <label htmlFor="icon-button-file">
         <input
           accept="image/*"
           id="icon-button-file"
@@ -149,12 +146,10 @@ export default class Upload3DImage extends Component<Props> {
             this.uploadImage(e.target.files[0]);
           }}
         />
-        <label htmlFor="icon-button-file">
-          <IconButton aria-label="upload picture" component="span">
-            <BackupIcon />
-          </IconButton>
-        </label>
-      </div>
-    );
-  };
+        <Button aria-label="upload-picture" component="span">
+          <BackupIcon />
+        </Button>
+      </label>
+    </div>
+  );
 }

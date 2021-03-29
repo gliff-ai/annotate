@@ -103,6 +103,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
   imageSource: string;
 
   private presetLabels: string[];
+
   private imageFileInfo: ImageFileInfo | null;
 
   constructor(props: never) {
@@ -131,7 +132,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
     this.imageSource = "zebrafish-heart.jpg";
 
     this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
-    this.presetLabels = ["label-1", "label-2", "label-3"]; //TODO: find a place for this
+    this.presetLabels = ["label-1", "label-2", "label-3"]; // TODO: find a place for this
     this.imageFileInfo = null;
   }
 

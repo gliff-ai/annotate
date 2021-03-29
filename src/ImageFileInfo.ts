@@ -1,13 +1,20 @@
 import { v4 as guidGenerator } from "uuid";
 
 class ImageFileInfo {
-  private fileName: string; //Name of imported image file
+  private fileName: string; // Name of imported image file
+
   private fileID: string; // ID of image file
+
   public resolution_x: number;
+
   public resolution_y: number;
+
   public resolution_z: number;
-  public width: number; //grid width boxes
-  public height: number; //grid height boxes
+
+  public width: number; // grid width boxes
+
+  public height: number; // grid height boxes
+
   public slicesData: Array<Uint8Array | Uint8ClampedArray>;
 
   constructor(fileName: string, fileID?: string) {
@@ -21,13 +28,9 @@ class ImageFileInfo {
     this.slicesData = [];
   }
 
-  public getFileID = (): string => {
-    return this.fileID;
-  };
+  public getFileID = (): string => this.fileID;
 
-  public getFileName = (): string => {
-    return this.fileName;
-  };
+  public getFileName = (): string => this.fileName;
 
   public setFileName = (newFileName: string): void => {
     this.fileName = newFileName;
@@ -37,9 +40,7 @@ class ImageFileInfo {
     this.fileName = newFileID;
   };
 
-  public getNumOfSlices = (): number => {
-    return this.slicesData.length;
-  };
+  public getNumOfSlices = (): number => this.slicesData.length;
 }
 
 export default ImageFileInfo;
