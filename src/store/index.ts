@@ -1,5 +1,4 @@
 // Based on https://github.com/pie6k/hooksy
-
 import { useState, useCallback, useLayoutEffect } from "react";
 
 interface StoreListeningComponentData<T> {
@@ -45,10 +44,10 @@ export function createStore<T>(
     storeState = newStoreState;
 
     storeListeningComponents.forEach(({ update, options }) => {
-      const shouldUpdate =
-        !options ||
-        !options.shouldUpdate ||
-        !options.shouldUpdate(oldStoreState, newStoreState);
+      const shouldUpdate = options?.shouldUpdate?.(
+        oldStoreState,
+        newStoreState
+      );
 
       if (!shouldUpdate) {
         return;
