@@ -26,9 +26,7 @@ import {
   KeyboardArrowRight,
   KeyboardArrowUp,
   ExpandMore,
-  AllOut,
   Brush,
-  RadioButtonUncheckedSharp,
 } from "@material-ui/icons";
 
 import { Annotations } from "./annotation";
@@ -37,18 +35,20 @@ import { ThemeProvider, theme } from "./theme";
 
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
-import { PaintbrushCanvas } from "./toolboxes/paintbrush";
+import { PaintbrushCanvas, PaintbrushUI } from "./toolboxes/paintbrush";
 import { Labels } from "./components/Labels";
 import { BaseSlider } from "./components/BaseSlider";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { keydownListener } from "./keybindings";
 
 // Define all mutually exclusive tools
-enum Tools {
-  paintbrush = "paintbrush",
-  spline = "spline",
-  eraser = "eraser",
-}
+// enum Tools {
+//   paintbrush = "paintbrush",
+//   spline = "spline",
+//   eraser = "eraser",
+// }
+
+import { Tools, Tool } from "./tools";
 
 interface PositionAndSize {
   top?: number;
@@ -70,11 +70,10 @@ interface State {
     y: number;
     scale: number;
   };
-  activeTool?: Tools;
+  activeTool?: Tool;
   imageWidth: number;
   imageHeight: number;
   activeAnnotationID: number;
-  brushSize: number;
   contrast: number;
   brightness: number;
 
@@ -115,7 +114,6 @@ export class UserInterface extends Component<Record<string, never>, State> {
       imageHeight: 0,
       activeTool: Tools.paintbrush,
       activeAnnotationID: 0,
-      brushSize: 20,
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       minimapPositionAndSize: { top: 0, left: 0, width: 200, height: 200 },
       expanded: false,
@@ -125,7 +123,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
 
     this.imageSource = "public/zebrafish-heart.jpg";
 
-    this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
+    this.annotationsObject.addAnnotation(this.state.activeTool);
     this.presetLabels = ["label-1", "label-2", "label-3"]; // TODO: find a place for this
   }
 
@@ -296,10 +294,6 @@ export class UserInterface extends Component<Record<string, never>, State> {
     this.incrementScaleAndPan("y", -20);
   };
 
-  incrementBrush = (): void => {
-    this.setState((state) => ({ brushSize: state.brushSize + 10 }));
-  };
-
   toggleEraser = (): void => {
     this.setState({ activeTool: Tools.eraser });
   };
@@ -339,7 +333,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
   };
 
   addAnnotation = (): void => {
-    this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
+    this.annotationsObject.addAnnotation(this.state.activeTool);
     this.setState({
       activeAnnotationID: this.annotationsObject.getActiveAnnotationID(),
     });
@@ -376,9 +370,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
     /* If the active annotation object is empty, change the value of toolbox
     to match the active tool. */
     if (this.annotationsObject.isActiveAnnotationEmpty()) {
-      this.annotationsObject.setActiveAnnotationToolbox(
-        Tools[this.state.activeTool]
-      );
+      this.annotationsObject.setActiveAnnotationToolbox(this.state.activeTool);
     }
   };
 
@@ -439,7 +431,6 @@ export class UserInterface extends Component<Record<string, never>, State> {
               annotationsObject={this.annotationsObject}
               imageWidth={this.state.imageWidth}
               imageHeight={this.state.imageHeight}
-              brushRadius={this.state.brushSize}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
             />
@@ -535,49 +526,16 @@ export class UserInterface extends Component<Record<string, never>, State> {
               </AccordionDetails>
             </Accordion>
 
-            <Accordion
+            <PaintbrushUI
               expanded={this.state.expanded === "paintbrush-toolbox"}
+              activeTool={
+                this.state.activeTool === Tools.paintbrush
+                  ? "paintbrush"
+                  : "eraser"
+              }
               onChange={this.handleToolboxChange("paintbrush-toolbox")}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMore />}
-                id="paintbrush-toolbox"
-              >
-                <Typography>Paintbrushes</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Tooltip title="Activate paintbrush">
-                  <IconButton
-                    id="activate-paintbrush"
-                    onClick={this.selectPaintbrushTool}
-                    color={
-                      Tools[this.state.activeTool] === Tools.paintbrush
-                        ? "secondary"
-                        : "default"
-                    }
-                  >
-                    <Brush />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Increase brush size">
-                  <IconButton
-                    id="increase-paintbrush-radius"
-                    onClick={this.incrementBrush}
-                  >
-                    <AllOut />
-                  </IconButton>
-                </Tooltip>
-
-                <Tooltip title="Activate Eraser">
-                  <IconButton
-                    id="activate-eraser"
-                    onClick={this.selectEraserTool}
-                  >
-                    <RadioButtonUncheckedSharp />
-                  </IconButton>
-                </Tooltip>
-              </AccordionDetails>
-            </Accordion>
+              activateTool={this.selectPaintbrushTool}
+            />
 
             <Accordion
               expanded={this.state.expanded === "spline-toolbox"}
@@ -592,7 +550,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
                     id="activate-spline"
                     onClick={this.selectSplineTool}
                     color={
-                      Tools[this.state.activeTool] === Tools.spline
+                      this.state.activeTool === Tools.spline
                         ? "secondary"
                         : "default"
                     }

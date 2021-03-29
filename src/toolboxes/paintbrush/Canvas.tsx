@@ -6,6 +6,8 @@ import { canvasToImage, imageToCanvas } from "@/transforms";
 import { XYPoint } from "@/annotation/interfaces";
 import { theme } from "@/theme";
 
+import { usePaintbrushStore } from "./Store";
+
 interface Props extends CanvasProps {
   brushType: string;
   annotationsObject: Annotations;
@@ -28,7 +30,7 @@ interface Event extends CustomEvent {
 
 type Cursor = "crosshair" | "none" | "not-allowed";
 
-export class PaintbrushCanvas extends Component<Props, State> {
+export class PaintbrushCanvasClass extends Component<Props, State> {
   readonly name = "paintbrush";
 
   private baseCanvas: BaseCanvas;
@@ -300,3 +302,19 @@ export class PaintbrushCanvas extends Component<Props, State> {
     </div>
   );
 }
+
+export const PaintbrushCanvas = (props: Omit<Props, "brushRadius">) => {
+  const [paintbrush] = usePaintbrushStore();
+
+  return (
+    <PaintbrushCanvasClass
+      brushType={props.brushType}
+      annotationsObject={props.annotationsObject}
+      imageWidth={props.imageWidth}
+      imageHeight={props.imageHeight}
+      scaleAndPan={props.scaleAndPan}
+      canvasPositionAndSize={props.canvasPositionAndSize}
+      brushRadius={paintbrush.brushRadius}
+    />
+  );
+};
