@@ -1,8 +1,8 @@
 import React, { ReactNode } from "react";
-
-import { Props as BaseProps, BaseCanvas } from "./Canvas";
 import { getMinimapViewFinder, minimapToCanvas } from "@/transforms";
 import { PositionAndSize } from "@/annotation/interfaces";
+
+import { Props as BaseProps, BaseCanvas } from "./Canvas";
 
 export interface Props extends BaseProps {
   cursor?: "move";
