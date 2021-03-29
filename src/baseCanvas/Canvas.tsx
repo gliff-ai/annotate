@@ -1,6 +1,6 @@
 import React, { Component, ReactNode } from "react";
 
-import { XYPoint } from "../annotation/interfaces";
+import { XYPoint } from "@/annotation/interfaces";
 
 export interface Props {
   name?: string;
