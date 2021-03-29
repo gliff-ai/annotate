@@ -50,6 +50,10 @@ import { keydownListener } from "./keybindings";
 
 import { Tools, Tool } from "./tools";
 
+const CONFIG = {
+  PAN_AMOUNT: 20,
+} as const;
+
 interface PositionAndSize {
   top?: number;
   left?: number;
@@ -276,22 +280,22 @@ export class UserInterface extends Component<Record<string, never>, State> {
 
   incrementPanX = (): void => {
     // negative is left, +ve is right...
-    this.incrementScaleAndPan("x", 20);
+    this.incrementScaleAndPan("x", CONFIG.PAN_AMOUNT);
   };
 
   decrementPanX = (): void => {
     // negative is left, +ve is right...
-    this.incrementScaleAndPan("x", -20);
+    this.incrementScaleAndPan("x", -CONFIG.PAN_AMOUNT);
   };
 
   incrementPanY = (): void => {
     // negative is up, +ve is down...
-    this.incrementScaleAndPan("y", 20);
+    this.incrementScaleAndPan("y", CONFIG.PAN_AMOUNT);
   };
 
   decrementPanY = (): void => {
     // negative is up, +ve is down...
-    this.incrementScaleAndPan("y", -20);
+    this.incrementScaleAndPan("y", -CONFIG.PAN_AMOUNT);
   };
 
   toggleEraser = (): void => {
