@@ -28,19 +28,6 @@ class ImageFileInfo {
     this.slicesData = [];
   }
 
-  public getFileID = (): string => this.fileID;
-
-  public getFileName = (): string => this.fileName;
-
-  public setFileName = (newFileName: string): void => {
-    this.fileName = newFileName;
-  };
-
-  public setFileID = (newFileID: string): void => {
-    this.fileName = newFileID;
-  };
-
-  public getNumOfSlices = (): number => this.slicesData.length;
 }
 
 export default ImageFileInfo;

@@ -118,8 +118,6 @@ export class BackgroundMinimapClass extends Component<Props> {
         this.baseMinimap = baseMinimap;
       }}
       name="background-minimap"
-      imageWidth={this.props.imageWidth}
-      imageHeight={this.props.imageHeight}
       canvasPositionAndSize={this.props.canvasPositionAndSize}
       minimapPositionAndSize={this.props.minimapPositionAndSize}
       setMinimapPositionAndSize={this.props.setMinimapPositionAndSize}
@@ -137,14 +135,13 @@ export const BackgroundMinimap = (
       contrast={background.contrast}
       brightness={background.brightness}
       imgSrc={props.imgSrc}
-      imageWidth={props.imageWidth}
-      imageHeight={props.imageHeight}
       canvasPositionAndSize={props.canvasPositionAndSize}
       minimapPositionAndSize={props.minimapPositionAndSize}
       setScaleAndPan={props.setScaleAndPan}
       scaleAndPan={props.scaleAndPan}
       imageFileInfo={props.imageFileInfo}
       sliceIndex={props.sliceIndex}
+      imageData={props.imageData}
     />
   );
 };

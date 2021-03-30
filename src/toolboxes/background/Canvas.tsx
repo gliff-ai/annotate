@@ -132,6 +132,9 @@ export const BackgroundCanvas = (
       brightness={background.brightness}
       scaleAndPan={props.scaleAndPan}
       canvasPositionAndSize={props.canvasPositionAndSize}
+      imageFileInfo={props.imageFileInfo}
+      sliceIndex={props.sliceIndex}
+      imageData={props.imageData}
     />
   );
 };

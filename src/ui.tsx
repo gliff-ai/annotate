@@ -40,7 +40,8 @@ import { Labels } from "./components/Labels";
 import { keydownListener } from "./keybindings";
 import Upload3DImage from "./upload3DImage";
 import ImageFileInfo from "./ImageFileInfo";
-import { Annotations } from "./annotation";
+import {Annotations} from "./annotation";
+
 import { Tools, Tool } from "./tools";
 
 const CONFIG = {
