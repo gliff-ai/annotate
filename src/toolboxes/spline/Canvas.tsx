@@ -58,6 +58,9 @@ export class SplineCanvas extends Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props): void {
+    if (this.gradientImage) {
+      this.baseCanvas.canvasContext.putImageData(this.gradientImage, 0, 0);
+    }
     // Redraw if we change pan or zoom
     const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
 

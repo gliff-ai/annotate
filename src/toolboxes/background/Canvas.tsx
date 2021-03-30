@@ -26,8 +26,8 @@ export class BackgroundCanvas extends Component<Props> {
   private redrawImage = () => {
     if (this.image && this.image.complete) {
       this.baseCanvas.canvasContext.filter = `contrast(${this.props.contrast}%) brightness(${this.props.brightness}%)`;
-      this.baseCanvas.canvasContext.globalCompositeOperation =
-        "destination-over";
+      //   this.baseCanvas.canvasContext.globalCompositeOperation =
+      ("destination-over");
       drawImageOnCanvas(
         this.baseCanvas.canvasContext,
         this.image,
