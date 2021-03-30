@@ -1,4 +1,7 @@
-// Based on https://github.com/pie6k/hooksy
+/*
+This work was modified from https://github.com/pie6k/hooksy, which is released under MIT license by Adam Pietrasiak
+ */
+
 import { useState, useCallback, useLayoutEffect } from "react";
 
 interface StoreListeningComponentData<T> {
