@@ -6,15 +6,17 @@ import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
 import { Annotations } from "../../annotation";
 import { canvasToImage, imageToCanvas } from "../../transforms";
 import { Annotation, XYPoint } from "../../annotation/interfaces";
+import { calculateSobel } from "./sobel";
 
 interface Props extends BaseProps {
-  isActive: boolean;
+  splineType: string;
   annotationsObject: Annotations;
   theme: Theme;
 }
 enum Mode {
   draw,
   edit,
+  magic,
 }
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
@@ -35,16 +37,20 @@ export class SplineCanvas extends Component<Props> {
   private baseCanvas: BaseCanvas;
   private selectedPointIndex: number;
   private isDragging: boolean;
-  private mode: number;
   state: {
-    cursor: "crosshair" | "none";
+    mode: number;
+    isActive: boolean;
   };
+  private gradientImage: ImageData;
+  private snapeSensitivity: number;
+  private magicCounter: number;
 
   constructor(props: Props) {
     super(props);
     this.selectedPointIndex = -1;
     this.isDragging = false;
-    this.mode = Mode.draw;
+    this.snapeSensitivity = 25;
+    this.state = { mode: Mode.draw, isActive: false };
   }
 
   drawSplineVector = (splineVector: XYPoint[], isActive = false): void => {
@@ -132,7 +138,10 @@ export class SplineCanvas extends Component<Props> {
     this.props.annotationsObject
       .getAllAnnotations()
       .forEach((annotation: Annotation, i: number) => {
-        if (annotation.toolbox === "spline") {
+        if (
+          annotation.toolbox === "spline" ||
+          annotation.toolbox === "magicspline"
+        ) {
           this.drawSplineVector(
             annotation.coordinates,
             i === activeAnnotationID
@@ -143,8 +152,14 @@ export class SplineCanvas extends Component<Props> {
 
   private changeSplineModeToEdit = () => {
     // TODO: add keyboard shortcuts for switching between modes
-    this.mode = Mode.edit; // Change mode to edit mode
+    this.state.mode = Mode.edit; // Change mode to edit mode
     this.deselectPoint();
+  };
+
+  public changeSplineModeToMagic = () => {
+    // TODO: add keyboard shortcuts for switching between modes
+    this.state.mode = Mode.magic; // Change mode to edit mode
+    this.calculateGradientImage();
   };
 
   private deselectPoint = () => {
@@ -186,14 +201,18 @@ export class SplineCanvas extends Component<Props> {
       coordinates.splice(this.selectedPointIndex, 1);
     }
     if (coordinates.length === 0) {
-      this.mode = Mode.draw;
+      this.state.mode = Mode.draw;
     }
 
     this.selectedPointIndex -= 1;
     this.drawAllSplines();
   };
 
-  clickNearPoint = (clickPoint: XYPoint, splineVector: XYPoint[]): number => {
+  clickNearPoint = (
+    clickPoint: XYPoint,
+    splineVector: XYPoint[],
+    sensitivity: number
+  ): number => {
     // iterates through the points of splineVector, returns the index of the first point within distance 25 of clickPoint
     // clickPoint and splineVector are both expected to be in image space
     // returns -1 if no point was within distance 25
@@ -223,17 +242,53 @@ export class SplineCanvas extends Component<Props> {
         (point.x - clickPointX) ** 2 + (point.y - clickPointY) ** 2
       );
 
-      if (distanceToPoint < 25) return i;
+      if (distanceToPoint < sensitivity) return i;
     }
 
     return -1;
   };
 
+  updateXYPoint = (newX: number, newY: number, index: number): void => {
+    const coordinates = this.props.annotationsObject.getActiveAnnotation()
+      .coordinates;
+    coordinates[index] = { x: newX, y: newY };
+  };
+
+  calculateGradientImage = (): void => {
+    this.gradientImage = calculateSobel(this.props.imageData);
+  };
+
+  snapToGradient = (clickPoint: XYPoint, sensitivity: number): XYPoint => {
+      let maxPixelX = clickPoint.x;
+      let maxPixelY = clickPoint.y;
+      let maxPixelValue = this.gradientImage.data[
+        (this.gradientImage.width * maxPixelY + maxPixelX) * 4 + 0
+      ];
+    for (let y = 0; y < this.gradientImage.height; y++) {
+      for (let x = 0; x < this.gradientImage.width; x++) {
+        const distance = Math.sqrt(
+          (x - clickPoint.x) ** 2 + (y - clickPoint.y) ** 2
+        );
+        if (distance <= sensitivity) {
+          // it's greyscale so just grab the red channel
+          const pixelValue = this.gradientImage.data[
+            (this.gradientImage.width * y + x) * 4 + 0
+          ] / (distance**2);
+          if (pixelValue > maxPixelValue) {
+            maxPixelValue = pixelValue;
+            maxPixelX = x;
+            maxPixelY = y;
+          }
+        }
+      }
+    }
+    return { x: maxPixelX, y: maxPixelY };
+  };
+
   // X and Y are in CanvasSpace
   onClick = (x: number, y: number): void => {
-    const {
-      coordinates: currentSplineVector,
-    } = this.props.annotationsObject.getActiveAnnotation();
+    const activeSpline = this.props.annotationsObject.getActiveAnnotation()
+      .coordinates;
 
     const { x: imageX, y: imageY } = canvasToImage(
       x,
@@ -247,13 +302,14 @@ export class SplineCanvas extends Component<Props> {
     // check if we clicked within the nudge radius of an existing point:
     const nudgePointIdx = this.clickNearPoint(
       { x: imageX, y: imageY },
-      currentSplineVector
+      activeSpline,
+      this.snapeSensitivity
     );
-    const isClosed = this.isClosed(currentSplineVector);
+    const isClosed = this.isClosed(activeSpline);
 
     // If the mouse click was near an existing point, nudge that point
     if (nudgePointIdx !== -1) {
-      const nudgePoint = currentSplineVector[nudgePointIdx];
+      const nudgePoint = activeSpline[nudgePointIdx];
 
       this.updateXYPoint(
         (nudgePoint.x + imageX) / 2,
@@ -267,43 +323,37 @@ export class SplineCanvas extends Component<Props> {
         this.updateXYPoint(
           (nudgePoint.x + imageX) / 2,
           (nudgePoint.y + imageY) / 2,
-          currentSplineVector.length - 1
+          activeSpline.length - 1
         );
       }
 
       // If the spline is not closed, append a new point
-    } else if (this.mode === Mode.draw && !isClosed) {
+    } else if (this.state.mode === Mode.draw && !isClosed) {
       // Add coordinates to the current spline
-      currentSplineVector.push({ x: imageX, y: imageY });
-      this.selectedPointIndex = currentSplineVector.length - 1;
-    } else if (this.mode === Mode.edit) {
+      activeSpline.push({ x: imageX, y: imageY });
+      this.selectedPointIndex = activeSpline.length - 1;
+    } else if (this.state.mode === Mode.edit) {
       this.addNewPointNearSpline(imageX, imageY);
     }
 
     this.drawAllSplines();
   };
 
-  updateXYPoint = (newX: number, newY: number, index: number): void => {
-    const coordinates = this.props.annotationsObject.getActiveAnnotation()
-      .coordinates;
-    coordinates[index] = { x: newX, y: newY };
-  };
-
   onDoubleClick = (): void => {
     // Append the first spline point to the end, making a closed polygon
 
-    const currentSplineVector = this.props.annotationsObject.getActiveAnnotation()
+    const activeSpline = this.props.annotationsObject.getActiveAnnotation()
       .coordinates;
 
-    if (currentSplineVector.length < 3) {
+    if (activeSpline.length < 3) {
       return; // need at least three points to make a closed polygon
     }
 
-    if (this.isClosed(currentSplineVector)) {
+    if (this.isClosed(activeSpline)) {
       return; // don't duplicate the first point again if the loop is already closed
     }
 
-    currentSplineVector.push(currentSplineVector[0]);
+    activeSpline.push(activeSpline[0]);
 
     this.drawAllSplines();
   };
@@ -312,16 +362,33 @@ export class SplineCanvas extends Component<Props> {
     const clickPoint = canvasToImage(
       x,
       y,
-        this.props.imageData.width,
-        this.props.imageData.height,
-
-    const nearPoint = this.clickNearPoint(
-      clickPoint,
-      annotationData.coordinates
+      this.props.imageData.width,
+      this.props.imageData.height,
+      this.props.scaleAndPan,
+      this.props.canvasPositionAndSize
     );
-    if (nearPoint !== -1) {
-      this.selectedPointIndex = nearPoint;
+    const activeSpline = this.props.annotationsObject.getActiveAnnotation()
+      .coordinates;
+
+    if (this.state.mode === Mode.magic) {
+      if (this.gradientImage === undefined) {
+        this.calculateGradientImage();
+      }
+      // add gradient-snapped coordinates to the current spline annotation
+      activeSpline.push(this.snapToGradient(clickPoint, this.snapeSensitivity));
+      this.magicCounter = 0;
       this.isDragging = true;
+      this.drawAllSplines();
+    } else {
+      const nearPoint = this.clickNearPoint(
+        clickPoint,
+        activeSpline,
+        this.snapeSensitivity
+      );
+      if (nearPoint !== -1) {
+        this.selectedPointIndex = nearPoint;
+        this.isDragging = true;
+      }
     }
   };
 
@@ -338,14 +405,26 @@ export class SplineCanvas extends Component<Props> {
       this.props.canvasPositionAndSize
     );
 
-    // If dragging first point, update also last
     const activeSpline = this.props.annotationsObject.getActiveAnnotation()
       .coordinates;
-    if (this.selectedPointIndex === 0 && this.isClosed(activeSpline)) {
-      this.updateXYPoint(clickPoint.x, clickPoint.y, activeSpline.length - 1);
-    }
+    if (this.state.mode === Mode.magic) {
+      this.magicCounter = this.magicCounter + 1;
+      // add gradient-snapped coordinates to the current spline annotation
+      if (this.magicCounter >= 10) {
+          debugger;
+        activeSpline.push(
+          this.snapToGradient(clickPoint, this.snapeSensitivity)
+        );
+        this.magicCounter = 0;
+      }
+    } else {
+      // If dragging first point, update also last
+      if (this.selectedPointIndex === 0 && this.isClosed(activeSpline)) {
+        this.updateXYPoint(clickPoint.x, clickPoint.y, activeSpline.length - 1);
+      }
 
-    this.updateXYPoint(clickPoint.x, clickPoint.y, this.selectedPointIndex);
+      this.updateXYPoint(clickPoint.x, clickPoint.y, this.selectedPointIndex);
+    }
 
     // Redraw all the splines
     this.drawAllSplines();
@@ -397,10 +476,33 @@ export class SplineCanvas extends Component<Props> {
     this.props.annotationsObject.setAnnotationCoordinates(coordinates); // Save new coordinates inside active annotation
   };
 
-  componentDidUpdate(): void {
+  updateMode(): void {
+    // FIXME this is a bit clumsy
+    // Change mode if we change the spline type prop
+    switch (this.props.splineType) {
+      case "spline": {
+        this.setState({ mode: Mode.draw, isActive: true });
+        break;
+      }
+      case "magicspline": {
+        this.setState({ mode: Mode.magic, isActive: true });
+        break;
+      }
+      default: {
+        this.setState({ mode: Mode.draw, isActive: false });
+        break;
+      }
+    }
+  }
+
+  componentDidUpdate(prevProps: Props): void {
     // Redraw if we change pan or zoom
     const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
-    this.mode = Mode.draw; // At change of active annotation, set mode to drawing mode (default)
+
+    // Change mode if we change the spline type prop
+    if (this.props.splineType !== prevProps.splineType) {
+      this.updateMode();
+    }
 
     if (activeAnnotation?.coordinates) {
       this.drawAllSplines();
@@ -427,14 +529,14 @@ export class SplineCanvas extends Component<Props> {
 
   render = (): ReactNode => {
     return (
-      <div style={{ pointerEvents: this.props.isActive ? "auto" : "none" }}>
+      <div style={{ pointerEvents: this.state.isActive ? "auto" : "none" }}>
         <BaseCanvas
           onClick={this.onClick}
           onDoubleClick={this.onDoubleClick}
           onMouseDown={this.onMouseDown}
           onMouseMove={this.onMouseMove}
           onMouseUp={this.onMouseUp}
-          cursor={this.props.isActive ? "crosshair" : "none"}
+          cursor={this.state.isActive ? "crosshair" : "none"}
           ref={(baseCanvas) => (this.baseCanvas = baseCanvas)}
           name="spline"
           scaleAndPan={this.props.scaleAndPan}

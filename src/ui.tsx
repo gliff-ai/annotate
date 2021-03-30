@@ -31,6 +31,8 @@ import {
   AllOut,
   Brush,
   RadioButtonUncheckedSharp,
+  Timeline,
+  Gesture
 } from "@material-ui/icons";
 
 import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
@@ -46,8 +48,9 @@ import { keydownListener } from "./keybindings";
 // Define all mutually exclusive tools
 enum Tools {
   paintbrush = "paintbrush",
-  spline = "spline",
   eraser = "eraser",
+  spline = "spline",
+  magicspline = "magicspline",
 }
 
 export class UserInterface extends Component {
@@ -157,25 +160,25 @@ export class UserInterface extends Component {
     // adjust pan such that image borders are not inside the canvas
 
     // calculate how much bigger the image is than the canvas, in canvas space:
-    let imageScalingFactor = Math.min(
-      this.state.viewportPositionAndSize.width / this.state.imageWidth,
-      this.state.viewportPositionAndSize.height / this.state.imageHeight
+    const imageScalingFactor = Math.min(
+      this.state.viewportPositionAndSize.width / this.state.imageData.width,
+      this.state.viewportPositionAndSize.height / this.state.imageData.height
     );
 
-    let xMargin =
-      this.state.imageWidth *
+    const xMargin =
+      this.state.imageData.width *
         imageScalingFactor *
         this.state.scaleAndPan.scale -
       this.state.viewportPositionAndSize.width;
-    let yMargin =
-      this.state.imageHeight *
+    const yMargin =
+      this.state.imageData.height *
         imageScalingFactor *
         this.state.scaleAndPan.scale -
       this.state.viewportPositionAndSize.height;
 
     // now calculate the allowable pan range:
-    let panRangeX = Math.max(0, xMargin / 2); // scaleAndPan.x can be +-panRangeX
-    let panRangeY = Math.max(0, yMargin / 2); // scaleAndPan.y can be +-panRangeY
+    const panRangeX = Math.max(0, xMargin / 2); // scaleAndPan.x can be +-panRangeX
+    const panRangeY = Math.max(0, yMargin / 2); // scaleAndPan.y can be +-panRangeY
 
     console.log(`panRangeX = ${panRangeX}, panRangeY = ${panRangeY}`);
 
@@ -195,7 +198,7 @@ export class UserInterface extends Component {
   };
 
   incrementScale = (): void => {
-    let panMultiplier =
+    const panMultiplier =
       (1 + this.state.scaleAndPan.scale) / this.state.scaleAndPan.scale;
     this.setScaleAndPan({
       x: this.state.scaleAndPan.x * panMultiplier,
@@ -207,7 +210,7 @@ export class UserInterface extends Component {
   decrementScale = (): void => {
     // Zoom out only if zoomed in.
     if (this.state.scaleAndPan.scale > 1) {
-      let panMultiplier =
+      const panMultiplier =
         (this.state.scaleAndPan.scale - 1) / this.state.scaleAndPan.scale;
       this.setScaleAndPan({
         x: this.state.scaleAndPan.x * panMultiplier,
@@ -258,6 +261,15 @@ export class UserInterface extends Component {
         this.reuseEmptyAnnotation();
       });
     }
+  };
+
+  selectMagicSplineTool = (): void => {
+    // Change active tool to magic spline
+    if (this.state.activeTool != Tools.magicspline) {
+        this.setState({ activeTool: Tools.magicspline }, () => {
+          this.reuseEmptyAnnotation();
+        });
+      }
   };
 
   selectPaintbrushTool = (): void => {
@@ -343,7 +355,7 @@ export class UserInterface extends Component {
 
               <SplineCanvas
                 scaleAndPan={this.state.scaleAndPan}
-                isActive={this.state.activeTool === Tools.spline}
+                splineType={this.state.activeTool}
                 annotationsObject={this.annotationsObject}
                 imageData={this.state.imageData}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
@@ -514,7 +526,20 @@ export class UserInterface extends Component {
                           : "default"
                       }
                     >
-                      <Brush />
+                      <Timeline />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Magic spline">
+                    <IconButton
+                      id={"activate-magic-spline"}
+                      onClick={this.selectMagicSplineTool}
+                      color={
+                        Tools[this.state.activeTool] === Tools.magicspline
+                          ? "secondary"
+                          : "default"
+                      }
+                    >
+                      <Gesture />
                     </IconButton>
                   </Tooltip>
                 </AccordionDetails>

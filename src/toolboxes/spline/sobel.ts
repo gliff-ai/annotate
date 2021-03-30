@@ -1,3 +1,6 @@
+// This is a much modified version of https://github.com/miguelmota/sobel
+// by Miguel Mota, which is made available under the MIT license.
+
 export function calculateSobel(imageData: ImageData): ImageData {
   const width = imageData.width;
   const height = imageData.height;
@@ -14,8 +17,8 @@ export function calculateSobel(imageData: ImageData): ImageData {
     [1, 2, 1],
   ];
 
-  let sobelData: Uint8ClampedArray;
-  let greyscaleData: Uint8ClampedArray;
+  const sobelData = new Uint8ClampedArray(width * height * 4);
+  const greyscaleData = new Uint8ClampedArray(width * height * 4);
 
   function bindPixelAt(data: Uint8ClampedArray) {
     return function (x: number, y: number, channel?: number): number {
