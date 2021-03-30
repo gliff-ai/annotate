@@ -73,19 +73,9 @@ interface State {
   imageHeight: number;
   activeAnnotationID: number;
 
-  viewportPositionAndSize: {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  };
+  viewportPositionAndSize: Required<PositionAndSize>;
 
-  minimapPositionAndSize: {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  };
+  minimapPositionAndSize: Required<PositionAndSize>;
 
   expanded: string | boolean;
 }
