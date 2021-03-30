@@ -28,15 +28,11 @@ export function calculateSobel(imageData: ImageData): ImageData {
     return function (
       x: number,
       y: number,
-      r?: number,
-      g?: number,
-      b?: number,
-      alpha?: number
+      r = 0,
+      g = 0,
+      b = 0,
+      alpha = 0
     ): void {
-      r = r || 0;
-      g = g || 0;
-      b = b || 0;
-      alpha = alpha || 0;
       data[(width * y + x) * 4 + 0] = r;
       data[(width * y + x) * 4 + 1] = g;
       data[(width * y + x) * 4 + 2] = b;
