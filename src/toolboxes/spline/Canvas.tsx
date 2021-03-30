@@ -292,8 +292,9 @@ export class SplineCanvas extends Component<Props, State> {
   };
 
   snapToGradient = (clickPoint: XYPoint, sensitivity: number): XYPoint => {
-    let maxPixelX = clickPoint.x;
-    let maxPixelY = clickPoint.y;
+    let maxPixelX = Math.floor(clickPoint.x);
+    let maxPixelY = Math.floor(clickPoint.y);
+    // it's greyscale so just grab the red channel
     let maxPixelValue = this.gradientImage.data[
       (this.gradientImage.width * maxPixelY + maxPixelX) * 4 + 0
     ];
@@ -303,7 +304,7 @@ export class SplineCanvas extends Component<Props, State> {
           Math.sqrt((x - clickPoint.x) ** 2 + (y - clickPoint.y) ** 2),
           1
         );
-        if (distance <= sensitivity) {
+        if (distance <= 100) {
           // it's greyscale so just grab the red channel
           const pixelValue =
             this.gradientImage.data[
