@@ -1,7 +1,9 @@
-import React, { Component, ReactNode } from "react";
+import React, { Component, ReactNode, ReactElement } from "react";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
 import drawImageOnCanvas from "./drawImage";
+
+import { useBackgroundStore } from "./Store";
 
 interface Props extends BaseProps {
   imgSrc?: string;
@@ -10,7 +12,7 @@ interface Props extends BaseProps {
   brightness: number;
 }
 
-export class BackgroundCanvas extends Component<Props> {
+export class BackgroundCanvasClass extends Component<Props> {
   private baseCanvas: BaseCanvas;
 
   private image: HTMLImageElement;
@@ -65,3 +67,20 @@ export class BackgroundCanvas extends Component<Props> {
     />
   );
 }
+
+export const BackgroundCanvas = (
+  props: Omit<Props, "contrast" | "brightness">
+): ReactElement => {
+  const [background] = useBackgroundStore();
+
+  return (
+    <BackgroundCanvasClass
+      imgSrc={props.imgSrc}
+      updateImageDimensions={props.updateImageDimensions}
+      contrast={background.contrast}
+      brightness={background.brightness}
+      scaleAndPan={props.scaleAndPan}
+      canvasPositionAndSize={props.canvasPositionAndSize}
+    />
+  );
+};
