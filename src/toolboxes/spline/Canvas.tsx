@@ -304,13 +304,11 @@ export class SplineCanvas extends Component<Props, State> {
           Math.sqrt((x - clickPoint.x) ** 2 + (y - clickPoint.y) ** 2),
           1
         );
-        if (distance <= 100) {
+        if (distance <= 25) {
           // it's greyscale so just grab the red channel
-          const pixelValue =
-            this.gradientImage.data[
-              (this.gradientImage.width * y + x) * 4 + 0
-            ] /
-            distance ** 2;
+          const pixelValue = this.gradientImage.data[
+            (this.gradientImage.width * y + x) * 4 + 0
+          ]; // distance ** 2;
           if (pixelValue > maxPixelValue) {
             maxPixelValue = pixelValue;
             maxPixelX = x;
