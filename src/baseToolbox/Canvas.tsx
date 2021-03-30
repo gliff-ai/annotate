@@ -3,11 +3,11 @@ import React, { Component, ReactNode } from "react";
 import { XYPoint } from "@/annotation/interfaces";
 
 export interface PositionAndSize {
-    top?: number;
-    left?: number;
-    width?: number;
-    height?: number;
-  }
+  top?: number;
+  left?: number;
+  width?: number;
+  height?: number;
+}
 
 export interface Props {
   name?: string;

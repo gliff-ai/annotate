@@ -62,6 +62,8 @@ export function calculateSobel(imageData: ImageData): ImageData {
   const greyscalePixelAt = bindPixelAt(greyscaleData);
   const setSobelPixelAt = bindSetPixelAt(sobelData);
 
+  let magnitudeMax = 0;
+
   for (y = 0; y < height; y++) {
     for (x = 0; x < width; x++) {
       const pixelX =
@@ -87,10 +89,14 @@ export function calculateSobel(imageData: ImageData): ImageData {
         kernelY[2][2] * greyscalePixelAt(x + 1, y + 1);
 
       const magnitude = Math.sqrt(pixelX * pixelX + pixelY * pixelY) >>> 0;
-
+      console.log(magnitude);
+      if (magnitude > magnitudeMax) {
+        magnitudeMax = magnitude;
+      }
       setSobelPixelAt(x, y, magnitude, magnitude, magnitude, 255);
     }
   }
 
+  console.log(magnitudeMax);
   return new ImageData(sobelData, width, height);
 }

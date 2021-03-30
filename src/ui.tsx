@@ -30,7 +30,7 @@ import {
   Brush,
   RadioButtonUncheckedSharp,
   Timeline,
-  Gesture
+  Gesture,
 } from "@material-ui/icons";
 
 import { Annotations } from "./annotation";
@@ -285,7 +285,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
 
   updateImageData = (imageData: ImageData): void => {
     this.setState({
-      imageData: imageData
+      imageData: imageData,
     });
   };
 
@@ -301,10 +301,10 @@ export class UserInterface extends Component<Record<string, never>, State> {
   selectMagicSplineTool = (): void => {
     // Change active tool to magic spline
     if (this.state.activeTool != Tools.magicspline) {
-        this.setState({ activeTool: Tools.magicspline }, () => {
-          this.reuseEmptyAnnotation();
-        });
-      }
+      this.setState({ activeTool: Tools.magicspline }, () => {
+        this.reuseEmptyAnnotation();
+      });
+    }
   };
 
   selectPaintbrushTool = (): void => {
@@ -428,45 +428,45 @@ export class UserInterface extends Component<Record<string, never>, State> {
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
             />
-            </Grid>
+          </Grid>
 
-            <Grid item style={{ width: 200, position: "relative" }}>
-              <div style={{ height: 200 }}>
-                <BackgroundMinimap
-                  scaleAndPan={this.state.scaleAndPan}
-                  setScaleAndPan={this.setScaleAndPan}
-                  imgSrc={this.imageSource}
-                  canvasPositionAndSize={this.state.viewportPositionAndSize}
-                  minimapPositionAndSize={this.state.minimapPositionAndSize}
-                  setMinimapPositionAndSize={this.setMinimapPositionAndSize}
-                  contrast={this.state.contrast}
-                  brightness={this.state.brightness}
-                />
-              </div>
+          <Grid item style={{ width: 200, position: "relative" }}>
+            <div style={{ height: 200 }}>
+              <BackgroundMinimap
+                scaleAndPan={this.state.scaleAndPan}
+                setScaleAndPan={this.setScaleAndPan}
+                imgSrc={this.imageSource}
+                canvasPositionAndSize={this.state.viewportPositionAndSize}
+                minimapPositionAndSize={this.state.minimapPositionAndSize}
+                setMinimapPositionAndSize={this.setMinimapPositionAndSize}
+                contrast={this.state.contrast}
+                brightness={this.state.brightness}
+              />
+            </div>
 
-              <Grid container justify="center">
-                <ButtonGroup size="small" style={{ margin: "5px" }}>
-                  <Tooltip title="Zoom out">
-                    <Button id={"zoom-out"} onClick={this.decrementScale}>
-                      <ZoomOut />
-                    </Button>
-                  </Tooltip>
-                  <Tooltip title="Reset zoom and pan">
-                    <Button id={"reset"} onClick={this.resetScaleAndPan}>
-                      <AspectRatio />
-                    </Button>
-                  </Tooltip>
-                  <Tooltip title="Zoom in">
-                    <Button id={"zoom-in"} onClick={this.incrementScale}>
-                      <ZoomIn />
-                    </Button>
-                  </Tooltip>
-                </ButtonGroup>
+            <Grid container justify="center">
+              <ButtonGroup size="small" style={{ margin: "5px" }}>
+                <Tooltip title="Zoom out">
+                  <Button id={"zoom-out"} onClick={this.decrementScale}>
+                    <ZoomOut />
+                  </Button>
+                </Tooltip>
+                <Tooltip title="Reset zoom and pan">
+                  <Button id={"reset"} onClick={this.resetScaleAndPan}>
+                    <AspectRatio />
+                  </Button>
+                </Tooltip>
+                <Tooltip title="Zoom in">
+                  <Button id={"zoom-in"} onClick={this.incrementScale}>
+                    <ZoomIn />
+                  </Button>
+                </Tooltip>
+              </ButtonGroup>
 
-                <ButtonGroup size="small" style={{ marginBottom: "5px" }}>
-                  <Tooltip title="Pan up">
-                    <Button id={"pan-up"} onClick={this.incrementPanY}>
-                      <KeyboardArrowUp />
+              <ButtonGroup size="small" style={{ marginBottom: "5px" }}>
+                <Tooltip title="Pan up">
+                  <Button id={"pan-up"} onClick={this.incrementPanY}>
+                    <KeyboardArrowUp />
                   </Button>
                 </Tooltip>
                 <ButtonGroup size="small">
@@ -568,34 +568,34 @@ export class UserInterface extends Component<Record<string, never>, State> {
               <AccordionSummary expandIcon={<ExpandMore />} id="spline-toolbox">
                 <Typography>Splines</Typography>
               </AccordionSummary>
-                <AccordionDetails>
-                  <Tooltip title="Activate spline">
-                    <IconButton
-                      id={"activate-spline"}
-                      onClick={this.selectSplineTool}
-                      color={
-                        Tools[this.state.activeTool] === Tools.spline
-                          ? "secondary"
-                          : "default"
-                      }
-                    >
-                      <Timeline />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Magic spline">
-                    <IconButton
-                      id={"activate-magic-spline"}
-                      onClick={this.selectMagicSplineTool}
-                      color={
-                        Tools[this.state.activeTool] === Tools.magicspline
-                          ? "secondary"
-                          : "default"
-                      }
-                    >
-                      <Gesture />
-                    </IconButton>
-                  </Tooltip>
-                </AccordionDetails>
+              <AccordionDetails>
+                <Tooltip title="Activate spline">
+                  <IconButton
+                    id={"activate-spline"}
+                    onClick={this.selectSplineTool}
+                    color={
+                      Tools[this.state.activeTool] === Tools.spline
+                        ? "secondary"
+                        : "default"
+                    }
+                  >
+                    <Timeline />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Magic spline">
+                  <IconButton
+                    id={"activate-magic-spline"}
+                    onClick={this.selectMagicSplineTool}
+                    color={
+                      Tools[this.state.activeTool] === Tools.magicspline
+                        ? "secondary"
+                        : "default"
+                    }
+                  >
+                    <Gesture />
+                  </IconButton>
+                </Tooltip>
+              </AccordionDetails>
             </Accordion>
 
             <Accordion

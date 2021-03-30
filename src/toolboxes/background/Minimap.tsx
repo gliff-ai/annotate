@@ -38,11 +38,15 @@ export class BackgroundMinimap extends Component<Props> {
         scale: 1,
       });
     } else if (this.props.imageData !== undefined) {
-        drawImageOnCanvas(this.baseMinimap.baseCanvas.canvasContext, this.props.imageData, {
-            x: 0,
-            y: 0,
-            scale: 1,
-          });
+      drawImageOnCanvas(
+        this.baseMinimap.baseCanvas.canvasContext,
+        this.props.imageData,
+        {
+          x: 0,
+          y: 0,
+          scale: 1,
+        }
+      );
     }
   };
 
