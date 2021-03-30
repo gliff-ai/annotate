@@ -1,8 +1,8 @@
-import React from "react";
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
+import { getMinimapViewFinder, minimapToCanvas } from "@/transforms";
+import { PositionAndSize } from "@/baseToolbox";
+
 import { Props as BaseProps, BaseCanvas } from "./Canvas";
-import { getMinimapViewFinder, minimapToCanvas } from "../transforms";
-import { PositionAndSize } from "../annotation/interfaces";
 
 export interface Props extends BaseProps {
   cursor?: "move";
@@ -23,12 +23,10 @@ export interface Props extends BaseProps {
 
 export class BaseMinimap extends React.Component<Props> {
   public baseCanvas: BaseCanvas;
-  private boundingRect: PositionAndSize;
-  private isDragging: boolean;
 
-  constructor(props: Props) {
-    super(props);
-  }
+  private boundingRect: PositionAndSize;
+
+  private isDragging: boolean;
 
   componentDidMount = (): void => {
     this.applyView();
@@ -60,12 +58,12 @@ export class BaseMinimap extends React.Component<Props> {
     }
   };
 
-  /*** Mouse events ****/
-  onDoubleClick = (minimapX: number, minimapY: number): void => {
-    // DO STUFF
-  };
+  /** * Mouse events *** */
+  // onDoubleClick = (minimapX: number, minimapY: number): void => {
+  //   // DO STUFF
+  // };
 
-  panToMinimapTarget = (minimapX: number, minimapY: number) => {
+  panToMinimapTarget = (minimapX: number, minimapY: number): void => {
     // convert minimap click into viewport coordinate frame
     const { x: targetX, y: targetY } = minimapToCanvas(
       minimapX,
@@ -93,7 +91,7 @@ export class BaseMinimap extends React.Component<Props> {
     this.panToMinimapTarget(minimapX, minimapY);
   };
 
-  onMouseDown = (minimapX: number, minimapY: number): void => {
+  onMouseDown = (): void => {
     this.isDragging = true;
   };
 
@@ -103,30 +101,30 @@ export class BaseMinimap extends React.Component<Props> {
     }
   };
 
-  onMouseUp = (minimapX: number, minimapY: number): void => {
+  onMouseUp = (): void => {
     this.isDragging = false;
   };
 
-  onContextMenu = (minimapX: number, minimapY: number): void => {
-    // DO STUFF
-  };
+  // onContextMenu = (minimapX: number, minimapY: number): void => {
+  //   // DO STUFF
+  // };
 
-  render = (): ReactNode => {
-    return (
-      <BaseCanvas
-        cursor="move"
-        onDoubleClick={this.onDoubleClick}
-        onClick={this.onClick}
-        onMouseDown={this.onMouseDown}
-        onMouseMove={this.onMouseMove}
-        onMouseUp={this.onMouseUp}
-        onContextMenu={this.onContextMenu}
-        name={this.props.name}
-        scaleAndPan={{ x: 0, y: 0, scale: 1 }}
-        canvasPositionAndSize={this.props.minimapPositionAndSize}
-        setCanvasPositionAndSize={this.props.setMinimapPositionAndSize}
-        ref={(baseCanvas) => (this.baseCanvas = baseCanvas)}
-      />
-    );
-  };
+  render = (): ReactNode => (
+    <BaseCanvas
+      cursor="move"
+      // onDoubleClick={this.onDoubleClick}
+      onClick={this.onClick}
+      onMouseDown={this.onMouseDown}
+      onMouseMove={this.onMouseMove}
+      onMouseUp={this.onMouseUp}
+      // onContextMenu={this.onContextMenu}
+      name={this.props.name}
+      scaleAndPan={{ x: 0, y: 0, scale: 1 }}
+      canvasPositionAndSize={this.props.minimapPositionAndSize}
+      setCanvasPositionAndSize={this.props.setMinimapPositionAndSize}
+      ref={(baseCanvas) => {
+        this.baseCanvas = baseCanvas;
+      }}
+    />
+  );
 }

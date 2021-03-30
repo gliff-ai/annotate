@@ -1,17 +1,19 @@
-import React, { ReactNode } from "react";
-import { Component } from "react";
-import { Theme } from "@material-ui/core/styles";
+import React, { ReactNode, Component } from "react";
 
-import { BaseCanvas, CanvasProps as BaseProps } from "../../baseCanvas";
-import { Annotations } from "../../annotation";
-import { canvasToImage, imageToCanvas } from "../../transforms";
-import { Annotation, XYPoint } from "../../annotation/interfaces";
+import {
+  BaseCanvas,
+  CanvasProps as BaseProps,
+  PositionAndSize,
+} from "@/baseToolbox";
+import { Annotations } from "@/annotation";
+import { canvasToImage, imageToCanvas } from "@/transforms";
+import { Annotation, XYPoint } from "@/annotation/interfaces";
+import { theme } from "@/theme";
 import { calculateSobel } from "./sobel";
 
 interface Props extends BaseProps {
   splineType: string;
   annotationsObject: Annotations;
-  theme: Theme;
 }
 enum Mode {
   draw,
@@ -25,22 +27,24 @@ export const events = [
   "deleteSelectedPoint",
   "changeSplineModeToEdit",
   "deselectPoint",
+  "closeLoop",
 ] as const;
 
 interface Event extends CustomEvent {
   type: typeof events[number];
 }
 
-export class SplineCanvas extends Component<Props> {
+interface State {
+  mode: number;
+  isActive: boolean;
+}
+
+export class SplineCanvas extends Component<Props, State> {
   readonly name = "spline";
 
   private baseCanvas: BaseCanvas;
   private selectedPointIndex: number;
   private isDragging: boolean;
-  state: {
-    mode: number;
-    isActive: boolean;
-  };
   private gradientImage: ImageData;
   private snapeSensitivity: number;
   private magicCounter: number;
@@ -53,14 +57,46 @@ export class SplineCanvas extends Component<Props> {
     this.state = { mode: Mode.draw, isActive: false };
   }
 
+  componentDidUpdate(prevProps: Props): void {
+    // Redraw if we change pan or zoom
+    const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
+
+    // Change mode if we change the spline type prop
+    if (this.props.splineType !== prevProps.splineType) {
+      this.updateMode();
+    }
+
+    if (activeAnnotation?.coordinates) {
+      this.drawAllSplines();
+    }
+  }
+
+  componentDidMount(): void {
+    for (const event of events) {
+      document.addEventListener(event, this.handleEvent);
+    }
+  }
+
+  componentWillUnmount(): void {
+    for (const event of events) {
+      document.removeEventListener(event, this.handleEvent);
+    }
+  }
+
+  handleEvent = (event: Event): void => {
+    if (event.detail === this.name) {
+      this[event.type]?.call(this);
+    }
+  };
+
   drawSplineVector = (splineVector: XYPoint[], isActive = false): void => {
     if (splineVector.length === 0) return;
 
     const { canvasContext: context } = this.baseCanvas;
     const lineWidth = isActive ? 2 : 1;
     context.lineWidth = lineWidth;
-    context.strokeStyle = this.props.theme.palette.secondary.dark;
-    context.fillStyle = this.props.theme.palette.primary.dark;
+    context.strokeStyle = theme.palette.secondary.dark;
+    context.fillStyle = theme.palette.primary.dark;
     const pointSize = 6;
     let nextPoint;
 
@@ -152,13 +188,13 @@ export class SplineCanvas extends Component<Props> {
 
   private changeSplineModeToEdit = () => {
     // TODO: add keyboard shortcuts for switching between modes
-    this.state.mode = Mode.edit; // Change mode to edit mode
+    this.setState({ mode: Mode.edit });
     this.deselectPoint();
   };
 
   public changeSplineModeToMagic = () => {
     // TODO: add keyboard shortcuts for switching between modes
-    this.state.mode = Mode.magic; // Change mode to edit mode
+    this.setState({ mode: Mode.magic });
     this.calculateGradientImage();
   };
 
@@ -169,9 +205,7 @@ export class SplineCanvas extends Component<Props> {
 
   deleteSelectedPoint = (): void => {
     if (this.selectedPointIndex === -1) return;
-    const {
-      coordinates: coordinates,
-    } = this.props.annotationsObject.getActiveAnnotation();
+    const { coordinates } = this.props.annotationsObject.getActiveAnnotation();
     const isClosed = this.isClosed(coordinates);
 
     // If close spline
@@ -201,7 +235,7 @@ export class SplineCanvas extends Component<Props> {
       coordinates.splice(this.selectedPointIndex, 1);
     }
     if (coordinates.length === 0) {
-      this.state.mode = Mode.draw;
+      this.setState({ mode: Mode.draw, isActive: true });
     }
 
     this.selectedPointIndex -= 1;
@@ -226,7 +260,7 @@ export class SplineCanvas extends Component<Props> {
       this.props.canvasPositionAndSize
     );
 
-    for (let i = 0; i < splineVector.length; i++) {
+    for (let i = 0; i < splineVector.length; i += 1) {
       // transform points into canvas space so the nudge radius won't depend on zoom level:
       let point = splineVector[i];
       point = imageToCanvas(
@@ -249,8 +283,7 @@ export class SplineCanvas extends Component<Props> {
   };
 
   updateXYPoint = (newX: number, newY: number, index: number): void => {
-    const coordinates = this.props.annotationsObject.getActiveAnnotation()
-      .coordinates;
+    const { coordinates } = this.props.annotationsObject.getActiveAnnotation();
     coordinates[index] = { x: newX, y: newY };
   };
 
@@ -259,21 +292,24 @@ export class SplineCanvas extends Component<Props> {
   };
 
   snapToGradient = (clickPoint: XYPoint, sensitivity: number): XYPoint => {
-      let maxPixelX = clickPoint.x;
-      let maxPixelY = clickPoint.y;
-      let maxPixelValue = this.gradientImage.data[
-        (this.gradientImage.width * maxPixelY + maxPixelX) * 4 + 0
-      ];
+    let maxPixelX = clickPoint.x;
+    let maxPixelY = clickPoint.y;
+    let maxPixelValue = this.gradientImage.data[
+      (this.gradientImage.width * maxPixelY + maxPixelX) * 4 + 0
+    ];
     for (let y = 0; y < this.gradientImage.height; y++) {
       for (let x = 0; x < this.gradientImage.width; x++) {
-        const distance = Math.sqrt(
-          (x - clickPoint.x) ** 2 + (y - clickPoint.y) ** 2
+        const distance = Math.max(
+          Math.sqrt((x - clickPoint.x) ** 2 + (y - clickPoint.y) ** 2),
+          1
         );
         if (distance <= sensitivity) {
           // it's greyscale so just grab the red channel
-          const pixelValue = this.gradientImage.data[
-            (this.gradientImage.width * y + x) * 4 + 0
-          ] / (distance**2);
+          const pixelValue =
+            this.gradientImage.data[
+              (this.gradientImage.width * y + x) * 4 + 0
+            ] /
+            distance ** 2;
           if (pixelValue > maxPixelValue) {
             maxPixelValue = pixelValue;
             maxPixelX = x;
@@ -339,7 +375,7 @@ export class SplineCanvas extends Component<Props> {
     this.drawAllSplines();
   };
 
-  onDoubleClick = (): void => {
+  closeLoop = (): void => {
     // Append the first spline point to the end, making a closed polygon
 
     const activeSpline = this.props.annotationsObject.getActiveAnnotation()
@@ -357,6 +393,8 @@ export class SplineCanvas extends Component<Props> {
 
     this.drawAllSplines();
   };
+
+  onDoubleClick = (): void => {};
 
   onMouseDown = (x: number, y: number): void => {
     const clickPoint = canvasToImage(
@@ -411,7 +449,6 @@ export class SplineCanvas extends Component<Props> {
       this.magicCounter = this.magicCounter + 1;
       // add gradient-snapped coordinates to the current spline annotation
       if (this.magicCounter >= 10) {
-          debugger;
         activeSpline.push(
           this.snapToGradient(clickPoint, this.snapeSensitivity)
         );
@@ -435,29 +472,22 @@ export class SplineCanvas extends Component<Props> {
     this.isDragging = false;
   };
 
-  isClosed = (splineVector: XYPoint[]): boolean => {
+  isClosed = (splineVector: XYPoint[]): boolean =>
     // Check whether the spline is a closed loop.
-    return (
-      splineVector.length > 1 &&
-      splineVector[0].x === splineVector[splineVector.length - 1].x &&
-      splineVector[0].y === splineVector[splineVector.length - 1].y
-    );
-  };
+    splineVector.length > 1 &&
+    splineVector[0].x === splineVector[splineVector.length - 1].x &&
+    splineVector[0].y === splineVector[splineVector.length - 1].y;
 
   private addNewPointNearSpline = (x: number, y: number): void => {
     // Add a new point near the spline.
-    const {
-      coordinates: coordinates,
-    } = this.props.annotationsObject.getActiveAnnotation();
+    const { coordinates } = this.props.annotationsObject.getActiveAnnotation();
 
-    const dist = (x1: number, y1: number, x2: number, y2: number): number => {
+    const dist = (x1: number, y1: number, x2: number, y2: number): number =>
       // Calculate Euclidean distance between two points (x1, y1) and (x2, y2).
-      return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-    };
-
+      Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
     let newPointIndex: number; // Index at which the new point is inserted
     let minDist = Number.MAX_VALUE; // Minimum distance
-    for (let i = 1; i < coordinates.length; i++) {
+    for (let i = 1; i < coordinates.length; i += 1) {
       // For each pair of consecutive points
       const prevPoint = coordinates[i - 1];
       const nextPoint = coordinates[i];
@@ -492,38 +522,6 @@ export class SplineCanvas extends Component<Props> {
         this.setState({ mode: Mode.draw, isActive: false });
         break;
       }
-    }
-  }
-
-  componentDidUpdate(prevProps: Props): void {
-    // Redraw if we change pan or zoom
-    const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
-
-    // Change mode if we change the spline type prop
-    if (this.props.splineType !== prevProps.splineType) {
-      this.updateMode();
-    }
-
-    if (activeAnnotation?.coordinates) {
-      this.drawAllSplines();
-    }
-  }
-
-  handleEvent = (event: Event): void => {
-    if (event.detail === this.name) {
-      this[event.type]?.call(this);
-    }
-  };
-
-  componentDidMount(): void {
-    for (const event of events) {
-      document.addEventListener(event, this.handleEvent);
-    }
-  }
-
-  componentWillUnmount(): void {
-    for (const event of events) {
-      document.removeEventListener(event, this.handleEvent);
     }
   }
 

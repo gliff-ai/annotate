@@ -92,9 +92,5 @@ export function calculateSobel(imageData: ImageData): ImageData {
     }
   }
 
-  return {
-    width,
-    height,
-    data: sobelData,
-  };
+  return new ImageData(sobelData, width, height);
 }

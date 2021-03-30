@@ -1,6 +1,6 @@
-export default function drawImageOnCanvas(
+export function drawImageOnCanvas(
   ctx: CanvasRenderingContext2D,
-  img: HTMLImageElement,
+  image: HTMLImageElement | ImageData,
   scaleAndPan: {
     x: number;
     y: number;
@@ -12,8 +12,8 @@ export default function drawImageOnCanvas(
   const h = ctx.canvas.height;
 
   // How much do we need to shrink the image to fit it all in?
-  const imageWidth = img.width;
-  const imageHeight = img.height;
+  const imageWidth = image.width;
+  const imageHeight = image.height;
   const ratio = Math.min(w / imageWidth, h / imageHeight);
 
   let newWidth = imageWidth * ratio; // scaled image width;
@@ -26,5 +26,9 @@ export default function drawImageOnCanvas(
   const offsetY = h / 2 - newHeight / 2 + scaleAndPan.y;
 
   // fill image in dest. rectangle
-  ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
+  if (image instanceof HTMLImageElement) {
+    ctx.drawImage(image, offsetX, offsetY, newWidth, newHeight);
+  } else if (image instanceof ImageData) {
+    ctx.putImageData(image, offsetX, offsetY); // FIXME seems not to actually work
+  }
 }

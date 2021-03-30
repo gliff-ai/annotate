@@ -1,7 +1,5 @@
 import React, { Component, ChangeEvent, ReactNode } from "react";
 
-import { Annotations } from "./annotation";
-
 import {
   AppBar,
   Container,
@@ -35,8 +33,11 @@ import {
   Gesture
 } from "@material-ui/icons";
 
-import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
+import { Annotations } from "./annotation";
 
+import { ThemeProvider, theme } from "./theme";
+
+import { PositionAndSize } from "./baseToolbox";
 import { BackgroundCanvas, BackgroundMinimap } from "./toolboxes/background";
 import { SplineCanvas } from "./toolboxes/spline";
 import { PaintbrushCanvas } from "./toolboxes/paintbrush";
@@ -53,40 +54,34 @@ enum Tools {
   magicspline = "magicspline",
 }
 
-export class UserInterface extends Component {
-  state: {
-    scaleAndPan: {
-      x: number;
-      y: number;
-      scale: number;
-    };
-    activeTool?: Tools;
-    imageData?: ImageData;
-    activeAnnotationID: number;
-    brushSize: number;
-    contrast: number;
-    brightness: number;
+interface Event extends CustomEvent {
+  type: typeof events[number];
+}
 
-    viewportPositionAndSize: {
-      top: number;
-      left: number;
-      width: number;
-      height: number;
-    };
+// Here we define the methods that are exposed to be called by keyboard shortcuts
+export const events = ["nextAnnotation", "previousAnnotation"] as const;
 
-    minimapPositionAndSize: {
-      top: number;
-      left: number;
-      width: number;
-      height: number;
-    };
-
-    expanded: string | boolean;
+interface State {
+  scaleAndPan: {
+    x: number;
+    y: number;
+    scale: number;
   };
-
+  activeTool?: Tools;
+  imageData?: ImageData;
+  activeAnnotationID: number;
+  brushSize: number;
+  contrast: number;
+  brightness: number;
+  viewportPositionAndSize: PositionAndSize;
+  minimapPositionAndSize: PositionAndSize;
+  expanded: string | boolean;
+}
+export class UserInterface extends Component<Record<string, never>, State> {
   annotationsObject: Annotations;
-  theme: Theme;
+
   imageSource: string;
+
   private presetLabels: string[];
 
   constructor(props: never) {
@@ -108,53 +103,97 @@ export class UserInterface extends Component {
       contrast: SLIDER_CONFIG[Sliders.contrast].initial,
     };
 
-    this.theme = createMuiTheme({
-      palette: {
-        type: "dark",
-      },
-    });
     this.imageSource = "zebrafish-heart.jpg";
+
     this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
-    this.presetLabels = ["label-1", "label-2", "label-3"]; //TODO: find a place for this
+    this.presetLabels = ["label-1", "label-2", "label-3"]; // TODO: find a place for this
   }
 
-  setViewportPositionAndSize = (viewportPositionAndSize: {
-    top?: number;
-    left?: number;
-    width?: number;
-    height?: number;
-  }): void => {
-    viewportPositionAndSize.top ??= this.state.viewportPositionAndSize.top;
-    viewportPositionAndSize.left ??= this.state.viewportPositionAndSize.left;
-    viewportPositionAndSize.width ??= this.state.viewportPositionAndSize.width;
-    viewportPositionAndSize.height ??= this.state.viewportPositionAndSize.height;
-    this.setState({ viewportPositionAndSize });
+  componentDidMount = (): void => {
+    document.addEventListener("keydown", keydownListener);
+    for (const event of events) {
+      document.addEventListener(event, this.handleEvent);
+    }
   };
 
-  setMinimapPositionAndSize = (minimapPositionAndSize: {
-    top?: number;
-    left?: number;
-    width?: number;
-    height?: number;
-  }): void => {
-    minimapPositionAndSize.top ??= this.state.minimapPositionAndSize.top;
-    minimapPositionAndSize.left ??= this.state.minimapPositionAndSize.left;
-    minimapPositionAndSize.width ??= this.state.minimapPositionAndSize.width;
-    minimapPositionAndSize.height ??= this.state.minimapPositionAndSize.height;
-    this.setState({ minimapPositionAndSize });
+  componentWillUnmount(): void {
+    for (const event of events) {
+      document.removeEventListener(event, this.handleEvent);
+    }
+  }
+
+  setViewportPositionAndSize = (
+    newViewportPositionAndSize: PositionAndSize
+  ): void => {
+    this.setState((prevState: State) => {
+      const { viewportPositionAndSize } = prevState;
+      return {
+        viewportPositionAndSize: {
+          top: newViewportPositionAndSize.top || viewportPositionAndSize.top,
+          left: newViewportPositionAndSize.left || viewportPositionAndSize.left,
+          width:
+            newViewportPositionAndSize.width || viewportPositionAndSize.width,
+          height:
+            newViewportPositionAndSize.height || viewportPositionAndSize.height,
+        },
+      };
+    });
   };
 
-  setScaleAndPan = (scaleAndPan: {
+  handleEvent = (event: Event): void => {
+    if (event.detail === "ui") {
+      this[event.type]?.call(this);
+    }
+  };
+
+  setMinimapPositionAndSize = (
+    newMinimapPositionAndSize: PositionAndSize
+  ): void => {
+    this.setState((prevState: State) => {
+      const { minimapPositionAndSize } = prevState;
+      return {
+        minimapPositionAndSize: {
+          top: newMinimapPositionAndSize.top || minimapPositionAndSize.top,
+          left: newMinimapPositionAndSize.left || minimapPositionAndSize.left,
+          width:
+            newMinimapPositionAndSize.width || minimapPositionAndSize.width,
+          height:
+            newMinimapPositionAndSize.height || minimapPositionAndSize.height,
+        },
+      };
+    });
+  };
+
+  setScaleAndPan = (newScaleAndPan: {
     scale?: number;
     x?: number;
     y?: number;
   }): void => {
-    // the is for passing down to the minimap
-    scaleAndPan.scale ??= this.state.scaleAndPan.scale;
-    scaleAndPan.x ??= this.state.scaleAndPan.x;
-    scaleAndPan.y ??= this.state.scaleAndPan.y;
-    this.setState({ scaleAndPan }, this.limitPan); // this sets limitPan as a callback after state update, ensuring it will use the new scaleAndPan
+    this.setState((prevState: State) => {
+      const { scaleAndPan } = prevState;
+      return {
+        scaleAndPan: {
+          x: newScaleAndPan.x || scaleAndPan.x,
+          y: newScaleAndPan.y || scaleAndPan.y,
+          scale: newScaleAndPan.scale || scaleAndPan.scale,
+        },
+      };
+    }, this.limitPan); // this sets limitPan as a callback after state update, ensuring it will use the new scaleAndPan
   };
+
+  incrementScaleAndPan = (key: "x" | "y" | "scale", increment: number): void =>
+    this.setState((prevState: State) => {
+      const { scaleAndPan } = prevState;
+      scaleAndPan[key] += increment;
+      return { scaleAndPan };
+    });
+
+  multiplyScaleAndPan = (key: "x" | "y" | "scale", multiple: number): void =>
+    this.setState((prevState: State) => {
+      const { scaleAndPan } = prevState;
+      scaleAndPan[key] *= multiple;
+      return { scaleAndPan };
+    });
 
   limitPan = (): void => {
     // adjust pan such that image borders are not inside the canvas
@@ -180,17 +219,15 @@ export class UserInterface extends Component {
     const panRangeX = Math.max(0, xMargin / 2); // scaleAndPan.x can be +-panRangeX
     const panRangeY = Math.max(0, yMargin / 2); // scaleAndPan.y can be +-panRangeY
 
-    console.log(`panRangeX = ${panRangeX}, panRangeY = ${panRangeY}`);
-
     // move pan into the allowable range:
     let panX = this.state.scaleAndPan.x;
     let panY = this.state.scaleAndPan.y;
     panX = Math.min(panRangeX, Math.abs(panX)) * Math.sign(panX);
     panY = Math.min(panRangeY, Math.abs(panY)) * Math.sign(panY);
 
-    this.setState({
-      scaleAndPan: { x: panX, y: panY, scale: this.state.scaleAndPan.scale },
-    });
+    this.setState((prevState: State) => ({
+      scaleAndPan: { x: panX, y: panY, scale: prevState.scaleAndPan.scale },
+    }));
   };
 
   resetScaleAndPan = (): void => {
@@ -200,11 +237,10 @@ export class UserInterface extends Component {
   incrementScale = (): void => {
     const panMultiplier =
       (1 + this.state.scaleAndPan.scale) / this.state.scaleAndPan.scale;
-    this.setScaleAndPan({
-      x: this.state.scaleAndPan.x * panMultiplier,
-      y: this.state.scaleAndPan.y * panMultiplier,
-      scale: this.state.scaleAndPan.scale + 1,
-    });
+
+    this.multiplyScaleAndPan("x", panMultiplier);
+    this.multiplyScaleAndPan("y", panMultiplier);
+    this.incrementScaleAndPan("scale", 1);
   };
 
   decrementScale = (): void => {
@@ -212,40 +248,39 @@ export class UserInterface extends Component {
     if (this.state.scaleAndPan.scale > 1) {
       const panMultiplier =
         (this.state.scaleAndPan.scale - 1) / this.state.scaleAndPan.scale;
-      this.setScaleAndPan({
-        x: this.state.scaleAndPan.x * panMultiplier,
-        y: this.state.scaleAndPan.y * panMultiplier,
-        scale: this.state.scaleAndPan.scale - 1,
-      });
+
+      this.multiplyScaleAndPan("x", panMultiplier);
+      this.multiplyScaleAndPan("y", panMultiplier);
+      this.incrementScaleAndPan("scale", -1);
     }
   };
 
   incrementPanX = (): void => {
     // negative is left, +ve is right...
-    this.setScaleAndPan({ x: this.state.scaleAndPan.x + 20 });
+    this.incrementScaleAndPan("x", 20);
   };
 
   decrementPanX = (): void => {
     // negative is left, +ve is right...
-    this.setScaleAndPan({ x: this.state.scaleAndPan.x - 20 });
+    this.incrementScaleAndPan("x", -20);
   };
 
   incrementPanY = (): void => {
     // negative is up, +ve is down...
-    this.setScaleAndPan({ y: this.state.scaleAndPan.y + 20 });
+    this.incrementScaleAndPan("y", 20);
   };
 
   decrementPanY = (): void => {
     // negative is up, +ve is down...
-    this.setScaleAndPan({ y: this.state.scaleAndPan.y - 20 });
+    this.incrementScaleAndPan("y", -20);
   };
 
   incrementBrush = (): void => {
-    this.setState({ brushSize: this.state.brushSize + 10 });
+    this.setState((state) => ({ brushSize: state.brushSize + 10 }));
   };
 
   toggleEraser = (): void => {
-    this.setState({ activeTool: "eraser" });
+    this.setState({ activeTool: Tools.eraser });
   };
 
   updateImageData = (imageData: ImageData): void => {
@@ -256,7 +291,7 @@ export class UserInterface extends Component {
 
   selectSplineTool = (): void => {
     // Change active tool to spline.
-    if (this.state.activeTool != Tools.spline) {
+    if (this.state.activeTool !== Tools.spline) {
       this.setState({ activeTool: Tools.spline }, () => {
         this.reuseEmptyAnnotation();
       });
@@ -274,7 +309,7 @@ export class UserInterface extends Component {
 
   selectPaintbrushTool = (): void => {
     // Change active tool to paintbrush.
-    if (this.state.activeTool != Tools.paintbrush) {
+    if (this.state.activeTool !== Tools.paintbrush) {
       this.setState({ activeTool: Tools.paintbrush }, () => {
         this.reuseEmptyAnnotation();
       });
@@ -283,7 +318,7 @@ export class UserInterface extends Component {
 
   selectEraserTool = (): void => {
     // Change active tool to paintbrush.
-    if (this.state.activeTool != Tools.eraser) {
+    if (this.state.activeTool !== Tools.eraser) {
       this.setState({ activeTool: Tools.eraser }, () => {
         this.reuseEmptyAnnotation();
       });
@@ -294,6 +329,33 @@ export class UserInterface extends Component {
     this.annotationsObject.addAnnotation(Tools[this.state.activeTool]);
     this.setState({
       activeAnnotationID: this.annotationsObject.getActiveAnnotationID(),
+    });
+  };
+
+  nextAnnotation = (): void => {
+    this.cycleActiveAnnotation(true);
+  };
+
+  previousAnnotation = (): void => {
+    this.cycleActiveAnnotation(false);
+  };
+
+  cycleActiveAnnotation = (forward = true): void => {
+    const data = this.annotationsObject.getAllAnnotations();
+    this.setState((prevState) => {
+      let i = prevState.activeAnnotationID;
+      const inc = forward ? 1 : -1;
+
+      // cycle i forward or backward until we reach another annotation whose toolbox attribute matches the current activeTool:
+      do {
+        // increment or decrement i by 1, wrapping around if we go above the length of the array(-1) or below 0:
+        i =
+          (i + inc + this.annotationsObject.length()) %
+          this.annotationsObject.length();
+      } while (data[i].toolbox !== Tools[prevState.activeTool]);
+
+      this.annotationsObject.setActiveAnnotationID(i);
+      return { activeAnnotationID: i };
     });
   };
 
@@ -314,65 +376,58 @@ export class UserInterface extends Component {
     this.setState({ expanded: isExpanded ? panel : false });
   };
 
-  handleSliderChange = (state: string) => (
+  handleSliderChange = <K extends keyof State>(key: K) => (
     event: ChangeEvent,
-    value: number
+    value: State[K]
   ): void => {
-    this.setState({ [state]: value });
+    this.setState({ [key]: value } as Pick<State, K>);
   };
 
-  componentDidMount = (): void => {
-    document.addEventListener("keydown", keydownListener);
-  };
+  render = (): ReactNode => (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Container disableGutters>
+        <AppBar>
+          <Toolbar>
+            <Tooltip title="Annotate new object">
+              <IconButton id="addAnnotation" onClick={this.addAnnotation}>
+                <Add />
+              </IconButton>
+            </Tooltip>
+          </Toolbar>
+        </AppBar>
+        <Toolbar />
 
-  render = (): ReactNode => {
-    return (
-      <ThemeProvider theme={this.theme}>
-        <CssBaseline />
-        <Container disableGutters={true}>
-          <AppBar>
-            <Toolbar>
-              <Tooltip title="Annotate new object">
-                <IconButton id={"addAnnotation"} onClick={this.addAnnotation}>
-                  <Add />
-                </IconButton>
-              </Tooltip>
-            </Toolbar>
-          </AppBar>
-          <Toolbar />
+        <Grid container spacing={0} justify="center" wrap="nowrap">
+          <Grid item style={{ width: "85%", position: "relative" }}>
+            <BackgroundCanvas
+              scaleAndPan={this.state.scaleAndPan}
+              canvasPositionAndSize={this.state.viewportPositionAndSize}
+              setCanvasPositionAndSize={this.setViewportPositionAndSize}
+              imgSrc={this.imageSource}
+              updateImageData={this.updateImageData}
+              contrast={this.state.contrast}
+              brightness={this.state.brightness}
+            />
 
-          <Grid container spacing={0} justify="center" wrap="nowrap">
-            <Grid item style={{ width: "85%", position: "relative" }}>
-              <BackgroundCanvas
-                scaleAndPan={this.state.scaleAndPan}
-                imgSrc={this.imageSource}
-                updateImageData={this.updateImageData}
-                canvasPositionAndSize={this.state.viewportPositionAndSize}
-                setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                contrast={this.state.contrast}
-                brightness={this.state.brightness}
-              />
+            <SplineCanvas
+              scaleAndPan={this.state.scaleAndPan}
+              splineType={this.state.activeTool}
+              annotationsObject={this.annotationsObject}
+              imageData={this.state.imageData}
+              canvasPositionAndSize={this.state.viewportPositionAndSize}
+              setCanvasPositionAndSize={this.setViewportPositionAndSize}
+            />
 
-              <SplineCanvas
-                scaleAndPan={this.state.scaleAndPan}
-                splineType={this.state.activeTool}
-                annotationsObject={this.annotationsObject}
-                imageData={this.state.imageData}
-                canvasPositionAndSize={this.state.viewportPositionAndSize}
-                setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                theme={this.theme}
-              />
-
-              <PaintbrushCanvas
-                scaleAndPan={this.state.scaleAndPan}
-                brushType={this.state.activeTool}
-                annotationsObject={this.annotationsObject}
-                imageData={this.state.imageData}
-                brushRadius={this.state.brushSize}
-                canvasPositionAndSize={this.state.viewportPositionAndSize}
-                setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                theme={this.theme}
-              />
+            <PaintbrushCanvas
+              scaleAndPan={this.state.scaleAndPan}
+              brushType={this.state.activeTool}
+              annotationsObject={this.annotationsObject}
+              imageData={this.state.imageData}
+              brushRadius={this.state.brushSize}
+              canvasPositionAndSize={this.state.viewportPositionAndSize}
+              setCanvasPositionAndSize={this.setViewportPositionAndSize}
+            />
             </Grid>
 
             <Grid item style={{ width: 200, position: "relative" }}>
@@ -381,7 +436,6 @@ export class UserInterface extends Component {
                   scaleAndPan={this.state.scaleAndPan}
                   setScaleAndPan={this.setScaleAndPan}
                   imgSrc={this.imageSource}
-                  imageData={this.state.imageData}
                   canvasPositionAndSize={this.state.viewportPositionAndSize}
                   minimapPositionAndSize={this.state.minimapPositionAndSize}
                   setMinimapPositionAndSize={this.setMinimapPositionAndSize}
@@ -413,108 +467,107 @@ export class UserInterface extends Component {
                   <Tooltip title="Pan up">
                     <Button id={"pan-up"} onClick={this.incrementPanY}>
                       <KeyboardArrowUp />
+                  </Button>
+                </Tooltip>
+                <ButtonGroup size="small">
+                  <Tooltip title="Pan left">
+                    <Button id="pan-left" onClick={this.incrementPanX}>
+                      <KeyboardArrowLeft />
                     </Button>
                   </Tooltip>
-                  <ButtonGroup size="small">
-                    <Tooltip title="Pan left">
-                      <Button id={"pan-left"} onClick={this.incrementPanX}>
-                        <KeyboardArrowLeft />
-                      </Button>
-                    </Tooltip>
-                    <Tooltip title="Pan right">
-                      <Button id={"pan-right"} onClick={this.decrementPanX}>
-                        <KeyboardArrowRight />
-                      </Button>
-                    </Tooltip>
-                  </ButtonGroup>
-                  <Tooltip title="Pan down">
-                    <Button id={"pan-down"} onClick={this.decrementPanY}>
-                      <KeyboardArrowDown />
+                  <Tooltip title="Pan right">
+                    <Button id="pan-right" onClick={this.decrementPanX}>
+                      <KeyboardArrowRight />
                     </Button>
                   </Tooltip>
                 </ButtonGroup>
-              </Grid>
+                <Tooltip title="Pan down">
+                  <Button id="pan-down" onClick={this.decrementPanY}>
+                    <KeyboardArrowDown />
+                  </Button>
+                </Tooltip>
+              </ButtonGroup>
+            </Grid>
 
-              <Accordion
-                expanded={this.state.expanded === "background-toolbox"}
-                onChange={this.handleToolboxChange("background-toolbox")}
+            <Accordion
+              expanded={this.state.expanded === "background-toolbox"}
+              onChange={this.handleToolboxChange("background-toolbox")}
+            >
+              <AccordionSummary
+                expandIcon={<ExpandMore />}
+                id="background-toolbox"
               >
-                <AccordionSummary
-                  expandIcon={<ExpandMore />}
-                  id="background-toolbox"
-                >
-                  <Typography>Background</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Grid container spacing={0} justify="center" wrap="nowrap">
-                    <Grid item style={{ width: "85%", position: "relative" }}>
-                      <BaseSlider
-                        value={this.state.contrast}
-                        config={SLIDER_CONFIG[Sliders.contrast]}
-                        onChange={this.handleSliderChange}
-                      />
-                      <BaseSlider
-                        value={this.state.brightness}
-                        config={SLIDER_CONFIG[Sliders.brightness]}
-                        onChange={this.handleSliderChange}
-                      />
-                    </Grid>
+                <Typography>Background</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid container spacing={0} justify="center" wrap="nowrap">
+                  <Grid item style={{ width: "85%", position: "relative" }}>
+                    <BaseSlider
+                      value={this.state.contrast}
+                      config={SLIDER_CONFIG[Sliders.contrast]}
+                      onChange={this.handleSliderChange}
+                    />
+                    <BaseSlider
+                      value={this.state.brightness}
+                      config={SLIDER_CONFIG[Sliders.brightness]}
+                      onChange={this.handleSliderChange}
+                    />
                   </Grid>
-                </AccordionDetails>
-              </Accordion>
-              <Accordion
-                expanded={this.state.expanded === "paintbrush-toolbox"}
-                onChange={this.handleToolboxChange("paintbrush-toolbox")}
-              >
-                <AccordionSummary
-                  expandIcon={<ExpandMore />}
-                  id="paintbrush-toolbox"
-                >
-                  <Typography>Paintbrushes</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Tooltip title="Activate paintbrush">
-                    <IconButton
-                      id={"activate-paintbrush"}
-                      onClick={this.selectPaintbrushTool}
-                      color={
-                        Tools[this.state.activeTool] === Tools.paintbrush
-                          ? "secondary"
-                          : "default"
-                      }
-                    >
-                      <Brush />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Increase brush size">
-                    <IconButton
-                      id={"increase-paintbrush-radius"}
-                      onClick={this.incrementBrush}
-                    >
-                      <AllOut />
-                    </IconButton>
-                  </Tooltip>
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
 
-                  <Tooltip title="Activate Eraser">
-                    <IconButton
-                      id={"activate-eraser"}
-                      onClick={this.selectEraserTool}
-                    >
-                      <RadioButtonUncheckedSharp />
-                    </IconButton>
-                  </Tooltip>
-                </AccordionDetails>
-              </Accordion>
-              <Accordion
-                expanded={this.state.expanded === "spline-toolbox"}
-                onChange={this.handleToolboxChange("spline-toolbox")}
+            <Accordion
+              expanded={this.state.expanded === "paintbrush-toolbox"}
+              onChange={this.handleToolboxChange("paintbrush-toolbox")}
+            >
+              <AccordionSummary
+                expandIcon={<ExpandMore />}
+                id="paintbrush-toolbox"
               >
-                <AccordionSummary
-                  expandIcon={<ExpandMore />}
-                  id="spline-toolbox"
-                >
-                  <Typography>Splines</Typography>
-                </AccordionSummary>
+                <Typography>Paintbrushes</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Tooltip title="Activate paintbrush">
+                  <IconButton
+                    id="activate-paintbrush"
+                    onClick={this.selectPaintbrushTool}
+                    color={
+                      Tools[this.state.activeTool] === Tools.paintbrush
+                        ? "secondary"
+                        : "default"
+                    }
+                  >
+                    <Brush />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Increase brush size">
+                  <IconButton
+                    id="increase-paintbrush-radius"
+                    onClick={this.incrementBrush}
+                  >
+                    <AllOut />
+                  </IconButton>
+                </Tooltip>
+
+                <Tooltip title="Activate Eraser">
+                  <IconButton
+                    id="activate-eraser"
+                    onClick={this.selectEraserTool}
+                  >
+                    <RadioButtonUncheckedSharp />
+                  </IconButton>
+                </Tooltip>
+              </AccordionDetails>
+            </Accordion>
+
+            <Accordion
+              expanded={this.state.expanded === "spline-toolbox"}
+              onChange={this.handleToolboxChange("spline-toolbox")}
+            >
+              <AccordionSummary expandIcon={<ExpandMore />} id="spline-toolbox">
+                <Typography>Splines</Typography>
+              </AccordionSummary>
                 <AccordionDetails>
                   <Tooltip title="Activate spline">
                     <IconButton
@@ -543,30 +596,26 @@ export class UserInterface extends Component {
                     </IconButton>
                   </Tooltip>
                 </AccordionDetails>
-              </Accordion>
-              <Accordion
-                expanded={this.state.expanded === "labels-toolbox"}
-                onChange={this.handleToolboxChange("labels-toolbox")}
-              >
-                <AccordionSummary
-                  expandIcon={<ExpandMore />}
-                  id="labels-toolbox"
-                >
-                  <Typography>Labels</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Labels
-                    annotationObject={this.annotationsObject}
-                    presetLabels={this.presetLabels}
-                    activeAnnotationID={this.state.activeAnnotationID}
-                    theme={this.theme}
-                  />
-                </AccordionDetails>
-              </Accordion>
-            </Grid>
+            </Accordion>
+
+            <Accordion
+              expanded={this.state.expanded === "labels-toolbox"}
+              onChange={this.handleToolboxChange("labels-toolbox")}
+            >
+              <AccordionSummary expandIcon={<ExpandMore />} id="labels-toolbox">
+                <Typography>Labels</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Labels
+                  annotationObject={this.annotationsObject}
+                  presetLabels={this.presetLabels}
+                  activeAnnotationID={this.state.activeAnnotationID}
+                />
+              </AccordionDetails>
+            </Accordion>
           </Grid>
-        </Container>
-      </ThemeProvider>
-    );
-  };
+        </Grid>
+      </Container>
+    </ThemeProvider>
+  );
 }

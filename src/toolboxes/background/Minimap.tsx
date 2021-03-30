@@ -1,8 +1,7 @@
-import React from "react";
-import { Component, ReactNode } from "react";
+import React, { Component, ReactNode } from "react";
 
-import { BaseMinimap, MinimapProps as BaseProps } from "../../baseCanvas";
-import drawImageOnCanvas from "./drawImage";
+import { BaseMinimap, MinimapProps as BaseProps } from "../../baseToolbox";
+import { drawImageOnCanvas } from "./drawImage";
 
 interface Props extends BaseProps {
   imgSrc?: string;
@@ -17,22 +16,33 @@ interface Props extends BaseProps {
 }
 export class BackgroundMinimap extends Component<Props> {
   private baseMinimap: BaseMinimap;
+
   private image: HTMLImageElement;
 
-  constructor(props: Props) {
-    super(props);
-  }
+  componentDidMount = (): void => {
+    this.drawImage();
+  };
+
+  componentDidUpdate = (): void => {
+    this.redrawImage();
+  };
 
   private redrawImage = () => {
+    this.baseMinimap.baseCanvas.canvasContext.filter = `contrast(${this.props.contrast}%) brightness(${this.props.brightness}%)`;
+    this.baseMinimap.baseCanvas.canvasContext.globalCompositeOperation =
+      "destination-over";
     if (this.image && this.image.complete) {
-      this.baseMinimap.baseCanvas.canvasContext.filter = `contrast(${this.props.contrast}%) brightness(${this.props.brightness}%)`;
-      this.baseMinimap.baseCanvas.canvasContext.globalCompositeOperation =
-        "destination-over";
       drawImageOnCanvas(this.baseMinimap.baseCanvas.canvasContext, this.image, {
         x: 0,
         y: 0,
         scale: 1,
       });
+    } else if (this.props.imageData !== undefined) {
+        drawImageOnCanvas(this.baseMinimap.baseCanvas.canvasContext, this.props.imageData, {
+            x: 0,
+            y: 0,
+            scale: 1,
+          });
     }
   };
 
@@ -49,14 +59,6 @@ export class BackgroundMinimap extends Component<Props> {
     this.image.onload = this.redrawImage;
     this.image.src = this.props.imgSrc;
   };
-
-  componentDidMount = (): void => {
-    this.drawImage();
-  };
-
-  componentDidUpdate(): void {
-    this.redrawImage();
-  }
 
   render = (): ReactNode => {
     return (
