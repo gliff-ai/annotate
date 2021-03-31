@@ -64,7 +64,7 @@ export class SplineCanvas extends Component<Props, State> {
     const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
     this.mode = Mode.draw; // At change of active annotation, set mode to drawing mode (default)
 
-    if (activeAnnotation?.coordinates.length > 0) {
+    if (activeAnnotation?.coordinates) {
       this.drawAllSplines();
     }
   }
