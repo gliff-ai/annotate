@@ -1,7 +1,6 @@
 import React, { ReactNode } from "react";
 import { getMinimapViewFinder, minimapToCanvas } from "@/transforms";
-import { PositionAndSize } from "@/annotation/interfaces";
-
+import { PositionAndSize } from "@/baseCanvas";
 import { Props as BaseProps, BaseCanvas } from "./Canvas";
 
 export interface Props extends BaseProps {
@@ -15,12 +14,7 @@ export interface Props extends BaseProps {
     x?: number;
     y?: number;
   }) => void;
-  setMinimapPositionAndSize?: (minimapPositionAndSize: {
-    top?: number;
-    left?: number;
-    width?: number;
-    height?: number;
-  }) => void;
+  setMinimapPositionAndSize?: (minimapPositionAndSize: PositionAndSize) => void;
 }
 
 export class BaseMinimap extends React.Component<Props> {

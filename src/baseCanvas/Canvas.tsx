@@ -2,6 +2,12 @@ import React, { Component, ReactNode } from "react";
 
 import { XYPoint } from "@/annotation/interfaces";
 
+export interface PositionAndSize {
+  top?: number;
+  left?: number;
+  width?: number;
+  height?: number;
+}
 export interface Props {
   name?: string;
   zoomExtents?: {
@@ -20,18 +26,8 @@ export interface Props {
   onMouseMove?: (x: number, y: number) => void;
   onMouseUp?: (x: number, y: number) => void;
   onContextMenu?: (x: number, y: number) => void;
-  canvasPositionAndSize: {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  };
-  setCanvasPositionAndSize?: (canvasPositionAndSize: {
-    top?: number;
-    left?: number;
-    width?: number;
-    height?: number;
-  }) => void;
+  canvasPositionAndSize: PositionAndSize;
+  setCanvasPositionAndSize?: (canvasPositionAndSize: PositionAndSize) => void;
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
