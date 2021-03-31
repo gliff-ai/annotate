@@ -7,7 +7,7 @@ import { useBackgroundStore } from "./Store";
 
 interface Props extends BaseProps {
   imgSrc?: string;
-  updateImageDimensions: (imageWidth: number, imageHeight: number) => void;
+  updateImageData: (imageData: ImageData) => void;
   contrast: number;
   brightness: number;
 }
@@ -50,7 +50,14 @@ export class BackgroundCanvasClass extends Component<Props> {
     // Draw the image once loaded
     this.image.onload = () => {
       this.redrawImage();
-      this.props.updateImageDimensions(this.image.width, this.image.height);
+      this.props.updateImageData(
+        this.baseCanvas.canvasContext.getImageData(
+          0,
+          0,
+          this.image.width,
+          this.image.height
+        )
+      );
     };
     this.image.src = this.props.imgSrc;
   };
@@ -76,7 +83,7 @@ export const BackgroundCanvas = (
   return (
     <BackgroundCanvasClass
       imgSrc={props.imgSrc}
-      updateImageDimensions={props.updateImageDimensions}
+      updateImageData={props.updateImageData}
       contrast={background.contrast}
       brightness={background.brightness}
       scaleAndPan={props.scaleAndPan}

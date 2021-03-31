@@ -28,32 +28,24 @@ import {
   ExpandMore,
 } from "@material-ui/icons";
 
-import { Annotations } from "./annotation";
-
-import { ThemeProvider, theme } from "./theme";
-
+import { Annotations } from "@/annotation";
+import { ThemeProvider, theme } from "@/theme";
+import { PositionAndSize } from "@/baseCanvas";
 import {
   BackgroundCanvas,
   BackgroundMinimap,
   BackgroundUI,
-} from "./toolboxes/background";
-import { SplineCanvas, SplineUI } from "./toolboxes/spline";
-import { PaintbrushCanvas, PaintbrushUI } from "./toolboxes/paintbrush";
-import { Labels } from "./components/Labels";
-import { keydownListener } from "./keybindings";
+} from "@/toolboxes/background";
+import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
+import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
+import { Labels } from "@/components/Labels";
+import { keydownListener } from "@/keybindings";
 
-import { Tools, Tool } from "./tools";
+import { Tools, Tool } from "@/tools";
 
 const CONFIG = {
   PAN_AMOUNT: 20,
 } as const;
-
-interface PositionAndSize {
-  top?: number;
-  left?: number;
-  width?: number;
-  height?: number;
-}
 
 interface Event extends CustomEvent {
   type: typeof events[number];
@@ -69,14 +61,10 @@ interface State {
     scale: number;
   };
   activeTool?: Tool;
-  imageWidth: number;
-  imageHeight: number;
+  imageData?: ImageData;
   activeAnnotationID: number;
-
   viewportPositionAndSize: Required<PositionAndSize>;
-
   minimapPositionAndSize: Required<PositionAndSize>;
-
   expanded: string | boolean;
 }
 
@@ -96,8 +84,6 @@ export class UserInterface extends Component<Record<string, never>, State> {
         x: 0,
         y: 0,
       },
-      imageWidth: 0,
-      imageHeight: 0,
       activeTool: Tools.paintbrush,
       activeAnnotationID: 0,
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
@@ -202,18 +188,18 @@ export class UserInterface extends Component<Record<string, never>, State> {
 
     // calculate how much bigger the image is than the canvas, in canvas space:
     const imageScalingFactor = Math.min(
-      this.state.viewportPositionAndSize.width / this.state.imageWidth,
-      this.state.viewportPositionAndSize.height / this.state.imageHeight
+      this.state.viewportPositionAndSize.width / this.state.imageData.width,
+      this.state.viewportPositionAndSize.height / this.state.imageData.height
     );
 
     const xMargin =
-      this.state.imageWidth *
+      this.state.imageData.width *
         imageScalingFactor *
         this.state.scaleAndPan.scale -
       this.state.viewportPositionAndSize.width;
 
     const yMargin =
-      this.state.imageHeight *
+      this.state.imageData.height *
         imageScalingFactor *
         this.state.scaleAndPan.scale -
       this.state.viewportPositionAndSize.height;
@@ -278,11 +264,8 @@ export class UserInterface extends Component<Record<string, never>, State> {
     this.incrementScaleAndPan("y", -CONFIG.PAN_AMOUNT);
   };
 
-  updateImageDimensions = (imageWidth: number, imageHeight: number): void => {
-    this.setState({
-      imageWidth,
-      imageHeight,
-    });
+  updateImageData = (imageData: ImageData): void => {
+    this.setState({ imageData: imageData });
   };
 
   activateTool = (tool: Tool): void => {
@@ -360,7 +343,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
             <BackgroundCanvas
               scaleAndPan={this.state.scaleAndPan}
               imgSrc={this.imageSource}
-              updateImageDimensions={this.updateImageDimensions}
+              updateImageData={this.updateImageData}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
             />
@@ -369,8 +352,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
               scaleAndPan={this.state.scaleAndPan}
               isActive={this.state.activeTool === Tools.spline}
               annotationsObject={this.annotationsObject}
-              imageWidth={this.state.imageWidth}
-              imageHeight={this.state.imageHeight}
+              imageData={this.state.imageData}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
             />
@@ -379,8 +361,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
               scaleAndPan={this.state.scaleAndPan}
               brushType={this.state.activeTool}
               annotationsObject={this.annotationsObject}
-              imageWidth={this.state.imageWidth}
-              imageHeight={this.state.imageHeight}
+              imageData={this.state.imageData}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
             />
@@ -392,8 +373,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
                 scaleAndPan={this.state.scaleAndPan}
                 setScaleAndPan={this.setScaleAndPan}
                 imgSrc={this.imageSource}
-                imageWidth={this.state.imageWidth}
-                imageHeight={this.state.imageHeight}
+                imageData={this.state.imageData}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 minimapPositionAndSize={this.state.minimapPositionAndSize}
                 setMinimapPositionAndSize={this.setMinimapPositionAndSize}

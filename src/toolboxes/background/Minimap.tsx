@@ -1,17 +1,16 @@
 import React, { Component, ReactNode, ReactElement } from "react";
 
-import { BaseMinimap, MinimapProps as BaseProps } from "@/baseCanvas";
+import {
+  BaseMinimap,
+  MinimapProps as BaseProps,
+  PositionAndSize,
+} from "@/baseCanvas";
 import drawImageOnCanvas from "./drawImage";
 import { useBackgroundStore } from "./Store";
 
 interface Props extends BaseProps {
   imgSrc?: string;
-  setMinimapPositionAndSize?: (minimapPositionAndSize: {
-    top?: number;
-    left?: number;
-    width?: number;
-    height?: number;
-  }) => void;
+  setMinimapPositionAndSize?: (minimapPositionAndSize: PositionAndSize) => void;
   contrast: number;
   brightness: number;
 }
@@ -64,8 +63,7 @@ export class BackgroundMinimapClass extends Component<Props> {
         this.baseMinimap = baseMinimap;
       }}
       name="background-minimap"
-      imageWidth={this.props.imageWidth}
-      imageHeight={this.props.imageHeight}
+      imageData={this.props.imageData}
       canvasPositionAndSize={this.props.canvasPositionAndSize}
       minimapPositionAndSize={this.props.minimapPositionAndSize}
       setMinimapPositionAndSize={this.props.setMinimapPositionAndSize}
@@ -83,8 +81,7 @@ export const BackgroundMinimap = (
       contrast={background.contrast}
       brightness={background.brightness}
       imgSrc={props.imgSrc}
-      imageWidth={props.imageWidth}
-      imageHeight={props.imageHeight}
+      imageData={props.imageData}
       canvasPositionAndSize={props.canvasPositionAndSize}
       minimapPositionAndSize={props.minimapPositionAndSize}
       setScaleAndPan={props.setScaleAndPan}

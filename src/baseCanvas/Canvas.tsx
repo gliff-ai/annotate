@@ -28,6 +28,7 @@ export interface Props {
   onContextMenu?: (x: number, y: number) => void;
   canvasPositionAndSize: PositionAndSize;
   setCanvasPositionAndSize?: (canvasPositionAndSize: PositionAndSize) => void;
+  imageData?: ImageData;
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
