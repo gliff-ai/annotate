@@ -18,9 +18,8 @@ export class BackgroundCanvasClass extends Component<Props> {
   private image: HTMLImageElement | HTMLCanvasElement;
 
   componentDidUpdate(prevProps: Props): void {
-    console.log(this.props.imageData.width);
-    // if ((prevProps.imgSrc !== this.props.imgSrc) || (prevProps.imageData !== undefined && this.props.imageData.data !== prevProps.imageData.data)) {
-    if ((!this.props.imgSrc) && (prevProps.imageData !== this.props.imageData)) {
+    // imgSrc is used to avoid calling loadImage when the component mounts
+    if (!this.props.imgSrc && prevProps.imageData !== this.props.imageData) {
       this.loadImage(); // calls this.drawImage() after image loading
     } else {
       this.drawImage();

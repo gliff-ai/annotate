@@ -77,7 +77,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
   annotationsObject: Annotations;
 
   imageSource: string;
-  
+
   private presetLabels: string[];
 
   private slicesData: Array<ImageData>;
@@ -281,13 +281,17 @@ export class UserInterface extends Component<Record<string, never>, State> {
     this.setState({ imageData });
   };
 
-  setUploadedImage = (slicesData: Array<ImageData>, imageFileInfo: ImageFileInfo): void => {
+  setUploadedImage = (
+    slicesData: Array<ImageData>,
+    imageFileInfo: ImageFileInfo
+  ): void => {
     this.imageFileInfo = imageFileInfo;
     this.slicesData = slicesData;
-    this.updateImageData(slicesData[0]); // go to first slice (if it's a 3D image)
-    this.setState({ imageLoaded: true, sliceIndex: 0 });
+    this.setState({ imageLoaded: true, sliceIndex: 0 }, () => {
+      this.updateImageData(slicesData[0]); // go to first slice (if it's a 3D image)
+    });
   };
-  
+
   activateTool = (tool: Tool): void => {
     this.setState({ activeTool: tool }, () => {
       this.reuseEmptyAnnotation();

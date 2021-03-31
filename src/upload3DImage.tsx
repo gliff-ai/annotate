@@ -5,7 +5,10 @@ import * as UTIF from "utif";
 import ImageFileInfo from "./ImageFileInfo";
 
 interface Props {
-  setUploadedImage: (slicesData: Array<ImageData>, imageFileInfo: ImageFileInfo) => void;
+  setUploadedImage: (
+    slicesData: Array<ImageData>,
+    imageFileInfo: ImageFileInfo
+  ) => void;
 }
 
 export default class Upload3DImage extends Component<Props> {
@@ -104,7 +107,9 @@ export default class Upload3DImage extends Component<Props> {
       // can be draw onto a canvas.
       this.slicesData = ifds
         .map(UTIF.toRGBA8)
-        .map((rgba) => new ImageData((rgba as unknown as Uint8ClampedArray), width, height));
+        .map(
+          (rgba) => new ImageData(Uint8ClampedArray.from(rgba), width, height)
+        );
     }
 
     this.imageFileInfo.width = width;
