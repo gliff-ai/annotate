@@ -23,7 +23,6 @@ interface Brush {
 
 interface State {
   hideBackCanvas: boolean;
-  currentBrush: Brush;
 }
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
@@ -58,11 +57,6 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
     this.state = {
       hideBackCanvas: false,
-      currentBrush: {
-        color: theme.palette.secondary.dark,
-        radius: this.props.brushRadius,
-        type: this.props.brushType === "paintbrush" ? "paint" : "erase",
-      },
     };
   }
 
@@ -108,11 +102,16 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       this.points.push({ x, y });
 
       // Create/update brush
+      const brush = {
+        color: theme.palette.secondary.dark,
+        radius: this.props.brushRadius,
+        type: this.props.brushType === "paintbrush" ? "paint" : "erase",
+      } as Brush;
 
       // Draw current points
       this.drawPoints(
         this.points,
-        this.state.currentBrush,
+        brush,
         true,
         this.interactionCanvas.canvasContext,
         this.props.brushType === "eraser" ? "destination-out" : "source-over"
@@ -161,7 +160,8 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     if (clearCanvas) {
       context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     }
-    context.lineWidth = brush.radius * 2;
+
+    context.lineWidth = brush.radius * 2 * this.props.scaleAndPan.scale;
 
     let p1 = points[0];
     let p2 = points[1];
