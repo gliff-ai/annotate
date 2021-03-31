@@ -7,13 +7,14 @@ import { Annotation, XYPoint } from "@/annotation/interfaces";
 import { theme } from "@/theme";
 
 interface Props extends BaseProps {
-  isActive: boolean;
+  splineType: string;
   annotationsObject: Annotations;
   callRedraw: number;
 }
 enum Mode {
   draw,
   edit,
+  magic,
 }
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
@@ -30,7 +31,8 @@ interface Event extends CustomEvent {
 }
 
 interface State {
-  cursor: "crosshair" | "none";
+  mode: number;
+  isActive: boolean;
 }
 
 export class SplineCanvas extends Component<Props, State> {
@@ -48,7 +50,7 @@ export class SplineCanvas extends Component<Props, State> {
     super(props);
     this.selectedPointIndex = -1;
     this.isDragging = false;
-    this.mode = Mode.draw;
+    this.state = { mode: Mode.draw, isActive: false };
   }
 
   componentDidMount(): void {
@@ -57,10 +59,14 @@ export class SplineCanvas extends Component<Props, State> {
     }
   }
 
-  componentDidUpdate(): void {
+  componentDidUpdate(prevProps: Props): void {
     // Redraw if we change pan or zoom
     const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
-    this.mode = Mode.draw; // At change of active annotation, set mode to drawing mode (default)
+
+    // Change mode if we change the spline type prop
+    if (this.props.splineType !== prevProps.splineType) {
+      this.updateMode();
+    }
 
     if (activeAnnotation?.coordinates) {
       this.drawAllSplines();
@@ -173,10 +179,16 @@ export class SplineCanvas extends Component<Props, State> {
       });
   };
 
-  private changeSplineModeToEdit = () => {
+  private changeSplineModeToEdit = (): void => {
     // TODO: add keyboard shortcuts for switching between modes
-    this.mode = Mode.edit; // Change mode to edit mode
+    this.setState({ mode: Mode.edit });
     this.deselectPoint();
+  };
+
+  public changeSplineModeToMagic = (): void => {
+    // TODO: add keyboard shortcuts for switching between modes
+    this.setState({ mode: Mode.magic });
+    // TODO this.calculateGradientImage();
   };
 
   private deselectPoint = () => {
@@ -216,7 +228,7 @@ export class SplineCanvas extends Component<Props, State> {
       coordinates.splice(this.selectedPointIndex, 1);
     }
     if (coordinates.length === 0) {
-      this.mode = Mode.draw;
+      this.setState({ mode: Mode.draw });
     }
 
     this.selectedPointIndex -= 1;
@@ -302,11 +314,11 @@ export class SplineCanvas extends Component<Props, State> {
       }
 
       // If the spline is not closed, append a new point
-    } else if (this.mode === Mode.draw && !isClosed) {
+    } else if (this.state.mode === Mode.draw && !isClosed) {
       // Add coordinates to the current spline
       currentSplineVector.push({ x: imageX, y: imageY });
       this.selectedPointIndex = currentSplineVector.length - 1;
-    } else if (this.mode === Mode.edit) {
+    } else if (this.state.mode === Mode.edit) {
       this.addNewPointNearSpline(imageX, imageY);
     }
 
@@ -423,14 +435,33 @@ export class SplineCanvas extends Component<Props, State> {
     this.props.annotationsObject.setAnnotationCoordinates(coordinates); // Save new coordinates inside active annotation
   };
 
+  private updateMode(): void {
+    // FIXME this is a bit clumsy
+    // Change mode if we change the spline type prop
+    switch (this.props.splineType) {
+      case "spline": {
+        this.setState({ mode: Mode.draw, isActive: true });
+        break;
+      }
+      case "magicspline": {
+        this.setState({ mode: Mode.magic, isActive: true });
+        break;
+      }
+      default: {
+        this.setState({ mode: Mode.draw, isActive: false });
+        break;
+      }
+    }
+  }
+
   render = (): ReactNode => (
-    <div style={{ pointerEvents: this.props.isActive ? "auto" : "none" }}>
+    <div style={{ pointerEvents: this.state.isActive ? "auto" : "none" }}>
       <BaseCanvas
         onClick={this.onClick}
         onMouseDown={this.onMouseDown}
         onMouseMove={this.onMouseMove}
         onMouseUp={this.onMouseUp}
-        cursor={this.props.isActive ? "crosshair" : "none"}
+        cursor={this.state.isActive ? "crosshair" : "none"}
         ref={(baseCanvas) => {
           this.baseCanvas = baseCanvas;
         }}

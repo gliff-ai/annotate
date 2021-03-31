@@ -361,7 +361,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
 
             <SplineCanvas
               scaleAndPan={this.state.scaleAndPan}
-              isActive={this.state.activeTool === Tools.spline}
+              splineType={this.state.activeTool}
               annotationsObject={this.annotationsObject}
               imageData={this.state.imageData}
               canvasPositionAndSize={this.state.viewportPositionAndSize}

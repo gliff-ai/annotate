@@ -8,7 +8,7 @@ import {
   AccordionDetails,
 } from "@material-ui/core";
 
-import { ExpandMore, Timeline } from "@material-ui/icons";
+import { ExpandMore, Timeline, Gesture } from "@material-ui/icons";
 
 import { Tool } from "@/tools";
 
@@ -32,6 +32,15 @@ const SplineUI = (props: Props): ReactElement => (
           color={props.activeTool === "spline" ? "secondary" : "default"}
         >
           <Timeline />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Magic spline">
+        <IconButton
+          id="activate-magic-spline"
+          onClick={() => props.activateTool("magicspline")}
+          color={props.activeTool === "magicspline" ? "secondary" : "default"}
+        >
+          <Gesture />
         </IconButton>
       </Tooltip>
     </AccordionDetails>
