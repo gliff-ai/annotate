@@ -5,11 +5,13 @@ import * as UTIF from "utif";
 import ImageFileInfo from "./ImageFileInfo";
 
 interface Props {
-  setImageFileInfo: (image: ImageFileInfo) => void;
+  setUploadedImage: (slicesData: Array<ImageData>, imageFileInfo: ImageFileInfo) => void;
 }
 
 export default class Upload3DImage extends Component<Props> {
   private imageFileInfo: ImageFileInfo | null;
+
+  private slicesData: Array<ImageData>;
 
   constructor(props: Props) {
     super(props);
@@ -71,7 +73,7 @@ export default class Upload3DImage extends Component<Props> {
     const extraChannels = this.getNumberOfExtraChannels(descriptions);
 
     if (extraChannels !== 0) {
-      this.imageFileInfo.slicesData = [];
+      this.slicesData = [];
 
       // Loop through each slice
       for (let i = 0; i < ifds.length / extraChannels; i += 1) {
@@ -95,20 +97,20 @@ export default class Upload3DImage extends Component<Props> {
         }
 
         // Push the slice onto our image stack.
-        this.imageFileInfo.slicesData.push(rgba);
+        this.slicesData.push(new ImageData(rgba, width, height));
       }
     } else {
       // Build a list of images (as canvas) that
       // can be draw onto a canvas.
-      this.imageFileInfo.slicesData = ifds
+      this.slicesData = ifds
         .map(UTIF.toRGBA8)
-        .map((rgba) => rgba);
+        .map((rgba) => new ImageData((rgba as unknown as Uint8ClampedArray), width, height));
     }
 
     this.imageFileInfo.width = width;
     this.imageFileInfo.height = height;
 
-    this.props.setImageFileInfo(this.imageFileInfo);
+    this.props.setUploadedImage(this.slicesData, this.imageFileInfo);
   };
 
   private getNumberOfExtraChannels = (descriptions: string[]): number => {

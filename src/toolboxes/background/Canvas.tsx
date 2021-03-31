@@ -1,15 +1,12 @@
 import React, { Component, ReactNode, ReactElement } from "react";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
-import ImageFileInfo from "@/ImageFileInfo";
 import drawImageOnCanvas from "./drawImage";
 
 import { useBackgroundStore } from "./Store";
 
 interface Props extends BaseProps {
   imgSrc: string | null;
-  imageFileInfo: ImageFileInfo;
-  sliceIndex: number;
   updateImageData: (imageData: ImageData) => void;
   contrast: number;
   brightness: number;
@@ -21,7 +18,9 @@ export class BackgroundCanvasClass extends Component<Props> {
   private image: HTMLImageElement | HTMLCanvasElement;
 
   componentDidUpdate(prevProps: Props): void {
-    if (prevProps.imageFileInfo !== this.props.imageFileInfo) {
+    console.log(this.props.imageData.width);
+    // if ((prevProps.imgSrc !== this.props.imgSrc) || (prevProps.imageData !== undefined && this.props.imageData.data !== prevProps.imageData.data)) {
+    if ((!this.props.imgSrc) && (prevProps.imageData !== this.props.imageData)) {
       this.loadImage(); // calls this.drawImage() after image loading
     } else {
       this.drawImage();
@@ -50,7 +49,7 @@ export class BackgroundCanvasClass extends Component<Props> {
           this.props.scaleAndPan
         );
       }
-    } else if (this.props.imageFileInfo) {
+    } else {
       drawImageOnCanvas(
         this.baseCanvas.canvasContext,
         this.image,
@@ -78,30 +77,19 @@ export class BackgroundCanvasClass extends Component<Props> {
         this.drawImage();
       };
       this.image.src = this.props.imgSrc;
-    } else if (this.props.imageFileInfo) {
-      this.image = this.createCanvasFromArray(
-        this.props.imageFileInfo.slicesData[this.props.sliceIndex],
-        this.props.imageFileInfo.width,
-        this.props.imageFileInfo.height
-      );
+    } else {
+      this.image = this.createCanvasFromImageData();
       this.drawImage();
     }
   };
 
-  private createCanvasFromArray = (
-    array: Uint8Array | Uint8ClampedArray,
-    width: number,
-    height: number
-  ): HTMLCanvasElement => {
+  private createCanvasFromImageData = (): HTMLCanvasElement => {
     // Create a canvas element from an array.
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
-    canvas.width = width;
-    canvas.height = height;
-    const imageData = context.createImageData(width, height);
-
-    imageData.data.set(array);
-    context.putImageData(imageData, 0, 0);
+    canvas.width = this.props.imageData.width;
+    canvas.height = this.props.imageData.height;
+    context.putImageData(this.props.imageData, 0, 0);
     return canvas;
   };
 
@@ -136,8 +124,6 @@ export const BackgroundCanvas = (
       brightness={background.brightness}
       scaleAndPan={props.scaleAndPan}
       canvasPositionAndSize={props.canvasPositionAndSize}
-      imageFileInfo={props.imageFileInfo}
-      sliceIndex={props.sliceIndex}
       imageData={props.imageData}
     />
   );

@@ -6,7 +6,6 @@ import {
   PositionAndSize,
 } from "@/baseCanvas";
 import drawImageOnCanvas from "./drawImage";
-import ImageFileInfo from "../../ImageFileInfo";
 import { useBackgroundStore } from "./Store";
 
 interface Props extends BaseProps {
@@ -14,8 +13,6 @@ interface Props extends BaseProps {
   setMinimapPositionAndSize?: (minimapPositionAndSize: PositionAndSize) => void;
   contrast: number;
   brightness: number;
-  imageFileInfo: ImageFileInfo;
-  sliceIndex: number;
 }
 
 export class BackgroundMinimapClass extends Component<Props> {
@@ -28,7 +25,7 @@ export class BackgroundMinimapClass extends Component<Props> {
   };
 
   componentDidUpdate(prevProps: Props): void {
-    if (prevProps.imageFileInfo !== this.props.imageFileInfo) {
+    if (prevProps.imageData !== this.props.imageData) {
       this.loadImage(); // calls this.drawImage() after image loading
     } else {
       this.drawImage();
@@ -52,12 +49,8 @@ export class BackgroundMinimapClass extends Component<Props> {
         this.drawImage();
       };
       this.image.src = this.props.imgSrc;
-    } else if (this.props.imageFileInfo) {
-      this.image = this.createCanvasFromArray(
-        this.props.imageFileInfo.slicesData[this.props.sliceIndex],
-        this.props.imageFileInfo.width,
-        this.props.imageFileInfo.height
-      );
+    } else {
+      this.image = this.createCanvasFromImageData();
       this.drawImage();
     }
   };
@@ -66,20 +59,13 @@ export class BackgroundMinimapClass extends Component<Props> {
     this.baseMinimap.baseCanvas.canvasContext.filter = `contrast(${this.props.contrast}%) brightness(${this.props.brightness}%)`;
   };
 
-  private createCanvasFromArray = (
-    array: Uint8Array | Uint8ClampedArray,
-    width: number,
-    height: number
-  ): HTMLCanvasElement => {
+  private createCanvasFromImageData = (): HTMLCanvasElement => {
     // Create a canvas element from an array.
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
-    canvas.width = width;
-    canvas.height = height;
-    const imageData = context.createImageData(width, height);
-
-    imageData.data.set(array);
-    context.putImageData(imageData, 0, 0);
+    canvas.width = this.props.imageData.width;
+    canvas.height = this.props.imageData.height;
+    context.putImageData(this.props.imageData, 0, 0);
     return canvas;
   };
 
@@ -100,7 +86,7 @@ export class BackgroundMinimapClass extends Component<Props> {
           }
         );
       }
-    } else if (this.props.imageFileInfo) {
+    } else {
       drawImageOnCanvas(this.baseMinimap.baseCanvas.canvasContext, this.image, {
         x: 0,
         y: 0,
@@ -135,13 +121,11 @@ export const BackgroundMinimap = (
       contrast={background.contrast}
       brightness={background.brightness}
       imgSrc={props.imgSrc}
-      imageData={props.imageData}
       canvasPositionAndSize={props.canvasPositionAndSize}
       minimapPositionAndSize={props.minimapPositionAndSize}
       setScaleAndPan={props.setScaleAndPan}
       scaleAndPan={props.scaleAndPan}
-      imageFileInfo={props.imageFileInfo}
-      sliceIndex={props.sliceIndex}
+      imageData={props.imageData}
     />
   );
 };

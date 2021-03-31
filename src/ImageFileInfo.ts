@@ -15,8 +15,6 @@ class ImageFileInfo {
 
   public height: number; // grid height boxes
 
-  public slicesData: Array<Uint8Array | Uint8ClampedArray>;
-
   constructor(fileName: string, fileID?: string) {
     this.fileName = fileName;
     this.fileID = fileID || guidGenerator();
@@ -25,7 +23,6 @@ class ImageFileInfo {
     this.resolution_z = 0;
     this.width = 0;
     this.height = 0;
-    this.slicesData = [];
   }
 
 }

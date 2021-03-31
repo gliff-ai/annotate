@@ -27,4 +27,5 @@ export default function drawImageOnCanvas(
 
   // fill image in dest. rectangle
   ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
+
 }

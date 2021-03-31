@@ -81,7 +81,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
   private presetLabels: string[];
 
   private slicesData: Array<ImageData>;
-  
+
   private imageFileInfo: ImageFileInfo | null;
 
   constructor(props: never) {
@@ -98,7 +98,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       minimapPositionAndSize: { top: 0, left: 0, width: 200, height: 200 },
       expanded: false,
-      sliceIndex: -1,
+      sliceIndex: 0,
       imageLoaded: false,
       callRedraw: 0,
     };
@@ -281,9 +281,10 @@ export class UserInterface extends Component<Record<string, never>, State> {
     this.setState({ imageData });
   };
 
-  setImageFileInfo = (image: ImageFileInfo): void => {
-    this.imageFileInfo = image;
-    this.updateImageDimensions(image.width, image.height);
+  setUploadedImage = (slicesData: Array<ImageData>, imageFileInfo: ImageFileInfo): void => {
+    this.imageFileInfo = imageFileInfo;
+    this.slicesData = slicesData;
+    this.updateImageData(slicesData[0]); // go to first slice (if it's a 3D image)
     this.setState({ imageLoaded: true, sliceIndex: 0 });
   };
   
@@ -370,11 +371,10 @@ export class UserInterface extends Component<Record<string, never>, State> {
             <BackgroundCanvas
               scaleAndPan={this.state.scaleAndPan}
               imgSrc={this.state.imageLoaded ? null : this.imageSource}
+              imageData={this.state.imageData}
               updateImageData={this.updateImageData}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
-              sliceIndex={this.state.sliceIndex}
-              imageFileInfo={this.state.imageLoaded ? this.imageFileInfo : null}
             />
 
             <SplineCanvas
@@ -409,10 +409,6 @@ export class UserInterface extends Component<Record<string, never>, State> {
                 minimapPositionAndSize={this.state.minimapPositionAndSize}
                 setMinimapPositionAndSize={this.setMinimapPositionAndSize}
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                sliceIndex={this.state.sliceIndex}
-                imageFileInfo={
-                  this.state.imageLoaded ? this.imageFileInfo : null
-                }
               />
             </div>
 
@@ -504,7 +500,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
 
             <Grid container justify="center">
               <ButtonGroup orientation="vertical" style={{ margin: "5px" }}>
-                <Upload3DImage setImageFileInfo={this.setImageFileInfo} />
+                <Upload3DImage setUploadedImage={this.setUploadedImage} />
                 <Tooltip title="Clear selected annotation">
                   <Button
                     id="clear-annotation"
