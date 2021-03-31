@@ -11,9 +11,8 @@ import { usePaintbrushStore } from "./Store";
 interface Props extends CanvasProps {
   brushType: string;
   annotationsObject: Annotations;
-  imageWidth: number;
-  imageHeight: number;
   brushRadius: number;
+  callRedraw: number;
 }
 
 interface State {
@@ -78,8 +77,8 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     const { x, y } = canvasToImage(
       canvasX,
       canvasY,
-      this.props.imageWidth,
-      this.props.imageHeight,
+      this.props.imageData.width,
+      this.props.imageData.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
@@ -121,8 +120,8 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
         const { x, y } = imageToCanvas(
           point.x,
           point.y,
-          this.props.imageWidth,
-          this.props.imageHeight,
+          this.props.imageData.width,
+          this.props.imageData.height,
           this.props.scaleAndPan,
           this.props.canvasPositionAndSize
         );
@@ -312,11 +311,11 @@ export const PaintbrushCanvas = (
     <PaintbrushCanvasClass
       brushType={props.brushType}
       annotationsObject={props.annotationsObject}
-      imageWidth={props.imageWidth}
-      imageHeight={props.imageHeight}
+      imageData={props.imageData}
       scaleAndPan={props.scaleAndPan}
       canvasPositionAndSize={props.canvasPositionAndSize}
       brushRadius={paintbrush.brushRadius}
+      callRedraw={props.callRedraw}
     />
   );
 };

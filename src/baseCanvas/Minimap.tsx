@@ -1,7 +1,6 @@
 import React, { ReactNode } from "react";
 import { getMinimapViewFinder, minimapToCanvas } from "@/transforms";
-import { PositionAndSize } from "@/annotation/interfaces";
-
+import { PositionAndSize } from "@/baseCanvas/Canvas";
 import { Props as BaseProps, BaseCanvas } from "./Canvas";
 
 export interface Props extends BaseProps {
@@ -13,12 +12,7 @@ export interface Props extends BaseProps {
     x?: number;
     y?: number;
   }) => void;
-  setMinimapPositionAndSize?: (minimapPositionAndSize: {
-    top?: number;
-    left?: number;
-    width?: number;
-    height?: number;
-  }) => void;
+  setMinimapPositionAndSize?: (minimapPositionAndSize: PositionAndSize) => void;
 }
 
 export class BaseMinimap extends React.Component<Props> {
@@ -37,23 +31,25 @@ export class BaseMinimap extends React.Component<Props> {
   };
 
   private applyView = (): void => {
-    this.boundingRect = getMinimapViewFinder(
-      this.props.imageData.width,
-      this.props.imageData.height,
-      this.props.scaleAndPan,
-      this.props.canvasPositionAndSize,
-      this.props.minimapPositionAndSize
-    );
-    this.baseCanvas.clearWindow();
-    this.baseCanvas.canvasContext.beginPath();
-    this.baseCanvas.canvasContext.strokeStyle = "#FFFFFF";
-    this.baseCanvas.canvasContext.lineWidth = 2;
-    this.baseCanvas.canvasContext.strokeRect(
-      this.boundingRect.left + 1,
-      this.boundingRect.top + 1,
-      this.boundingRect.width - 2,
-      this.boundingRect.height - 2
-    ); // +1 and -2 shift the box's centerline so the outer edge of the drawn box will trace the viewfinder
+    if (this.props.imageData) {
+      this.boundingRect = getMinimapViewFinder(
+        this.props.imageData.width,
+        this.props.imageData.height,
+        this.props.scaleAndPan,
+        this.props.canvasPositionAndSize,
+        this.props.minimapPositionAndSize
+      );
+      this.baseCanvas.clearWindow();
+      this.baseCanvas.canvasContext.beginPath();
+      this.baseCanvas.canvasContext.strokeStyle = "#FFFFFF";
+      this.baseCanvas.canvasContext.lineWidth = 2;
+      this.baseCanvas.canvasContext.strokeRect(
+        this.boundingRect.left + 1,
+        this.boundingRect.top + 1,
+        this.boundingRect.width - 2,
+        this.boundingRect.height - 2
+      ); // +1 and -2 shift the box's centerline so the outer edge of the drawn box will trace the viewfinder
+    }
   };
 
   /** * Mouse events *** */

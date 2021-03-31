@@ -10,7 +10,7 @@ interface Props extends BaseProps {
   imgSrc: string | null;
   imageFileInfo: ImageFileInfo;
   sliceIndex: number;
-  updateImageDimensions: (imageWidth: number, imageHeight: number) => void;
+  updateImageData: (imageData: ImageData) => void;
   contrast: number;
   brightness: number;
 }
@@ -67,9 +67,13 @@ export class BackgroundCanvasClass extends Component<Props> {
       this.image.crossOrigin = "anonymous";
       // Draw the image once loaded
       this.image.onload = () => {
-        this.props.updateImageDimensions(
-          (this.image as HTMLImageElement).width,
-          (this.image as HTMLImageElement).height
+        this.props.updateImageData(
+          this.baseCanvas.canvasContext.getImageData(
+            0,
+            0,
+            this.image.width,
+            this.image.height
+          )
         );
         this.drawImage();
       };
@@ -127,7 +131,7 @@ export const BackgroundCanvas = (
   return (
     <BackgroundCanvasClass
       imgSrc={props.imgSrc}
-      updateImageDimensions={props.updateImageDimensions}
+      updateImageData={props.updateImageData}
       contrast={background.contrast}
       brightness={background.brightness}
       scaleAndPan={props.scaleAndPan}
