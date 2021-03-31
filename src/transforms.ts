@@ -1,4 +1,5 @@
-import { XYPoint, PositionAndSize } from "@/annotation/interfaces";
+import { XYPoint } from "@/annotation/interfaces";
+import { PositionAndSize } from "@/baseCanvas";
 
 export function canvasToImage(
   canvasX: number,
@@ -10,12 +11,7 @@ export function canvasToImage(
     y: number;
     scale: number;
   },
-  canvasPositionAndSize: {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  }
+  canvasPositionAndSize: PositionAndSize
 ): XYPoint {
   const { x: translateX, y: translateY, scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
 
@@ -56,12 +52,7 @@ export function imageToCanvas(
     y: number;
     scale: number;
   },
-  canvasPositionAndSize: {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  }
+  canvasPositionAndSize: PositionAndSize
 ): XYPoint {
   const { x: translateX, y: translateY, scale } = scaleAndPan; // destructuring: https://2ality.com/2014/06/es6-multiple-return-values.html
 
