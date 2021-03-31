@@ -8,7 +8,7 @@ import {
   AccordionDetails,
 } from "@material-ui/core";
 
-import { ExpandMore, Brush } from "@material-ui/icons";
+import { ExpandMore, Timeline } from "@material-ui/icons";
 
 import { Tool } from "@/tools";
 
@@ -31,7 +31,7 @@ const SplineUI = (props: Props): ReactElement => (
           onClick={() => props.activateTool("spline")}
           color={props.activeTool === "spline" ? "secondary" : "default"}
         >
-          <Brush />
+          <Timeline />
         </IconButton>
       </Tooltip>
     </AccordionDetails>
