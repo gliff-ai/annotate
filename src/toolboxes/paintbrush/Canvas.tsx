@@ -152,7 +152,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     if (brush.type === "erase") {
       // If we are live drawing, use a brush colour
       if (context.canvas.id === "interaction-canvas") {
-        context.strokeStyle = "rgb(255,0,0)";
+        context.strokeStyle = theme.palette.secondary.dark;
       } else {
         // If we have saved this line, use a subtraction
         context.globalCompositeOperation = "destination-out";
