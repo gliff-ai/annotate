@@ -18,9 +18,10 @@ import {
 
 import {
   Add,
+  AspectRatio,
+  Delete,
   ZoomOut,
   ZoomIn,
-  AspectRatio,
   KeyboardArrowDown,
   KeyboardArrowLeft,
   KeyboardArrowRight,
@@ -78,6 +79,7 @@ interface State {
   minimapPositionAndSize: Required<PositionAndSize>;
 
   expanded: string | boolean;
+  callRedraw: number;
 }
 
 export class UserInterface extends Component<Record<string, never>, State> {
@@ -103,6 +105,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       minimapPositionAndSize: { top: 0, left: 0, width: 200, height: 200 },
       expanded: false,
+      callRedraw: 0,
     };
 
     this.imageSource = "zebrafish-heart.jpg";
@@ -340,6 +343,14 @@ export class UserInterface extends Component<Record<string, never>, State> {
     this.setState({ expanded: isExpanded ? panel : false });
   };
 
+  clearActiveAnnotation = (): void => {
+    this.annotationsObject.setAnnotationCoordinates([]);
+    this.annotationsObject.setAnnotationBrushStrokes([]);
+    this.setState((prevState) => ({
+      callRedraw: prevState.callRedraw + 1,
+    }));
+  };
+
   render = (): ReactNode => (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -373,6 +384,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
               imageHeight={this.state.imageHeight}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
+              callRedraw={this.state.callRedraw}
             />
 
             <PaintbrushCanvas
@@ -383,6 +395,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
               imageHeight={this.state.imageHeight}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
+              callRedraw={this.state.callRedraw}
             />
           </Grid>
 
@@ -480,6 +493,18 @@ export class UserInterface extends Component<Record<string, never>, State> {
                 />
               </AccordionDetails>
             </Accordion>
+            <Grid container justify="center">
+              <ButtonGroup orientation="vertical" style={{ margin: "5px" }}>
+                <Tooltip title="Clear selected annotation">
+                  <Button
+                    id="clear-annotation"
+                    onClick={this.clearActiveAnnotation}
+                  >
+                    <Delete />
+                  </Button>
+                </Tooltip>
+              </ButtonGroup>
+            </Grid>
           </Grid>
         </Grid>
       </Container>

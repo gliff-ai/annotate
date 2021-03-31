@@ -57,6 +57,10 @@ export class Annotations {
     this.data[this.activeAnnotationID].coordinates = newCoordinates;
   };
 
+  setAnnotationBrushStrokes = (newBrushStrokes: BrushStrokes[]): void => {
+    this.data[this.activeAnnotationID].brushStrokes = newBrushStrokes;
+  };
+
   setActiveAnnotationToolbox = (newToolbox: string): void => {
     this.data[this.activeAnnotationID].toolbox = newToolbox;
   };

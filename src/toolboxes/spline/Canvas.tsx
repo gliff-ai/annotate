@@ -11,6 +11,7 @@ interface Props extends BaseProps {
   annotationsObject: Annotations;
   imageWidth: number;
   imageHeight: number;
+  callRedraw: number;
 }
 enum Mode {
   draw,
@@ -63,7 +64,7 @@ export class SplineCanvas extends Component<Props, State> {
     const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
     this.mode = Mode.draw; // At change of active annotation, set mode to drawing mode (default)
 
-    if (activeAnnotation?.coordinates) {
+    if (activeAnnotation?.coordinates.length > 0) {
       this.drawAllSplines();
     }
   }
