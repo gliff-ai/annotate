@@ -212,7 +212,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       brush: {
         color: brushColor,
         radius: brushRadius,
-        type: this.state.currentBrush.type,
+        type: this.props.brushType === "paintbrush" ? "paint" : "erase",
       },
     });
 
