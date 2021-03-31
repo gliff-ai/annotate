@@ -26,7 +26,7 @@ export interface Props {
   onMouseMove?: (x: number, y: number) => void;
   onMouseUp?: (x: number, y: number) => void;
   onContextMenu?: (x: number, y: number) => void;
-  canvasPositionAndSize: PositionAndSize;
+  canvasPositionAndSize: Required<PositionAndSize>;
   setCanvasPositionAndSize?: (canvasPositionAndSize: PositionAndSize) => void;
   imageData?: ImageData;
 }
