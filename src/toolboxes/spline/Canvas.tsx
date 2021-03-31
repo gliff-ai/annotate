@@ -9,6 +9,7 @@ import { theme } from "@/theme";
 interface Props extends BaseProps {
   isActive: boolean;
   annotationsObject: Annotations;
+  callRedraw: number;
 }
 enum Mode {
   draw,
