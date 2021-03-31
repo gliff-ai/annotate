@@ -465,14 +465,20 @@ export class UserInterface extends Component<Record<string, never>, State> {
             />
 
             <PaintbrushUI
-              expanded={this.state.expanded === "paintbrush-toolbox"}
+              expanded={
+                this.state.expanded === "paintbrush-toolbox" ||
+                ["paintbrush", "eraser"].includes(this.state.activeTool)
+              }
               activeTool={this.state.activeTool}
               onChange={this.handleToolboxChange("paintbrush-toolbox")}
               activateTool={this.activateTool}
             />
 
             <SplineUI
-              expanded={this.state.expanded === "spline-toolbox"}
+              expanded={
+                this.state.expanded === "spline-toolbox" ||
+                ["spline"].includes(this.state.activeTool)
+              }
               activeTool={this.state.activeTool}
               onChange={this.handleToolboxChange("spline-toolbox")}
               activateTool={this.activateTool}
