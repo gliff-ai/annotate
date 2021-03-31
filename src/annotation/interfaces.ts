@@ -1,9 +1,13 @@
 export interface BrushStrokes {
+  // Todo move this into Paintbrush Toolbox
   coordinates: XYPoint[];
-  brushColor: string;
-  brushRadius: number;
-  brushType: string;
+  brush: {
+    radius: number;
+    type: "paint" | "erase";
+    color: string; // rgb(a) string
+  };
 }
+
 export interface Annotation {
   labels: string[];
   toolbox: string;
