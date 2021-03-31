@@ -265,7 +265,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
   };
 
   updateImageData = (imageData: ImageData): void => {
-    this.setState({ imageData: imageData });
+    this.setState({ imageData });
   };
 
   activateTool = (tool: Tool): void => {
