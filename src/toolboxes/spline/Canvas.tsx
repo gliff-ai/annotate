@@ -11,6 +11,7 @@ interface Props extends BaseProps {
   annotationsObject: Annotations;
   imageWidth: number;
   imageHeight: number;
+  callRedraw: number;
 }
 enum Mode {
   draw,

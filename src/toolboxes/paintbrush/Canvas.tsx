@@ -14,6 +14,7 @@ interface Props extends CanvasProps {
   imageWidth: number;
   imageHeight: number;
   brushRadius: number;
+  callRedraw: number;
 }
 
 interface State {
@@ -317,6 +318,7 @@ export const PaintbrushCanvas = (
       scaleAndPan={props.scaleAndPan}
       canvasPositionAndSize={props.canvasPositionAndSize}
       brushRadius={paintbrush.brushRadius}
+      callRedraw={props.callRedraw}
     />
   );
 };
