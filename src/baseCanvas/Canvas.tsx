@@ -172,7 +172,6 @@ export class BaseCanvas extends Component<Props> {
         touchAction: "none",
         width: "100%",
         height: this.props.canvasPositionAndSize.height,
-        zIndex: 100,
         cursor: this.props.cursor || "pointer",
         //   border: "1px solid gray",
         top: this.props.canvasPositionAndSize.top,
