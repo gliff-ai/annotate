@@ -5,11 +5,14 @@ import drawImageOnCanvas from "./drawImage";
 
 import { useBackgroundStore } from "./Store";
 
+import { imageToCanvas } from "@/transforms";
+
 interface Props extends BaseProps {
   imgSrc: string | null;
   updateImageData: (imageData: ImageData) => void;
   contrast: number;
   brightness: number;
+  channels: boolean[];
 }
 
 export class BackgroundCanvasClass extends Component<Props> {
@@ -29,6 +32,45 @@ export class BackgroundCanvasClass extends Component<Props> {
       prevProps.contrast !== this.props.contrast
     ) {
       this.updateBrightnessOrContrast();
+    }
+
+    if (this.props.imageData !== undefined) {
+      // Update number of channels displayed
+
+      const colour =
+        "#" +
+        this.props.channels
+          .map((channel: boolean) => (channel ? "FF" : "00"))
+          .join("") +
+        "FF";
+
+      console.log(colour);
+
+      const canvasContext = this.baseCanvas.canvasContext;
+      canvasContext.globalCompositeOperation = "multiply";
+      canvasContext.fillStyle = colour;
+      const topLeft = imageToCanvas(
+        0,
+        0,
+        this.props.imageData.width,
+        this.props.imageData.height,
+        this.props.scaleAndPan,
+        this.props.canvasPositionAndSize
+      );
+      const imageScalingFactor = Math.min(
+        this.props.canvasPositionAndSize.width / this.props.imageData.width,
+        this.props.canvasPositionAndSize.height / this.props.imageData.height
+      );
+      canvasContext.fillRect(
+        topLeft.x,
+        topLeft.y,
+        this.props.imageData.width *
+          imageScalingFactor *
+          this.props.scaleAndPan.scale,
+        this.props.imageData.height *
+          imageScalingFactor *
+          this.props.scaleAndPan.scale
+      );
     }
   }
 
@@ -111,7 +153,7 @@ export class BackgroundCanvasClass extends Component<Props> {
 }
 
 export const BackgroundCanvas = (
-  props: Omit<Props, "contrast" | "brightness">
+  props: Omit<Props, "contrast" | "brightness" | "channels">
 ): ReactElement => {
   const [background] = useBackgroundStore();
 
@@ -121,6 +163,7 @@ export const BackgroundCanvas = (
       updateImageData={props.updateImageData}
       contrast={background.contrast}
       brightness={background.brightness}
+      channels={background.channels}
       scaleAndPan={props.scaleAndPan}
       canvasPositionAndSize={props.canvasPositionAndSize}
       imageData={props.imageData}
