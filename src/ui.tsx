@@ -376,7 +376,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
         <Toolbar />
 
         <Grid container spacing={0} justify="center" wrap="nowrap">
-          <Grid container direction="column" style={{ position: "relative" }}>
+          <Grid item style={{ width: "85%", position: "relative" }}>
             <BackgroundCanvas
               scaleAndPan={this.state.scaleAndPan}
               imgSrc={this.state.imageLoaded ? null : this.imageSource}
