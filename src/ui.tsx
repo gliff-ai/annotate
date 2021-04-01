@@ -422,7 +422,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
                 <Slider
                   value={this.state.sliceIndex}
                   onChange={this.changeSlice}
-                  aria-labelledby={"slice-index-slider"}
+                  aria-labelledby="slice-index-slider"
                   step={1}
                   min={0}
                   max={this.slicesData.length - 1}
