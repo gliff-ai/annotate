@@ -100,7 +100,9 @@ export default class Upload3DImage extends Component<Props> {
         }
 
         // Push the slice onto our image stack.
-        this.slicesData.push(new ImageData(rgba, width, height));
+        this.slicesData.push(
+          new ImageData(Uint8ClampedArray.from(rgba), width, height)
+        );
       }
     } else {
       // Build a list of images (as canvas) that
