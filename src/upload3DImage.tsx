@@ -27,7 +27,9 @@ export default class Upload3DImage extends Component<Props> {
         this.imageFileInfo = new ImageFileInfo(imageFile.name);
         this.loadImageFile(buffer);
       })
-      .catch((error) => {});
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   private readFile = (file: File) =>
@@ -37,7 +39,9 @@ export default class Upload3DImage extends Component<Props> {
         resolve(fr.result as ArrayBuffer);
       };
       fr.readAsArrayBuffer(file);
-    }).catch((error) => {});
+    }).catch((error) => {
+      console.log(error);
+    });
 
   private loadImageFile = (buffer: ArrayBuffer): void => {
     // Decode the images using the UTIF library.
@@ -50,16 +54,16 @@ export default class Upload3DImage extends Component<Props> {
 
     const resolutionUnitstr = ifds[0].t296 as string[];
 
-    if (resolutionUnitstr !== null && resolutionUnitstr.length === 1) {
+    if (resolutionUnitstr !== undefined && resolutionUnitstr.length === 1) {
       const resolutionUnit = parseInt(resolutionUnitstr[0], 10);
 
       const resolutionXstr = ifds[0].t282 as string[];
       const resolutionYstr = ifds[0].t283 as string[];
 
-      if (resolutionXstr !== null && resolutionXstr.length === 1) {
+      if (resolutionXstr !== undefined && resolutionXstr.length === 1) {
         this.imageFileInfo.resolution_x = parseFloat(resolutionXstr[0]);
       }
-      if (resolutionYstr !== null && resolutionYstr.length === 1) {
+      if (resolutionYstr !== undefined && resolutionYstr.length === 1) {
         this.imageFileInfo.resolution_y = parseFloat(resolutionYstr[0]);
       }
 
@@ -126,7 +130,7 @@ export default class Upload3DImage extends Component<Props> {
     if (descriptions !== undefined && descriptions.length === 1) {
       const description = descriptions[0];
 
-      if (description !== null && description.includes("channels=")) {
+      if (description !== undefined && description.includes("channels=")) {
         // Image-J extension:
         // Image-J stores various parameters in the image description.
         // As such, it stores the number of channels inside the description and
