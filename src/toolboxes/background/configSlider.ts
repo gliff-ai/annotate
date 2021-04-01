@@ -27,4 +27,5 @@ export const SLIDER_CONFIG: {
     max: 200,
     unit: "%",
   },
+  
 } as const;
