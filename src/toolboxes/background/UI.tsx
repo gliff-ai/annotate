@@ -12,8 +12,6 @@ import {
   FormControl,
 } from "@material-ui/core";
 
-import FormControlLabelPosition from "./formcontrol";
-
 import { ExpandMore } from "@material-ui/icons";
 
 import { BaseSlider } from "@/components/BaseSlider";
