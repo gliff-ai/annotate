@@ -65,7 +65,6 @@ interface State {
   activeTool?: Tool;
   imageData?: ImageData;
   activeAnnotationID: number;
-  sliceIndex: number;
   imageLoaded: boolean;
   viewportPositionAndSize: Required<PositionAndSize>;
   minimapPositionAndSize: Required<PositionAndSize>;
@@ -98,7 +97,6 @@ export class UserInterface extends Component<Record<string, never>, State> {
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       minimapPositionAndSize: { top: 0, left: 0, width: 200, height: 200 },
       expanded: false,
-      sliceIndex: 0,
       imageLoaded: false,
       callRedraw: 0,
     };
@@ -287,7 +285,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
   ): void => {
     this.imageFileInfo = imageFileInfo;
     this.slicesData = slicesData;
-    this.setState({ imageLoaded: true, sliceIndex: 0 }, () => {
+    this.setState({ imageLoaded: true }, () => {
       this.updateImageData(slicesData[0]); // go to first slice (if it's a 3D image)
     });
   };
