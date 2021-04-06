@@ -60,11 +60,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
   componentDidUpdate(): void {
     // Redraw if we change pan or zoom
-    const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
-
-    if (activeAnnotation?.brushStrokes.length > 0) {
-      this.drawAllStrokes();
-    }
+    this.drawAllStrokes();
   }
 
   componentWillUnmount(): void {
@@ -175,18 +171,23 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
   };
 
   drawAllStrokes = (context = this.drawingCanvas.canvasContext): void => {
-    const { brushStrokes } = this.props.annotationsObject.getActiveAnnotation();
-
-    for (let i = 0; i < brushStrokes.length; i += 1) {
-      this.drawPoints(
-        brushStrokes[i].coordinates,
-        brushStrokes[i].brushColor,
-        brushStrokes[i].brushRadius,
-        brushStrokes[i].brushType,
-        false,
-        context
-      );
-    }
+    //Draw strokes on active layer whiles showing exiting paintbrush layers
+    this.props.annotationsObject
+      .getAllAnnotations()
+      .forEach((annotationsObject) => {
+        if (annotationsObject.toolbox === "paintbrush") {
+          for (let i = 0; i < annotationsObject.brushStrokes.length; i += 1) {
+            this.drawPoints(
+              annotationsObject.brushStrokes[i].coordinates,
+              annotationsObject.brushStrokes[i].brushColor,
+              annotationsObject.brushStrokes[i].brushRadius,
+              annotationsObject.brushStrokes[i].brushType,
+              false,
+              context
+            );
+          }
+        }
+      });
   };
 
   saveLine = (
