@@ -171,7 +171,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
   };
 
   drawAllStrokes = (context = this.drawingCanvas.canvasContext): void => {
-    //Draw strokes on active layer whiles showing exiting paintbrush layers
+    // Draw strokes on active layer whiles showing exiting paintbrush layers
     this.props.annotationsObject
       .getAllAnnotations()
       .forEach((annotationsObject) => {
