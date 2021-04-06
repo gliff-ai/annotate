@@ -15,6 +15,12 @@ interface Props extends CanvasProps {
   callRedraw: number;
 }
 
+interface Brush {
+  radius: number;
+  type: "paint" | "erase";
+  color: string; // rgb(a) string
+}
+
 interface State {
   hideBackCanvas: boolean;
 }
@@ -32,9 +38,9 @@ type Cursor = "crosshair" | "none" | "not-allowed";
 export class PaintbrushCanvasClass extends Component<Props, State> {
   readonly name = "paintbrush";
 
-  private baseCanvas: BaseCanvas;
+  private interactionCanvas: BaseCanvas;
 
-  private drawingCanvas: BaseCanvas;
+  private backgroundCanvas: BaseCanvas;
 
   private isPressing: boolean;
 
@@ -49,7 +55,9 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     this.isDrawing = false;
     this.points = [];
 
-    this.state = { hideBackCanvas: false };
+    this.state = {
+      hideBackCanvas: false,
+    };
   }
 
   componentDidMount(): void {
@@ -93,27 +101,28 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       // Add new point
       this.points.push({ x, y });
 
+      // Create/update brush
+      const brush = {
+        color: theme.palette.secondary.dark,
+        radius: this.props.brushRadius,
+        type: this.props.brushType === "paintbrush" ? "paint" : "erase",
+      } as Brush;
+
       // Draw current points
       this.drawPoints(
         this.points,
-        theme.palette.secondary.dark,
-        this.props.brushRadius,
-        this.props.brushType,
+        brush,
         true,
-        this.baseCanvas.canvasContext,
-        this.props.brushType === "eraser" ? "destination-out" : "source-over"
+        this.interactionCanvas.canvasContext
       );
     }
   };
 
   drawPoints = (
     imagePoints: XYPoint[],
-    brushColor: string,
-    brushRadius: number,
-    brushType: string,
+    brush: Brush,
     clearCanvas = true,
-    context: CanvasRenderingContext2D,
-    globalCompositeOperation: "destination-out" | "source-over" = "source-over"
+    context: CanvasRenderingContext2D
   ): void => {
     const points = imagePoints.map(
       (point): XYPoint => {
@@ -136,20 +145,26 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       };
     }
 
-    context.globalCompositeOperation = globalCompositeOperation;
-
     context.lineJoin = "round";
     context.lineCap = "round";
-    context.strokeStyle = brushColor;
+    context.strokeStyle = brush.color;
 
-    if (brushType === "eraser") {
-      context.globalCompositeOperation = "destination-out";
+    if (brush.type === "erase") {
+      // If we are live drawing, use a brush colour
+      if (context.canvas.id === "interaction-canvas") {
+        context.strokeStyle = theme.palette.secondary.dark;
+      } else {
+        // If we have saved this line, use a subtraction
+        context.globalCompositeOperation = "destination-out";
+      }
+    } else {
+      context.globalCompositeOperation = "source-over";
+      if (clearCanvas) {
+        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+      }
     }
 
-    if (clearCanvas) {
-      context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-    }
-    context.lineWidth = brushRadius * 2;
+    context.lineWidth = brush.radius * 2 * this.props.scaleAndPan.scale;
 
     let p1 = points[0];
     let p2 = points[1];
@@ -174,15 +189,13 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     context.stroke();
   };
 
-  drawAllStrokes = (context = this.drawingCanvas.canvasContext): void => {
+  drawAllStrokes = (context = this.backgroundCanvas.canvasContext): void => {
     const { brushStrokes } = this.props.annotationsObject.getActiveAnnotation();
 
     for (let i = 0; i < brushStrokes.length; i += 1) {
       this.drawPoints(
         brushStrokes[i].coordinates,
-        brushStrokes[i].brushColor,
-        brushStrokes[i].brushRadius,
-        brushStrokes[i].brushType,
+        brushStrokes[i].brush,
         false,
         context
       );
@@ -198,17 +211,19 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     const { brushStrokes } = this.props.annotationsObject.getActiveAnnotation();
 
     brushStrokes.push({
-      brushColor,
-      brushRadius,
       coordinates: [...this.points],
-      brushType: this.props.brushType,
+      brush: {
+        color: brushColor,
+        radius: brushRadius,
+        type: this.props.brushType === "paintbrush" ? "paint" : "erase",
+      },
     });
 
     // Reset points array
     this.points.length = 0;
 
     this.drawAllStrokes();
-    const context = this.baseCanvas.canvasContext;
+    const context = this.interactionCanvas.canvasContext;
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
   };
 
@@ -217,8 +232,11 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     // Start drawing
     if (this.props.brushType === "eraser") {
       // Copy the current BACK strokes to the front canvas
-      this.drawAllStrokes(this.baseCanvas.canvasContext);
-      this.setState({ hideBackCanvas: true });
+      this.drawAllStrokes(this.interactionCanvas.canvasContext);
+      this.setState({ hideBackCanvas: true }, () => {
+        this.isPressing = true;
+        this.handlePointerMove(canvasX, canvasY);
+      });
     }
 
     this.isPressing = true;
@@ -231,12 +249,12 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     this.handlePointerMove(canvasX, canvasY);
   };
 
-  onMouseUp = (): void => {
+  onMouseUp = (canvasX: number, canvasY: number): void => {
     // End painting & save painting
     this.isPressing = false;
 
     // Draw to this end pos
-    // this.handleDrawMove(canvasX, canvasY);
+    this.handlePointerMove(canvasX, canvasY);
 
     // Stop drawing & save the drawn line
     this.isDrawing = false;
@@ -275,10 +293,10 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       <div style={{ opacity: this.state.hideBackCanvas ? "none" : "block" }}>
         <BaseCanvas
           cursor="none"
-          ref={(drawingCanvas) => {
-            this.drawingCanvas = drawingCanvas;
+          ref={(backgroundCanvas) => {
+            this.backgroundCanvas = backgroundCanvas;
           }}
-          name="drawingCanvas"
+          name="background"
           scaleAndPan={this.props.scaleAndPan}
           canvasPositionAndSize={this.props.canvasPositionAndSize}
           setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
@@ -290,10 +308,10 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
         onMouseMove={this.onMouseMove}
         onMouseUp={this.onMouseUp}
         cursor={this.getCursor()}
-        ref={(baseCanvas) => {
-          this.baseCanvas = baseCanvas;
+        ref={(interactionCanvas) => {
+          this.interactionCanvas = interactionCanvas;
         }}
-        name="paintbrush"
+        name="interaction"
         scaleAndPan={this.props.scaleAndPan}
         canvasPositionAndSize={this.props.canvasPositionAndSize}
         setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}

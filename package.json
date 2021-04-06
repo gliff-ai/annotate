@@ -1,6 +1,6 @@
 {
   "name": "@gliff-ai/annotate",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "gliff.ai ANNOTATE - a user friendly browser interface for annotating multidimensional images for machine learning",
   "repository": "git://github.com/gliff-ai/annotate.git",
   "main": "dist/main.js",
@@ -55,7 +55,11 @@
   "dependencies": {
     "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",
+    "@types/utif": "^3.0.1",
+    "@types/uuid": "^8.3.0",
     "react": "^17.0.0",
-    "react-dom": "^17.0.1"
+    "react-dom": "^17.0.1",
+    "utif": "^3.1.0",
+    "uuid": "^8.3.2"
   }
 }
