@@ -1,11 +1,10 @@
 import React, { Component, ReactNode, ReactElement } from "react";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
+import { imageToCanvas } from "@/transforms";
 import drawImageOnCanvas from "./drawImage";
 
 import { useBackgroundStore } from "./Store";
-
-import { imageToCanvas } from "@/transforms";
 
 interface Props extends BaseProps {
   imgSrc: string | null;
@@ -37,16 +36,11 @@ export class BackgroundCanvasClass extends Component<Props> {
     if (this.props.imageData !== undefined) {
       // Update number of channels displayed
 
-      const colour =
-        "#" +
-        this.props.channels
-          .map((channel: boolean) => (channel ? "FF" : "00"))
-          .join("") +
-        "FF";
+      const colour = `#${this.props.channels
+        .map((channel: boolean) => (channel ? "FF" : "00"))
+        .join("")}FF`;
 
-      console.log(colour);
-
-      const canvasContext = this.baseCanvas.canvasContext;
+      const { canvasContext } = this.baseCanvas;
       canvasContext.globalCompositeOperation = "multiply";
       canvasContext.fillStyle = colour;
       const topLeft = imageToCanvas(

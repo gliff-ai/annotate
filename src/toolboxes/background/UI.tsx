@@ -51,6 +51,45 @@ const BackgroundUI = (props: Props): ReactElement => {
     });
   }
 
+  const control1 = (
+    <Checkbox
+      checked={background.channels[0]}
+      onChange={() => {
+        changeChannels(
+          !background.channels[0],
+          background.channels[1],
+          background.channels[2]
+        );
+      }}
+    />
+  );
+
+  const control2 = (
+    <Checkbox
+      checked={background.channels[1]}
+      onChange={() => {
+        changeChannels(
+          background.channels[0],
+          !background.channels[1],
+          background.channels[2]
+        );
+      }}
+    />
+  );
+
+  const control3 = (
+    <Checkbox
+      checked={background.channels[2]}
+      onChange={() => {
+        changeChannels(
+          background.channels[0],
+          background.channels[1],
+          !background.channels[2]
+        );
+      }}
+    />
+  );
+
   return (
     <Accordion expanded={props.expanded} onChange={props.onChange}>
       <AccordionSummary expandIcon={<ExpandMore />} id="background-toolbox">
@@ -72,57 +111,24 @@ const BackgroundUI = (props: Props): ReactElement => {
 
             <FormControl component="fieldset">
               <FormLabel component="legend">Channels</FormLabel>
-              <FormGroup aria-label="position" row={true}>
+              <FormGroup aria-label="position" row>
                 <FormControlLabel
                   value="top"
-                  control={
-                    <Checkbox
-                      checked={background.channels[0]}
-                      onChange={() => {
-                        changeChannels(
-                          !background.channels[0],
-                          background.channels[1],
-                          background.channels[2]
-                        );
-                      }}
-                    />
-                  }
+                  control={control1}
                   label="R"
                   labelPlacement="top"
                   style={{ margin: "0", padding: "0" }}
                 />
                 <FormControlLabel
                   value="top"
-                  control={
-                    <Checkbox
-                      checked={background.channels[1]}
-                      onChange={() => {
-                        changeChannels(
-                          background.channels[0],
-                          !background.channels[1],
-                          background.channels[2]
-                        );
-                      }}
-                    />
-                  }
+                  control={control2}
                   label="G"
                   labelPlacement="top"
                   style={{ margin: "0", padding: "0" }}
                 />
                 <FormControlLabel
                   value="top"
-                  control={
-                    <Checkbox
-                      checked={background.channels[2]}
-                      onChange={() => {
-                        changeChannels(
-                          background.channels[0],
-                          background.channels[1],
-                          !background.channels[2]
-                        );
-                      }}
-                    />
-                  }
+                  control={control3}
                   label="B"
                   labelPlacement="top"
                   style={{ margin: "0", padding: "0" }}
