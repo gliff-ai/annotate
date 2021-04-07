@@ -11,6 +11,7 @@ export const keybindings = {
   "ctrl+KeyC": "spline.closeLoop",
   "ctrl+ArrowLeft": "ui.previousAnnotation",
   "ctrl+ArrowRight": "ui.nextAnnotation",
+  "ctrl+KeyA": "paintbrush.toggleMode",
 } as Readonly<{
   [key: string]: string;
 }>;
