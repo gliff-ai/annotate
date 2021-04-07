@@ -13,6 +13,7 @@ import {
   Typography,
   AccordionDetails,
   CssBaseline,
+  Slider,
 } from "@material-ui/core";
 
 import {
@@ -70,6 +71,7 @@ interface State {
   minimapPositionAndSize: Required<PositionAndSize>;
   expanded: string | boolean;
   callRedraw: number;
+  sliceIndex: number;
 }
 
 export class UserInterface extends Component<Record<string, never>, State> {
@@ -99,6 +101,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
       expanded: false,
       imageLoaded: false,
       callRedraw: 0,
+      sliceIndex: 0,
     };
 
     this.imageSource = "zebrafish-heart.jpg";
@@ -285,7 +288,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
   ): void => {
     this.imageFileInfo = imageFileInfo;
     this.slicesData = slicesData;
-    this.setState({ imageLoaded: true }, () => {
+    this.setState({ imageLoaded: true, sliceIndex: 0 }, () => {
       this.updateImageData(slicesData[0]); // go to first slice (if it's a 3D image)
     });
   };
@@ -353,6 +356,10 @@ export class UserInterface extends Component<Record<string, never>, State> {
     }));
   };
 
+  changeSlice = (e: ChangeEvent, value: number): void => {
+    this.setState({ sliceIndex: value, imageData: this.slicesData[value] });
+  };
+
   render = (): ReactNode => (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -398,8 +405,32 @@ export class UserInterface extends Component<Record<string, never>, State> {
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
               callRedraw={this.state.callRedraw}
             />
-          </Grid>
 
+            {this.state.imageLoaded && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: `${
+                    this.state.viewportPositionAndSize.top +
+                    this.state.viewportPositionAndSize.height +
+                    5
+                  }px`,
+                  left: `${this.state.viewportPositionAndSize.left}px`,
+                  width: `${this.state.viewportPositionAndSize.width}px`,
+                }}
+              >
+                <Slider
+                  value={this.state.sliceIndex}
+                  onChange={this.changeSlice}
+                  aria-labelledby="slice-index-slider"
+                  step={1}
+                  min={0}
+                  max={this.slicesData.length - 1}
+                  valueLabelDisplay="auto"
+                />
+              </div>
+            )}
+          </Grid>
           <Grid item style={{ width: 200, position: "relative" }}>
             <div style={{ height: 200 }}>
               <BackgroundMinimap
