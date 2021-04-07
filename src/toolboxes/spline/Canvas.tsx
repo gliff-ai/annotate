@@ -13,7 +13,7 @@ interface Props extends BaseProps {
 }
 enum Mode {
   draw,
-  edit,
+  select,
 }
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
@@ -177,7 +177,7 @@ export class SplineCanvas extends Component<Props, State> {
 
   private changeSplineModeToEdit = () => {
     // TODO: add keyboard shortcuts for switching between modes
-    this.mode = Mode.edit; // Change mode to edit mode
+    this.mode = Mode.select; // Change mode to select mode
     this.deselectPoint();
   };
 
@@ -308,11 +308,10 @@ export class SplineCanvas extends Component<Props, State> {
       // Add coordinates to the current spline
       currentSplineVector.push({ x: imageX, y: imageY });
       this.selectedPointIndex = currentSplineVector.length - 1;
-    } else if (this.mode === Mode.edit) {
-      // In edit mode a single click allows to select splines
+    } else if (this.mode === Mode.select) {
+      // In select mode a single click allows to select a different spline
       const selectedSpline = this.clickNearSpline(imageX, imageY);
       if (selectedSpline !== -1) {
-        // Change active spline to selected spline
         this.props.annotationsObject.setActiveAnnotationID(selectedSpline);
       }
     }
@@ -321,30 +320,31 @@ export class SplineCanvas extends Component<Props, State> {
   };
 
   clickNearSpline = (imageX: number, imageY: number): number => {
-    // Check if the clicked (x,y) point in image space belongs to an existing spline.
-    // If true, return spline index, otherwise return -1.
+    // Check if point clicked (in image space) is near an existing spline.
+    // If true, return annotation index, otherwise return -1.
     const annotations = this.props.annotationsObject.getAllAnnotations();
 
     for (let i = 0; i < annotations.length; i += 1) {
       if (annotations[i].toolbox === "spline") {
-        let { coordinates } = annotations[i];
+        const { coordinates } = annotations[i];
+        // For each pair of points, check is point clicked is near the line segment
+        // having for end points two consecutive points in the spline.
         for (let j = 1; j < coordinates.length; j += 1) {
           if (
-            this.isPointOnLineSegment(
+            this.isClickNearLineSegment(
               { x: imageX, y: imageY },
               coordinates[j - 1],
               coordinates[j]
             )
-          ) {
+          )
             return i;
-          }
         }
       }
     }
     return -1;
   };
 
-  isPointOnLineSegment = (
+  isClickNearLineSegment = (
     point: XYPoint,
     point1: XYPoint,
     point2: XYPoint
