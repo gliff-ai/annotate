@@ -1,5 +1,4 @@
 import React, { Component, ChangeEvent, ReactNode } from "react";
-
 import {
   AppBar,
   Container,
@@ -41,6 +40,8 @@ import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
 import { Labels } from "@/components/Labels";
 import { keydownListener } from "@/keybindings";
+import Upload3DImage from "@/upload3DImage";
+import ImageFileInfo from "@/ImageFileInfo";
 
 import { Tools, Tool } from "@/tools";
 
@@ -64,6 +65,7 @@ interface State {
   activeTool?: Tool;
   imageData?: ImageData;
   activeAnnotationID: number;
+  imageLoaded: boolean;
   viewportPositionAndSize: Required<PositionAndSize>;
   minimapPositionAndSize: Required<PositionAndSize>;
   expanded: string | boolean;
@@ -76,6 +78,10 @@ export class UserInterface extends Component<Record<string, never>, State> {
   imageSource: string;
 
   private presetLabels: string[];
+
+  private slicesData: Array<ImageData>;
+
+  private imageFileInfo: ImageFileInfo | null;
 
   constructor(props: never) {
     super(props);
@@ -91,6 +97,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       minimapPositionAndSize: { top: 0, left: 0, width: 200, height: 200 },
       expanded: false,
+      imageLoaded: false,
       callRedraw: 0,
     };
 
@@ -98,6 +105,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
 
     this.annotationsObject.addAnnotation(this.state.activeTool);
     this.presetLabels = ["label-1", "label-2", "label-3"]; // TODO: find a place for this
+    this.imageFileInfo = null;
   }
 
   componentDidMount = (): void => {
@@ -271,6 +279,17 @@ export class UserInterface extends Component<Record<string, never>, State> {
     this.setState({ imageData });
   };
 
+  setUploadedImage = (
+    slicesData: Array<ImageData>,
+    imageFileInfo: ImageFileInfo
+  ): void => {
+    this.imageFileInfo = imageFileInfo;
+    this.slicesData = slicesData;
+    this.setState({ imageLoaded: true }, () => {
+      this.updateImageData(slicesData[0]); // go to first slice (if it's a 3D image)
+    });
+  };
+
   activateTool = (tool: Tool): void => {
     this.setState({ activeTool: tool }, () => {
       this.reuseEmptyAnnotation();
@@ -353,7 +372,8 @@ export class UserInterface extends Component<Record<string, never>, State> {
           <Grid item style={{ width: "85%", position: "relative" }}>
             <BackgroundCanvas
               scaleAndPan={this.state.scaleAndPan}
-              imgSrc={this.imageSource}
+              imgSrc={this.state.imageLoaded ? null : this.imageSource}
+              imageData={this.state.imageData}
               updateImageData={this.updateImageData}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
@@ -385,7 +405,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
               <BackgroundMinimap
                 scaleAndPan={this.state.scaleAndPan}
                 setScaleAndPan={this.setScaleAndPan}
-                imgSrc={this.imageSource}
+                imgSrc={this.state.imageLoaded ? null : this.imageSource}
                 imageData={this.state.imageData}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 minimapPositionAndSize={this.state.minimapPositionAndSize}
@@ -479,8 +499,10 @@ export class UserInterface extends Component<Record<string, never>, State> {
                 />
               </AccordionDetails>
             </Accordion>
+
             <Grid container justify="center">
               <ButtonGroup orientation="vertical" style={{ margin: "5px" }}>
+                <Upload3DImage setUploadedImage={this.setUploadedImage} />
                 <Tooltip title="Clear selected annotation">
                   <Button
                     id="clear-annotation"

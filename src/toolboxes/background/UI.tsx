@@ -5,6 +5,11 @@ import {
   AccordionSummary,
   Typography,
   AccordionDetails,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  FormLabel,
+  FormControl,
 } from "@material-ui/core";
 
 import { ExpandMore } from "@material-ui/icons";
@@ -23,12 +28,67 @@ const BackgroundUI = (props: Props): ReactElement => {
   const [background, setBackground] = useBackgroundStore();
 
   function changeContrast(e: ChangeEvent, value: number) {
-    setBackground({ contrast: value, brightness: background.brightness });
+    setBackground({
+      contrast: value,
+      brightness: background.brightness,
+      channels: background.channels,
+    });
   }
 
   function changeBrightness(e: ChangeEvent, value: number) {
-    setBackground({ brightness: value, contrast: background.contrast });
+    setBackground({
+      brightness: value,
+      contrast: background.contrast,
+      channels: background.channels,
+    });
   }
+
+  function changeChannels(red = true, green = true, blue = true): void {
+    setBackground({
+      brightness: background.brightness,
+      contrast: background.contrast,
+      channels: [red, green, blue],
+    });
+  }
+
+  const control1 = (
+    <Checkbox
+      checked={background.channels[0]}
+      onChange={() => {
+        changeChannels(
+          !background.channels[0],
+          background.channels[1],
+          background.channels[2]
+        );
+      }}
+    />
+  );
+
+  const control2 = (
+    <Checkbox
+      checked={background.channels[1]}
+      onChange={() => {
+        changeChannels(
+          background.channels[0],
+          !background.channels[1],
+          background.channels[2]
+        );
+      }}
+    />
+  );
+
+  const control3 = (
+    <Checkbox
+      checked={background.channels[2]}
+      onChange={() => {
+        changeChannels(
+          background.channels[0],
+          background.channels[1],
+          !background.channels[2]
+        );
+      }}
+    />
+  );
 
   return (
     <Accordion expanded={props.expanded} onChange={props.onChange}>
@@ -48,6 +108,33 @@ const BackgroundUI = (props: Props): ReactElement => {
               config={SLIDER_CONFIG[Sliders.brightness]}
               onChange={() => changeBrightness}
             />
+
+            <FormControl component="fieldset">
+              <FormLabel component="legend">Channels</FormLabel>
+              <FormGroup aria-label="position" row>
+                <FormControlLabel
+                  value="top"
+                  control={control1}
+                  label="R"
+                  labelPlacement="top"
+                  style={{ margin: "0", padding: "0" }}
+                />
+                <FormControlLabel
+                  value="top"
+                  control={control2}
+                  label="G"
+                  labelPlacement="top"
+                  style={{ margin: "0", padding: "0" }}
+                />
+                <FormControlLabel
+                  value="top"
+                  control={control3}
+                  label="B"
+                  labelPlacement="top"
+                  style={{ margin: "0", padding: "0" }}
+                />
+              </FormGroup>
+            </FormControl>
           </Grid>
         </Grid>
       </AccordionDetails>

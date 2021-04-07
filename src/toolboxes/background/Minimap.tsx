@@ -18,41 +18,81 @@ interface Props extends BaseProps {
 export class BackgroundMinimapClass extends Component<Props> {
   private baseMinimap: BaseMinimap;
 
-  private image: HTMLImageElement;
+  private image: HTMLImageElement | HTMLCanvasElement;
 
   componentDidMount = (): void => {
-    this.drawImage();
+    this.loadImage();
   };
 
-  componentDidUpdate = (): void => {
-    this.redrawImage();
+  componentDidUpdate(prevProps: Props): void {
+    if (prevProps.imageData !== this.props.imageData) {
+      this.loadImage(); // calls this.drawImage() after image loading
+    } else {
+      this.drawImage();
+    }
+    if (
+      prevProps.brightness !== this.props.brightness ||
+      prevProps.contrast !== this.props.contrast
+    ) {
+      this.updateBrightnessOrContrast();
+    }
+  }
+
+  private loadImage = () => {
+    if (this.props.imgSrc) {
+      // Load the image
+      this.image = new Image();
+      // Prevent SecurityError "Tainted canvases may not be exported." #70
+      this.image.crossOrigin = "anonymous";
+      // Draw the image once loaded
+      this.image.onload = () => {
+        this.drawImage();
+      };
+      this.image.src = this.props.imgSrc;
+    } else {
+      this.image = this.createCanvasFromImageData();
+      this.drawImage();
+    }
   };
 
-  private redrawImage = () => {
-    if (this.image && this.image.complete) {
-      this.baseMinimap.baseCanvas.canvasContext.filter = `contrast(${this.props.contrast}%) brightness(${this.props.brightness}%)`;
-      this.baseMinimap.baseCanvas.canvasContext.globalCompositeOperation =
-        "destination-over";
+  updateBrightnessOrContrast = (): void => {
+    this.baseMinimap.baseCanvas.canvasContext.filter = `contrast(${this.props.contrast}%) brightness(${this.props.brightness}%)`;
+  };
+
+  private createCanvasFromImageData = (): HTMLCanvasElement => {
+    // Create a canvas element from an array.
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    canvas.width = this.props.imageData.width;
+    canvas.height = this.props.imageData.height;
+    context.putImageData(this.props.imageData, 0, 0);
+    return canvas;
+  };
+
+  private drawImage = () => {
+    // Any annotation that is already on the canvas is put on top of any new annotation
+    this.baseMinimap.baseCanvas.canvasContext.globalCompositeOperation =
+      "destination-over";
+
+    if (this.props.imgSrc) {
+      if (this.image && (this.image as HTMLImageElement).complete) {
+        drawImageOnCanvas(
+          this.baseMinimap.baseCanvas.canvasContext,
+          this.image,
+          {
+            x: 0,
+            y: 0,
+            scale: 1,
+          }
+        );
+      }
+    } else {
       drawImageOnCanvas(this.baseMinimap.baseCanvas.canvasContext, this.image, {
         x: 0,
         y: 0,
         scale: 1,
       });
     }
-  };
-
-  private drawImage = () => {
-    if (!this.props.imgSrc) return;
-
-    // Load the image
-    this.image = new Image();
-
-    // Prevent SecurityError "Tainted canvases may not be exported." #70
-    this.image.crossOrigin = "anonymous";
-
-    // Draw the image once loaded
-    this.image.onload = this.redrawImage;
-    this.image.src = this.props.imgSrc;
   };
 
   render = (): ReactNode => (
@@ -81,11 +121,11 @@ export const BackgroundMinimap = (
       contrast={background.contrast}
       brightness={background.brightness}
       imgSrc={props.imgSrc}
-      imageData={props.imageData}
       canvasPositionAndSize={props.canvasPositionAndSize}
       minimapPositionAndSize={props.minimapPositionAndSize}
       setScaleAndPan={props.setScaleAndPan}
       scaleAndPan={props.scaleAndPan}
+      imageData={props.imageData}
     />
   );
 };

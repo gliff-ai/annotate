@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { getMinimapViewFinder, minimapToCanvas } from "@/transforms";
-import { PositionAndSize } from "@/baseCanvas";
+import { PositionAndSize } from "@/baseCanvas/Canvas";
 import { Props as BaseProps, BaseCanvas } from "./Canvas";
 
 export interface Props extends BaseProps {
@@ -68,7 +68,7 @@ export class BaseMinimap extends React.Component<Props> {
       this.props.canvasPositionAndSize,
       this.props.minimapPositionAndSize
     );
-
+   
     // calculate the vector from the current canvas centre to the target position:
     const translateX = targetX - this.props.canvasPositionAndSize.width / 2;
     const translateY = targetY - this.props.canvasPositionAndSize.height / 2;
