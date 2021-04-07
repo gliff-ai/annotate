@@ -60,10 +60,12 @@ export class SplineCanvas extends Component<Props, State> {
   componentDidUpdate(): void {
     // Redraw if we change pan or zoom
     const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
-    this.mode = Mode.draw; // At change of active annotation, set mode to drawing mode (default)
 
     if (activeAnnotation?.coordinates) {
       this.drawAllSplines();
+    }
+    if (activeAnnotation?.coordinates.length === 0) {
+      this.mode = Mode.draw; // At change of active annotation, set mode to drawing mode (default)
     }
   }
 
@@ -306,12 +308,68 @@ export class SplineCanvas extends Component<Props, State> {
       // Add coordinates to the current spline
       currentSplineVector.push({ x: imageX, y: imageY });
       this.selectedPointIndex = currentSplineVector.length - 1;
+    } else if (this.mode === Mode.edit) {
+      // In edit mode a single click allows to select splines
+      const selectedSpline = this.clickNearSpline(imageX, imageY);
+      if (selectedSpline !== -1) {
+        // Change active spline to selected spline
+        this.props.annotationsObject.setActiveAnnotationID(selectedSpline);
+      }
     }
-    // } else if (this.mode === Mode.edit) {
-    //   this.addNewPointNearSpline(imageX, imageY);
-    // }
 
     this.drawAllSplines();
+  };
+
+  clickNearSpline = (imageX: number, imageY: number): number => {
+    // Check if the clicked (x,y) point in image space belongs to an existing spline.
+    // If true, return spline index, otherwise return -1.
+    const annotations = this.props.annotationsObject.getAllAnnotations();
+
+    for (let i = 0; i < annotations.length; i += 1) {
+      if (annotations[i].toolbox === "spline") {
+        let { coordinates } = annotations[i];
+        for (let j = 1; j < coordinates.length; j += 1) {
+          if (
+            this.isPointOnLineSegment(
+              { x: imageX, y: imageY },
+              coordinates[j - 1],
+              coordinates[j]
+            )
+          ) {
+            return i;
+          }
+        }
+      }
+    }
+    return -1;
+  };
+
+  isPointOnLineSegment = (
+    point: XYPoint,
+    point1: XYPoint,
+    point2: XYPoint
+  ): boolean => {
+    // Check if a XYpoint belongs to the line segment with endpoints XYpoint 1 and XYpoint 2.
+    const dx = point.x - point1.x;
+    const dy = point.y - point1.y;
+    const dxLine = point2.x - point1.x;
+    const dyLine = point2.y - point1.y;
+    // Use the cross-product to check whether the XYpoint lies on the line passing
+    // through XYpoint 1 and XYpoint 2.
+    const crossProduct = dx * dyLine - dy * dxLine;
+    // If the XYpoint is exactly on the line the cross-product is zero. Here we set a threshold
+    // based on ease of use, to accept points that are close enough to the spline.
+    if (Math.abs(crossProduct) > 700) return false;
+
+    // Check if the point is on the segment (i.e., between point 1 and point 2).
+    if (Math.abs(dxLine) >= Math.abs(dyLine)) {
+      return dxLine > 0
+        ? point1.x <= point.x && point.x <= point2.x
+        : point2.x <= point.x && point.x <= point1.x;
+    }
+    return dyLine > 0
+      ? point1.y <= point.y && point.y <= point2.y
+      : point2.y <= point.y && point.y <= point1.y;
   };
 
   onDoubleClick = (x: number, y: number): void => {
