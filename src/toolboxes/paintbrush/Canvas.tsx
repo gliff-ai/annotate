@@ -4,7 +4,7 @@ import { BaseCanvas, CanvasProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/transforms";
 import { XYPoint } from "@/annotation/interfaces";
-import { theme } from "@/theme";
+
 import {
   main as mainColor,
   secondary as secondaryColor,
