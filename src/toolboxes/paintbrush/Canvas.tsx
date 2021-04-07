@@ -5,6 +5,12 @@ import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/transforms";
 import { XYPoint } from "@/annotation/interfaces";
 import { theme } from "@/theme";
+import {
+  main as mainColor,
+  secondary as secondaryColor,
+  getRGBString,
+  getRandomPalette,
+} from "@/palette";
 
 import { usePaintbrushStore } from "./Store";
 
@@ -103,7 +109,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
       // Create/update brush
       const brush = {
-        color: theme.palette.secondary.dark,
+        color: getRGBString(mainColor),
         radius: this.props.brushRadius,
         type: this.props.brushType === "paintbrush" ? "paint" : "erase",
       } as Brush;
@@ -152,7 +158,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     if (brush.type === "erase") {
       // If we are live drawing, use a brush colour
       if (context.canvas.id === "interaction-canvas") {
-        context.strokeStyle = theme.palette.secondary.dark;
+        context.strokeStyle = getRGBString(secondaryColor);
       } else {
         // If we have saved this line, use a subtraction
         context.globalCompositeOperation = "destination-out";
@@ -202,19 +208,20 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     }
   };
 
-  saveLine = (
-    brushRadius = 20,
-    brushColor = theme.palette.primary.dark
-  ): void => {
+  saveLine = (radius = 20): void => {
     if (this.points.length < 2) return;
 
     const { brushStrokes } = this.props.annotationsObject.getActiveAnnotation();
 
+    // Do we already have a colour for this layer?
+    const color =
+      brushStrokes?.[0]?.brush.color || getRGBString(getRandomPalette());
+
     brushStrokes.push({
       coordinates: [...this.points],
       brush: {
-        color: brushColor,
-        radius: brushRadius,
+        color,
+        radius,
         type: this.props.brushType === "paintbrush" ? "paint" : "erase",
       },
     });
