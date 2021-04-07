@@ -1,5 +1,6 @@
 type RGBColor = [red: number, green: number, blue: number];
 
+// Muted qualitative colour scheme, colourblind safe, but lacking a clear red or medium blue.
 const palette: RGBColor[] = [
   [51, 34, 136],
   [17, 119, 51],

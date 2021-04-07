@@ -4,12 +4,11 @@ import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/transforms";
 import { Annotation, XYPoint } from "@/annotation/interfaces";
-import { theme } from "@/theme";
+
 import {
   main as mainColor,
   secondary as secondaryColor,
   getRGBString,
-  getRandomPalette,
   palette,
 } from "@/palette";
 
