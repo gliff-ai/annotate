@@ -8,7 +8,7 @@ import { Annotation, XYPoint } from "@/annotation/interfaces";
 import {
   main as mainColor,
   secondary as secondaryColor,
-  getRGBString,
+  getRGBAString,
   palette,
 } from "@/palette";
 
@@ -98,12 +98,12 @@ export class SplineCanvas extends Component<Props, State> {
 
     if (isActive) {
       // Lines
-      context.strokeStyle = getRGBString(mainColor);
+      context.strokeStyle = getRGBAString(mainColor);
     } else {
       context.strokeStyle = color;
     }
     // Squares
-    context.fillStyle = getRGBString(secondaryColor);
+    context.fillStyle = getRGBAString(secondaryColor);
 
     const pointSize = 6;
     let nextPoint;
@@ -186,7 +186,7 @@ export class SplineCanvas extends Component<Props, State> {
           this.drawSplineVector(
             annotation.coordinates,
             i === activeAnnotationID,
-            getRGBString(palette[i % palette.length])
+            getRGBAString(palette[i % palette.length])
           );
         }
       });
