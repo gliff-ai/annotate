@@ -281,8 +281,8 @@ export class SplineCanvas extends Component<Props, State> {
     );
     const isClosed = this.isClosed(currentSplineVector);
 
-    // If the mouse click was near an existing point, nudge that point
     if (nudgePointIdx !== -1) {
+      // If the mouse click was near an existing point, nudge that point
       const nudgePoint = currentSplineVector[nudgePointIdx];
 
       this.updateXYPoint(
@@ -306,10 +306,26 @@ export class SplineCanvas extends Component<Props, State> {
       // Add coordinates to the current spline
       currentSplineVector.push({ x: imageX, y: imageY });
       this.selectedPointIndex = currentSplineVector.length - 1;
-    } else if (this.mode === Mode.edit) {
-      this.addNewPointNearSpline(imageX, imageY);
     }
+    // } else if (this.mode === Mode.edit) {
+    //   this.addNewPointNearSpline(imageX, imageY);
+    // }
 
+    this.drawAllSplines();
+  };
+
+  onDoubleClick = (x: number, y: number): void => {
+    // Add new point on double-click.
+    if (this.mode === Mode.draw) return;
+    const { x: imageX, y: imageY } = canvasToImage(
+      x,
+      y,
+      this.props.imageData.width,
+      this.props.imageData.height,
+      this.props.scaleAndPan,
+      this.props.canvasPositionAndSize
+    );
+    this.addNewPointNearSpline(imageX, imageY);
     this.drawAllSplines();
   };
 
@@ -427,6 +443,7 @@ export class SplineCanvas extends Component<Props, State> {
     <div style={{ pointerEvents: this.props.isActive ? "auto" : "none" }}>
       <BaseCanvas
         onClick={this.onClick}
+        onDoubleClick={this.onDoubleClick}
         onMouseDown={this.onMouseDown}
         onMouseMove={this.onMouseMove}
         onMouseUp={this.onMouseUp}
