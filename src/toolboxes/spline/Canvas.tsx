@@ -29,14 +29,16 @@ export const events = [
   "changeSplineModeToEdit",
   "deselectPoint",
   "closeLoop",
+  "toggleMode",
 ] as const;
 
 interface Event extends CustomEvent {
   type: typeof events[number];
 }
 
+type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 interface State {
-  cursor: "crosshair" | "none";
+  mode: number;
 }
 
 export class SplineCanvas extends Component<Props, State> {
@@ -48,13 +50,14 @@ export class SplineCanvas extends Component<Props, State> {
 
   private isDragging: boolean;
 
-  private mode: number;
-
   constructor(props: Props) {
     super(props);
     this.selectedPointIndex = -1;
     this.isDragging = false;
-    this.mode = Mode.draw;
+
+    this.state = {
+      mode: Mode.draw,
+    };
   }
 
   componentDidMount(): void {
@@ -70,9 +73,6 @@ export class SplineCanvas extends Component<Props, State> {
     if (activeAnnotation?.coordinates) {
       this.drawAllSplines();
     }
-    if (activeAnnotation?.coordinates.length === 0) {
-      this.mode = Mode.draw; // At change of active annotation, set mode to drawing mode (default)
-    }
   }
 
   componentWillUnmount(): void {
@@ -82,7 +82,7 @@ export class SplineCanvas extends Component<Props, State> {
   }
 
   handleEvent = (event: Event): void => {
-    if (event.detail === this.name) {
+    if ((event.detail as string).includes(this.name)) {
       this[event.type]?.call(this);
     }
   };
@@ -196,7 +196,7 @@ export class SplineCanvas extends Component<Props, State> {
 
   private changeSplineModeToEdit = () => {
     // TODO: add keyboard shortcuts for switching between modes
-    this.mode = Mode.select; // Change mode to select mode
+    this.setState({ mode: Mode.select }); // Change mode to select mode
     this.deselectPoint();
   };
 
@@ -237,7 +237,7 @@ export class SplineCanvas extends Component<Props, State> {
       coordinates.splice(this.selectedPointIndex, 1);
     }
     if (coordinates.length === 0) {
-      this.mode = Mode.draw;
+      this.setState({ mode: Mode.draw });
     }
 
     this.selectedPointIndex -= 1;
@@ -323,11 +323,11 @@ export class SplineCanvas extends Component<Props, State> {
       }
 
       // If the spline is not closed, append a new point
-    } else if (this.mode === Mode.draw && !isClosed) {
+    } else if (this.state.mode === Mode.draw && !isClosed) {
       // Add coordinates to the current spline
       currentSplineVector.push({ x: imageX, y: imageY });
       this.selectedPointIndex = currentSplineVector.length - 1;
-    } else if (this.mode === Mode.select) {
+    } else if (this.state.mode === Mode.select) {
       // In select mode a single click allows to select a different spline
       const selectedSpline = this.clickNearSpline(imageX, imageY);
       if (selectedSpline !== -1) {
@@ -393,7 +393,7 @@ export class SplineCanvas extends Component<Props, State> {
 
   onDoubleClick = (x: number, y: number): void => {
     // Add new point on double-click.
-    if (this.mode === Mode.draw) return;
+    if (this.state.mode === Mode.draw) return;
     const { x: imageX, y: imageY } = canvasToImage(
       x,
       y,
@@ -516,6 +516,20 @@ export class SplineCanvas extends Component<Props, State> {
     this.props.annotationsObject.setAnnotationCoordinates(coordinates); // Save new coordinates inside active annotation
   };
 
+  getCursor = (): Cursor => {
+    if (!this.props.isActive) return "none";
+    return this.state.mode === Mode.draw ? "crosshair" : "pointer";
+  };
+
+  toggleMode = (): void => {
+    if (!this.props.isActive) return;
+    if (this.state.mode === Mode.draw) {
+      this.setState({ mode: Mode.select });
+    } else {
+      this.setState({ mode: Mode.draw });
+    }
+  };
+
   render = (): ReactNode => (
     <div style={{ pointerEvents: this.props.isActive ? "auto" : "none" }}>
       <BaseCanvas
@@ -524,7 +538,7 @@ export class SplineCanvas extends Component<Props, State> {
         onMouseDown={this.onMouseDown}
         onMouseMove={this.onMouseMove}
         onMouseUp={this.onMouseUp}
-        cursor={this.props.isActive ? "crosshair" : "none"}
+        cursor={this.getCursor()}
         ref={(baseCanvas) => {
           this.baseCanvas = baseCanvas;
         }}

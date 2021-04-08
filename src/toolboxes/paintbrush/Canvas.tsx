@@ -31,8 +31,10 @@ enum Mode {
   draw,
   select,
 }
+
 interface State {
   hideBackCanvas: boolean;
+  mode: number;
 }
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
@@ -43,7 +45,7 @@ interface Event extends CustomEvent {
   type: typeof events[number];
 }
 
-type Cursor = "crosshair" | "none" | "not-allowed";
+type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 
 export class PaintbrushCanvasClass extends Component<Props, State> {
   readonly name = "paintbrush";
@@ -58,18 +60,16 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
   private points: XYPoint[];
 
-  private mode: number;
-
   constructor(props: Props) {
     super(props);
 
     this.isPressing = false;
     this.isDrawing = false;
     this.points = [];
-    this.mode = Mode.draw;
 
     this.state = {
       hideBackCanvas: false,
+      mode: Mode.draw,
     };
   }
 
@@ -256,12 +256,16 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     Math.abs(point.y - point1.y) < radius;
 
   toggleMode = (): void => {
-    if (this.mode === Mode.draw) {
-      this.mode = Mode.select;
+    if (!this.isActive()) return;
+    if (this.state.mode === Mode.draw) {
+      this.setState({ mode: Mode.select });
     } else {
-      this.mode = Mode.draw;
+      this.setState({ mode: Mode.draw });
     }
   };
+
+  isActive = (): boolean =>
+    this.props.brushType === "paintbrush" || this.props.brushType === "eraser";
 
   saveLine = (radius = 20): void => {
     if (this.points.length < 2) return;
@@ -296,7 +300,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
   /** * Mouse events *** */
   onMouseDown = (canvasX: number, canvasY: number): void => {
-    if (this.mode === Mode.draw) {
+    if (this.state.mode === Mode.draw) {
       // Start drawing
       if (this.props.brushType === "eraser") {
         // Copy the current BACK strokes to the front canvas
@@ -311,7 +315,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
       // Ensure the initial down position gets added to our line
       this.handlePointerMove(canvasX, canvasY);
-    } else if (this.mode === Mode.select) {
+    } else if (this.state.mode === Mode.select) {
       // In select mode a single click allows to select a different paintbrush annotation
       const { x: imageX, y: imageY } = canvasToImage(
         canvasX,
@@ -330,13 +334,13 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
   };
 
   onMouseMove = (canvasX: number, canvasY: number): void => {
-    if (this.mode === Mode.draw) {
+    if (this.state.mode === Mode.draw) {
       this.handlePointerMove(canvasX, canvasY);
     }
   };
 
   onMouseUp = (canvasX: number, canvasY: number): void => {
-    if (this.mode === Mode.draw) {
+    if (this.state.mode === Mode.draw) {
       // End painting & save painting
       this.isPressing = false;
 
@@ -353,16 +357,16 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
   getCursor = (): Cursor => {
     if (this.props.brushType === "paintbrush") {
-      return "crosshair";
+      return this.state.mode === Mode.draw ? "crosshair" : "pointer";
     }
     if (this.props.brushType === "eraser") {
-      return "not-allowed";
+      return this.state.mode === Mode.draw ? "not-allowed" : "pointer";
     }
     return "none";
   };
 
   handleEvent = (event: Event): void => {
-    if (event.detail === this.name) {
+    if ((event.detail as string).includes(this.name)) {
       this[event.type]?.call(this);
     }
   };

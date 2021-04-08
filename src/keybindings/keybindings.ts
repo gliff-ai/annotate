@@ -9,9 +9,9 @@ export const keybindings = {
   Enter: "spline.changeSplineModeToEdit",
   Escape: "spline.deselectPoint",
   "ctrl+KeyC": "spline.closeLoop",
+  "ctrl+KeyA": "spline-paintbrush.toggleMode",
   "ctrl+ArrowLeft": "ui.previousAnnotation",
   "ctrl+ArrowRight": "ui.nextAnnotation",
-  "ctrl+KeyA": "paintbrush.toggleMode",
 } as Readonly<{
   [key: string]: string;
 }>;
