@@ -4,7 +4,13 @@ import { BaseCanvas, CanvasProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/transforms";
 import { XYPoint } from "@/annotation/interfaces";
-import { theme } from "@/theme";
+
+import {
+  main as mainColor,
+  secondary as secondaryColor,
+  palette,
+  getRGBAString,
+} from "@/palette";
 
 import { usePaintbrushStore } from "./Store";
 
@@ -99,7 +105,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
       // Create/update brush
       const brush = {
-        color: theme.palette.secondary.dark,
+        color: getRGBAString(mainColor),
         radius: this.props.brushRadius,
         type: this.props.brushType === "paintbrush" ? "paint" : "erase",
       } as Brush;
@@ -148,7 +154,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     if (brush.type === "erase") {
       // If we are live drawing, use a brush colour
       if (context.canvas.id === "interaction-canvas") {
-        context.strokeStyle = theme.palette.secondary.dark;
+        context.strokeStyle = getRGBAString(secondaryColor);
       } else {
         // If we have saved this line, use a subtraction
         context.globalCompositeOperation = "destination-out";
@@ -186,10 +192,10 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
   };
 
   drawAllStrokes = (context = this.backgroundCanvas.canvasContext): void => {
-    // Draw strokes on active layer whiles showing exiting paintbrush layers
+    // Draw strokes on active layer whiles showing existing paintbrush layers
     this.props.annotationsObject
       .getAllAnnotations()
-      .forEach((annotationsObject) => {
+      .forEach((annotationsObject, index) => {
         if (annotationsObject.toolbox === "paintbrush") {
           annotationsObject.brushStrokes.forEach((brushStrokes) => {
             this.drawPoints(
@@ -203,19 +209,25 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       });
   };
 
-  saveLine = (
-    brushRadius = 20,
-    brushColor = theme.palette.primary.dark
-  ): void => {
+  saveLine = (radius = 20): void => {
     if (this.points.length < 2) return;
 
     const { brushStrokes } = this.props.annotationsObject.getActiveAnnotation();
 
+    // Do we already have a colour for this layer?
+    const color =
+      brushStrokes?.[0]?.brush.color ||
+      getRGBAString(
+        palette[
+          this.props.annotationsObject.getActiveAnnotationID() % palette.length
+        ]
+      );
+
     brushStrokes.push({
       coordinates: [...this.points],
       brush: {
-        color: brushColor,
-        radius: brushRadius,
+        color,
+        radius,
         type: this.props.brushType === "paintbrush" ? "paint" : "erase",
       },
     });

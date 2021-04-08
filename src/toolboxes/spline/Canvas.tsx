@@ -4,7 +4,13 @@ import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/transforms";
 import { Annotation, XYPoint } from "@/annotation/interfaces";
-import { theme } from "@/theme";
+
+import {
+  main as mainColor,
+  secondary as secondaryColor,
+  getRGBAString,
+  palette,
+} from "@/palette";
 
 interface Props extends BaseProps {
   isActive: boolean;
@@ -79,14 +85,26 @@ export class SplineCanvas extends Component<Props, State> {
     }
   };
 
-  drawSplineVector = (splineVector: XYPoint[], isActive = false): void => {
+  drawSplineVector = (
+    splineVector: XYPoint[],
+    isActive = false,
+    color: string
+  ): void => {
     if (splineVector.length === 0) return;
 
     const { canvasContext: context } = this.baseCanvas;
     const lineWidth = isActive ? 2 : 1;
     context.lineWidth = lineWidth;
-    context.strokeStyle = theme.palette.secondary.dark;
-    context.fillStyle = theme.palette.primary.dark;
+
+    if (isActive) {
+      // Lines
+      context.strokeStyle = getRGBAString(mainColor);
+    } else {
+      context.strokeStyle = color;
+    }
+    // Squares
+    context.fillStyle = getRGBAString(secondaryColor);
+
     const pointSize = 6;
     let nextPoint;
 
@@ -167,7 +185,8 @@ export class SplineCanvas extends Component<Props, State> {
         if (annotation.toolbox === "spline") {
           this.drawSplineVector(
             annotation.coordinates,
-            i === activeAnnotationID
+            i === activeAnnotationID,
+            getRGBAString(palette[i % palette.length])
           );
         }
       });
