@@ -75,11 +75,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
   componentDidUpdate(): void {
     // Redraw if we change pan or zoom
-    const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
-
-    if (activeAnnotation?.brushStrokes.length > 0) {
-      this.drawAllStrokes();
-    }
+    this.drawAllStrokes();
   }
 
   componentWillUnmount(): void {
@@ -196,24 +192,22 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     context.stroke();
   };
 
-  drawAllStrokes = (
-    context = this.backgroundCanvas.canvasContext,
-    clearCanvas = false
-  ): void => {
-    const { brushStrokes } = this.props.annotationsObject.getActiveAnnotation();
-
-    if (clearCanvas) {
-      context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-    }
-
-    for (let i = 0; i < brushStrokes.length; i += 1) {
-      this.drawPoints(
-        brushStrokes[i].coordinates,
-        brushStrokes[i].brush,
-        false,
-        context
-      );
-    }
+  drawAllStrokes = (context = this.backgroundCanvas.canvasContext): void => {
+    // Draw strokes on active layer whiles showing exiting paintbrush layers
+    this.props.annotationsObject
+      .getAllAnnotations()
+      .forEach((annotationsObject) => {
+        if (annotationsObject.toolbox === "paintbrush") {
+          annotationsObject.brushStrokes.forEach((brushStrokes) => {
+            this.drawPoints(
+              brushStrokes.coordinates,
+              brushStrokes.brush,
+              false,
+              context
+            );
+          });
+        }
+      });
   };
 
   clickNearBrushStroke = (imageX: number, imageY: number): number => {
@@ -318,7 +312,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       const selectedBrushStroke = this.clickNearBrushStroke(imageX, imageY);
       if (selectedBrushStroke !== -1) {
         this.props.annotationsObject.setActiveAnnotationID(selectedBrushStroke);
-        this.drawAllStrokes(this.backgroundCanvas.canvasContext, true);
+        this.drawAllStrokes();
       }
     }
   };
