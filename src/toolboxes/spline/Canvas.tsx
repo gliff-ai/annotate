@@ -5,11 +5,17 @@ import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/transforms";
 import { Annotation, XYPoint } from "@/annotation/interfaces";
 import { theme } from "@/theme";
+import { calculateSobel } from "./sobel";
+import ImageFileInfo from "@/ImageFileInfo";
 
 interface Props extends BaseProps {
   splineType: string;
   annotationsObject: Annotations;
   callRedraw: number;
+  setUploadedImage: (
+    slicesData: Array<ImageData>,
+    imageFileInfo: ImageFileInfo
+  ) => void;
 }
 enum Mode {
   draw,
@@ -45,6 +51,8 @@ export class SplineCanvas extends Component<Props, State> {
   private isDragging: boolean;
 
   private mode: number;
+
+  private gradientImage: ImageData;
 
   constructor(props: Props) {
     super(props);
@@ -170,7 +178,10 @@ export class SplineCanvas extends Component<Props, State> {
     this.props.annotationsObject
       .getAllAnnotations()
       .forEach((annotation: Annotation, i: number) => {
-        if (annotation.toolbox === "spline") {
+        if (
+          annotation.toolbox === "spline" ||
+          annotation.toolbox === "magicspline"
+        ) {
           this.drawSplineVector(
             annotation.coordinates,
             i === activeAnnotationID
@@ -349,6 +360,39 @@ export class SplineCanvas extends Component<Props, State> {
     this.drawAllSplines();
   };
 
+  snapToGradient = (idx: number, snapeRadius: number = 25): void => {
+    // snaps point #idx in the current active spline to the maximum gradient point within snapeRadius
+    if (this.gradientImage === undefined) return;
+    const { coordinates } = this.props.annotationsObject.getActiveAnnotation();
+    if (coordinates.length == 0) return;
+    const point = coordinates[idx];
+
+    const xMin = Math.floor(Math.max(0, point.x - snapeRadius));
+    const xMax = Math.floor(
+      Math.min(this.props.imageData.width - 1, point.x + snapeRadius)
+    );
+    const yMin = Math.floor(Math.max(0, point.y - snapeRadius));
+    const yMax = Math.floor(
+      Math.min(this.props.imageData.height - 1, point.y + snapeRadius)
+    );
+    console.log(xMin, xMax, yMin, yMax);
+    let maxGradVal = 0;
+    let maxGradX = Math.floor(point.x);
+    let maxGradY = Math.floor(point.y);
+    for (let x = xMin; x <= xMax; x++) {
+      for (let y = yMin; y <= yMax; y++) {
+        let i = (y * this.gradientImage.width + x) * 4 + 0; // using red channel values since gradientImage is always greyscale
+        if (this.gradientImage.data[i] > maxGradVal) {
+          maxGradVal = this.gradientImage.data[i];
+          maxGradX = x;
+          maxGradY = y;
+        }
+      }
+    }
+    console.log(point.x, point.y, maxGradX, maxGradY);
+    this.updateXYPoint(maxGradX, maxGradY, idx);
+  };
+
   onMouseDown = (x: number, y: number): void => {
     const clickPoint = canvasToImage(
       x,
@@ -358,15 +402,34 @@ export class SplineCanvas extends Component<Props, State> {
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
-    const annotationData = this.props.annotationsObject.getActiveAnnotation();
 
-    const nearPoint = this.clickNearPoint(
-      clickPoint,
-      annotationData.coordinates
-    );
-    if (nearPoint !== -1) {
-      this.selectedPointIndex = nearPoint;
+    if (this.state.mode == Mode.magic) {
+      // add a new point and snap it to the highest gradient point within 25 pixels:
+      if (this.gradientImage === undefined) {
+        this.gradientImage = calculateSobel(this.props.imageData);
+        this.baseCanvas.canvasContext.putImageData(this.gradientImage, 0, 0);
+        this.props.setUploadedImage(
+          [this.gradientImage],
+          new ImageFileInfo("balls")
+        );
+        console.log(this.gradientImage);
+      }
+      let { coordinates } = this.props.annotationsObject.getActiveAnnotation();
+      coordinates.push(clickPoint);
+      this.snapToGradient(0, 50);
       this.isDragging = true;
+      this.drawAllSplines();
+    } else {
+      const annotationData = this.props.annotationsObject.getActiveAnnotation();
+
+      const nearPoint = this.clickNearPoint(
+        clickPoint,
+        annotationData.coordinates
+      );
+      if (nearPoint !== -1) {
+        this.selectedPointIndex = nearPoint;
+        this.isDragging = true;
+      }
     }
   };
 
@@ -383,14 +446,21 @@ export class SplineCanvas extends Component<Props, State> {
       this.props.canvasPositionAndSize
     );
 
-    // If dragging first point, update also last
-    const activeSpline = this.props.annotationsObject.getActiveAnnotation()
-      .coordinates;
-    if (this.selectedPointIndex === 0 && this.isClosed(activeSpline)) {
-      this.updateXYPoint(clickPoint.x, clickPoint.y, activeSpline.length - 1);
-    }
+    if (this.state.mode == Mode.magic) {
+      // add a new point and snap it to the highest gradient point within 25 pixels:
+      let { coordinates } = this.props.annotationsObject.getActiveAnnotation();
+      coordinates.push({ x: clickPoint.x, y: clickPoint.y });
+      this.snapToGradient(coordinates.length - 1, 50);
+    } else {
+      // If dragging first point, update also last
+      const activeSpline = this.props.annotationsObject.getActiveAnnotation()
+        .coordinates;
+      if (this.selectedPointIndex === 0 && this.isClosed(activeSpline)) {
+        this.updateXYPoint(clickPoint.x, clickPoint.y, activeSpline.length - 1);
+      }
 
-    this.updateXYPoint(clickPoint.x, clickPoint.y, this.selectedPointIndex);
+      this.updateXYPoint(clickPoint.x, clickPoint.y, this.selectedPointIndex);
+    }
 
     // Redraw all the splines
     this.drawAllSplines();
