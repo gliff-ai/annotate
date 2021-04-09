@@ -34,7 +34,7 @@ enum Mode {
 
 interface State {
   hideBackCanvas: boolean;
-  mode: number;
+  mode: Mode;
 }
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
@@ -218,13 +218,13 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
   clickNearBrushStroke = (imageX: number, imageY: number): number => {
     // Check if point clicked is near an existing paintbrush annotation.
-    // If true, return annotation index, otherwise return -1.
+    // If true, return annotation index, otherwise return null.
     // If more than one annotation at clicked point, select first drawn.
     const annotations = this.props.annotationsObject.getAllAnnotations();
 
     for (let i = 0; i < annotations.length; i += 1) {
       if (annotations[i].toolbox === "paintbrush") {
-        let finalIndex = -1;
+        let finalIndex = null;
         for (let j = 0; j < annotations[i].brushStrokes.length; j += 1) {
           const { coordinates, brush } = annotations[i].brushStrokes[j];
           for (let k = 0; k < coordinates.length; k += 1) {
@@ -236,15 +236,15 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
               )
             ) {
               // If the region near the clicked point has been erased,
-              // finalIndex will be reset to - 1.
-              finalIndex = brush.type === "paint" ? i : -1;
+              // finalIndex will be reset to null.
+              finalIndex = brush.type === "paint" ? i : null;
             }
           }
         }
-        if (finalIndex !== -1) return i;
+        if (finalIndex !== null) return i;
       }
     }
-    return -1;
+    return null;
   };
 
   isClickNearPoint = (
@@ -326,7 +326,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
         this.props.canvasPositionAndSize
       );
       const selectedBrushStroke = this.clickNearBrushStroke(imageX, imageY);
-      if (selectedBrushStroke !== -1) {
+      if (selectedBrushStroke !== null) {
         this.props.annotationsObject.setActiveAnnotationID(selectedBrushStroke);
         this.drawAllStrokes();
       }

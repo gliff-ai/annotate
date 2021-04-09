@@ -38,7 +38,7 @@ interface Event extends CustomEvent {
 
 type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 interface State {
-  mode: number;
+  mode: Mode;
 }
 
 export class SplineCanvas extends Component<Props, State> {
@@ -330,7 +330,7 @@ export class SplineCanvas extends Component<Props, State> {
     } else if (this.state.mode === Mode.select) {
       // In select mode a single click allows to select a different spline
       const selectedSpline = this.clickNearSpline(imageX, imageY);
-      if (selectedSpline !== -1) {
+      if (selectedSpline !== null) {
         this.props.annotationsObject.setActiveAnnotationID(selectedSpline);
       }
     }
@@ -340,7 +340,7 @@ export class SplineCanvas extends Component<Props, State> {
 
   clickNearSpline = (imageX: number, imageY: number): number => {
     // Check if point clicked (in image space) is near an existing spline.
-    // If true, return annotation index, otherwise return -1.
+    // If true, return annotation index, otherwise return null.
     const annotations = this.props.annotationsObject.getAllAnnotations();
 
     for (let i = 0; i < annotations.length; i += 1) {
@@ -360,7 +360,7 @@ export class SplineCanvas extends Component<Props, State> {
         }
       }
     }
-    return -1;
+    return null;
   };
 
   isClickNearLineSegment = (
@@ -373,12 +373,13 @@ export class SplineCanvas extends Component<Props, State> {
     const dy = point.y - point1.y;
     const dxLine = point2.x - point1.x;
     const dyLine = point2.y - point1.y;
+    const distance = 700;
     // Use the cross-product to check whether the XYpoint lies on the line passing
     // through XYpoint 1 and XYpoint 2.
     const crossProduct = dx * dyLine - dy * dxLine;
     // If the XYpoint is exactly on the line the cross-product is zero. Here we set a threshold
     // based on ease of use, to accept points that are close enough to the spline.
-    if (Math.abs(crossProduct) > 700) return false;
+    if (Math.abs(crossProduct) > distance) return false;
 
     // Check if the point is on the segment (i.e., between point 1 and point 2).
     if (Math.abs(dxLine) >= Math.abs(dyLine)) {
