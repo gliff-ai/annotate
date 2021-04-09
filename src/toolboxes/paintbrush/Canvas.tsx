@@ -27,19 +27,25 @@ interface Brush {
   color: string; // rgb(a) string
 }
 
+enum Mode {
+  draw,
+  select,
+}
+
 interface State {
   hideBackCanvas: boolean;
+  mode: Mode;
 }
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
 // We should maybe namespace them so we don't get conflicting methods across toolboxes.
-export const events = ["saveLine"] as const;
+export const events = ["saveLine", "toggleMode"] as const;
 
 interface Event extends CustomEvent {
   type: typeof events[number];
 }
 
-type Cursor = "crosshair" | "none" | "not-allowed";
+type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 
 export class PaintbrushCanvasClass extends Component<Props, State> {
   readonly name = "paintbrush";
@@ -63,6 +69,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
     this.state = {
       hideBackCanvas: false,
+      mode: Mode.draw,
     };
   }
 
@@ -209,6 +216,57 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       });
   };
 
+  clickNearBrushStroke = (imageX: number, imageY: number): number => {
+    // Check if point clicked is near an existing paintbrush annotation.
+    // If true, return annotation index, otherwise return null.
+    // If more than one annotation at clicked point, select first drawn.
+    const annotations = this.props.annotationsObject.getAllAnnotations();
+
+    for (let i = 0; i < annotations.length; i += 1) {
+      if (annotations[i].toolbox === "paintbrush") {
+        let finalIndex = null;
+        for (let j = 0; j < annotations[i].brushStrokes.length; j += 1) {
+          const { coordinates, brush } = annotations[i].brushStrokes[j];
+          for (let k = 0; k < coordinates.length; k += 1) {
+            if (
+              this.isClickNearPoint(
+                { x: imageX, y: imageY },
+                coordinates[k],
+                brush.radius
+              )
+            ) {
+              // If the region near the clicked point has been erased,
+              // finalIndex will be reset to null.
+              finalIndex = brush.type === "paint" ? i : null;
+            }
+          }
+        }
+        if (finalIndex !== null) return i;
+      }
+    }
+    return null;
+  };
+
+  isClickNearPoint = (
+    point: XYPoint,
+    point1: XYPoint,
+    radius: number
+  ): boolean =>
+    Math.abs(point.x - point1.x) < radius &&
+    Math.abs(point.y - point1.y) < radius;
+
+  toggleMode = (): void => {
+    if (!this.isActive()) return;
+    if (this.state.mode === Mode.draw) {
+      this.setState({ mode: Mode.select });
+    } else {
+      this.setState({ mode: Mode.draw });
+    }
+  };
+
+  isActive = (): boolean =>
+    this.props.brushType === "paintbrush" || this.props.brushType === "eraser";
+
   saveLine = (radius = 20): void => {
     if (this.points.length < 2) return;
 
@@ -242,52 +300,73 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
   /** * Mouse events *** */
   onMouseDown = (canvasX: number, canvasY: number): void => {
-    // Start drawing
-    if (this.props.brushType === "eraser") {
-      // Copy the current BACK strokes to the front canvas
-      this.drawAllStrokes(this.interactionCanvas.canvasContext);
-      this.setState({ hideBackCanvas: true }, () => {
-        this.isPressing = true;
-        this.handlePointerMove(canvasX, canvasY);
-      });
+    if (this.state.mode === Mode.draw) {
+      // Start drawing
+      if (this.props.brushType === "eraser") {
+        // Copy the current BACK strokes to the front canvas
+        this.drawAllStrokes(this.interactionCanvas.canvasContext);
+        this.setState({ hideBackCanvas: true }, () => {
+          this.isPressing = true;
+          this.handlePointerMove(canvasX, canvasY);
+        });
+      }
+
+      this.isPressing = true;
+
+      // Ensure the initial down position gets added to our line
+      this.handlePointerMove(canvasX, canvasY);
+    } else if (this.state.mode === Mode.select) {
+      // In select mode a single click allows to select a different paintbrush annotation
+      const { x: imageX, y: imageY } = canvasToImage(
+        canvasX,
+        canvasY,
+        this.props.imageData.width,
+        this.props.imageData.height,
+        this.props.scaleAndPan,
+        this.props.canvasPositionAndSize
+      );
+      const selectedBrushStroke = this.clickNearBrushStroke(imageX, imageY);
+      if (selectedBrushStroke !== null) {
+        this.props.annotationsObject.setActiveAnnotationID(selectedBrushStroke);
+        this.drawAllStrokes();
+      }
     }
-
-    this.isPressing = true;
-
-    // Ensure the initial down position gets added to our line
-    this.handlePointerMove(canvasX, canvasY);
   };
 
   onMouseMove = (canvasX: number, canvasY: number): void => {
-    this.handlePointerMove(canvasX, canvasY);
+    if (this.state.mode === Mode.draw) {
+      this.handlePointerMove(canvasX, canvasY);
+    }
   };
 
   onMouseUp = (canvasX: number, canvasY: number): void => {
-    // End painting & save painting
-    this.isPressing = false;
+    if (this.state.mode === Mode.draw) {
+      // End painting & save painting
+      this.isPressing = false;
 
-    // Draw to this end pos
-    this.handlePointerMove(canvasX, canvasY);
+      // Draw to this end pos
+      this.handlePointerMove(canvasX, canvasY);
 
-    // Stop drawing & save the drawn line
-    this.isDrawing = false;
+      // Stop drawing & save the drawn line
+      this.isDrawing = false;
 
-    this.saveLine(this.props.brushRadius);
-    this.drawAllStrokes();
+      this.saveLine(this.props.brushRadius);
+      this.drawAllStrokes();
+    }
   };
 
   getCursor = (): Cursor => {
     if (this.props.brushType === "paintbrush") {
-      return "crosshair";
+      return this.state.mode === Mode.draw ? "crosshair" : "pointer";
     }
     if (this.props.brushType === "eraser") {
-      return "not-allowed";
+      return this.state.mode === Mode.draw ? "not-allowed" : "pointer";
     }
     return "none";
   };
 
   handleEvent = (event: Event): void => {
-    if (event.detail === this.name) {
+    if ((event.detail as string).includes(this.name)) {
       this[event.type]?.call(this);
     }
   };
