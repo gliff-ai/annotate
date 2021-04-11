@@ -366,11 +366,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
       <Container disableGutters>
         <AppBar>
           <Toolbar>
-            <Tooltip title="Annotate new object">
-              <IconButton id="addAnnotation" onClick={this.addAnnotation}>
-                <Add />
-              </IconButton>
-            </Tooltip>
+            <Upload3DImage setUploadedImage={this.setUploadedImage} />
           </Toolbar>
         </AppBar>
         <Toolbar />
@@ -490,6 +486,40 @@ export class UserInterface extends Component<Record<string, never>, State> {
               </ButtonGroup>
             </Grid>
 
+            <Accordion
+              expanded={this.state.expanded === "labels-toolbox"}
+              onChange={this.handleToolboxChange("labels-toolbox")}
+            >
+              <AccordionSummary expandIcon={<ExpandMore />} id="labels-toolbox">
+                <Typography>Annotations</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid container justify="center">
+                  <ButtonGroup>
+                    <Tooltip title="Annotate new object">
+                      <Button id="addAnnotation" onClick={this.addAnnotation}>
+                        <Add />
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title="Clear selected annotation">
+                      <Button
+                        id="clear-annotation"
+                        onClick={this.clearActiveAnnotation}
+                      >
+                        <Delete />
+                      </Button>
+                    </Tooltip>
+                  </ButtonGroup>
+
+                  <Labels
+                    annotationObject={this.annotationsObject}
+                    presetLabels={this.presetLabels}
+                    activeAnnotationID={this.state.activeAnnotationID}
+                  />
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+
             <BackgroundUI
               expanded={this.state.expanded === "background-toolbox"}
               onChange={this.handleToolboxChange("background-toolbox")}
@@ -514,36 +544,6 @@ export class UserInterface extends Component<Record<string, never>, State> {
               onChange={this.handleToolboxChange("spline-toolbox")}
               activateTool={this.activateTool}
             />
-
-            <Accordion
-              expanded={this.state.expanded === "labels-toolbox"}
-              onChange={this.handleToolboxChange("labels-toolbox")}
-            >
-              <AccordionSummary expandIcon={<ExpandMore />} id="labels-toolbox">
-                <Typography>Labels</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Labels
-                  annotationObject={this.annotationsObject}
-                  presetLabels={this.presetLabels}
-                  activeAnnotationID={this.state.activeAnnotationID}
-                />
-              </AccordionDetails>
-            </Accordion>
-
-            <Grid container justify="center">
-              <ButtonGroup orientation="vertical" style={{ margin: "5px" }}>
-                <Upload3DImage setUploadedImage={this.setUploadedImage} />
-                <Tooltip title="Clear selected annotation">
-                  <Button
-                    id="clear-annotation"
-                    onClick={this.clearActiveAnnotation}
-                  >
-                    <Delete />
-                  </Button>
-                </Tooltip>
-              </ButtonGroup>
-            </Grid>
           </Grid>
         </Grid>
       </Container>
