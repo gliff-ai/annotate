@@ -116,8 +116,8 @@ export class SplineCanvas extends Component<Props, State> {
       firstPoint = imageToCanvas(
         firstPoint.x,
         firstPoint.y,
-        this.props.imageData.width,
-        this.props.imageData.height,
+        this.props.displayedImage.width,
+        this.props.displayedImage.height,
         this.props.scaleAndPan,
         this.props.canvasPositionAndSize
       );
@@ -130,8 +130,8 @@ export class SplineCanvas extends Component<Props, State> {
         nextPoint = imageToCanvas(
           x,
           y,
-          this.props.imageData.width,
-          this.props.imageData.height,
+          this.props.displayedImage.width,
+          this.props.displayedImage.height,
           this.props.scaleAndPan,
           this.props.canvasPositionAndSize
         );
@@ -147,8 +147,8 @@ export class SplineCanvas extends Component<Props, State> {
         nextPoint = imageToCanvas(
           x,
           y,
-          this.props.imageData.width,
-          this.props.imageData.height,
+          this.props.displayedImage.width,
+          this.props.displayedImage.height,
           this.props.scaleAndPan,
           this.props.canvasPositionAndSize
         );
@@ -252,8 +252,8 @@ export class SplineCanvas extends Component<Props, State> {
     const { x: clickPointX, y: clickPointY } = imageToCanvas(
       clickPoint.x,
       clickPoint.y,
-      this.props.imageData.width,
-      this.props.imageData.height,
+      this.props.displayedImage.width,
+      this.props.displayedImage.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
@@ -264,8 +264,8 @@ export class SplineCanvas extends Component<Props, State> {
       point = imageToCanvas(
         point.x,
         point.y,
-        this.props.imageData.width,
-        this.props.imageData.height,
+        this.props.displayedImage.width,
+        this.props.displayedImage.height,
         this.props.scaleAndPan,
         this.props.canvasPositionAndSize
       );
@@ -289,8 +289,8 @@ export class SplineCanvas extends Component<Props, State> {
     const { x: imageX, y: imageY } = canvasToImage(
       x,
       y,
-      this.props.imageData.width,
-      this.props.imageData.height,
+      this.props.displayedImage.width,
+      this.props.displayedImage.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
@@ -398,8 +398,8 @@ export class SplineCanvas extends Component<Props, State> {
     const { x: imageX, y: imageY } = canvasToImage(
       x,
       y,
-      this.props.imageData.width,
-      this.props.imageData.height,
+      this.props.displayedImage.width,
+      this.props.displayedImage.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
@@ -435,8 +435,8 @@ export class SplineCanvas extends Component<Props, State> {
     const clickPoint = canvasToImage(
       x,
       y,
-      this.props.imageData.width,
-      this.props.imageData.height,
+      this.props.displayedImage.width,
+      this.props.displayedImage.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
@@ -459,8 +459,8 @@ export class SplineCanvas extends Component<Props, State> {
     const clickPoint = canvasToImage(
       x,
       y,
-      this.props.imageData.width,
-      this.props.imageData.height,
+      this.props.displayedImage.width,
+      this.props.displayedImage.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );

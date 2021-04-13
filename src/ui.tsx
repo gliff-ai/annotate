@@ -64,7 +64,7 @@ interface State {
     scale: number;
   };
   activeTool?: Tool;
-  imageData?: ImageData;
+  displayedImage?: ImageBitmap;
   activeAnnotationID: number;
   imageLoaded: boolean;
   viewportPositionAndSize: Required<PositionAndSize>;
@@ -81,7 +81,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
 
   private presetLabels: string[];
 
-  private slicesData: Array<ImageData>;
+  private slicesData: Array<Array<ImageBitmap>>;
 
   private imageFileInfo: ImageFileInfo | null;
 
@@ -202,18 +202,20 @@ export class UserInterface extends Component<Record<string, never>, State> {
 
     // calculate how much bigger the image is than the canvas, in canvas space:
     const imageScalingFactor = Math.min(
-      this.state.viewportPositionAndSize.width / this.state.imageData.width,
-      this.state.viewportPositionAndSize.height / this.state.imageData.height
+      this.state.viewportPositionAndSize.width /
+        this.state.displayedImage.width,
+      this.state.viewportPositionAndSize.height /
+        this.state.displayedImage.height
     );
 
     const xMargin =
-      this.state.imageData.width *
+      this.state.displayedImage.width *
         imageScalingFactor *
         this.state.scaleAndPan.scale -
       this.state.viewportPositionAndSize.width;
 
     const yMargin =
-      this.state.imageData.height *
+      this.state.displayedImage.height *
         imageScalingFactor *
         this.state.scaleAndPan.scale -
       this.state.viewportPositionAndSize.height;
@@ -278,18 +280,18 @@ export class UserInterface extends Component<Record<string, never>, State> {
     this.incrementScaleAndPan("y", -CONFIG.PAN_AMOUNT);
   };
 
-  updateImageData = (imageData: ImageData): void => {
-    this.setState({ imageData });
+  updateDisplayedImage = (displayedImage: ImageBitmap): void => {
+    this.setState({ displayedImage });
   };
 
   setUploadedImage = (
-    slicesData: Array<ImageData>,
+    slicesData: Array<Array<ImageBitmap>>,
     imageFileInfo: ImageFileInfo
   ): void => {
     this.imageFileInfo = imageFileInfo;
     this.slicesData = slicesData;
     this.setState({ imageLoaded: true, sliceIndex: 0 }, () => {
-      this.updateImageData(slicesData[0]); // go to first slice (if it's a 3D image)
+      this.updateDisplayedImage(slicesData[0][0]); // go to first slice (if it's a 3D image)
     });
   };
 
@@ -357,7 +359,10 @@ export class UserInterface extends Component<Record<string, never>, State> {
   };
 
   changeSlice = (e: ChangeEvent, value: number): void => {
-    this.setState({ sliceIndex: value, imageData: this.slicesData[value] });
+    this.setState({
+      sliceIndex: value,
+      displayedImage: this.slicesData[value][0],
+    });
   };
 
   render = (): ReactNode => (
@@ -376,8 +381,8 @@ export class UserInterface extends Component<Record<string, never>, State> {
             <BackgroundCanvas
               scaleAndPan={this.state.scaleAndPan}
               imgSrc={this.state.imageLoaded ? null : this.imageSource}
-              imageData={this.state.imageData}
-              updateImageData={this.updateImageData}
+              displayedImage={this.state.displayedImage}
+              updateDisplayedImage={this.updateDisplayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
             />
@@ -386,7 +391,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
               scaleAndPan={this.state.scaleAndPan}
               isActive={this.state.activeTool === Tools.spline}
               annotationsObject={this.annotationsObject}
-              imageData={this.state.imageData}
+              displayedImage={this.state.displayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
               callRedraw={this.state.callRedraw}
@@ -396,13 +401,13 @@ export class UserInterface extends Component<Record<string, never>, State> {
               scaleAndPan={this.state.scaleAndPan}
               brushType={this.state.activeTool}
               annotationsObject={this.annotationsObject}
-              imageData={this.state.imageData}
+              displayedImage={this.state.displayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
               callRedraw={this.state.callRedraw}
             />
 
-            {this.state.imageLoaded && (
+            {this.state.imageLoaded && this.slicesData.length > 1 && (
               <div
                 style={{
                   position: "absolute",
@@ -433,7 +438,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
                 scaleAndPan={this.state.scaleAndPan}
                 setScaleAndPan={this.setScaleAndPan}
                 imgSrc={this.state.imageLoaded ? null : this.imageSource}
-                imageData={this.state.imageData}
+                displayedImage={this.state.displayedImage}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 minimapPositionAndSize={this.state.minimapPositionAndSize}
                 setMinimapPositionAndSize={this.setMinimapPositionAndSize}

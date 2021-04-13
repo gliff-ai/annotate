@@ -18,14 +18,14 @@ interface Props extends BaseProps {
 export class BackgroundMinimapClass extends Component<Props> {
   private baseMinimap: BaseMinimap;
 
-  private image: HTMLImageElement | HTMLCanvasElement;
+  private image: HTMLImageElement | ImageBitmap;
 
   componentDidMount = (): void => {
     this.loadImage();
   };
 
   componentDidUpdate(prevProps: Props): void {
-    if (prevProps.imageData !== this.props.imageData) {
+    if (prevProps.displayedImage !== this.props.displayedImage) {
       this.loadImage(); // calls this.drawImage() after image loading
     } else {
       this.drawImage();
@@ -50,7 +50,8 @@ export class BackgroundMinimapClass extends Component<Props> {
       };
       this.image.src = this.props.imgSrc;
     } else {
-      this.image = this.createCanvasFromImageData();
+      // this.image = this.createCanvasFromImageData();
+      this.image = this.props.displayedImage;
       this.drawImage();
     }
   };
@@ -59,15 +60,15 @@ export class BackgroundMinimapClass extends Component<Props> {
     this.baseMinimap.baseCanvas.canvasContext.filter = `contrast(${this.props.contrast}%) brightness(${this.props.brightness}%)`;
   };
 
-  private createCanvasFromImageData = (): HTMLCanvasElement => {
-    // Create a canvas element from an array.
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-    canvas.width = this.props.imageData.width;
-    canvas.height = this.props.imageData.height;
-    context.putImageData(this.props.imageData, 0, 0);
-    return canvas;
-  };
+  // private createCanvasFromImageData = (): HTMLCanvasElement => {
+  //   // Create a canvas element from an array.
+  //   const canvas = document.createElement("canvas");
+  //   const context = canvas.getContext("2d");
+  //   canvas.width = this.props.imageData.width;
+  //   canvas.height = this.props.imageData.height;
+  //   context.putImageData(this.props.imageData, 0, 0);
+  //   return canvas;
+  // };
 
   private drawImage = () => {
     // Any annotation that is already on the canvas is put on top of any new annotation
@@ -103,7 +104,7 @@ export class BackgroundMinimapClass extends Component<Props> {
         this.baseMinimap = baseMinimap;
       }}
       name="background-minimap"
-      imageData={this.props.imageData}
+      displayedImage={this.props.displayedImage}
       canvasPositionAndSize={this.props.canvasPositionAndSize}
       minimapPositionAndSize={this.props.minimapPositionAndSize}
       setMinimapPositionAndSize={this.props.setMinimapPositionAndSize}
@@ -125,7 +126,7 @@ export const BackgroundMinimap = (
       minimapPositionAndSize={props.minimapPositionAndSize}
       setScaleAndPan={props.setScaleAndPan}
       scaleAndPan={props.scaleAndPan}
-      imageData={props.imageData}
+      displayedImage={props.displayedImage}
     />
   );
 };

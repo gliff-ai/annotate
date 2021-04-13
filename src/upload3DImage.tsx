@@ -6,7 +6,7 @@ import ImageFileInfo from "./ImageFileInfo";
 
 interface Props {
   setUploadedImage: (
-    slicesData: Array<ImageData>,
+    slicesData: Array<Array<ImageBitmap>>,
     imageFileInfo: ImageFileInfo
   ) => void;
 }
@@ -14,7 +14,7 @@ interface Props {
 export default class Upload3DImage extends Component<Props> {
   private imageFileInfo: ImageFileInfo | null;
 
-  private slicesData: Array<ImageData>;
+  private slicesData: Array<Array<ImageBitmap>>;
 
   constructor(props: Props) {
     super(props);
@@ -43,7 +43,7 @@ export default class Upload3DImage extends Component<Props> {
       console.log(error);
     });
 
-  private loadImageFile = (buffer: ArrayBuffer): void => {
+  private loadImageFile = async (buffer: ArrayBuffer): Promise<void> => {
     // Decode the images using the UTIF library.
     const ifds = UTIF.decode(buffer);
     for (const ifd of ifds) {
@@ -54,6 +54,7 @@ export default class Upload3DImage extends Component<Props> {
 
     const resolutionUnitstr = ifds[0].t296 as string[];
 
+    // set this.imageFileInfo.resolution_x and resolution_y:
     if (resolutionUnitstr !== undefined && resolutionUnitstr.length === 1) {
       const resolutionUnit = parseInt(resolutionUnitstr[0], 10);
 
@@ -77,45 +78,39 @@ export default class Upload3DImage extends Component<Props> {
     }
 
     const descriptions = ifds[0].t270 as string[];
-    const extraChannels = this.getNumberOfExtraChannels(descriptions);
+    const channels = this.getNumberOfChannels(descriptions);
 
-    if (extraChannels !== 0) {
-      this.slicesData = [];
+    const slices = ifds.length / channels;
+    this.slicesData = [];
 
-      // Loop through each slice
-      for (let i = 0; i < ifds.length / extraChannels; i += 1) {
-        // Allocate a buffer for this slice
-        const rgba = new Uint8ClampedArray(width * height * 4);
+    // Loop through each slice
+    for (let i = 0; i < slices; i += 1) {
+      // Allocate a buffer for this slice
+      this.slicesData.push(new Array<ImageBitmap>());
 
-        // For each channel, copy the data for the right IFD into the buffer
-        for (let j = 0; j < extraChannels; j += 1) {
-          // For some reason, it seems that the channels are inverted
-          const srcj = extraChannels - 1 - j;
-          const component = UTIF.toRGBA8(ifds[i * extraChannels + srcj]);
-          // The single channel will be stored in the green component.
-          for (let k = 0; k < width * height; k += 1) {
-            rgba[4 * k + j] = component[4 * k + 1];
-          }
-        }
+      // For each channel, copy the corresponding ifd data into a new ImageBitmap
+      for (let j = 0; j < channels; j += 1) {
+        // For some reason, it seems that the channels are inverted
+        const srcj = channels - 1 - j;
 
-        // Set the alpha value to opaque.
+        // extract data from the ifd for this channelslice into an RGBA 8bit array (it will be stored in the green channel):
+        const sliceChannelRGBA8 = UTIF.toRGBA8(ifds[i * channels + srcj]);
+
+        // read the green channel of sliceChannelRGBA8 into a new Uint8ClampedArray (getting rid of all the extra zeros):
+        const sliceChannel = new Uint8ClampedArray(width * height);
         for (let k = 0; k < width * height; k += 1) {
-          rgba[4 * k + 3] = 255;
+          sliceChannel[k] = sliceChannelRGBA8[4 * k + 1];
         }
 
-        // Push the slice onto our image stack.
-        this.slicesData.push(
-          new ImageData(Uint8ClampedArray.from(rgba), width, height)
+        // create a bitmap image from the channel slice data and store it inside slicesData
+        this.slicesData[i][j] = await createImageBitmap(
+          new ImageData(
+            Uint8ClampedArray.from(sliceChannelRGBA8),
+            width,
+            height
+          )
         );
       }
-    } else {
-      // Build a list of images (as canvas) that
-      // can be draw onto a canvas.
-      this.slicesData = ifds
-        .map(UTIF.toRGBA8)
-        .map(
-          (rgba) => new ImageData(Uint8ClampedArray.from(rgba), width, height)
-        );
     }
 
     this.imageFileInfo.width = width;
@@ -124,9 +119,9 @@ export default class Upload3DImage extends Component<Props> {
     this.props.setUploadedImage(this.slicesData, this.imageFileInfo);
   };
 
-  private getNumberOfExtraChannels = (descriptions: string[]): number => {
+  private getNumberOfChannels = (descriptions: string[]): number => {
     // Get the number of extra channels in the uploaded tiff image
-    let extraChannels = 0;
+    let channels = 1;
     if (descriptions !== undefined && descriptions.length === 1) {
       const description = descriptions[0];
 
@@ -138,13 +133,17 @@ export default class Upload3DImage extends Component<Props> {
 
         const descChannelsIdx = description.indexOf("channels=") + 9;
         const descChannelsEnd = description.indexOf("\n", descChannelsIdx);
-        extraChannels = parseInt(
+        channels = parseInt(
           description.slice(descChannelsIdx, descChannelsEnd),
           10
         );
       }
     }
-    return extraChannels;
+    // TODO: check if we need this..
+    if (channels == 0) {
+      channels = 1;
+    }
+    return channels;
   };
 
   render = (): ReactNode => (

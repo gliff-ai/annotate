@@ -31,10 +31,10 @@ export class BaseMinimap extends React.Component<Props> {
   };
 
   private applyView = (): void => {
-    if (this.props.imageData) {
+    if (this.props.displayedImage) {
       this.boundingRect = getMinimapViewFinder(
-        this.props.imageData.width,
-        this.props.imageData.height,
+        this.props.displayedImage.width,
+        this.props.displayedImage.height,
         this.props.scaleAndPan,
         this.props.canvasPositionAndSize,
         this.props.minimapPositionAndSize
@@ -62,13 +62,13 @@ export class BaseMinimap extends React.Component<Props> {
     const { x: targetX, y: targetY } = minimapToCanvas(
       minimapX,
       minimapY,
-      this.props.imageData.width,
-      this.props.imageData.height,
+      this.props.displayedImage.width,
+      this.props.displayedImage.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize,
       this.props.minimapPositionAndSize
     );
-   
+
     // calculate the vector from the current canvas centre to the target position:
     const translateX = targetX - this.props.canvasPositionAndSize.width / 2;
     const translateY = targetY - this.props.canvasPositionAndSize.height / 2;

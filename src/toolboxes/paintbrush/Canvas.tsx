@@ -94,8 +94,8 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     const { x, y } = canvasToImage(
       canvasX,
       canvasY,
-      this.props.imageData.width,
-      this.props.imageData.height,
+      this.props.displayedImage.width,
+      this.props.displayedImage.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
@@ -138,8 +138,8 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
         const { x, y } = imageToCanvas(
           point.x,
           point.y,
-          this.props.imageData.width,
-          this.props.imageData.height,
+          this.props.displayedImage.width,
+          this.props.displayedImage.height,
           this.props.scaleAndPan,
           this.props.canvasPositionAndSize
         );
@@ -320,8 +320,8 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       const { x: imageX, y: imageY } = canvasToImage(
         canvasX,
         canvasY,
-        this.props.imageData.width,
-        this.props.imageData.height,
+        this.props.displayedImage.width,
+        this.props.displayedImage.height,
         this.props.scaleAndPan,
         this.props.canvasPositionAndSize
       );
@@ -421,7 +421,7 @@ export const PaintbrushCanvas = (
     <PaintbrushCanvasClass
       brushType={props.brushType}
       annotationsObject={props.annotationsObject}
-      imageData={props.imageData}
+      displayedImage={props.displayedImage}
       scaleAndPan={props.scaleAndPan}
       canvasPositionAndSize={props.canvasPositionAndSize}
       brushRadius={paintbrush.brushRadius}
