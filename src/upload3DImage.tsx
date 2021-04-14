@@ -46,9 +46,7 @@ export default class Upload3DImage extends Component<Props> {
   private loadImageFile = (buffer: ArrayBuffer): void => {
     // Decode the images using the UTIF library.
     const ifds = UTIF.decode(buffer);
-    for (const ifd of ifds) {
-      UTIF.decodeImage(buffer, ifd);
-    }
+    ifds.map((ifd) => UTIF.decodeImage(buffer, ifd));
 
     const { width, height } = ifds[0];
 
@@ -83,28 +81,22 @@ export default class Upload3DImage extends Component<Props> {
     const slices = ifds.length / channels;
     this.slicesData = [];
 
-    // Loop through each slice
-    for (let i = 0; i < slices; i += 1) {
-      // Allocate a buffer for this slice
-      this.slicesData.push(new Array<Uint8ClampedArray>());
-
-      // For each channel, copy the corresponding ifd data into a new ImageBitmap
-      for (let j = 0; j < channels; j += 1) {
-        // For some reason, it seems that the channels are inverted
-        const srcj = channels - 1 - j;
-
-        // extract data from the ifd for this channelslice into an RGBA 8bit array (will be greyscale, R==G==B):
-        const sliceChannelRGBA8 = UTIF.toRGBA8(ifds[i * channels + srcj]);
-
-        // read the red channel of sliceChannelRGBA8 into a new Uint8ClampedArray (discarding redundant channels):
-        const sliceChannel = new Uint8ClampedArray(width * height);
-        for (let k = 0; k < width * height; k += 1) {
-          sliceChannel[k] = sliceChannelRGBA8[4 * k];
-        }
-
-        this.slicesData[i][j] = sliceChannel;
+    ifds.map((ifd, i) => {
+      if (i % channels === 0) {
+        this.slicesData.push(new Array<Uint8ClampedArray>());
       }
-    }
+
+      const sliceChannelRGBA8 = UTIF.toRGBA8(ifds[i]);
+
+      const sliceChannel = new Uint8ClampedArray(width * height);
+      for (let k = 0; k < width * height; k += 1) {
+        sliceChannel[k] = sliceChannelRGBA8[4 * k];
+      }
+
+      this.slicesData[Math.floor(i / channels)][
+        channels - 1 - (i % channels) // channels are ordered backwards in ifds
+      ] = sliceChannel;
+    });
 
     this.imageFileInfo.width = width;
     this.imageFileInfo.height = height;
