@@ -60,12 +60,15 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
   private points: XYPoint[];
 
+  private annotationOpacity: number;
+
   constructor(props: Props) {
     super(props);
 
     this.isPressing = false;
     this.isDrawing = false;
     this.points = [];
+    this.annotationOpacity = 1;
 
     this.state = {
       hideBackCanvas: false,
@@ -158,13 +161,15 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     context.lineJoin = "round";
     context.lineCap = "round";
 
+    // Set annotation colour and transparency
     if (isActive) {
       context.strokeStyle = getRGBAString(mainColor);
-      context.globalAlpha = 1;
+      this.annotationOpacity = 1;
     } else {
       context.strokeStyle = brush.color;
-      context.globalAlpha = 0.3;
+      this.annotationOpacity = 0.5;
     }
+    context.globalAlpha = this.annotationOpacity;
 
     if (brush.type === "erase") {
       // If we are live drawing, use a brush colour
