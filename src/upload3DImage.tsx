@@ -46,7 +46,7 @@ export default class Upload3DImage extends Component<Props> {
   private loadImageFile = (buffer: ArrayBuffer): void => {
     // Decode the images using the UTIF library.
     const ifds = UTIF.decode(buffer);
-    ifds.map((ifd) => UTIF.decodeImage(buffer, ifd));
+    ifds.forEach((ifd) => UTIF.decodeImage(buffer, ifd));
 
     const { width, height } = ifds[0];
 
@@ -78,10 +78,9 @@ export default class Upload3DImage extends Component<Props> {
     const descriptions = ifds[0].t270 as string[];
     const channels = this.getNumberOfChannels(descriptions);
 
-    const slices = ifds.length / channels;
     this.slicesData = [];
 
-    ifds.map((ifd, i) => {
+    ifds.forEach((ifd, i) => {
       if (i % channels === 0) {
         this.slicesData.push(new Array<Uint8ClampedArray>());
       }
