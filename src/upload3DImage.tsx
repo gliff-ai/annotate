@@ -25,9 +25,7 @@ export default class Upload3DImage extends Component<Props> {
     this.readFile(imageFile)
       .then((buffer: ArrayBuffer) => {
         this.imageFileInfo = new ImageFileInfo(imageFile.name);
-        this.loadImageFile(buffer).catch((error) => {
-          console.log(error);
-        });
+        this.loadImageFile(buffer);
       })
       .catch((error) => {
         console.log(error);
@@ -45,7 +43,7 @@ export default class Upload3DImage extends Component<Props> {
       console.log(error);
     });
 
-  private loadImageFile = async (buffer: ArrayBuffer): Promise<void> => {
+  private loadImageFile = (buffer: ArrayBuffer): void => {
     // Decode the images using the UTIF library.
     const ifds = UTIF.decode(buffer);
     for (const ifd of ifds) {

@@ -282,8 +282,8 @@ export class UserInterface extends Component<Record<string, never>, State> {
   updateDisplayedImage = async (): Promise<void> => {
     // Combine selected channels' data into single rbg image
 
-    const width = this.imageFileInfo.width;
-    const height = this.imageFileInfo.height;
+    const { width } = this.imageFileInfo;
+    const { height } = this.imageFileInfo;
     const rgbaImage = new Uint8ClampedArray(width * height * 4);
     const imageChannels = this.slicesData[this.state.sliceIndex];
 
@@ -309,7 +309,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
       rgbaImage[4 * i + 3] = 255;
     }
 
-    //create a bitmap image from the channel slice data and store it inside displayedImage:
+    // create a bitmap image from the channel slice data and store it inside displayedImage:
     const displayedImage = await createImageBitmap(
       new ImageData(rgbaImage, width, height)
     );
@@ -325,7 +325,9 @@ export class UserInterface extends Component<Record<string, never>, State> {
 
     this.slicesData = slicesData;
     this.setState({ imageLoaded: true, sliceIndex: 0 }, () => {
-      this.updateDisplayedImage(); // go to first slice (if it's a 3D image)
+      this.updateDisplayedImage().catch((error) => {
+        console.log(error);
+      }); // go to first slice (if it's a 3D image)
     });
   };
 
@@ -398,7 +400,9 @@ export class UserInterface extends Component<Record<string, never>, State> {
         sliceIndex: value,
       },
       () => {
-        this.updateDisplayedImage();
+        this.updateDisplayedImage().catch((error) => {
+          console.log(error);
+        });
       }
     );
   };
