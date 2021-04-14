@@ -25,7 +25,9 @@ export default class Upload3DImage extends Component<Props> {
     this.readFile(imageFile)
       .then((buffer: ArrayBuffer) => {
         this.imageFileInfo = new ImageFileInfo(imageFile.name);
-        this.loadImageFile(buffer);
+        this.loadImageFile(buffer).catch((error) => {
+          console.log(error);
+        });
       })
       .catch((error) => {
         console.log(error);
@@ -81,12 +83,12 @@ export default class Upload3DImage extends Component<Props> {
     const channels = this.getNumberOfChannels(descriptions);
 
     const slices = ifds.length / channels;
-    this.slicesData = [];
+    const slicesDataPromises: Promise<ImageBitmap>[][] = [];
 
     // Loop through each slice
     for (let i = 0; i < slices; i += 1) {
       // Allocate a buffer for this slice
-      this.slicesData.push(new Array<ImageBitmap>());
+      slicesDataPromises.push(new Array<Promise<ImageBitmap>>());
 
       // For each channel, copy the corresponding ifd data into a new ImageBitmap
       for (let j = 0; j < channels; j += 1) {
@@ -103,7 +105,7 @@ export default class Upload3DImage extends Component<Props> {
         }
 
         // create a bitmap image from the channel slice data and store it inside slicesData
-        this.slicesData[i][j] = await createImageBitmap(
+        slicesDataPromises[i][j] = createImageBitmap(
           new ImageData(
             Uint8ClampedArray.from(sliceChannelRGBA8),
             width,
@@ -112,6 +114,17 @@ export default class Upload3DImage extends Component<Props> {
         );
       }
     }
+
+    // the linter complains if we await the createImageBitmaps inside a for loop, so instead we have to let the foo loop
+    // build a Promise<ImageBitmap>[][], and then use Promise.all twice to turn that into ImageBitmap[][]
+    // see https://eslint.org/docs/rules/no-await-in-loop
+    // also https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
+    const halfUnwrapped: Promise<
+      ImageBitmap[]
+    >[] = slicesDataPromises.map(async (sliceChannels) =>
+      Promise.all(sliceChannels)
+    );
+    this.slicesData = await Promise.all(halfUnwrapped); // ImageBitmap[][]
 
     this.imageFileInfo.width = width;
     this.imageFileInfo.height = height;
@@ -140,7 +153,7 @@ export default class Upload3DImage extends Component<Props> {
       }
     }
     // TODO: check if we need this..
-    if (channels == 0) {
+    if (channels === 0) {
       channels = 1;
     }
     return channels;

@@ -202,7 +202,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     // Draw strokes on active layer whiles showing existing paintbrush layers
     this.props.annotationsObject
       .getAllAnnotations()
-      .forEach((annotationsObject, index) => {
+      .forEach((annotationsObject) => {
         if (annotationsObject.toolbox === "paintbrush") {
           annotationsObject.brushStrokes.forEach((brushStrokes) => {
             this.drawPoints(
