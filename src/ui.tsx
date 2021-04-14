@@ -80,7 +80,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
 
   private presetLabels: string[];
 
-  private slicesData: Array<Array<ImageBitmap>>;
+  private slicesData: Array<Array<Uint8ClampedArray>>;
 
   private imageFileInfo: ImageFileInfo | null;
 
@@ -279,18 +279,53 @@ export class UserInterface extends Component<Record<string, never>, State> {
     this.incrementScaleAndPan("y", -CONFIG.PAN_AMOUNT);
   };
 
-  updateDisplayedImage = (displayedImage: ImageBitmap): void => {
+  updateDisplayedImage = async (): Promise<void> => {
+    // Combine selected channels' data into single rbg image
+
+    const width = this.imageFileInfo.width;
+    const height = this.imageFileInfo.height;
+    const rgbaImage = new Uint8ClampedArray(width * height * 4);
+    const imageChannels = this.slicesData[this.state.sliceIndex];
+
+    for (let i = 0; i < width * height; i += 1) {
+      if (imageChannels.length === 1) {
+        // single channel image; so write the same values into R, G and B:
+        rgbaImage[4 * i + 0] = imageChannels[0][i];
+        rgbaImage[4 * i + 1] = imageChannels[0][i];
+        rgbaImage[4 * i + 2] = imageChannels[0][i];
+      } else if (imageChannels.length === 2) {
+        // two channel image; write first channel into R, second into G, leave B as 0:
+        rgbaImage[4 * i + 0] = imageChannels[0][i];
+        rgbaImage[4 * i + 1] = imageChannels[1][i];
+      } else {
+        // three or more channel image; first three channels in R, G and B respectively:
+        rgbaImage[4 * i + 0] = imageChannels[0][i];
+        rgbaImage[4 * i + 1] = imageChannels[1][i];
+        rgbaImage[4 * i + 2] = imageChannels[2][i];
+        // TODO: instead of ignoring channels>3, convert extra channels into yellow, cyan, magenta
+      }
+
+      // set alpha to 255:
+      rgbaImage[4 * i + 3] = 255;
+    }
+
+    //create a bitmap image from the channel slice data and store it inside displayedImage:
+    const displayedImage = await createImageBitmap(
+      new ImageData(rgbaImage, width, height)
+    );
+
     this.setState({ displayedImage });
   };
 
   setUploadedImage = (
-    slicesData: Array<Array<ImageBitmap>>,
-    imageFileInfo: ImageFileInfo
+    imageFileInfo: ImageFileInfo,
+    slicesData: Array<Array<Uint8ClampedArray>>
   ): void => {
     this.imageFileInfo = imageFileInfo;
+
     this.slicesData = slicesData;
     this.setState({ imageLoaded: true, sliceIndex: 0 }, () => {
-      this.updateDisplayedImage(slicesData[0][0]); // go to first slice (if it's a 3D image)
+      this.updateDisplayedImage(); // go to first slice (if it's a 3D image)
     });
   };
 
@@ -358,10 +393,18 @@ export class UserInterface extends Component<Record<string, never>, State> {
   };
 
   changeSlice = (e: ChangeEvent, value: number): void => {
-    this.setState({
-      sliceIndex: value,
-      displayedImage: this.slicesData[value][0],
-    });
+    this.setState(
+      {
+        sliceIndex: value,
+      },
+      () => {
+        this.updateDisplayedImage();
+      }
+    );
+  };
+
+  setDisplayedImage = (displayedImage: ImageBitmap): void => {
+    this.setState({ displayedImage });
   };
 
   render = (): ReactNode => (
@@ -381,7 +424,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
               scaleAndPan={this.state.scaleAndPan}
               imgSrc={this.state.imageLoaded ? null : this.imageSource}
               displayedImage={this.state.displayedImage}
-              updateDisplayedImage={this.updateDisplayedImage}
+              setDisplayedImage={this.setDisplayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
             />

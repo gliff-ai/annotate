@@ -8,7 +8,7 @@ import { useBackgroundStore } from "./Store";
 
 interface Props extends BaseProps {
   imgSrc: string | null;
-  updateDisplayedImage: (displayedImage: ImageBitmap) => void;
+  setDisplayedImage: (displayedImage: ImageBitmap) => void;
   contrast: number;
   brightness: number;
   channels: boolean[];
@@ -106,7 +106,7 @@ export class BackgroundCanvasClass extends Component<Props> {
       this.image.crossOrigin = "anonymous";
       // Draw the image once loaded
       this.image.onload = async () => {
-        this.props.updateDisplayedImage(
+        this.props.setDisplayedImage(
           await createImageBitmap(
             this.baseCanvas.canvasContext.getImageData(
               0,
@@ -162,7 +162,7 @@ export const BackgroundCanvas = (
   return (
     <BackgroundCanvasClass
       imgSrc={props.imgSrc}
-      updateDisplayedImage={props.updateDisplayedImage}
+      setDisplayedImage={props.setDisplayedImage}
       contrast={background.contrast}
       brightness={background.brightness}
       channels={background.channels}

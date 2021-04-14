@@ -6,15 +6,15 @@ import ImageFileInfo from "./ImageFileInfo";
 
 interface Props {
   setUploadedImage: (
-    slicesData: Array<Array<ImageBitmap>>,
-    imageFileInfo: ImageFileInfo
+    imageFileInfo: ImageFileInfo,
+    slicesData?: Array<Array<Uint8ClampedArray>>
   ) => void;
 }
 
 export default class Upload3DImage extends Component<Props> {
   private imageFileInfo: ImageFileInfo | null;
 
-  private slicesData: Array<Array<ImageBitmap>>;
+  private slicesData: Array<Array<Uint8ClampedArray>>;
 
   constructor(props: Props) {
     super(props);
@@ -83,53 +83,35 @@ export default class Upload3DImage extends Component<Props> {
     const channels = this.getNumberOfChannels(descriptions);
 
     const slices = ifds.length / channels;
-    const slicesDataPromises: Promise<ImageBitmap>[][] = [];
+    this.slicesData = [];
 
     // Loop through each slice
     for (let i = 0; i < slices; i += 1) {
       // Allocate a buffer for this slice
-      slicesDataPromises.push(new Array<Promise<ImageBitmap>>());
+      this.slicesData.push(new Array<Uint8ClampedArray>());
 
       // For each channel, copy the corresponding ifd data into a new ImageBitmap
       for (let j = 0; j < channels; j += 1) {
         // For some reason, it seems that the channels are inverted
         const srcj = channels - 1 - j;
 
-        // extract data from the ifd for this channelslice into an RGBA 8bit array (it will be stored in the green channel):
+        // extract data from the ifd for this channelslice into an RGBA 8bit array (will be greyscale, R==G==B):
         const sliceChannelRGBA8 = UTIF.toRGBA8(ifds[i * channels + srcj]);
 
-        // read the green channel of sliceChannelRGBA8 into a new Uint8ClampedArray (getting rid of all the extra zeros):
+        // read the red channel of sliceChannelRGBA8 into a new Uint8ClampedArray (discarding redundant channels):
         const sliceChannel = new Uint8ClampedArray(width * height);
         for (let k = 0; k < width * height; k += 1) {
-          sliceChannel[k] = sliceChannelRGBA8[4 * k + 1];
+          sliceChannel[k] = sliceChannelRGBA8[4 * k];
         }
 
-        // create a bitmap image from the channel slice data and store it inside slicesData
-        slicesDataPromises[i][j] = createImageBitmap(
-          new ImageData(
-            Uint8ClampedArray.from(sliceChannelRGBA8),
-            width,
-            height
-          )
-        );
+        this.slicesData[i][j] = sliceChannel;
       }
     }
-
-    // the linter complains if we await the createImageBitmaps inside a for loop, so instead we have to let the foo loop
-    // build a Promise<ImageBitmap>[][], and then use Promise.all twice to turn that into ImageBitmap[][]
-    // see https://eslint.org/docs/rules/no-await-in-loop
-    // also https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
-    const halfUnwrapped: Promise<
-      ImageBitmap[]
-    >[] = slicesDataPromises.map(async (sliceChannels) =>
-      Promise.all(sliceChannels)
-    );
-    this.slicesData = await Promise.all(halfUnwrapped); // ImageBitmap[][]
 
     this.imageFileInfo.width = width;
     this.imageFileInfo.height = height;
 
-    this.props.setUploadedImage(this.slicesData, this.imageFileInfo);
+    this.props.setUploadedImage(this.imageFileInfo, this.slicesData);
   };
 
   private getNumberOfChannels = (descriptions: string[]): number => {
