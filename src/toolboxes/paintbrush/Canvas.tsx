@@ -60,12 +60,15 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
   private points: XYPoint[];
 
+  private annotationOpacity: number;
+
   constructor(props: Props) {
     super(props);
 
     this.isPressing = false;
     this.isDrawing = false;
     this.points = [];
+    this.annotationOpacity = 1;
 
     this.state = {
       hideBackCanvas: false,
@@ -122,7 +125,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
         this.points,
         brush,
         true,
-        this.interactionCanvas.canvasContext
+        this.interactionCanvas.canvasContext,
       );
     }
   };
@@ -131,7 +134,8 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     imagePoints: XYPoint[],
     brush: Brush,
     clearCanvas = true,
-    context: CanvasRenderingContext2D
+    context: CanvasRenderingContext2D,
+    isActive=true,
   ): void => {
     const points = imagePoints.map(
       (point): XYPoint => {
@@ -156,7 +160,16 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
     context.lineJoin = "round";
     context.lineCap = "round";
-    context.strokeStyle = brush.color;
+
+    // Set annotation colour and transparency
+    if (isActive) {
+      context.strokeStyle = getRGBAString(mainColor);
+      this.annotationOpacity = 1;
+    } else {
+      context.strokeStyle = brush.color;
+      this.annotationOpacity = 0.5;
+    }
+    context.globalAlpha = this.annotationOpacity;
 
     if (brush.type === "erase") {
       // If we are live drawing, use a brush colour
@@ -200,16 +213,25 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
   drawAllStrokes = (context = this.backgroundCanvas.canvasContext): void => {
     // Draw strokes on active layer whiles showing existing paintbrush layers
+
+    // Get active annotation ID
+    const activeAnnotationID = this.props.annotationsObject.getActiveAnnotationID();
+
+    // Clear paintbrush canvas
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+
+    // Draw all paintbrush annotations
     this.props.annotationsObject
       .getAllAnnotations()
-      .forEach((annotationsObject) => {
+      .forEach((annotationsObject, i) => {
         if (annotationsObject.toolbox === "paintbrush") {
           annotationsObject.brushStrokes.forEach((brushStrokes) => {
             this.drawPoints(
               brushStrokes.coordinates,
               brushStrokes.brush,
               false,
-              context
+              context,
+              i === activeAnnotationID
             );
           });
         }
