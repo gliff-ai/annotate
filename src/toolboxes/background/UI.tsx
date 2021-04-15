@@ -12,7 +12,7 @@ import {
   FormControl,
 } from "@material-ui/core";
 
-import { ExpandMore } from "@material-ui/icons";
+import { ExpandMore, PortraitSharp } from "@material-ui/icons";
 
 import { BaseSlider } from "@/components/BaseSlider";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
@@ -22,6 +22,8 @@ import { useBackgroundStore } from "./Store";
 interface Props {
   expanded: boolean;
   onChange: (event: ChangeEvent, isExpanded: boolean) => void;
+  channels: boolean[];
+  setChannels: (index: number) => void;
 }
 
 const BackgroundUI = (props: Props): ReactElement => {
@@ -31,7 +33,6 @@ const BackgroundUI = (props: Props): ReactElement => {
     setBackground({
       contrast: value,
       brightness: background.brightness,
-      channels: background.channels,
     });
   }
 
@@ -39,56 +40,30 @@ const BackgroundUI = (props: Props): ReactElement => {
     setBackground({
       brightness: value,
       contrast: background.contrast,
-      channels: background.channels,
     });
   }
 
-  function changeChannels(red = true, green = true, blue = true): void {
-    setBackground({
-      brightness: background.brightness,
-      contrast: background.contrast,
-      channels: [red, green, blue],
-    });
+  // function changeChannels(index: number): void {
+  //   const channels = background.channels;
+  //   channels[index] = !background.channels[index];
+  //   setBackground({
+  //     brightness: background.brightness,
+  //     contrast: background.contrast,
+  //     channels: channels,
+  //   });
+  // }
+
+  let controls = [];
+  for (let i = 0; i < props.channels.length; i += 1) {
+    controls[i] = (
+      <Checkbox
+        checked={props.channels[i]}
+        onChange={() => {
+          props.setChannels(i);
+        }}
+      />
+    );
   }
-
-  const control1 = (
-    <Checkbox
-      checked={background.channels[0]}
-      onChange={() => {
-        changeChannels(
-          !background.channels[0],
-          background.channels[1],
-          background.channels[2]
-        );
-      }}
-    />
-  );
-
-  const control2 = (
-    <Checkbox
-      checked={background.channels[1]}
-      onChange={() => {
-        changeChannels(
-          background.channels[0],
-          !background.channels[1],
-          background.channels[2]
-        );
-      }}
-    />
-  );
-
-  const control3 = (
-    <Checkbox
-      checked={background.channels[2]}
-      onChange={() => {
-        changeChannels(
-          background.channels[0],
-          background.channels[1],
-          !background.channels[2]
-        );
-      }}
-    />
-  );
 
   return (
     <Accordion expanded={props.expanded} onChange={props.onChange}>
@@ -112,27 +87,15 @@ const BackgroundUI = (props: Props): ReactElement => {
             <FormControl component="fieldset">
               <FormLabel component="legend">Channels</FormLabel>
               <FormGroup aria-label="position" row>
-                <FormControlLabel
-                  value="top"
-                  control={control1}
-                  label="R"
-                  labelPlacement="top"
-                  style={{ margin: "0", padding: "0" }}
-                />
-                <FormControlLabel
-                  value="top"
-                  control={control2}
-                  label="G"
-                  labelPlacement="top"
-                  style={{ margin: "0", padding: "0" }}
-                />
-                <FormControlLabel
-                  value="top"
-                  control={control3}
-                  label="B"
-                  labelPlacement="top"
-                  style={{ margin: "0", padding: "0" }}
-                />
+                {controls.map((control, i) => (
+                  <FormControlLabel
+                    value="top"
+                    control={control}
+                    label={`C${i + 1}`}
+                    labelPlacement="top"
+                    style={{ margin: "0", padding: "0" }}
+                  />
+                ))}
               </FormGroup>
             </FormControl>
           </Grid>

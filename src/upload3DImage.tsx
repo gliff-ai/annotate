@@ -7,14 +7,14 @@ import ImageFileInfo from "./ImageFileInfo";
 interface Props {
   setUploadedImage: (
     imageFileInfo: ImageFileInfo,
-    slicesData?: Array<Array<Uint8ClampedArray>>
+    slicesData?: Array<Array<ImageBitmap>>
   ) => void;
 }
 
 export default class Upload3DImage extends Component<Props> {
   private imageFileInfo: ImageFileInfo | null;
 
-  private slicesData: Array<Array<Uint8ClampedArray>>;
+  private slicesData: Array<Array<ImageBitmap>>;
 
   constructor(props: Props) {
     super(props);
@@ -43,7 +43,7 @@ export default class Upload3DImage extends Component<Props> {
       console.log(error);
     });
 
-  private loadImageFile = (buffer: ArrayBuffer): void => {
+  private loadImageFile = async (buffer: ArrayBuffer): Promise<void> => {
     // Decode the images using the UTIF library.
     const ifds = UTIF.decode(buffer);
     ifds.forEach((ifd) => UTIF.decodeImage(buffer, ifd));
@@ -79,26 +79,64 @@ export default class Upload3DImage extends Component<Props> {
     const channels = this.getNumberOfChannels(descriptions);
 
     this.slicesData = [];
+    const slicesDataPromises: Promise<ImageBitmap>[][] = [];
 
     ifds.forEach((ifd, i) => {
       if (i % channels === 0) {
-        this.slicesData.push(new Array<Uint8ClampedArray>());
+        slicesDataPromises.push(new Array<Promise<ImageBitmap>>());
       }
 
       const sliceChannelRGBA8 = UTIF.toRGBA8(ifds[i]);
 
-      const sliceChannel = new Uint8ClampedArray(width * height);
-      for (let k = 0; k < width * height; k += 1) {
-        sliceChannel[k] = sliceChannelRGBA8[4 * k];
+      let sliceChannel = new Uint8ClampedArray(width * height * 4);
+      const channelIndex = channels - 1 - (i % channels); // channels are ordered backwards in ifds
+
+      if (channels === 1) {
+        sliceChannel = Uint8ClampedArray.from(sliceChannelRGBA8);
+      } else {
+        for (let j = 0; j < width * height; j += 1) {
+          if (channelIndex < 3) {
+            // channel 1-3: r,g,b
+            sliceChannel[4 * j + channelIndex] = sliceChannelRGBA8[4 * j];
+          } else if (channelIndex === 4) {
+            // channel 5: r+g or yellow
+            sliceChannel[4 * j + 0] = sliceChannelRGBA8[4 * j];
+            sliceChannel[4 * j + 1] = sliceChannelRGBA8[4 * j];
+          } else if (channelIndex === 5) {
+            // channel 5: r+b or magenta
+            sliceChannel[4 * j + 0] = sliceChannelRGBA8[4 * j];
+            sliceChannel[4 * j + 2] = sliceChannelRGBA8[4 * j];
+          } else if (channelIndex === 6) {
+            // channel 6: g+b or cyan
+            sliceChannel[4 * j + 1] = sliceChannelRGBA8[4 * j];
+            sliceChannel[4 * j + 2] = sliceChannelRGBA8[4 * j];
+          }
+          // set alpha to 255
+          sliceChannel[4 * j + 3] = 255;
+        }
       }
 
-      this.slicesData[Math.floor(i / channels)][
-        channels - 1 - (i % channels) // channels are ordered backwards in ifds
-      ] = sliceChannel;
+      slicesDataPromises[Math.floor(i / channels)][
+        channelIndex
+      ] = createImageBitmap(
+        //new ImageData(Uint8ClampedArray.from(sliceChannelRGBA8), width, height)
+        new ImageData(sliceChannel, width, height)
+      );
     });
 
     this.imageFileInfo.width = width;
     this.imageFileInfo.height = height;
+
+    // the linter complains if we await the createImageBitmaps inside a for loop, so instead we have to let the foo loop
+    // build a Promise<ImageBitmap>[][], and then use Promise.all twice to turn that into ImageBitmap[][]
+    // see https://eslint.org/docs/rules/no-await-in-loop
+    // also https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
+    const halfUnwrapped: Promise<
+      ImageBitmap[]
+    >[] = slicesDataPromises.map(async (sliceChannels) =>
+      Promise.all(sliceChannels)
+    );
+    this.slicesData = await Promise.all(halfUnwrapped); // ImageBitmap[][]
 
     this.props.setUploadedImage(this.imageFileInfo, this.slicesData);
   };

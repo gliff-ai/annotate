@@ -71,6 +71,7 @@ interface State {
   expanded: string | boolean;
   callRedraw: number;
   sliceIndex: number;
+  channels: boolean[];
 }
 
 export class UserInterface extends Component<Record<string, never>, State> {
@@ -80,7 +81,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
 
   private presetLabels: string[];
 
-  private slicesData: Array<Array<Uint8ClampedArray>>;
+  private slicesData: Array<Array<ImageBitmap>>;
 
   private imageFileInfo: ImageFileInfo | null;
 
@@ -101,6 +102,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
       imageLoaded: false,
       callRedraw: 0,
       sliceIndex: 0,
+      channels: [true],
     };
 
     this.imageSource = "zebrafish-heart.jpg";
@@ -280,55 +282,30 @@ export class UserInterface extends Component<Record<string, never>, State> {
   };
 
   updateDisplayedImage = async (): Promise<void> => {
-    // Combine selected channels' data into single rbg image
-
-    const { width } = this.imageFileInfo;
-    const { height } = this.imageFileInfo;
-    const rgbaImage = new Uint8ClampedArray(width * height * 4);
-    const imageChannels = this.slicesData[this.state.sliceIndex];
-
-    for (let i = 0; i < width * height; i += 1) {
-      if (imageChannels.length === 1) {
-        // single channel image; so write the same values into R, G and B:
-        rgbaImage[4 * i + 0] = imageChannels[0][i];
-        rgbaImage[4 * i + 1] = imageChannels[0][i];
-        rgbaImage[4 * i + 2] = imageChannels[0][i];
-      } else if (imageChannels.length === 2) {
-        // two channel image; write first channel into R, second into G, leave B as 0:
-        rgbaImage[4 * i + 0] = imageChannels[0][i];
-        rgbaImage[4 * i + 1] = imageChannels[1][i];
-      } else {
-        // three or more channel image; first three channels in R, G and B respectively:
-        rgbaImage[4 * i + 0] = imageChannels[0][i];
-        rgbaImage[4 * i + 1] = imageChannels[1][i];
-        rgbaImage[4 * i + 2] = imageChannels[2][i];
-        // TODO: instead of ignoring channels>3, convert extra channels into yellow, cyan, magenta
-      }
-
-      // set alpha to 255:
-      rgbaImage[4 * i + 3] = 255;
-    }
-
-    // create a bitmap image from the channel slice data and store it inside displayedImage:
-    const displayedImage = await createImageBitmap(
-      new ImageData(rgbaImage, width, height)
-    );
-
-    this.setState({ displayedImage });
+    this.setState({
+      displayedImage: this.slicesData[this.state.sliceIndex][1],
+    });
   };
 
   setUploadedImage = (
     imageFileInfo: ImageFileInfo,
-    slicesData: Array<Array<Uint8ClampedArray>>
+    slicesData: Array<Array<ImageBitmap>>
   ): void => {
     this.imageFileInfo = imageFileInfo;
 
     this.slicesData = slicesData;
-    this.setState({ imageLoaded: true, sliceIndex: 0 }, () => {
-      this.updateDisplayedImage().catch((error) => {
-        console.log(error);
-      }); // go to first slice (if it's a 3D image)
-    });
+    this.setState(
+      {
+        imageLoaded: true,
+        sliceIndex: 0,
+        channels: Array(slicesData[0].length).fill(true),
+      },
+      () => {
+        this.updateDisplayedImage().catch((error) => {
+          console.log(error);
+        }); // go to first slice (if it's a 3D image)
+      }
+    );
   };
 
   activateTool = (tool: Tool): void => {
@@ -411,6 +388,12 @@ export class UserInterface extends Component<Record<string, never>, State> {
     this.setState({ displayedImage });
   };
 
+  setChannels = (index: number): void => {
+    const channels = this.state.channels;
+    channels[index] = !channels[index];
+    this.setState({ channels });
+  };
+
   render = (): ReactNode => (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -431,6 +414,13 @@ export class UserInterface extends Component<Record<string, never>, State> {
               setDisplayedImage={this.setDisplayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
+              sliceChannelsImages={
+                this.state.imageLoaded
+                  ? this.slicesData[this.state.sliceIndex]
+                  : null
+              }
+              setChannels={this.setChannels}
+              channel={this.state.channels}
             />
 
             <SplineCanvas
@@ -479,7 +469,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
             )}
           </Grid>
           <Grid item style={{ width: 200, position: "relative" }}>
-            <div style={{ height: 200 }}>
+            {/* <div style={{ height: 200 }}>
               <BackgroundMinimap
                 scaleAndPan={this.state.scaleAndPan}
                 setScaleAndPan={this.setScaleAndPan}
@@ -490,7 +480,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
                 setMinimapPositionAndSize={this.setMinimapPositionAndSize}
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}
               />
-            </div>
+            </div> */}
 
             <Grid container justify="center">
               <ButtonGroup size="small" style={{ margin: "5px" }}>
@@ -574,6 +564,8 @@ export class UserInterface extends Component<Record<string, never>, State> {
             <BackgroundUI
               expanded={this.state.expanded === "background-toolbox"}
               onChange={this.handleToolboxChange("background-toolbox")}
+              channels={this.state.channels}
+              setChannels={this.setChannels}
             />
 
             <PaintbrushUI

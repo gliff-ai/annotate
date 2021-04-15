@@ -11,7 +11,9 @@ interface Props extends BaseProps {
   setDisplayedImage: (displayedImage: ImageBitmap) => void;
   contrast: number;
   brightness: number;
-  channels: boolean[];
+  sliceChannelsImages: Array<ImageBitmap>;
+  channel: boolean[];
+  setChannels: any;
 }
 
 export class BackgroundCanvasClass extends Component<Props> {
@@ -36,40 +38,8 @@ export class BackgroundCanvasClass extends Component<Props> {
       this.updateBrightnessOrContrast();
     }
 
-    if (this.props.displayedImage !== undefined) {
-      // Update number of channels displayed
-
-      const colour = `#${this.props.channels
-        .map((channel: boolean) => (channel ? "FF" : "00"))
-        .join("")}FF`;
-
-      const { canvasContext } = this.baseCanvas;
-      canvasContext.globalCompositeOperation = "multiply";
-      canvasContext.fillStyle = colour;
-      const topLeft = imageToCanvas(
-        0,
-        0,
-        this.props.displayedImage.width,
-        this.props.displayedImage.height,
-        this.props.scaleAndPan,
-        this.props.canvasPositionAndSize
-      );
-      const imageScalingFactor = Math.min(
-        this.props.canvasPositionAndSize.width /
-          this.props.displayedImage.width,
-        this.props.canvasPositionAndSize.height /
-          this.props.displayedImage.height
-      );
-      canvasContext.fillRect(
-        topLeft.x,
-        topLeft.y,
-        this.props.displayedImage.width *
-          imageScalingFactor *
-          this.props.scaleAndPan.scale,
-        this.props.displayedImage.height *
-          imageScalingFactor *
-          this.props.scaleAndPan.scale
-      );
+    if (prevProps.channel !== this.props.channel) {
+      this.drawChannelImages();
     }
   }
 
@@ -90,11 +60,21 @@ export class BackgroundCanvasClass extends Component<Props> {
         );
       }
     } else {
-      drawImageOnCanvas(
-        this.baseCanvas.canvasContext,
-        this.image,
-        this.props.scaleAndPan
-      );
+      this.drawChannelImages();
+    }
+  };
+
+  private drawChannelImages = () => {
+    const { canvasContext } = this.baseCanvas;
+    canvasContext.globalCompositeOperation = "lighter";
+    for (let i = 0; i < this.props.sliceChannelsImages.length; i += 1) {
+      if (this.props.channel[i]) {
+        drawImageOnCanvas(
+          canvasContext,
+          this.props.sliceChannelsImages[i],
+          this.props.scaleAndPan
+        );
+      }
     }
   };
 
@@ -120,21 +100,9 @@ export class BackgroundCanvasClass extends Component<Props> {
       };
       this.image.src = this.props.imgSrc;
     } else {
-      // this.image = this.createCanvasFromImageData();
-      this.image = this.props.displayedImage;
       this.drawImage();
     }
   };
-
-  // private createCanvasFromImageData = (): HTMLCanvasElement => {
-  //   // Create a canvas element from an array.
-  //   const canvas = document.createElement("canvas");
-  //   const context = canvas.getContext("2d");
-  //   canvas.width = this.props.imageData.width;
-  //   canvas.height = this.props.imageData.height;
-  //   context.putImageData(this.props.imageData, 0, 0);
-  //   return canvas;
-  // };
 
   updateBrightnessOrContrast = (): void => {
     // Update image brightness and contrast
@@ -165,10 +133,12 @@ export const BackgroundCanvas = (
       setDisplayedImage={props.setDisplayedImage}
       contrast={background.contrast}
       brightness={background.brightness}
-      channels={background.channels}
+      channel={props.channel}
+      setChannels={props.setChannels}
       scaleAndPan={props.scaleAndPan}
       canvasPositionAndSize={props.canvasPositionAndSize}
       displayedImage={props.displayedImage}
+      sliceChannelsImages={props.sliceChannelsImages}
     />
   );
 };
