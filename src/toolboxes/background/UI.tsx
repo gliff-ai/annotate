@@ -23,7 +23,7 @@ interface Props {
   expanded: boolean;
   onChange: (event: ChangeEvent, isExpanded: boolean) => void;
   channels: boolean[];
-  setChannels: (index: number) => void;
+  toggleChannelAtIndex: (index: number) => void;
 }
 
 const BackgroundUI = (props: Props): ReactElement => {
@@ -49,7 +49,7 @@ const BackgroundUI = (props: Props): ReactElement => {
       <Checkbox
         checked={props.channels[i]}
         onChange={() => {
-          props.setChannels(i);
+          props.toggleChannelAtIndex(i);
         }}
       />
     );

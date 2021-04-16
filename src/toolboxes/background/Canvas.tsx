@@ -11,9 +11,7 @@ interface Props extends BaseProps {
   setDisplayedImage: (displayedImage: ImageBitmap) => void;
   contrast: number;
   brightness: number;
-  sliceChannelsImages: Array<ImageBitmap>;
   channels: boolean[];
-  setChannels: any;
 }
 
 export class BackgroundCanvasClass extends Component<Props> {
@@ -37,10 +35,6 @@ export class BackgroundCanvasClass extends Component<Props> {
     ) {
       this.updateBrightnessOrContrast();
     }
-
-    if (prevProps.channels !== this.props.channels) {
-      this.drawChannelImages();
-    }
   }
 
   componentDidMount = (): void => {
@@ -60,23 +54,11 @@ export class BackgroundCanvasClass extends Component<Props> {
         );
       }
     } else {
-      this.drawChannelImages();
-    }
-  };
-
-  private drawChannelImages = () => {
-    // Draw all selected channel images on the canvas
-    const { canvasContext } = this.baseCanvas;
-    canvasContext.globalCompositeOperation = "lighter"; // Where images overlap add colour values
-
-    for (let i = 0; i < this.props.sliceChannelsImages.length; i += 1) {
-      if (this.props.channels[i]) {
-        drawImageOnCanvas(
-          canvasContext,
-          this.props.sliceChannelsImages[i],
-          this.props.scaleAndPan
-        );
-      }
+      drawImageOnCanvas(
+        this.baseCanvas.canvasContext,
+        this.image,
+        this.props.scaleAndPan
+      );
     }
   };
 
@@ -102,6 +84,7 @@ export class BackgroundCanvasClass extends Component<Props> {
       };
       this.image.src = this.props.imgSrc;
     } else {
+      this.image = this.props.displayedImage;
       this.drawImage();
     }
   };
@@ -135,12 +118,10 @@ export const BackgroundCanvas = (
       setDisplayedImage={props.setDisplayedImage}
       contrast={background.contrast}
       brightness={background.brightness}
-      channels={props.channels}
-      setChannels={props.setChannels}
       scaleAndPan={props.scaleAndPan}
       canvasPositionAndSize={props.canvasPositionAndSize}
       displayedImage={props.displayedImage}
-      sliceChannelsImages={props.sliceChannelsImages}
+      channels={props.channels}
     />
   );
 };

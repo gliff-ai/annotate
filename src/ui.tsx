@@ -281,18 +281,11 @@ export class UserInterface extends Component<Record<string, never>, State> {
     this.incrementScaleAndPan("y", -CONFIG.PAN_AMOUNT);
   };
 
-  updateDisplayedImage = async (): Promise<void> => {
-    this.setState({
-      displayedImage: this.slicesData[this.state.sliceIndex][1],
-    });
-  };
-
   setUploadedImage = (
     imageFileInfo: ImageFileInfo,
     slicesData: Array<Array<ImageBitmap>>
   ): void => {
     this.imageFileInfo = imageFileInfo;
-
     this.slicesData = slicesData;
     this.setState(
       {
@@ -301,11 +294,31 @@ export class UserInterface extends Component<Record<string, never>, State> {
         channels: Array(slicesData[0].length).fill(true),
       },
       () => {
-        this.updateDisplayedImage().catch((error) => {
-          console.log(error);
-        }); // go to first slice (if it's a 3D image)
+        this.mixChannels();
       }
     );
+  };
+
+  mixChannels = async (): Promise<void> => {
+    // combines the separate channels in this.slicesData[this.state.sliceIndex] into
+    // a single ImageBitmap according to the user's channel picker settings, and stores
+    // the result in this.state.displayedImage
+
+    // draw the channels onto a new canvas using additive composition:
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    canvas.width = this.slicesData[this.state.sliceIndex][0].width;
+    canvas.height = this.slicesData[this.state.sliceIndex][0].height;
+    context.globalCompositeOperation = "lighter";
+    this.slicesData[this.state.sliceIndex].forEach(
+      (channel: ImageBitmap, i: number) => {
+        if (this.state.channels[i]) {
+          context.drawImage(channel, 0, 0);
+        }
+      }
+    );
+
+    this.setState({ displayedImage: await createImageBitmap(canvas) });
   };
 
   activateTool = (tool: Tool): void => {
@@ -377,9 +390,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
         sliceIndex: value,
       },
       () => {
-        this.updateDisplayedImage().catch((error) => {
-          console.log(error);
-        });
+        this.mixChannels();
       }
     );
   };
@@ -388,10 +399,12 @@ export class UserInterface extends Component<Record<string, never>, State> {
     this.setState({ displayedImage });
   };
 
-  setChannels = (index: number): void => {
+  toggleChannelAtIndex = (index: number): void => {
     const channels = this.state.channels;
     channels[index] = !channels[index];
-    this.setState({ channels });
+    this.setState({ channels }, () => {
+      this.mixChannels();
+    });
   };
 
   render = (): ReactNode => (
@@ -414,12 +427,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
               setDisplayedImage={this.setDisplayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
-              sliceChannelsImages={
-                this.state.imageLoaded
-                  ? this.slicesData[this.state.sliceIndex]
-                  : null
-              }
-              setChannels={this.setChannels}
+              //toggleChannelAtIndex={this.toggleChannelAtIndex}
               channels={this.state.channels}
             />
 
@@ -565,7 +573,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
               expanded={this.state.expanded === "background-toolbox"}
               onChange={this.handleToolboxChange("background-toolbox")}
               channels={this.state.channels}
-              setChannels={this.setChannels}
+              toggleChannelAtIndex={this.toggleChannelAtIndex}
             />
 
             <PaintbrushUI
