@@ -12,7 +12,7 @@ interface Props extends BaseProps {
   contrast: number;
   brightness: number;
   sliceChannelsImages: Array<ImageBitmap>;
-  channel: boolean[];
+  channels: boolean[];
   setChannels: any;
 }
 
@@ -38,7 +38,7 @@ export class BackgroundCanvasClass extends Component<Props> {
       this.updateBrightnessOrContrast();
     }
 
-    if (prevProps.channel !== this.props.channel) {
+    if (prevProps.channels !== this.props.channels) {
       this.drawChannelImages();
     }
   }
@@ -65,10 +65,12 @@ export class BackgroundCanvasClass extends Component<Props> {
   };
 
   private drawChannelImages = () => {
+    // Draw all selected channel images on the canvas
     const { canvasContext } = this.baseCanvas;
-    canvasContext.globalCompositeOperation = "lighter";
+    canvasContext.globalCompositeOperation = "lighter"; // Where images overlap add colour values
+
     for (let i = 0; i < this.props.sliceChannelsImages.length; i += 1) {
-      if (this.props.channel[i]) {
+      if (this.props.channels[i]) {
         drawImageOnCanvas(
           canvasContext,
           this.props.sliceChannelsImages[i],
@@ -123,7 +125,7 @@ export class BackgroundCanvasClass extends Component<Props> {
 }
 
 export const BackgroundCanvas = (
-  props: Omit<Props, "contrast" | "brightness" | "channels">
+  props: Omit<Props, "contrast" | "brightness">
 ): ReactElement => {
   const [background] = useBackgroundStore();
 
@@ -133,7 +135,7 @@ export const BackgroundCanvas = (
       setDisplayedImage={props.setDisplayedImage}
       contrast={background.contrast}
       brightness={background.brightness}
-      channel={props.channel}
+      channels={props.channels}
       setChannels={props.setChannels}
       scaleAndPan={props.scaleAndPan}
       canvasPositionAndSize={props.canvasPositionAndSize}

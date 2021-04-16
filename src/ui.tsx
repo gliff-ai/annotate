@@ -420,7 +420,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
                   : null
               }
               setChannels={this.setChannels}
-              channel={this.state.channels}
+              channels={this.state.channels}
             />
 
             <SplineCanvas
@@ -469,18 +469,18 @@ export class UserInterface extends Component<Record<string, never>, State> {
             )}
           </Grid>
           <Grid item style={{ width: 200, position: "relative" }}>
-            {/* <div style={{ height: 200 }}>
+            <div style={{ height: 200 }}>
               <BackgroundMinimap
                 scaleAndPan={this.state.scaleAndPan}
                 setScaleAndPan={this.setScaleAndPan}
                 imgSrc={this.state.imageLoaded ? null : this.imageSource}
-                displayedImage={this.state.displayedImage}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 minimapPositionAndSize={this.state.minimapPositionAndSize}
                 setMinimapPositionAndSize={this.setMinimapPositionAndSize}
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                displayedImage={this.state.displayedImage}
               />
-            </div> */}
+            </div>
 
             <Grid container justify="center">
               <ButtonGroup size="small" style={{ margin: "5px" }}>

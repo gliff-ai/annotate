@@ -43,16 +43,6 @@ const BackgroundUI = (props: Props): ReactElement => {
     });
   }
 
-  // function changeChannels(index: number): void {
-  //   const channels = background.channels;
-  //   channels[index] = !background.channels[index];
-  //   setBackground({
-  //     brightness: background.brightness,
-  //     contrast: background.contrast,
-  //     channels: channels,
-  //   });
-  // }
-
   let controls = [];
   for (let i = 0; i < props.channels.length; i += 1) {
     controls[i] = (
