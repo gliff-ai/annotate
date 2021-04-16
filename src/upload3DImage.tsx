@@ -25,7 +25,9 @@ export default class Upload3DImage extends Component<Props> {
     this.readFile(imageFile)
       .then((buffer: ArrayBuffer) => {
         this.imageFileInfo = new ImageFileInfo(imageFile.name);
-        this.loadImageFile(buffer);
+        this.loadImageFile(buffer).catch((error) => {
+          console.log(error);
+        });
       })
       .catch((error) => {
         console.log(error);
@@ -97,7 +99,7 @@ export default class Upload3DImage extends Component<Props> {
       context.putImageData(imageData, 0, 0);
 
       let colour;
-      let channel = channels - 1 - (i % channels); // channels are in reverse order in ifds
+      const channel = channels - 1 - (i % channels); // channels are in reverse order in ifds
       if (channels > 1) {
         if (channel === 0) colour = "#FF0000FF";
         else if (channel === 1 && channels !== 2) colour = "#00FF00FF";

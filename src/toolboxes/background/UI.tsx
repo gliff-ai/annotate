@@ -43,7 +43,7 @@ const BackgroundUI = (props: Props): ReactElement => {
     });
   }
 
-  let controls = [];
+  const controls = [];
   for (let i = 0; i < props.channels.length; i += 1) {
     controls[i] = (
       <Checkbox

@@ -291,10 +291,12 @@ export class UserInterface extends Component<Record<string, never>, State> {
       {
         imageLoaded: true,
         sliceIndex: 0,
-        channels: Array(slicesData[0].length).fill(true),
+        channels: Array(slicesData[0].length).fill(true) as boolean[],
       },
       () => {
-        this.mixChannels();
+        this.mixChannels().catch((error) => {
+          console.log(error);
+        });
       }
     );
   };
@@ -390,21 +392,30 @@ export class UserInterface extends Component<Record<string, never>, State> {
         sliceIndex: value,
       },
       () => {
-        this.mixChannels();
+        this.mixChannels().catch((error) => {
+          console.log(error);
+        });
       }
     );
   };
 
-  setDisplayedImage = (displayedImage: ImageBitmap): void => {
-    this.setState({ displayedImage });
+  setDisplayedImage = (image: ImageBitmap): void => {
+    this.setState({ displayedImage: image });
   };
 
   toggleChannelAtIndex = (index: number): void => {
-    const channels = this.state.channels;
-    channels[index] = !channels[index];
-    this.setState({ channels }, () => {
-      this.mixChannels();
-    });
+    this.setState(
+      (prevState: State) => {
+        const { channels } = prevState;
+        channels[index] = !channels[index];
+        return { channels };
+      },
+      () => {
+        this.mixChannels().catch((error) => {
+          console.log(error);
+        });
+      }
+    );
   };
 
   render = (): ReactNode => (
@@ -427,7 +438,6 @@ export class UserInterface extends Component<Record<string, never>, State> {
               setDisplayedImage={this.setDisplayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
-              //toggleChannelAtIndex={this.toggleChannelAtIndex}
               channels={this.state.channels}
             />
 
