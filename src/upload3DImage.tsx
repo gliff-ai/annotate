@@ -97,7 +97,7 @@ export default class Upload3DImage extends Component<Props> {
       context.putImageData(imageData, 0, 0);
 
       let colour;
-      let channel = channels - 1 - (i % channels); // channels are ordered backwards in ifds
+      let channel = channels - 1 - (i % channels); // channels are in reverse order in ifds
       if (channels > 1) {
         if (channel === 0) colour = "#FF0000FF";
         else if (channel === 1 && channels !== 2) colour = "#00FF00FF";
@@ -116,9 +116,9 @@ export default class Upload3DImage extends Component<Props> {
         slicesDataPromises.push(new Array<Promise<ImageBitmap>>());
       }
 
-      slicesDataPromises[Math.floor(i / channels)][
-        i % channels
-      ] = createImageBitmap(canvas);
+      slicesDataPromises[Math.floor(i / channels)][channel] = createImageBitmap(
+        canvas
+      );
     });
 
     // the linter complains if we await the createImageBitmaps inside a for loop, so instead we have to let the for loop
