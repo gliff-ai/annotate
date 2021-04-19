@@ -11,7 +11,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 15
       - name: Setup dependencies
         run: npm i -g eslint prettier && npm i
       - name: Lint
@@ -27,7 +27,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 15
       - name: Setup dependencies
         run: npm i
       - name: Build
@@ -41,7 +41,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 15
       - name: Setup dependencies
         run: npm i
       - name: Test
@@ -54,6 +54,10 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
     - uses: actions/checkout@v2
+    - name: Setup node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 15
     - name: Setup dependencies
       run: npm i --omit=peer
     - name: Publish
