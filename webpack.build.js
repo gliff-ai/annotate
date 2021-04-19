@@ -1,9 +1,7 @@
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const CopyPlugin = require("copy-webpack-plugin");
 const path = require("path");
 
 module.exports = {
-  entry: "./src/index.tsx",
+  entry: "./src/ui.tsx",
   mode: "production",
   module: {
     rules: [
@@ -36,17 +34,4 @@ module.exports = {
       "@": path.resolve(__dirname, "src"),
     },
   },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: "public/index.html",
-    }),
-    new CopyPlugin({
-      patterns: [
-        {
-          from: "public/zebrafish-heart.jpg",
-          to: "zebrafish-heart.jpg",
-        },
-      ],
-    }),
-  ],
 };
