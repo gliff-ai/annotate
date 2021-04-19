@@ -293,15 +293,11 @@ export class UserInterface extends Component<Record<string, never>, State> {
         sliceIndex: 0,
         channels: Array(slicesData[0].length).fill(true) as boolean[],
       },
-      () => {
-        this.mixChannels().catch((error) => {
-          console.log(error);
-        });
-      }
+      this.mixChannels
     );
   };
 
-  mixChannels = async (): Promise<void> => {
+  mixChannels = (): void => {
     // combines the separate channels in this.slicesData[this.state.sliceIndex] into
     // a single ImageBitmap according to the user's channel picker settings, and stores
     // the result in this.state.displayedImage
@@ -320,12 +316,9 @@ export class UserInterface extends Component<Record<string, never>, State> {
       }
     );
 
-    try {
-      const displayedImage = await createImageBitmap(canvas);
-      this.setState({ displayedImage });
-    } catch (e) {
-      console.log(e);
-    }
+    createImageBitmap(canvas)
+      .then((displayedImage) => this.setState({ displayedImage }))
+      .catch((e) => console.log(e));
   };
 
   activateTool = (tool: Tool): void => {
@@ -396,11 +389,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
       {
         sliceIndex: value,
       },
-      () => {
-        this.mixChannels().catch((error) => {
-          console.log(error);
-        });
-      }
+      this.mixChannels
     );
   };
 
@@ -409,18 +398,11 @@ export class UserInterface extends Component<Record<string, never>, State> {
   };
 
   toggleChannelAtIndex = (index: number): void => {
-    this.setState(
-      (prevState: State) => {
-        const { channels } = prevState;
-        channels[index] = !channels[index];
-        return { channels };
-      },
-      () => {
-        this.mixChannels().catch((error) => {
-          console.log(error);
-        });
-      }
-    );
+    this.setState((prevState: State) => {
+      const { channels } = prevState;
+      channels[index] = !channels[index];
+      return { channels };
+    }, this.mixChannels);
   };
 
   render = (): ReactNode => (
