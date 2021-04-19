@@ -320,7 +320,12 @@ export class UserInterface extends Component<Record<string, never>, State> {
       }
     );
 
-    this.setState({ displayedImage: await createImageBitmap(canvas) });
+    try {
+      const displayedImage = await createImageBitmap(canvas);
+      this.setState({ displayedImage });
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   activateTool = (tool: Tool): void => {

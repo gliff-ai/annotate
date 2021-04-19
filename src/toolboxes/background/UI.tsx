@@ -12,7 +12,7 @@ import {
   FormControl,
 } from "@material-ui/core";
 
-import { ExpandMore, PortraitSharp } from "@material-ui/icons";
+import { ExpandMore } from "@material-ui/icons";
 
 import { BaseSlider } from "@/components/BaseSlider";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
@@ -43,17 +43,14 @@ const BackgroundUI = (props: Props): ReactElement => {
     });
   }
 
-  const controls = [];
-  for (let i = 0; i < props.channels.length; i += 1) {
-    controls[i] = (
-      <Checkbox
-        checked={props.channels[i]}
-        onChange={() => {
-          props.toggleChannelAtIndex(i);
-        }}
-      />
-    );
-  }
+  const controls = props.channels.map((channel, i) => (
+    <Checkbox
+      checked={channel}
+      onChange={() => {
+        props.toggleChannelAtIndex(i);
+      }}
+    />
+  ));
 
   return (
     <Accordion expanded={props.expanded} onChange={props.onChange}>
@@ -79,6 +76,7 @@ const BackgroundUI = (props: Props): ReactElement => {
               <FormGroup aria-label="position" row>
                 {controls.map((control, i) => (
                   <FormControlLabel
+                    key={`C${i + 1}`}
                     value="top"
                     control={control}
                     label={`C${i + 1}`}

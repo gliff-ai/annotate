@@ -161,11 +161,7 @@ export default class Upload3DImage extends Component<Props> {
         );
       }
     }
-    // TODO: check if we need this..
-    if (channels === 0) {
-      channels = 1;
-    }
-    return channels;
+    return channels || 1;
   };
 
   render = (): ReactNode => (

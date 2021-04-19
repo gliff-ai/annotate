@@ -1,7 +1,6 @@
 import React, { Component, ReactNode, ReactElement } from "react";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
-import { imageToCanvas } from "@/transforms";
 import drawImageOnCanvas from "./drawImage";
 
 import { useBackgroundStore } from "./Store";

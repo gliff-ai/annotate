@@ -60,16 +60,6 @@ export class BackgroundMinimapClass extends Component<Props> {
     this.baseMinimap.baseCanvas.canvasContext.filter = `contrast(${this.props.contrast}%) brightness(${this.props.brightness}%)`;
   };
 
-  // private createCanvasFromImageData = (): HTMLCanvasElement => {
-  //   // Create a canvas element from an array.
-  //   const canvas = document.createElement("canvas");
-  //   const context = canvas.getContext("2d");
-  //   canvas.width = this.props.imageData.width;
-  //   canvas.height = this.props.imageData.height;
-  //   context.putImageData(this.props.imageData, 0, 0);
-  //   return canvas;
-  // };
-
   private drawImage = () => {
     // Any annotation that is already on the canvas is put on top of any new annotation
     this.baseMinimap.baseCanvas.canvasContext.globalCompositeOperation =
