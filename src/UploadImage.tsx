@@ -11,7 +11,7 @@ interface Props {
   ) => void;
 }
 
-export default class Upload3DImage extends Component<Props> {
+export default class UploadImage extends Component<Props> {
   private imageFileInfo: ImageFileInfo | null;
 
   private slicesData: Array<Array<ImageBitmap>> = [];

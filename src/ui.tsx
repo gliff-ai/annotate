@@ -40,7 +40,7 @@ import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
 import { Labels } from "@/components/Labels";
 import { keydownListener } from "@/keybindings";
-import Upload3DImage from "@/upload3DImage";
+import UploadImage from "@/UploadImage";
 import ImageFileInfo from "@/ImageFileInfo";
 
 import { Tools, Tool } from "@/tools";
@@ -411,7 +411,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
       <Container disableGutters>
         <AppBar>
           <Toolbar>
-            <Upload3DImage setUploadedImage={this.setUploadedImage} />
+            <UploadImage setUploadedImage={this.setUploadedImage} />
           </Toolbar>
         </AppBar>
         <Toolbar />
