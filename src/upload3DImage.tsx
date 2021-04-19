@@ -14,7 +14,7 @@ interface Props {
 export default class Upload3DImage extends Component<Props> {
   private imageFileInfo: ImageFileInfo | null;
 
-  private slicesData: Array<Array<ImageBitmap>>;
+  private slicesData: Array<Array<ImageBitmap>> = [];
 
   constructor(props: Props) {
     super(props);
@@ -22,16 +22,24 @@ export default class Upload3DImage extends Component<Props> {
   }
 
   private uploadImage = (imageFile: File): void => {
-    this.readFile(imageFile)
-      .then((buffer: ArrayBuffer) => {
-        this.imageFileInfo = new ImageFileInfo(imageFile.name);
-        this.loadImageFile(buffer).catch((error) => {
+    const patternTiff = /tiff|tif$/i;
+    const patternNonTiff = /jpg|jpeg|png|gif$/i;
+    this.imageFileInfo = new ImageFileInfo(imageFile.name);
+
+    if (patternTiff.exec(imageFile.name)) {
+      this.readFile(imageFile)
+        .then((buffer: ArrayBuffer) => {
+          this.loadTiffImage(buffer);
+          // .catch((error) => {
+          //   console.log(error);
+          // });
+        })
+        .catch((error) => {
           console.log(error);
         });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    } else if (patternNonTiff.exec(imageFile.name)) {
+      this.loadNonTiffImage(imageFile);
+    }
   };
 
   private readFile = (file: File) =>
@@ -45,7 +53,31 @@ export default class Upload3DImage extends Component<Props> {
       console.log(error);
     });
 
-  private loadImageFile = async (buffer: ArrayBuffer): Promise<void> => {
+  private loadNonTiffImage = (imageFile: File): void => {
+    const reader = new FileReader();
+    this.slicesData = new Array<Array<ImageBitmap>>();
+
+    reader.onload = () => {
+      const image = new Image();
+      image.src = reader.result.toString();
+
+      image.onload = () => {
+        this.imageFileInfo.width = image.width;
+        this.imageFileInfo.height = image.height;
+
+        createImageBitmap(image)
+          .then((image) => {
+            const imageBitmap = image;
+            this.slicesData.push(new Array(imageBitmap));
+            this.props.setUploadedImage(this.imageFileInfo, this.slicesData);
+          })
+          .catch((e) => console.log(e));
+      };
+    };
+    reader.readAsDataURL(imageFile);
+  };
+
+  private loadTiffImage = async (buffer: ArrayBuffer): Promise<void> => {
     // Decode the images using the UTIF library.
     const ifds = UTIF.decode(buffer);
     ifds.forEach((ifd) => UTIF.decodeImage(buffer, ifd));
@@ -80,12 +112,14 @@ export default class Upload3DImage extends Component<Props> {
     const descriptions = ifds[0].t270 as string[];
     const channels = this.getNumberOfChannels(descriptions);
 
-    this.slicesData = [];
-
     const slicesDataPromises: Promise<ImageBitmap>[][] = [];
 
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
+    canvas.width = width;
+    canvas.height = height;
+    this.imageFileInfo.width = width;
+    this.imageFileInfo.height = height;
 
     ifds.forEach((ifd, i) => {
       // extract image data from the idf page:
@@ -93,9 +127,6 @@ export default class Upload3DImage extends Component<Props> {
       const imageData = new ImageData(sliceChannelRGBA8, width, height);
 
       // colour the image according to which channel it's from and how many channels there are
-
-      canvas.width = imageData.width;
-      canvas.height = imageData.height;
       context.putImageData(imageData, 0, 0);
 
       let colour;
@@ -134,9 +165,6 @@ export default class Upload3DImage extends Component<Props> {
       Promise.all(sliceChannels)
     );
     this.slicesData = await Promise.all(halfUnwrapped); // ImageBitmap[][]
-
-    this.imageFileInfo.width = width;
-    this.imageFileInfo.height = height;
 
     this.props.setUploadedImage(this.imageFileInfo, this.slicesData);
   };
