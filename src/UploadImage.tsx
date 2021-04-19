@@ -23,7 +23,6 @@ export default class UploadImage extends Component<Props> {
 
   private uploadImage = (imageFile: File): void => {
     const patternTiff = /tiff|tif$/i;
-    const patternNonTiff = /jpg|jpeg|png|gif$/i;
     this.imageFileInfo = new ImageFileInfo(imageFile.name);
 
     if (patternTiff.exec(imageFile.name)) {
@@ -34,7 +33,7 @@ export default class UploadImage extends Component<Props> {
         .catch((error) => {
           console.log(error);
         });
-    } else if (patternNonTiff.exec(imageFile.name)) {
+    } else {
       this.loadNonTiffImage(imageFile);
     }
   };
