@@ -2,9 +2,19 @@ const path = require("path");
 
 module.exports = {
   entry: {
-    main: "./src/ui.tsx",
+    main: "./src/index.tsx",
   },
-  mode: "production",
+  // experiments: {
+  //   outputModule: true,
+  // },
+  mode: "development",
+  output: {
+    filename: "main.js",
+    path: path.resolve(__dirname, "dist"),
+    // libraryExport: "default",
+    libraryTarget: "commonjs",
+  },
+  // mode: "production",
   module: {
     rules: [
       {

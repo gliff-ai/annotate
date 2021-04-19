@@ -13,7 +13,7 @@
     "lint:ts": "npx eslint \"**/*.ts*\"",
     "serve": "webpack serve --config webpack.config.js",
     "test": "jest --coverage",
-    "prepare": "webpack --progress --config webpack.build.js"
+    "prepare": "rm -r dist/; webpack --progress --config webpack.build.js"
   },
   "license": "AGPL-3.0-only",
   "devDependencies": {
@@ -54,12 +54,15 @@
     "webpack-cli": "^4.5.0",
     "webpack-dev-server": "^3.11.2"
   },
+  "peerDependencies": {
+    "react": "^17.0.0",
+    "react-dom": "^17.0.1"
+  },
   "dependencies": {
     "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",
     "@types/utif": "^3.0.1",
     "@types/uuid": "^8.3.0",
-    "react-dom": "^17.0.1",
     "utif": "^3.1.0",
     "uuid": "^8.3.2"
   }
