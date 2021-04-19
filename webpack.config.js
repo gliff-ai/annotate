@@ -9,7 +9,7 @@ function resolve(dir) {
 }
 
 module.exports = {
-  entry: "./src/index.tsx",
+  entry: "./examples/src/index.tsx",
   mode: "development",
   devtool: "source-map",
   module: {
@@ -45,12 +45,12 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: "public/index.html",
+      template: "examples/index.html",
     }),
     new CopyPlugin({
       patterns: [
         {
-          from: "public/zebrafish-heart.jpg",
+          from: "examples/zebrafish-heart.jpg",
           to: "zebrafish-heart.jpg",
         },
       ],

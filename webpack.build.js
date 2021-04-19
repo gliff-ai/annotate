@@ -1,7 +1,9 @@
 const path = require("path");
 
 module.exports = {
-  entry: "./src/ui.tsx",
+  entry: {
+    main: "./src/ui.tsx",
+  },
   mode: "production",
   module: {
     rules: [
@@ -10,7 +12,6 @@ module.exports = {
         use: "ts-loader",
         exclude: /node_modules/,
       },
-
       {
         test: /\.m?js$/,
         exclude: /(node_modules|bower_components)/,
