@@ -1,6 +1,6 @@
 {
   "name": "@gliff-ai/annotate",
-  "version": "0.0.2",
+  "version": "0.1.1",
   "description": "gliff.ai ANNOTATE - a user friendly browser interface for annotating multidimensional images for machine learning",
   "repository": "git://github.com/gliff-ai/annotate.git",
   "main": "dist/main.js",
@@ -12,7 +12,8 @@
     "lint": "npm run lint:ts",
     "lint:ts": "npx eslint \"**/*.ts*\"",
     "serve": "webpack serve --config webpack.config.js",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "prepare": "rm -r dist/; webpack --progress --config webpack.build.js"
   },
   "license": "AGPL-3.0-only",
   "devDependencies": {
@@ -43,6 +44,8 @@
     "jest": "^26.6.3",
     "prettier": "^2.2.1",
     "raw-loader": "^4.0.2",
+    "react": "^17.0.0",
+    "react-dom": "^17.0.1",
     "sass": "^1.32.8",
     "sass-loader": "^11.0.1",
     "style-loader": "^2.0.0",
@@ -52,13 +55,15 @@
     "webpack-cli": "^4.5.0",
     "webpack-dev-server": "^3.11.2"
   },
+  "peerDependencies": {
+    "react": "^17.0.0",
+    "react-dom": "^17.0.1"
+  },
   "dependencies": {
     "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",
     "@types/utif": "^3.0.1",
     "@types/uuid": "^8.3.0",
-    "react": "^17.0.0",
-    "react-dom": "^17.0.1",
     "utif": "^3.1.0",
     "uuid": "^8.3.2"
   }
