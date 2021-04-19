@@ -30,9 +30,6 @@ export default class Upload3DImage extends Component<Props> {
       this.readFile(imageFile)
         .then((buffer: ArrayBuffer) => {
           this.loadTiffImage(buffer);
-          // .catch((error) => {
-          //   console.log(error);
-          // });
         })
         .catch((error) => {
           console.log(error);
@@ -66,8 +63,7 @@ export default class Upload3DImage extends Component<Props> {
         this.imageFileInfo.height = image.height;
 
         createImageBitmap(image)
-          .then((image) => {
-            const imageBitmap = image;
+          .then((imageBitmap) => {
             this.slicesData.push(new Array(imageBitmap));
             this.props.setUploadedImage(this.imageFileInfo, this.slicesData);
           })
@@ -77,7 +73,7 @@ export default class Upload3DImage extends Component<Props> {
     reader.readAsDataURL(imageFile);
   };
 
-  private loadTiffImage = async (buffer: ArrayBuffer): Promise<void> => {
+  private loadTiffImage = (buffer: ArrayBuffer): void => {
     // Decode the images using the UTIF library.
     const ifds = UTIF.decode(buffer);
     ifds.forEach((ifd) => UTIF.decodeImage(buffer, ifd));
@@ -164,9 +160,13 @@ export default class Upload3DImage extends Component<Props> {
     >[] = slicesDataPromises.map(async (sliceChannels) =>
       Promise.all(sliceChannels)
     );
-    this.slicesData = await Promise.all(halfUnwrapped); // ImageBitmap[][]
-
-    this.props.setUploadedImage(this.imageFileInfo, this.slicesData);
+    Promise.all(halfUnwrapped)
+      .then((slicesData) => {
+        this.props.setUploadedImage(this.imageFileInfo, slicesData);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   };
 
   private getNumberOfChannels = (descriptions: string[]): number => {
