@@ -4,7 +4,6 @@ import {
   Container,
   Toolbar,
   Tooltip,
-  IconButton,
   Button,
   ButtonGroup,
   Grid,
@@ -41,7 +40,7 @@ import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
 import { Labels } from "@/components/Labels";
 import { keydownListener } from "@/keybindings";
-import Upload3DImage from "@/upload3DImage";
+import UploadImage from "@/UploadImage";
 import ImageFileInfo from "@/ImageFileInfo";
 
 import { Tools, Tool } from "@/tools";
@@ -64,7 +63,7 @@ interface State {
     scale: number;
   };
   activeTool?: Tool;
-  imageData?: ImageData;
+  displayedImage?: ImageBitmap;
   activeAnnotationID: number;
   imageLoaded: boolean;
   viewportPositionAndSize: Required<PositionAndSize>;
@@ -72,6 +71,7 @@ interface State {
   expanded: string | boolean;
   callRedraw: number;
   sliceIndex: number;
+  channels: boolean[];
 }
 
 export class UserInterface extends Component<Record<string, never>, State> {
@@ -81,7 +81,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
 
   private presetLabels: string[];
 
-  private slicesData: Array<ImageData>;
+  private slicesData: Array<Array<ImageBitmap>>;
 
   private imageFileInfo: ImageFileInfo | null;
 
@@ -102,6 +102,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
       imageLoaded: false,
       callRedraw: 0,
       sliceIndex: 0,
+      channels: [true],
     };
 
     this.imageSource = "zebrafish-heart.jpg";
@@ -202,18 +203,20 @@ export class UserInterface extends Component<Record<string, never>, State> {
 
     // calculate how much bigger the image is than the canvas, in canvas space:
     const imageScalingFactor = Math.min(
-      this.state.viewportPositionAndSize.width / this.state.imageData.width,
-      this.state.viewportPositionAndSize.height / this.state.imageData.height
+      this.state.viewportPositionAndSize.width /
+        this.state.displayedImage.width,
+      this.state.viewportPositionAndSize.height /
+        this.state.displayedImage.height
     );
 
     const xMargin =
-      this.state.imageData.width *
+      this.state.displayedImage.width *
         imageScalingFactor *
         this.state.scaleAndPan.scale -
       this.state.viewportPositionAndSize.width;
 
     const yMargin =
-      this.state.imageData.height *
+      this.state.displayedImage.height *
         imageScalingFactor *
         this.state.scaleAndPan.scale -
       this.state.viewportPositionAndSize.height;
@@ -278,19 +281,44 @@ export class UserInterface extends Component<Record<string, never>, State> {
     this.incrementScaleAndPan("y", -CONFIG.PAN_AMOUNT);
   };
 
-  updateImageData = (imageData: ImageData): void => {
-    this.setState({ imageData });
-  };
-
   setUploadedImage = (
-    slicesData: Array<ImageData>,
-    imageFileInfo: ImageFileInfo
+    imageFileInfo: ImageFileInfo,
+    slicesData: Array<Array<ImageBitmap>>
   ): void => {
     this.imageFileInfo = imageFileInfo;
     this.slicesData = slicesData;
-    this.setState({ imageLoaded: true, sliceIndex: 0 }, () => {
-      this.updateImageData(slicesData[0]); // go to first slice (if it's a 3D image)
-    });
+    this.setState(
+      {
+        imageLoaded: true,
+        sliceIndex: 0,
+        channels: Array(slicesData[0].length).fill(true) as boolean[],
+      },
+      this.mixChannels
+    );
+  };
+
+  mixChannels = (): void => {
+    // combines the separate channels in this.slicesData[this.state.sliceIndex] into
+    // a single ImageBitmap according to the user's channel picker settings, and stores
+    // the result in this.state.displayedImage
+
+    // draw the channels onto a new canvas using additive composition:
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    canvas.width = this.slicesData[this.state.sliceIndex][0].width;
+    canvas.height = this.slicesData[this.state.sliceIndex][0].height;
+    context.globalCompositeOperation = "lighter";
+    this.slicesData[this.state.sliceIndex].forEach(
+      (channel: ImageBitmap, i: number) => {
+        if (this.state.channels[i]) {
+          context.drawImage(channel, 0, 0);
+        }
+      }
+    );
+
+    createImageBitmap(canvas)
+      .then((displayedImage) => this.setState({ displayedImage }))
+      .catch((e) => console.log(e));
   };
 
   activateTool = (tool: Tool): void => {
@@ -357,7 +385,24 @@ export class UserInterface extends Component<Record<string, never>, State> {
   };
 
   changeSlice = (e: ChangeEvent, value: number): void => {
-    this.setState({ sliceIndex: value, imageData: this.slicesData[value] });
+    this.setState(
+      {
+        sliceIndex: value,
+      },
+      this.mixChannels
+    );
+  };
+
+  setDisplayedImage = (image: ImageBitmap): void => {
+    this.setState({ displayedImage: image });
+  };
+
+  toggleChannelAtIndex = (index: number): void => {
+    this.setState((prevState: State) => {
+      const { channels } = prevState;
+      channels[index] = !channels[index];
+      return { channels };
+    }, this.mixChannels);
   };
 
   render = (): ReactNode => (
@@ -366,7 +411,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
       <Container disableGutters>
         <AppBar>
           <Toolbar>
-            <Upload3DImage setUploadedImage={this.setUploadedImage} />
+            <UploadImage setUploadedImage={this.setUploadedImage} />
           </Toolbar>
         </AppBar>
         <Toolbar />
@@ -376,17 +421,18 @@ export class UserInterface extends Component<Record<string, never>, State> {
             <BackgroundCanvas
               scaleAndPan={this.state.scaleAndPan}
               imgSrc={this.state.imageLoaded ? null : this.imageSource}
-              imageData={this.state.imageData}
-              updateImageData={this.updateImageData}
+              displayedImage={this.state.displayedImage}
+              setDisplayedImage={this.setDisplayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
+              channels={this.state.channels}
             />
 
             <SplineCanvas
               scaleAndPan={this.state.scaleAndPan}
               isActive={this.state.activeTool === Tools.spline}
               annotationsObject={this.annotationsObject}
-              imageData={this.state.imageData}
+              displayedImage={this.state.displayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
               callRedraw={this.state.callRedraw}
@@ -396,13 +442,13 @@ export class UserInterface extends Component<Record<string, never>, State> {
               scaleAndPan={this.state.scaleAndPan}
               brushType={this.state.activeTool}
               annotationsObject={this.annotationsObject}
-              imageData={this.state.imageData}
+              displayedImage={this.state.displayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
               callRedraw={this.state.callRedraw}
             />
 
-            {this.state.imageLoaded && (
+            {this.state.imageLoaded && this.slicesData.length > 1 && (
               <div
                 style={{
                   position: "absolute",
@@ -433,11 +479,11 @@ export class UserInterface extends Component<Record<string, never>, State> {
                 scaleAndPan={this.state.scaleAndPan}
                 setScaleAndPan={this.setScaleAndPan}
                 imgSrc={this.state.imageLoaded ? null : this.imageSource}
-                imageData={this.state.imageData}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 minimapPositionAndSize={this.state.minimapPositionAndSize}
                 setMinimapPositionAndSize={this.setMinimapPositionAndSize}
                 setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                displayedImage={this.state.displayedImage}
               />
             </div>
 
@@ -523,6 +569,8 @@ export class UserInterface extends Component<Record<string, never>, State> {
             <BackgroundUI
               expanded={this.state.expanded === "background-toolbox"}
               onChange={this.handleToolboxChange("background-toolbox")}
+              channels={this.state.channels}
+              toggleChannelAtIndex={this.toggleChannelAtIndex}
             />
 
             <PaintbrushUI

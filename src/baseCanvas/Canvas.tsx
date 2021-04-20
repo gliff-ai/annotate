@@ -28,7 +28,7 @@ export interface Props {
   onContextMenu?: (x: number, y: number) => void;
   canvasPositionAndSize: PositionAndSize;
   setCanvasPositionAndSize?: (canvasPositionAndSize: PositionAndSize) => void;
-  imageData?: ImageData;
+  displayedImage?: ImageBitmap;
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
@@ -68,14 +68,6 @@ export class BaseCanvas extends Component<Props> {
 
   private applyView = (): void => {
     this.clearWindow();
-    // this.canvasContext.setTransform(
-    //   this.props.scaleAndPan.scale,
-    //   0,
-    //   0,
-    //   this.props.scaleAndPan.scale,
-    //   this.props.scaleAndPan.x,
-    //   this.props.scaleAndPan.y
-    // );
   };
 
   private handleCanvasResize = (entries: ResizeObserverEntry[]): void => {

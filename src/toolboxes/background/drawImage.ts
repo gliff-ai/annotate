@@ -1,6 +1,6 @@
 export default function drawImageOnCanvas(
   ctx: CanvasRenderingContext2D,
-  img: HTMLImageElement | HTMLCanvasElement,
+  img: HTMLImageElement | ImageBitmap,
   scaleAndPan: {
     x: number;
     y: number;
@@ -27,5 +27,4 @@ export default function drawImageOnCanvas(
 
   // fill image in dest. rectangle
   ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
-
 }

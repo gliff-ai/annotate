@@ -1,14 +1,13 @@
 import React, { Component, ReactNode, ReactElement } from "react";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
-import { imageToCanvas } from "@/transforms";
 import drawImageOnCanvas from "./drawImage";
 
 import { useBackgroundStore } from "./Store";
 
 interface Props extends BaseProps {
   imgSrc: string | null;
-  updateImageData: (imageData: ImageData) => void;
+  setDisplayedImage: (displayedImage: ImageBitmap) => void;
   contrast: number;
   brightness: number;
   channels: boolean[];
@@ -17,11 +16,14 @@ interface Props extends BaseProps {
 export class BackgroundCanvasClass extends Component<Props> {
   private baseCanvas: BaseCanvas;
 
-  private image: HTMLImageElement | HTMLCanvasElement;
+  private image: HTMLImageElement | ImageBitmap;
 
   componentDidUpdate(prevProps: Props): void {
     // imgSrc is used to avoid calling loadImage when the component mounts
-    if (!this.props.imgSrc && prevProps.imageData !== this.props.imageData) {
+    if (
+      !this.props.imgSrc &&
+      prevProps.displayedImage !== this.props.displayedImage
+    ) {
       this.loadImage(); // calls this.drawImage() after image loading
     } else {
       this.drawImage();
@@ -31,40 +33,6 @@ export class BackgroundCanvasClass extends Component<Props> {
       prevProps.contrast !== this.props.contrast
     ) {
       this.updateBrightnessOrContrast();
-    }
-
-    if (this.props.imageData !== undefined) {
-      // Update number of channels displayed
-
-      const colour = `#${this.props.channels
-        .map((channel: boolean) => (channel ? "FF" : "00"))
-        .join("")}FF`;
-
-      const { canvasContext } = this.baseCanvas;
-      canvasContext.globalCompositeOperation = "multiply";
-      canvasContext.fillStyle = colour;
-      const topLeft = imageToCanvas(
-        0,
-        0,
-        this.props.imageData.width,
-        this.props.imageData.height,
-        this.props.scaleAndPan,
-        this.props.canvasPositionAndSize
-      );
-      const imageScalingFactor = Math.min(
-        this.props.canvasPositionAndSize.width / this.props.imageData.width,
-        this.props.canvasPositionAndSize.height / this.props.imageData.height
-      );
-      canvasContext.fillRect(
-        topLeft.x,
-        topLeft.y,
-        this.props.imageData.width *
-          imageScalingFactor *
-          this.props.scaleAndPan.scale,
-        this.props.imageData.height *
-          imageScalingFactor *
-          this.props.scaleAndPan.scale
-      );
     }
   }
 
@@ -100,32 +68,24 @@ export class BackgroundCanvasClass extends Component<Props> {
       // Prevent SecurityError "Tainted canvases may not be exported." #70
       this.image.crossOrigin = "anonymous";
       // Draw the image once loaded
-      this.image.onload = () => {
-        this.props.updateImageData(
-          this.baseCanvas.canvasContext.getImageData(
-            0,
-            0,
-            this.image.width,
-            this.image.height
+      this.image.onload = async () => {
+        this.props.setDisplayedImage(
+          await createImageBitmap(
+            this.baseCanvas.canvasContext.getImageData(
+              0,
+              0,
+              this.image.width,
+              this.image.height
+            )
           )
         );
         this.drawImage();
       };
       this.image.src = this.props.imgSrc;
     } else {
-      this.image = this.createCanvasFromImageData();
+      this.image = this.props.displayedImage;
       this.drawImage();
     }
-  };
-
-  private createCanvasFromImageData = (): HTMLCanvasElement => {
-    // Create a canvas element from an array.
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-    canvas.width = this.props.imageData.width;
-    canvas.height = this.props.imageData.height;
-    context.putImageData(this.props.imageData, 0, 0);
-    return canvas;
   };
 
   updateBrightnessOrContrast = (): void => {
@@ -147,20 +107,20 @@ export class BackgroundCanvasClass extends Component<Props> {
 }
 
 export const BackgroundCanvas = (
-  props: Omit<Props, "contrast" | "brightness" | "channels">
+  props: Omit<Props, "contrast" | "brightness">
 ): ReactElement => {
   const [background] = useBackgroundStore();
 
   return (
     <BackgroundCanvasClass
       imgSrc={props.imgSrc}
-      updateImageData={props.updateImageData}
+      setDisplayedImage={props.setDisplayedImage}
       contrast={background.contrast}
       brightness={background.brightness}
-      channels={background.channels}
       scaleAndPan={props.scaleAndPan}
       canvasPositionAndSize={props.canvasPositionAndSize}
-      imageData={props.imageData}
+      displayedImage={props.displayedImage}
+      channels={props.channels}
     />
   );
 };
