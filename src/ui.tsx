@@ -74,7 +74,13 @@ interface State {
   channels: boolean[];
 }
 
-export class UserInterface extends Component<Record<string, never>, State> {
+interface Props {
+  slicesData?: Array<Array<ImageBitmap>>;
+  annotationsObject?: Annotations;
+  presetLabels?: string[];
+}
+
+export class UserInterface extends Component<Props, State> {
   annotationsObject: Annotations;
 
   imageSource: string;
@@ -85,9 +91,9 @@ export class UserInterface extends Component<Record<string, never>, State> {
 
   private imageFileInfo: ImageFileInfo | null;
 
-  constructor(props: never) {
+  constructor(props: Props) {
     super(props);
-    this.annotationsObject = new Annotations();
+    this.annotationsObject = this.props.annotationsObject || new Annotations();
     this.state = {
       scaleAndPan: {
         scale: 1,
@@ -106,9 +112,13 @@ export class UserInterface extends Component<Record<string, never>, State> {
     };
 
     this.imageSource = "zebrafish-heart.jpg";
-
+    this.slicesData = this.props.slicesData || null;
     this.annotationsObject.addAnnotation(this.state.activeTool);
-    this.presetLabels = ["label-1", "label-2", "label-3"]; // TODO: find a place for this
+    this.presetLabels = this.props.presetLabels || [
+      "label-1",
+      "label-2",
+      "label-3",
+    ];
     this.imageFileInfo = null;
   }
 
