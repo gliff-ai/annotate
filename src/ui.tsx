@@ -30,12 +30,8 @@ import {
 
 import { Annotations } from "@/annotation";
 import { ThemeProvider, theme } from "@/theme";
-import { PositionAndSize } from "@/baseCanvas";
-import {
-  BackgroundCanvas,
-  BackgroundMinimap,
-  BackgroundUI,
-} from "@/toolboxes/background";
+import { PositionAndSize, MinimapCanvas } from "@/baseCanvas";
+import { BackgroundCanvas, BackgroundUI } from "@/toolboxes/background";
 import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
 import { Labels } from "@/components/Labels";
@@ -426,7 +422,6 @@ export class UserInterface extends Component<Props, State> {
               displayedImage={this.state.displayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
-              channels={this.state.channels}
             />
 
             <SplineCanvas
@@ -476,14 +471,19 @@ export class UserInterface extends Component<Props, State> {
           </Grid>
           <Grid item style={{ width: 200, position: "relative" }}>
             <div style={{ height: 200 }}>
-              <BackgroundMinimap
+              <BackgroundCanvas
+                scaleAndPan={{ x: 0, y: 0, scale: 1 }}
+                displayedImage={this.state.displayedImage}
+                canvasPositionAndSize={this.state.minimapPositionAndSize}
+                setCanvasPositionAndSize={this.setMinimapPositionAndSize}
+              />
+              <MinimapCanvas
+                imageWidth={this.state.displayedImage.width}
+                imageHeight={this.state.displayedImage.height}
                 scaleAndPan={this.state.scaleAndPan}
                 setScaleAndPan={this.setScaleAndPan}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 minimapPositionAndSize={this.state.minimapPositionAndSize}
-                setMinimapPositionAndSize={this.setMinimapPositionAndSize}
-                setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                displayedImage={this.state.displayedImage}
               />
             </div>
 

@@ -8,7 +8,6 @@ import { useBackgroundStore } from "./Store";
 interface Props extends BaseProps {
   contrast: number;
   brightness: number;
-  channels: boolean[];
 }
 
 export class BackgroundCanvasClass extends Component<Props> {
@@ -73,7 +72,6 @@ export const BackgroundCanvas = (
       scaleAndPan={props.scaleAndPan}
       canvasPositionAndSize={props.canvasPositionAndSize}
       displayedImage={props.displayedImage}
-      channels={props.channels}
     />
   );
 };
