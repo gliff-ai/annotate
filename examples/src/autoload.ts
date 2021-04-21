@@ -3,7 +3,7 @@ const loadImage = (filename: string): Promise<Array<Array<ImageBitmap>>> =>
     const image = new Image();
     image.crossOrigin = "anonymous";
 
-    image.onload = async () => {
+    image.onload = () => {
       createImageBitmap(image)
         .then((imageBitmap) => {
           const slicesData: Array<Array<ImageBitmap>> = [[imageBitmap]];
