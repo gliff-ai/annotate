@@ -13,8 +13,6 @@ interface Props extends BaseProps {
 export class BackgroundCanvasClass extends Component<Props> {
   private baseCanvas: BaseCanvas;
 
-  private image: HTMLImageElement | ImageBitmap;
-
   componentDidMount = (): void => {
     this.drawImage();
   };
