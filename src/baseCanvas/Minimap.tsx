@@ -52,11 +52,6 @@ export class BaseMinimap extends React.Component<Props> {
     }
   };
 
-  /** * Mouse events *** */
-  // onDoubleClick = (minimapX: number, minimapY: number): void => {
-  //   // DO STUFF
-  // };
-
   panToMinimapTarget = (minimapX: number, minimapY: number): void => {
     // convert minimap click into viewport coordinate frame
     const { x: targetX, y: targetY } = minimapToCanvas(
@@ -98,10 +93,6 @@ export class BaseMinimap extends React.Component<Props> {
   onMouseUp = (): void => {
     this.isDragging = false;
   };
-
-  // onContextMenu = (minimapX: number, minimapY: number): void => {
-  //   // DO STUFF
-  // };
 
   render = (): ReactNode => (
     <BaseCanvas

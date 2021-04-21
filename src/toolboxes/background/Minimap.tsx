@@ -9,7 +9,6 @@ import drawImageOnCanvas from "./drawImage";
 import { useBackgroundStore } from "./Store";
 
 interface Props extends BaseProps {
-  imgSrc?: string;
   setMinimapPositionAndSize?: (minimapPositionAndSize: PositionAndSize) => void;
   contrast: number;
   brightness: number;
@@ -21,15 +20,11 @@ export class BackgroundMinimapClass extends Component<Props> {
   private image: HTMLImageElement | ImageBitmap;
 
   componentDidMount = (): void => {
-    this.loadImage();
+    this.drawImage();
   };
 
   componentDidUpdate(prevProps: Props): void {
-    if (prevProps.displayedImage !== this.props.displayedImage) {
-      this.loadImage(); // calls this.drawImage() after image loading
-    } else {
-      this.drawImage();
-    }
+    this.drawImage();
     if (
       prevProps.brightness !== this.props.brightness ||
       prevProps.contrast !== this.props.contrast
@@ -38,51 +33,25 @@ export class BackgroundMinimapClass extends Component<Props> {
     }
   }
 
-  private loadImage = () => {
-    if (this.props.imgSrc) {
-      // Load the image
-      this.image = new Image();
-      // Prevent SecurityError "Tainted canvases may not be exported." #70
-      this.image.crossOrigin = "anonymous";
-      // Draw the image once loaded
-      this.image.onload = () => {
-        this.drawImage();
-      };
-      this.image.src = this.props.imgSrc;
-    } else {
-      // this.image = this.createCanvasFromImageData();
-      this.image = this.props.displayedImage;
-      this.drawImage();
-    }
-  };
-
   updateBrightnessOrContrast = (): void => {
     this.baseMinimap.baseCanvas.canvasContext.filter = `contrast(${this.props.contrast}%) brightness(${this.props.brightness}%)`;
   };
 
   private drawImage = () => {
-    // Any annotation that is already on the canvas is put on top of any new annotation
-    this.baseMinimap.baseCanvas.canvasContext.globalCompositeOperation =
-      "destination-over";
+    if (this.props.displayedImage) {
+      // Any annotation that is already on the canvas is put on top of any new annotation
+      this.baseMinimap.baseCanvas.canvasContext.globalCompositeOperation =
+        "destination-over";
 
-    if (this.props.imgSrc) {
-      if (this.image && (this.image as HTMLImageElement).complete) {
-        drawImageOnCanvas(
-          this.baseMinimap.baseCanvas.canvasContext,
-          this.image,
-          {
-            x: 0,
-            y: 0,
-            scale: 1,
-          }
-        );
-      }
-    } else {
-      drawImageOnCanvas(this.baseMinimap.baseCanvas.canvasContext, this.image, {
-        x: 0,
-        y: 0,
-        scale: 1,
-      });
+      drawImageOnCanvas(
+        this.baseMinimap.baseCanvas.canvasContext,
+        this.props.displayedImage,
+        {
+          x: 0,
+          y: 0,
+          scale: 1,
+        }
+      );
     }
   };
 
@@ -111,7 +80,6 @@ export const BackgroundMinimap = (
     <BackgroundMinimapClass
       contrast={background.contrast}
       brightness={background.brightness}
-      imgSrc={props.imgSrc}
       canvasPositionAndSize={props.canvasPositionAndSize}
       minimapPositionAndSize={props.minimapPositionAndSize}
       setScaleAndPan={props.setScaleAndPan}

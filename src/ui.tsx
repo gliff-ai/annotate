@@ -65,7 +65,6 @@ interface State {
   activeTool?: Tool;
   displayedImage?: ImageBitmap;
   activeAnnotationID: number;
-  imageLoaded: boolean;
   viewportPositionAndSize: Required<PositionAndSize>;
   minimapPositionAndSize: Required<PositionAndSize>;
   expanded: string | boolean;
@@ -83,8 +82,6 @@ interface Props {
 export class UserInterface extends Component<Props, State> {
   annotationsObject: Annotations;
 
-  imageSource: string;
-
   private presetLabels: string[];
 
   private slicesData: Array<Array<ImageBitmap>>;
@@ -94,6 +91,8 @@ export class UserInterface extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.annotationsObject = this.props.annotationsObject || new Annotations();
+    this.slicesData = this.props.slicesData || null;
+
     this.state = {
       scaleAndPan: {
         scale: 1,
@@ -105,14 +104,12 @@ export class UserInterface extends Component<Props, State> {
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       minimapPositionAndSize: { top: 0, left: 0, width: 200, height: 200 },
       expanded: false,
-      imageLoaded: false,
       callRedraw: 0,
       sliceIndex: 0,
       channels: [true],
+      displayedImage: this.slicesData[0][0] || null,
     };
 
-    this.imageSource = "zebrafish-heart.jpg";
-    this.slicesData = this.props.slicesData || null;
     this.annotationsObject.addAnnotation(this.state.activeTool);
     this.presetLabels = this.props.presetLabels || [
       "label-1",
@@ -127,6 +124,7 @@ export class UserInterface extends Component<Props, State> {
     for (const event of events) {
       document.addEventListener(event, this.handleEvent);
     }
+    this.mixChannels();
   };
 
   componentWillUnmount(): void {
@@ -299,7 +297,6 @@ export class UserInterface extends Component<Props, State> {
     this.slicesData = slicesData;
     this.setState(
       {
-        imageLoaded: true,
         sliceIndex: 0,
         channels: Array(slicesData[0].length).fill(true) as boolean[],
       },
@@ -403,10 +400,6 @@ export class UserInterface extends Component<Props, State> {
     );
   };
 
-  setDisplayedImage = (image: ImageBitmap): void => {
-    this.setState({ displayedImage: image });
-  };
-
   toggleChannelAtIndex = (index: number): void => {
     this.setState((prevState: State) => {
       const { channels } = prevState;
@@ -430,9 +423,7 @@ export class UserInterface extends Component<Props, State> {
           <Grid item style={{ width: "85%", position: "relative" }}>
             <BackgroundCanvas
               scaleAndPan={this.state.scaleAndPan}
-              imgSrc={this.state.imageLoaded ? null : this.imageSource}
               displayedImage={this.state.displayedImage}
-              setDisplayedImage={this.setDisplayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
               channels={this.state.channels}
@@ -458,7 +449,7 @@ export class UserInterface extends Component<Props, State> {
               callRedraw={this.state.callRedraw}
             />
 
-            {this.state.imageLoaded && this.slicesData.length > 1 && (
+            {this.slicesData.length > 1 && (
               <div
                 style={{
                   position: "absolute",
@@ -488,7 +479,6 @@ export class UserInterface extends Component<Props, State> {
               <BackgroundMinimap
                 scaleAndPan={this.state.scaleAndPan}
                 setScaleAndPan={this.setScaleAndPan}
-                imgSrc={this.state.imageLoaded ? null : this.imageSource}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 minimapPositionAndSize={this.state.minimapPositionAndSize}
                 setMinimapPositionAndSize={this.setMinimapPositionAndSize}

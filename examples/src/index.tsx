@@ -5,16 +5,17 @@ import { UserInterface } from "@/ui";
 
 import loadImage from "./autoload";
 
-loadImage("zebrafish-heart.jpg")
-  .then((slicesData) => {
+loadImage("zebrafish-heart.jpg").then(
+  (slicesData) => {
     ReactDOM.render(
       <UserInterface slicesData={slicesData} />,
       document.getElementById("react-container")
     );
-  })
-  .catch((e) => {
+  },
+  (e) => {
     ReactDOM.render(
       <UserInterface />,
       document.getElementById("react-container")
     );
-  });
+  }
+);
