@@ -193,14 +193,14 @@ export class UserInterface extends Component<Props, State> {
       const { scaleAndPan } = prevState;
       scaleAndPan[key] += increment;
       return { scaleAndPan };
-    });
+    }, this.limitPan);
 
   multiplyScaleAndPan = (key: "x" | "y" | "scale", multiple: number): void =>
     this.setState((prevState: State) => {
       const { scaleAndPan } = prevState;
       scaleAndPan[key] *= multiple;
       return { scaleAndPan };
-    });
+    }, this.limitPan);
 
   limitPan = (): void => {
     // adjust pan such that image borders are not inside the canvas
