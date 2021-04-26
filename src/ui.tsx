@@ -27,6 +27,8 @@ import {
   KeyboardArrowUp,
   ExpandMore,
 } from "@material-ui/icons";
+//@ts-ignore
+import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
 
 import { Annotations } from "@/annotation";
 import { ThemeProvider, theme } from "@/theme";
@@ -40,8 +42,8 @@ import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
 import { Labels } from "@/components/Labels";
 import { keydownListener } from "@/keybindings";
-import UploadImage from "@/UploadImage";
-import ImageFileInfo from "@/ImageFileInfo";
+// import UploadImage from "@/UploadImage";
+// import ImageFileInfo from "@/ImageFileInfo";
 
 import { Tools, Tool } from "@/tools";
 
