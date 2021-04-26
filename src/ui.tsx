@@ -478,8 +478,7 @@ export class UserInterface extends Component<Props, State> {
                 setCanvasPositionAndSize={this.setMinimapPositionAndSize}
               />
               <MinimapCanvas
-                imageWidth={this.state.displayedImage.width}
-                imageHeight={this.state.displayedImage.height}
+                displayedImage={this.state.displayedImage}
                 scaleAndPan={this.state.scaleAndPan}
                 setScaleAndPan={this.setScaleAndPan}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}

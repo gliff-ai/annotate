@@ -4,8 +4,6 @@ import { PositionAndSize } from "@/baseCanvas/Canvas";
 import { Props as BaseProps, BaseCanvas } from "./Canvas";
 
 export interface Props extends BaseProps {
-  imageWidth: number;
-  imageHeight: number;
   cursor?: "move";
   canvasPositionAndSize: PositionAndSize;
   minimapPositionAndSize: PositionAndSize;
@@ -34,8 +32,8 @@ export class MinimapCanvas extends React.Component<Props> {
 
   private applyView = (): void => {
     this.boundingRect = getMinimapViewFinder(
-      this.props.imageWidth,
-      this.props.imageHeight,
+      this.props.displayedImage.width,
+      this.props.displayedImage.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize,
       this.props.minimapPositionAndSize
@@ -57,8 +55,8 @@ export class MinimapCanvas extends React.Component<Props> {
     const { x: targetX, y: targetY } = minimapToCanvas(
       minimapX,
       minimapY,
-      this.props.imageWidth,
-      this.props.imageHeight,
+      this.props.displayedImage.width,
+      this.props.displayedImage.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize,
       this.props.minimapPositionAndSize
