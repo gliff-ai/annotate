@@ -30,12 +30,8 @@ import {
 
 import { Annotations } from "@/annotation";
 import { ThemeProvider, theme } from "@/theme";
-import { PositionAndSize } from "@/baseCanvas";
-import {
-  BackgroundCanvas,
-  BackgroundMinimap,
-  BackgroundUI,
-} from "@/toolboxes/background";
+import { PositionAndSize, MinimapCanvas } from "@/baseCanvas";
+import { BackgroundCanvas, BackgroundUI } from "@/toolboxes/background";
 import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
 import { Labels } from "@/components/Labels";
@@ -65,7 +61,6 @@ interface State {
   activeTool?: Tool;
   displayedImage?: ImageBitmap;
   activeAnnotationID: number;
-  imageLoaded: boolean;
   viewportPositionAndSize: Required<PositionAndSize>;
   minimapPositionAndSize: Required<PositionAndSize>;
   expanded: string | boolean;
@@ -74,10 +69,14 @@ interface State {
   channels: boolean[];
 }
 
-export class UserInterface extends Component<Record<string, never>, State> {
-  annotationsObject: Annotations;
+interface Props {
+  slicesData?: Array<Array<ImageBitmap>>;
+  annotationsObject?: Annotations;
+  presetLabels?: string[];
+}
 
-  imageSource: string;
+export class UserInterface extends Component<Props, State> {
+  annotationsObject: Annotations;
 
   private presetLabels: string[];
 
@@ -85,9 +84,11 @@ export class UserInterface extends Component<Record<string, never>, State> {
 
   private imageFileInfo: ImageFileInfo | null;
 
-  constructor(props: never) {
+  constructor(props: Props) {
     super(props);
-    this.annotationsObject = new Annotations();
+    this.annotationsObject = this.props.annotationsObject || new Annotations();
+    this.slicesData = this.props.slicesData || null;
+
     this.state = {
       scaleAndPan: {
         scale: 1,
@@ -99,16 +100,18 @@ export class UserInterface extends Component<Record<string, never>, State> {
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       minimapPositionAndSize: { top: 0, left: 0, width: 200, height: 200 },
       expanded: false,
-      imageLoaded: false,
       callRedraw: 0,
       sliceIndex: 0,
       channels: [true],
+      displayedImage: this.slicesData[0][0] || null,
     };
 
-    this.imageSource = "zebrafish-heart.jpg";
-
     this.annotationsObject.addAnnotation(this.state.activeTool);
-    this.presetLabels = ["label-1", "label-2", "label-3"]; // TODO: find a place for this
+    this.presetLabels = this.props.presetLabels || [
+      "label-1",
+      "label-2",
+      "label-3",
+    ];
     this.imageFileInfo = null;
   }
 
@@ -117,6 +120,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
     for (const event of events) {
       document.addEventListener(event, this.handleEvent);
     }
+    this.mixChannels();
   };
 
   componentWillUnmount(): void {
@@ -189,14 +193,14 @@ export class UserInterface extends Component<Record<string, never>, State> {
       const { scaleAndPan } = prevState;
       scaleAndPan[key] += increment;
       return { scaleAndPan };
-    });
+    }, this.limitPan);
 
   multiplyScaleAndPan = (key: "x" | "y" | "scale", multiple: number): void =>
     this.setState((prevState: State) => {
       const { scaleAndPan } = prevState;
       scaleAndPan[key] *= multiple;
       return { scaleAndPan };
-    });
+    }, this.limitPan);
 
   limitPan = (): void => {
     // adjust pan such that image borders are not inside the canvas
@@ -289,7 +293,6 @@ export class UserInterface extends Component<Record<string, never>, State> {
     this.slicesData = slicesData;
     this.setState(
       {
-        imageLoaded: true,
         sliceIndex: 0,
         channels: Array(slicesData[0].length).fill(true) as boolean[],
       },
@@ -393,10 +396,6 @@ export class UserInterface extends Component<Record<string, never>, State> {
     );
   };
 
-  setDisplayedImage = (image: ImageBitmap): void => {
-    this.setState({ displayedImage: image });
-  };
-
   toggleChannelAtIndex = (index: number): void => {
     this.setState((prevState: State) => {
       const { channels } = prevState;
@@ -420,12 +419,9 @@ export class UserInterface extends Component<Record<string, never>, State> {
           <Grid item style={{ width: "85%", position: "relative" }}>
             <BackgroundCanvas
               scaleAndPan={this.state.scaleAndPan}
-              imgSrc={this.state.imageLoaded ? null : this.imageSource}
               displayedImage={this.state.displayedImage}
-              setDisplayedImage={this.setDisplayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
-              channels={this.state.channels}
             />
 
             <SplineCanvas
@@ -448,7 +444,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
               callRedraw={this.state.callRedraw}
             />
 
-            {this.state.imageLoaded && this.slicesData.length > 1 && (
+            {this.slicesData.length > 1 && (
               <div
                 style={{
                   position: "absolute",
@@ -475,15 +471,19 @@ export class UserInterface extends Component<Record<string, never>, State> {
           </Grid>
           <Grid item style={{ width: 200, position: "relative" }}>
             <div style={{ height: 200 }}>
-              <BackgroundMinimap
+              <BackgroundCanvas
+                scaleAndPan={{ x: 0, y: 0, scale: 1 }}
+                displayedImage={this.state.displayedImage}
+                canvasPositionAndSize={this.state.minimapPositionAndSize}
+                setCanvasPositionAndSize={this.setMinimapPositionAndSize}
+              />
+              <MinimapCanvas
+                displayedImage={this.state.displayedImage}
                 scaleAndPan={this.state.scaleAndPan}
                 setScaleAndPan={this.setScaleAndPan}
-                imgSrc={this.state.imageLoaded ? null : this.imageSource}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 minimapPositionAndSize={this.state.minimapPositionAndSize}
                 setMinimapPositionAndSize={this.setMinimapPositionAndSize}
-                setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                displayedImage={this.state.displayedImage}
               />
             </div>
 
