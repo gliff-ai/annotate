@@ -484,6 +484,7 @@ export class UserInterface extends Component<Props, State> {
                 setScaleAndPan={this.setScaleAndPan}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 minimapPositionAndSize={this.state.minimapPositionAndSize}
+                setMinimapPositionAndSize={this.setMinimapPositionAndSize}
               />
             </div>
 

@@ -97,15 +97,14 @@ export class MinimapCanvas extends React.Component<Props> {
   render = (): ReactNode => (
     <BaseCanvas
       cursor="move"
-      // onDoubleClick={this.onDoubleClick}
       onClick={this.onClick}
       onMouseDown={this.onMouseDown}
       onMouseMove={this.onMouseMove}
       onMouseUp={this.onMouseUp}
-      // onContextMenu={this.onContextMenu}
       name={this.props.name}
       scaleAndPan={{ x: 0, y: 0, scale: 1 }}
       canvasPositionAndSize={this.props.minimapPositionAndSize}
+      setCanvasPositionAndSize={this.props.setMinimapPositionAndSize}
       ref={(baseCanvas) => {
         this.baseCanvas = baseCanvas;
       }}
