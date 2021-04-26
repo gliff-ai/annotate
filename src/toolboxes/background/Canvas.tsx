@@ -18,13 +18,14 @@ export class BackgroundCanvasClass extends Component<Props> {
   };
 
   componentDidUpdate(prevProps: Props): void {
-    this.drawImage();
     if (
       prevProps.brightness !== this.props.brightness ||
-      prevProps.contrast !== this.props.contrast
+      prevProps.contrast !== this.props.contrast ||
+      prevProps.canvasPositionAndSize !== this.props.canvasPositionAndSize
     ) {
       this.updateBrightnessOrContrast();
     }
+    this.drawImage();
   }
 
   private drawImage = () => {
