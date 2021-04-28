@@ -6,6 +6,9 @@ import {
   AccordionSummary,
   Typography,
   AccordionDetails,
+  List,
+  ListItem,
+  Grid,
 } from "@material-ui/core";
 
 import {
@@ -16,6 +19,9 @@ import {
 } from "@material-ui/icons";
 
 import { Tool } from "@/tools";
+
+import { BaseSlider } from "@/components/BaseSlider";
+import { Sliders, SLIDER_CONFIG } from "./configSlider";
 
 import { usePaintbrushStore } from "./Store";
 
@@ -29,8 +35,10 @@ interface Props {
 const PaintbrushUI = (props: Props): ReactElement => {
   const [paintbrush, setPaintbrush] = usePaintbrushStore();
 
-  function incrementBrush() {
-    setPaintbrush({ brushRadius: paintbrush.brushRadius + 10 });
+  function changeBrushRadius(e: ChangeEvent, value: number) {
+    setPaintbrush({
+      brushRadius: value,
+    });
   }
 
   return (
@@ -39,30 +47,36 @@ const PaintbrushUI = (props: Props): ReactElement => {
         <Typography>Paintbrushes</Typography>
       </AccordionSummary>
       <AccordionDetails>
-        <Tooltip title="Activate paintbrush">
-          <IconButton
-            id="activate-paintbrush"
-            onClick={() => props.activateTool("paintbrush")}
-            color={props.activeTool === "paintbrush" ? "secondary" : "default"}
-          >
-            <Brush />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Increase brush size">
-          <IconButton id="increase-paintbrush-radius" onClick={incrementBrush}>
-            <AllOut />
-          </IconButton>
-        </Tooltip>
+        <Grid container spacing={0} justify="center" wrap="nowrap">
+          <Grid item style={{ width: "85%", position: "relative" }}>
+            <Tooltip title="Activate paintbrush">
+              <IconButton
+                id="activate-paintbrush"
+                onClick={() => props.activateTool("paintbrush")}
+                color={
+                  props.activeTool === "paintbrush" ? "secondary" : "default"
+                }
+              >
+                <Brush />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Activate Eraser">
+              <IconButton
+                id="activate-eraser"
+                onClick={() => props.activateTool("eraser")}
+                color={props.activeTool === "eraser" ? "secondary" : "default"}
+              >
+                <RadioButtonUncheckedSharp />
+              </IconButton>
+            </Tooltip>
 
-        <Tooltip title="Activate Eraser">
-          <IconButton
-            id="activate-eraser"
-            onClick={() => props.activateTool("eraser")}
-            color={props.activeTool === "eraser" ? "secondary" : "default"}
-          >
-            <RadioButtonUncheckedSharp />
-          </IconButton>
-        </Tooltip>
+            <BaseSlider
+              value={paintbrush.brushRadius}
+              config={SLIDER_CONFIG[Sliders.brushRadius]}
+              onChange={() => changeBrushRadius}
+            />
+          </Grid>
+        </Grid>
       </AccordionDetails>
     </Accordion>
   );
