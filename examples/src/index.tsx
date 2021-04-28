@@ -3,8 +3,19 @@ import * as ReactDOM from "react-dom";
 
 import { UserInterface } from "@/ui";
 
-ReactDOM.render(
-  <UserInterface />,
+import loadImage from "./autoload";
 
-  document.getElementById("react-container")
+loadImage("zebrafish-heart.jpg").then(
+  (slicesData) => {
+    ReactDOM.render(
+      <UserInterface slicesData={slicesData} />,
+      document.getElementById("react-container")
+    );
+  },
+  (e) => {
+    ReactDOM.render(
+      <UserInterface />,
+      document.getElementById("react-container")
+    );
+  }
 );
