@@ -429,11 +429,8 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
   };
 
   getCursor = (): Cursor => {
-    if (this.props.brushType === "paintbrush") {
+    if (this.props.brushType === "paintbrush" || this.props.brushType === "eraser") {
       return this.state.mode === Mode.draw ? "none" : "pointer";
-    }
-    if (this.props.brushType === "eraser") {
-      return this.state.mode === Mode.draw ? "not-allowed" : "pointer";
     }
     return "none";
   };
