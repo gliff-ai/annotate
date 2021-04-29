@@ -452,10 +452,10 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
         brushRadius={this.props.brushRadius}
         canvasTopAndLeft={{
           top:
-            this.backgroundCanvas?.canvasContext?.canvas?.boundingClientRect()
+            this.backgroundCanvas?.canvasContext?.canvas?.getBoundingClientRect()
               .top || 0,
           left:
-            this.backgroundCanvas?.canvasContext?.canvas?.boundingClientRect()
+            this.backgroundCanvas?.canvasContext?.canvas?.getBoundingClientRect()
               .left || 0,
         }}
       />
