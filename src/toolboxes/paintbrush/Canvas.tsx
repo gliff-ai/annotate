@@ -56,13 +56,13 @@ type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 type CursorProps = {
   brushType: string;
   brushRadius: number;
-  canvasTopAndLeft: {top: number, left: number}
+  canvasTopAndLeft: { top: number; left: number };
 };
 
 const FauxCursor: React.FC<CursorProps> = ({
   brushType,
   brushRadius,
-  canvasTopAndLeft
+  canvasTopAndLeft,
 }: CursorProps): ReactElement => {
   const [mousePosition, setMousePosition] = useState({ x: null, y: null });
 
@@ -92,7 +92,7 @@ const FauxCursor: React.FC<CursorProps> = ({
         borderRadius: "50%",
         position: "absolute",
         top: mousePosition.y - brushRadius - canvasTopAndLeft.top,
-        left: mousePosition.x - brushRadius - canvasTopAndLeft.left
+        left: mousePosition.x - brushRadius - canvasTopAndLeft.left,
       }}
     />
   );
@@ -450,7 +450,14 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       <FauxCursor
         brushType={this.props.brushType}
         brushRadius={this.props.brushRadius}
-        canvasTopAndLeft={{top: this.backgroundCanvas ? this.backgroundCanvas.canvasContext.canvas.getBoundingClientRect().top : 0, left: this.backgroundCanvas ? this.backgroundCanvas.canvasContext.canvas.getBoundingClientRect().left : 0}}
+        canvasTopAndLeft={{
+          top:
+            this.backgroundCanvas?.canvasContext?.canvas?.boundingClientRect()
+              .top || 0,
+          left:
+            this.backgroundCanvas?.canvasContext?.canvas?.boundingClientRect()
+              .left || 0,
+        }}
       />
       {/* We have two canvases in order to be able to erase stuff. */}
       <div
