@@ -29,8 +29,9 @@ import {
 } from "@material-ui/icons";
 
 import { Annotations } from "@/annotation";
+import { PositionAndSize } from "@/annotation/interfaces";
 import { ThemeProvider, theme } from "@/theme";
-import { PositionAndSize, MinimapCanvas } from "@/baseCanvas";
+import { MinimapCanvas } from "@/baseCanvas";
 import { BackgroundCanvas, BackgroundUI } from "@/toolboxes/background";
 import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";

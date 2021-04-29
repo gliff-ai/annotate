@@ -3,7 +3,7 @@ import React, { ReactNode, Component, ReactElement } from "react";
 import { BaseCanvas, CanvasProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/transforms";
-import { XYPoint } from "@/annotation/interfaces";
+import { PositionAndSize, XYPoint } from "@/annotation/interfaces";
 
 import {
   main as mainColor,

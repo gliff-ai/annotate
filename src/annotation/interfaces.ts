@@ -30,8 +30,8 @@ export interface ZTPoint {
 }
 
 export interface PositionAndSize {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
+  top?: number;
+  left?: number;
+  width?: number;
+  height?: number;
 }
