@@ -6,14 +6,11 @@ import {
   AccordionSummary,
   Typography,
   AccordionDetails,
-  List,
-  ListItem,
   Grid,
 } from "@material-ui/core";
 
 import {
   ExpandMore,
-  AllOut,
   Brush,
   RadioButtonUncheckedSharp,
 } from "@material-ui/icons";

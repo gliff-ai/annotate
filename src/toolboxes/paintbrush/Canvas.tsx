@@ -9,7 +9,7 @@ import React, {
 import { BaseCanvas, CanvasProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/transforms";
-import { PositionAndSize, XYPoint } from "@/annotation/interfaces";
+import { XYPoint } from "@/annotation/interfaces";
 
 import {
   main as mainColor,
@@ -56,7 +56,7 @@ type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 type CursorProps = {
   brushType: string;
   brushRadius: number;
-  canvasTopAndLeft: { top: number; left: number };
+  canvasTopAndLeft: { top: number, left: number };
 };
 
 const FauxCursor: React.FC<CursorProps> = ({
