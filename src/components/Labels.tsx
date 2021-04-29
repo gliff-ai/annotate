@@ -74,12 +74,28 @@ export const Labels: FunctionComponent<Props> = ({
   }, [activeAnnotationID]);
 
   return (
-    <div>
+    <>
+      <List component="div" disablePadding>
+        {assignedLabels.map((label) => (
+          <ListItem key={label} dense>
+            <ListItemText primary={label} />
+            <ListItemSecondaryAction>
+              <IconButton
+                edge="end"
+                aria-label="delete"
+                onClick={handleRemoveLabel(label)}
+              >
+                <BackspaceIcon />
+              </IconButton>
+            </ListItemSecondaryAction>
+          </ListItem>
+        ))}
+      </List>
       <List style={{ width: "100%" }}>
         <ListItem button onClick={handleClick}>
           <ListItemIcon>
-            Add Labels&nbsp;
             <LibraryAddIcon />
+            Add Labels
             {isOpen ? <ExpandLess /> : <ExpandMore />}
           </ListItemIcon>
         </ListItem>
@@ -109,21 +125,7 @@ export const Labels: FunctionComponent<Props> = ({
             ))}
           </List>
         </Collapse>
-        {assignedLabels.map((label) => (
-          <ListItem key={label} dense>
-            <ListItemText primary={label} />
-            <ListItemSecondaryAction>
-              <IconButton
-                edge="end"
-                aria-label="delete"
-                onClick={handleRemoveLabel(label)}
-              >
-                <BackspaceIcon />
-              </IconButton>
-            </ListItemSecondaryAction>
-          </ListItem>
-        ))}
       </List>
-    </div>
+    </>
   );
 };

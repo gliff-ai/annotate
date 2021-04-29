@@ -24,7 +24,6 @@ class ImageFileInfo {
     this.width = 0;
     this.height = 0;
   }
-
 }
 
 export default ImageFileInfo;

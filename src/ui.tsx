@@ -29,8 +29,9 @@ import {
 } from "@material-ui/icons";
 
 import { Annotations } from "@/annotation";
+import { PositionAndSize } from "@/annotation/interfaces";
 import { ThemeProvider, theme } from "@/theme";
-import { PositionAndSize, MinimapCanvas } from "@/baseCanvas";
+import { MinimapCanvas } from "@/baseCanvas";
 import { BackgroundCanvas, BackgroundUI } from "@/toolboxes/background";
 import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
@@ -95,11 +96,10 @@ export class UserInterface extends Component<Props, State> {
         x: 0,
         y: 0,
       },
-      activeTool: Tools.paintbrush,
       activeAnnotationID: 0,
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       minimapPositionAndSize: { top: 0, left: 0, width: 200, height: 200 },
-      expanded: false,
+      expanded: "labels-toolbox",
       callRedraw: 0,
       sliceIndex: 0,
       channels: [true],
