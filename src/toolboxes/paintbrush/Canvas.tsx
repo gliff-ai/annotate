@@ -56,7 +56,7 @@ type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 type CursorProps = {
   brushType: string;
   brushRadius: number;
-  canvasTopAndLeft: { top: number, left: number };
+  canvasTopAndLeft: { top: number; left: number };
 };
 
 const FauxCursor: React.FC<CursorProps> = ({
@@ -446,7 +446,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       {/* this div is basically a fake cursor */}
       <FauxCursor
         brushType={this.props.brushType}
-        brushRadius={this.props.brushRadius}
+        brushRadius={this.props.brushRadius * this.props.scaleAndPan.scale}
         canvasTopAndLeft={{
           top:
             this.backgroundCanvas?.canvasContext?.canvas?.getBoundingClientRect()
