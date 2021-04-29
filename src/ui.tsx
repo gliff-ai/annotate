@@ -107,11 +107,7 @@ export class UserInterface extends Component<Props, State> {
     };
 
     this.annotationsObject.addAnnotation(this.state.activeTool);
-    this.presetLabels = this.props.presetLabels || [
-      "label-1",
-      "label-2",
-      "label-3",
-    ];
+    this.presetLabels = this.props.presetLabels || ["default-label"];
     this.imageFileInfo = null;
   }
 
@@ -133,6 +129,14 @@ export class UserInterface extends Component<Props, State> {
     if (event.detail === "ui") {
       this[event.type]?.call(this);
     }
+  };
+
+  updatePresetLabels = (label: string): void => {  
+    function onlyUnique(value: string, index: number, self: string[]) {
+        return self.indexOf(value) === index;
+    }
+    this.presetLabels.push(label)
+    this.presetLabels = this.presetLabels.filter(onlyUnique);
   };
 
   setViewportPositionAndSize = (
@@ -560,6 +564,7 @@ export class UserInterface extends Component<Props, State> {
                   <Labels
                     annotationObject={this.annotationsObject}
                     presetLabels={this.presetLabels}
+                    updatePresetLabels={this.updatePresetLabels}
                     activeAnnotationID={this.state.activeAnnotationID}
                   />
                 </Grid>

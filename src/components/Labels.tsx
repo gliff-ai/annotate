@@ -8,17 +8,22 @@ import React, {
 import {
   Collapse,
   IconButton,
+  InputBase,
   List,
   ListItem,
   ListItemIcon,
   ListItemSecondaryAction,
   ListItemText,
+  TextField,
 } from "@material-ui/core";
-import AddIcon from "@material-ui/icons/Add";
-import BackspaceIcon from "@material-ui/icons/Backspace";
-import ExpandLess from "@material-ui/icons/ExpandLess";
-import ExpandMore from "@material-ui/icons/ExpandMore";
-import LibraryAddIcon from "@material-ui/icons/LibraryAdd";
+import {
+  Add,
+  Backspace,
+  ExpandLess,
+  ExpandMore,
+  LibraryAdd,
+  PinDropSharp,
+} from "@material-ui/icons";
 
 import { Annotations } from "@/annotation";
 import { theme } from "@/theme";
@@ -26,12 +31,14 @@ import { theme } from "@/theme";
 interface Props {
   annotationObject: Annotations;
   presetLabels: string[];
+  updatePresetLabels: (label: string) => void;
   activeAnnotationID: number;
 }
 
 export const Labels: FunctionComponent<Props> = ({
   annotationObject,
   presetLabels,
+  updatePresetLabels,
   activeAnnotationID,
 }: Props): ReactElement => {
   const getMenuLabels = (labels: string[]): string[] =>
@@ -46,6 +53,12 @@ export const Labels: FunctionComponent<Props> = ({
 
   const [isOpen, setIsOpen] = useState(false);
 
+  const [newLabel, setNewLabel] = React.useState("");
+
+  const handleNewLabelChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewLabel(event.target.value);
+  };
+
   const updateAllLabels = (): void => {
     const labels = annotationObject.getLabels();
     setAssignedLabels(labels);
@@ -55,6 +68,7 @@ export const Labels: FunctionComponent<Props> = ({
   const handleAddLabel = (label: string) => (): void => {
     // Add a label to active annotation object and update some states.
     annotationObject.addLabel(label);
+    updatePresetLabels(label);
     updateAllLabels();
   };
 
@@ -85,7 +99,7 @@ export const Labels: FunctionComponent<Props> = ({
                 aria-label="delete"
                 onClick={handleRemoveLabel(label)}
               >
-                <BackspaceIcon />
+                <Backspace />
               </IconButton>
             </ListItemSecondaryAction>
           </ListItem>
@@ -94,7 +108,7 @@ export const Labels: FunctionComponent<Props> = ({
       <List style={{ width: "100%" }}>
         <ListItem button onClick={handleClick}>
           <ListItemIcon>
-            <LibraryAddIcon />
+            <LibraryAdd />
             Add Labels
             {isOpen ? <ExpandLess /> : <ExpandMore />}
           </ListItemIcon>
@@ -118,12 +132,24 @@ export const Labels: FunctionComponent<Props> = ({
                     aria-label="add"
                     onClick={handleAddLabel(label)}
                   >
-                    <AddIcon />
+                    <Add />
                   </IconButton>
                 </ListItemSecondaryAction>
               </ListItem>
             ))}
           </List>
+          <InputBase
+            placeholder="New label"
+            value={newLabel}
+            onChange={handleNewLabelChange}
+          />
+          <IconButton
+            type="submit"
+            aria-label="add-new-label"
+            onClick={handleAddLabel(newLabel)}
+          >
+            <Add />
+          </IconButton>
         </Collapse>
       </List>
     </>
