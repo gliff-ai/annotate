@@ -1,4 +1,10 @@
-import React, { ReactNode, Component, ReactElement } from "react";
+import React, {
+  ReactNode,
+  Component,
+  ReactElement,
+  useState,
+  useEffect,
+} from "react";
 
 import { BaseCanvas, CanvasProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";
@@ -46,6 +52,51 @@ interface Event extends CustomEvent {
 }
 
 type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
+
+type CursorProps = {
+  brushType: string;
+  brushRadius: number;
+  canvasPositionAndSize: PositionAndSize
+};
+
+const FauxCursor: React.FC<CursorProps> = ({
+  brushType,
+  brushRadius,
+  canvasPositionAndSize
+}: CursorProps): ReactElement => {
+  const [mousePosition, setMousePosition] = useState({ x: null, y: null });
+
+  useEffect(() => {
+    const mouseMoveHandler = (event: MouseEvent) => {
+      const { clientX, clientY } = event;
+      setMousePosition({ x: clientX, y: clientY });
+    };
+    document.addEventListener("mousemove", mouseMoveHandler);
+
+    return () => {
+      document.removeEventListener("mousemove", mouseMoveHandler);
+    };
+  }, []);
+
+  return (
+    <div
+      id="cursor"
+      style={{
+        visibility:
+          brushType === "paintbrush" || brushType === "eraser"
+            ? "visible"
+            : "hidden",
+        width: brushRadius * 2,
+        height: brushRadius * 2,
+        border: "2px solid #666666",
+        borderRadius: "50%",
+        position: "absolute",
+        top: mousePosition.y, // FIXME need to include toolbar and gutters
+        left: mousePosition.x // FIXME need to include toolbar and gutters
+      }}
+    />
+  );
+};
 
 export class PaintbrushCanvasClass extends Component<Props, State> {
   readonly name = "paintbrush";
@@ -125,7 +176,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
         this.points,
         brush,
         true,
-        this.interactionCanvas.canvasContext,
+        this.interactionCanvas.canvasContext
       );
     }
   };
@@ -135,7 +186,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     brush: Brush,
     clearCanvas = true,
     context: CanvasRenderingContext2D,
-    isActive=true,
+    isActive = true
   ): void => {
     const points = imagePoints.map(
       (point): XYPoint => {
@@ -394,43 +445,51 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
   };
 
   render = (): ReactNode => (
-    // We have two canvases in order to be able to erase stuff.
-    <div
-      style={{
-        pointerEvents:
-          this.props.brushType === "paintbrush" ||
-          this.props.brushType === "eraser"
-            ? "auto"
-            : "none",
-      }}
-    >
-      <div style={{ opacity: this.state.hideBackCanvas ? "none" : "block" }}>
+    <>
+      {/* this div is basically a fake cursor */}
+      <FauxCursor
+        brushType={this.props.brushType}
+        brushRadius={this.props.brushRadius}
+        canvasPositionAndSize={this.props.canvasPositionAndSize}
+      />
+      {/* We have two canvases in order to be able to erase stuff. */}
+      <div
+        style={{
+          pointerEvents:
+            this.props.brushType === "paintbrush" ||
+            this.props.brushType === "eraser"
+              ? "auto"
+              : "none",
+        }}
+      >
+        <div style={{ opacity: this.state.hideBackCanvas ? "none" : "block" }}>
+          <BaseCanvas
+            cursor="none"
+            ref={(backgroundCanvas) => {
+              this.backgroundCanvas = backgroundCanvas;
+            }}
+            name="background"
+            scaleAndPan={this.props.scaleAndPan}
+            canvasPositionAndSize={this.props.canvasPositionAndSize}
+            setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
+          />
+        </div>
+
         <BaseCanvas
-          cursor="none"
-          ref={(backgroundCanvas) => {
-            this.backgroundCanvas = backgroundCanvas;
+          onMouseDown={this.onMouseDown}
+          onMouseMove={this.onMouseMove}
+          onMouseUp={this.onMouseUp}
+          cursor={this.getCursor()}
+          ref={(interactionCanvas) => {
+            this.interactionCanvas = interactionCanvas;
           }}
-          name="background"
+          name="interaction"
           scaleAndPan={this.props.scaleAndPan}
           canvasPositionAndSize={this.props.canvasPositionAndSize}
           setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
         />
       </div>
-
-      <BaseCanvas
-        onMouseDown={this.onMouseDown}
-        onMouseMove={this.onMouseMove}
-        onMouseUp={this.onMouseUp}
-        cursor={this.getCursor()}
-        ref={(interactionCanvas) => {
-          this.interactionCanvas = interactionCanvas;
-        }}
-        name="interaction"
-        scaleAndPan={this.props.scaleAndPan}
-        canvasPositionAndSize={this.props.canvasPositionAndSize}
-        setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
-      />
-    </div>
+    </>
   );
 }
 
