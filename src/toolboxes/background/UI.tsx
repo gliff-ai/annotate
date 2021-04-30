@@ -55,7 +55,7 @@ const BackgroundUI = (props: Props): ReactElement => {
   return (
     <Accordion expanded={props.expanded} onChange={props.onChange}>
       <AccordionSummary expandIcon={<ExpandMore />} id="background-toolbox">
-        <Typography>Background</Typography>
+        <Typography>Image</Typography>
       </AccordionSummary>
       <AccordionDetails>
         <Grid container spacing={0} justify="center" wrap="nowrap">
