@@ -26,9 +26,10 @@ import {
   KeyboardArrowRight,
   KeyboardArrowUp,
   ExpandMore,
+  Backup,
 } from "@material-ui/icons";
-//@ts-ignore
-import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
+import { ImageFileInfo } from "@gliff-ai/upload/typings";
+import { UploadImage } from "@gliff-ai/upload";
 
 import { Annotations } from "@/annotation";
 import { ThemeProvider, theme } from "@/theme";
@@ -38,8 +39,6 @@ import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
 import { Labels } from "@/components/Labels";
 import { keydownListener } from "@/keybindings";
-// import UploadImage from "@/UploadImage";
-// import ImageFileInfo from "@/ImageFileInfo";
 
 import { Tools, Tool } from "@/tools";
 
@@ -412,7 +411,15 @@ export class UserInterface extends Component<Props, State> {
       <Container disableGutters>
         <AppBar>
           <Toolbar>
-            <UploadImage setUploadedImage={this.setUploadedImage} />
+            <UploadImage
+              setUploadedImage={this.setUploadedImage}
+              spanElement={
+                /* eslint-disable react/jsx-wrap-multilines */
+                <Button aria-label="upload-picture" component="span">
+                  <Backup />
+                </Button>
+              }
+            />
           </Toolbar>
         </AppBar>
         <Toolbar />
