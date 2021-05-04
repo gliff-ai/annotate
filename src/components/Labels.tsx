@@ -14,7 +14,6 @@ import {
   ListItemIcon,
   ListItemSecondaryAction,
   ListItemText,
-  TextField,
 } from "@material-ui/core";
 import {
   Add,
@@ -137,19 +136,21 @@ export const Labels: FunctionComponent<Props> = ({
                 </ListItemSecondaryAction>
               </ListItem>
             ))}
+            <ListItem>
+              <InputBase
+                placeholder="New label"
+                value={newLabel}
+                onChange={handleNewLabelChange}
+              />
+              <IconButton
+                type="submit"
+                aria-label="add-new-label"
+                onClick={handleAddLabel(newLabel)}
+              >
+                <Add />
+              </IconButton>
+            </ListItem>
           </List>
-          <InputBase
-            placeholder="New label"
-            value={newLabel}
-            onChange={handleNewLabelChange}
-          />
-          <IconButton
-            type="submit"
-            aria-label="add-new-label"
-            onClick={handleAddLabel(newLabel)}
-          >
-            <Add />
-          </IconButton>
         </Collapse>
       </List>
     </>
