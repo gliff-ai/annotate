@@ -482,7 +482,7 @@ export class SplineCanvas extends Component<Props, State> {
         let i = (y * this.gradientImage.width + x) * 4 + 0; // using red channel values since gradientImage is always greyscale
         val =
           this.gradientImage.data[i] /
-          (2 + Math.sqrt((x - point.x) ^ (2 + (y - point.y)) ^ 2));
+          (2 + Math.sqrt((x - point.x) ** 2 + (y - point.y) ** 2));
         if (val > bestVal) {
           bestVal = this.gradientImage.data[i];
           bestX = x;
