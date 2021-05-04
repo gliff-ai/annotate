@@ -511,7 +511,7 @@ export class SplineCanvas extends Component<Props, State> {
         // this.baseCanvas.canvasContext.putImageData(this.gradientImage, 0, 0);
         createImageBitmap(this.gradientImage).then(
           (imageBitmap: ImageBitmap) => {
-            this.props.setUploadedImage(new ImageFileInfo("balls"), [
+            this.props.setUploadedImage(new ImageFileInfo("test"), [
               [imageBitmap],
             ]);
           }
@@ -558,7 +558,10 @@ export class SplineCanvas extends Component<Props, State> {
       // add a new point and snap it to the highest gradient point within 25 pixels:
       let { coordinates } = this.props.annotationsObject.getActiveAnnotation();
       coordinates.push({ x: clickPoint.x, y: clickPoint.y });
-      this.snapToGradient(coordinates.length - 1);
+      this.snapToGradient(
+        coordinates.length - 1,
+        25 / this.props.scaleAndPan.scale
+      );
     } else {
       // If dragging first point, update also last
       const activeSpline = this.props.annotationsObject.getActiveAnnotation()
