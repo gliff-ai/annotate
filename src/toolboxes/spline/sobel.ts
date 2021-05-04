@@ -13,8 +13,8 @@ function getDataFromImageBitmap(imageBitmap: ImageBitmap): Uint8ClampedArray {
 }
 
 export function calculateSobel(imageBitmap: ImageBitmap): ImageData {
-  const width = imageBitmap.width;
-  const height = imageBitmap.height;
+  const { width } = imageBitmap;
+  const { height } = imageBitmap;
 
   const kernelX = [
     [-0.125, 0, 0.125],
@@ -29,12 +29,12 @@ export function calculateSobel(imageBitmap: ImageBitmap): ImageData {
   ];
 
   const greyscaleData = new Uint8ClampedArray(width * height * 4);
-  let sobelData = new Uint8ClampedArray(width * height * 4);
+  const sobelData = new Uint8ClampedArray(width * height * 4);
 
   function bindPixelAt(data: Uint8ClampedArray) {
     return function (x: number, y: number, channel?: number): number {
-      channel = channel || 0;
-      return data[(width * y + x) * 4 + channel];
+      const actualChannel = channel || 0;
+      return data[(width * y + x) * 4 + actualChannel];
     };
   }
 
@@ -57,10 +57,13 @@ export function calculateSobel(imageBitmap: ImageBitmap): ImageData {
   const data = getDataFromImageBitmap(imageBitmap);
   const pixelAt = bindPixelAt(data);
   const setGreyscalePixelAt = bindSetPixelAt(greyscaleData);
-  let x, y, i, j;
+  let x;
+  let y;
+  let i;
+  let j;
 
-  for (y = 0; y < height; y++) {
-    for (x = 0; x < width; x++) {
+  for (y = 0; y < height; y += 1) {
+    for (x = 0; x < width; x += 1) {
       const r = pixelAt(x, y, 0);
       const g = pixelAt(x, y, 1);
       const b = pixelAt(x, y, 2);
@@ -75,25 +78,23 @@ export function calculateSobel(imageBitmap: ImageBitmap): ImageData {
 
   let magnitudeMax = 0;
 
-  for (y = 0; y < height; y++) {
-    for (x = 0; x < width; x++) {
+  for (y = 0; y < height; y += 1) {
+    for (x = 0; x < width; x += 1) {
       let sobelX = 0;
-      for (i = -1; i <= 1; i++) {
-        for (j = -1; j <= 1; j++) {
-          sobelX =
-            sobelX + kernelX[i + 1][j + 1] * greyscalePixelAt(x + i, y + j);
+      for (i = -1; i <= 1; i += 1) {
+        for (j = -1; j <= 1; j += 1) {
+          sobelX += kernelX[i + 1][j + 1] * greyscalePixelAt(x + i, y + j);
         }
       }
       let sobelY = 0;
-      for (i = -1; i <= 1; i++) {
-        for (j = -1; j <= 1; j++) {
-          sobelY =
-            sobelY + kernelY[i + 1][j + 1] * greyscalePixelAt(x + i, y + j);
+      for (i = -1; i <= 1; i += 1) {
+        for (j = -1; j <= 1; j += 1) {
+          sobelY += kernelY[i + 1][j + 1] * greyscalePixelAt(x + i, y + j);
         }
       }
 
       let magnitude = Math.sqrt(sobelX * sobelX + sobelY * sobelY);
-      if (isNaN(magnitude)) {
+      if (Number.isNaN(magnitude)) {
         magnitude = 0;
       } else {
         magnitudeMax = Math.max(magnitudeMax, magnitude);

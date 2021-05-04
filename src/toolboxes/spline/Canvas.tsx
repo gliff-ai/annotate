@@ -4,7 +4,6 @@ import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/transforms";
 import { Annotation, XYPoint } from "@/annotation/interfaces";
-import { calculateSobel } from "./sobel";
 import ImageFileInfo from "@/ImageFileInfo";
 
 import {
@@ -13,6 +12,8 @@ import {
   getRGBAString,
   palette,
 } from "@/palette";
+
+import { calculateSobel } from "./sobel";
 
 interface Props extends BaseProps {
   activeTool: string;
@@ -455,11 +456,11 @@ export class SplineCanvas extends Component<Props, State> {
     this.drawAllSplines();
   };
 
-  snapToGradient = (idx: number, snapeRadius: number = 25): void => {
+  snapToGradient = (idx: number, snapeRadius = 25): void => {
     // snaps point #idx in the current active spline to the maximum gradient point within snapeRadius
     if (this.gradientImage === undefined) return;
     const { coordinates } = this.props.annotationsObject.getActiveAnnotation();
-    if (coordinates.length == 0) return;
+    if (coordinates.length === 0) return;
     const point = coordinates[idx];
 
     const xMin = Math.floor(Math.max(0, point.x - snapeRadius));
@@ -486,9 +487,9 @@ export class SplineCanvas extends Component<Props, State> {
         coordinates[idx - 1].y - coordinates[idx - 2].y,
       ];
     }
-    for (let x = xMin; x <= xMax; x++) {
-      for (let y = yMin; y <= yMax; y++) {
-        let i = (y * this.gradientImage.width + x) * 4 + 0; // using red channel values since gradientImage is always greyscale
+    for (let x = xMin; x <= xMax; x += 1) {
+      for (let y = yMin; y <= yMax; y += 1) {
+        const i = (y * this.gradientImage.width + x) * 4 + 0; // using red channel values since gradientImage is always greyscale
         if (parallel !== undefined) {
           // dot product of (B -> C) with (A -> B)
           // where line is A -> B -> C
@@ -498,7 +499,9 @@ export class SplineCanvas extends Component<Props, State> {
         }
         // multiplying by sign of forward gives backward-facing points a negative score, so they never win
         // i.e. will never turn more than 90 degrees at once
-        let clickDistance = Math.sqrt((x - point.x) ** 2 + (y - point.y) ** 2); // distance to where the user clicked
+        const clickDistance = Math.sqrt(
+          (x - point.x) ** 2 + (y - point.y) ** 2
+        ); // distance to where the user clicked
         val =
           (Math.sign(forward) * this.gradientImage.data[i]) /
           (1 + clickDistance);
@@ -522,7 +525,7 @@ export class SplineCanvas extends Component<Props, State> {
       this.props.canvasPositionAndSize
     );
 
-    if (this.state.mode == Mode.magic) {
+    if (this.state.mode === Mode.magic) {
       // add a new point and snap it to the highest gradient point within 25 pixels:
       if (this.gradientImage === undefined) {
         this.gradientImage = calculateSobel(this.props.displayedImage);
@@ -534,7 +537,9 @@ export class SplineCanvas extends Component<Props, State> {
         //   }
         // );
       }
-      let { coordinates } = this.props.annotationsObject.getActiveAnnotation();
+      const {
+        coordinates,
+      } = this.props.annotationsObject.getActiveAnnotation();
       coordinates.push(clickPoint);
       this.snapToGradient(coordinates.length - 1);
       this.isDragging = true;
@@ -556,7 +561,7 @@ export class SplineCanvas extends Component<Props, State> {
   onMouseMove = (x: number, y: number): void => {
     if (!this.isDragging) return;
 
-    this.numberOfMoves++;
+    this.numberOfMoves += 1;
 
     // Replace update the coordinates for the point dragged
     const clickPoint = canvasToImage(
@@ -568,9 +573,11 @@ export class SplineCanvas extends Component<Props, State> {
       this.props.canvasPositionAndSize
     );
 
-    if (this.state.mode == Mode.magic && this.numberOfMoves % 5 == 0) {
+    if (this.state.mode === Mode.magic && this.numberOfMoves % 5 === 0) {
       // add a new point and snap it to the highest gradient point within 25 pixels:
-      let { coordinates } = this.props.annotationsObject.getActiveAnnotation();
+      const {
+        coordinates,
+      } = this.props.annotationsObject.getActiveAnnotation();
       coordinates.push({ x: clickPoint.x, y: clickPoint.y });
       this.snapToGradient(
         coordinates.length - 1,
@@ -630,6 +637,24 @@ export class SplineCanvas extends Component<Props, State> {
     this.props.annotationsObject.setAnnotationCoordinates(coordinates); // Save new coordinates inside active annotation
   };
 
+  getCursor = (): Cursor => {
+    if (!this.isActive()) return "none";
+    return this.state.mode === Mode.draw ? "crosshair" : "pointer";
+  };
+
+  isActive = (): boolean =>
+    this.props.activeTool === "spline" ||
+    this.props.activeTool === "magicspline";
+
+  toggleMode = (): void => {
+    if (!this.isActive()) return;
+    if (this.state.mode === Mode.draw) {
+      this.setState({ mode: Mode.select });
+    } else {
+      this.setState({ mode: Mode.draw });
+    }
+  };
+
   private updateMode(): void {
     // FIXME this is a bit clumsy
     // Change mode if we change the spline type prop
@@ -648,24 +673,6 @@ export class SplineCanvas extends Component<Props, State> {
       }
     }
   }
-
-  getCursor = (): Cursor => {
-    if (!this.isActive()) return "none";
-    return this.state.mode === Mode.draw ? "crosshair" : "pointer";
-  };
-
-  isActive = (): boolean =>
-    this.props.activeTool === "spline" ||
-    this.props.activeTool === "magicspline";
-
-  toggleMode = (): void => {
-    if (!this.isActive()) return;
-    if (this.state.mode === Mode.draw) {
-      this.setState({ mode: Mode.select });
-    } else {
-      this.setState({ mode: Mode.draw });
-    }
-  };
 
   render = (): ReactNode => (
     <div style={{ pointerEvents: this.state.isActive ? "auto" : "none" }}>
