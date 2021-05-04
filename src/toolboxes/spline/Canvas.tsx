@@ -470,19 +470,38 @@ export class SplineCanvas extends Component<Props, State> {
     const yMax = Math.floor(
       Math.min(this.props.displayedImage.height - 1, point.y + snapeRadius)
     );
-    console.log(xMin, xMax, yMin, yMax);
 
     // search within snapeRadius for the maximum (gradient : distance)
     let bestVal = 0;
     let bestX = Math.floor(point.x);
     let bestY = Math.floor(point.y);
     let val;
+    let forward = 0;
+    let parallel;
+    if (idx > 1) {
+      // if at least two points have already been drawn, get a normalized vector at right angles to the line joining the previous two points
+      // so we can penalize deviation along that axis:
+      parallel = [
+        coordinates[idx - 1].x - coordinates[idx - 2].x,
+        coordinates[idx - 1].y - coordinates[idx - 2].y,
+      ];
+    }
     for (let x = xMin; x <= xMax; x++) {
       for (let y = yMin; y <= yMax; y++) {
         let i = (y * this.gradientImage.width + x) * 4 + 0; // using red channel values since gradientImage is always greyscale
+        if (parallel !== undefined) {
+          // dot product of (B -> C) with (A -> B)
+          // where line is A -> B -> C
+          forward =
+            (x - coordinates[idx - 1].x) * parallel[0] +
+            (y - coordinates[idx - 1].y) * parallel[1];
+        }
+        // multiplying by sign of forward gives backward-facing points a negative score, so they never win
+        // i.e. will never turn more than 90 degrees at once
+        let clickDistance = Math.sqrt((x - point.x) ** 2 + (y - point.y) ** 2); // distance to where the user clicked
         val =
-          this.gradientImage.data[i] /
-          (2 + Math.sqrt((x - point.x) ** 2 + (y - point.y) ** 2));
+          (Math.sign(forward) * this.gradientImage.data[i]) /
+          (1 + clickDistance);
         if (val > bestVal) {
           bestVal = this.gradientImage.data[i];
           bestX = x;
@@ -490,7 +509,6 @@ export class SplineCanvas extends Component<Props, State> {
         }
       }
     }
-    console.log(point.x, point.y, bestX, bestY);
     this.updateXYPoint(bestX, bestY, idx);
   };
 
@@ -521,7 +539,7 @@ export class SplineCanvas extends Component<Props, State> {
       }
       let { coordinates } = this.props.annotationsObject.getActiveAnnotation();
       coordinates.push(clickPoint);
-      this.snapToGradient(0);
+      this.snapToGradient(coordinates.length - 1);
       this.isDragging = true;
       this.drawAllSplines();
     } else {
@@ -553,7 +571,6 @@ export class SplineCanvas extends Component<Props, State> {
       this.props.canvasPositionAndSize
     );
 
-    console.log(this.numberOfMoves % 5);
     if (this.state.mode == Mode.magic && this.numberOfMoves % 5 == 0) {
       // add a new point and snap it to the highest gradient point within 25 pixels:
       let { coordinates } = this.props.annotationsObject.getActiveAnnotation();
