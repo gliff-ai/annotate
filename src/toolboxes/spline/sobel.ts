@@ -1,9 +1,20 @@
 // This is a much modified version of https://github.com/miguelmota/sobel
 // by Miguel Mota, which is made available under the MIT license.
 
-export function calculateSobel(imageData: ImageData): ImageData {
-  const width = imageData.width;
-  const height = imageData.height;
+function getDataFromImageBitmap(imageBitmap: ImageBitmap): Uint8ClampedArray {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = imageBitmap.width;
+  canvas.height = imageBitmap.height;
+
+  ctx.drawImage(imageBitmap, 0, 0);
+
+  return ctx.getImageData(0, 0, imageBitmap.width, imageBitmap.height).data;
+}
+
+export function calculateSobel(imageBitmap: ImageBitmap): ImageData {
+  const width = imageBitmap.width;
+  const height = imageBitmap.height;
 
   const kernelX = [
     [-0.125, 0, 0.125],
@@ -43,7 +54,7 @@ export function calculateSobel(imageData: ImageData): ImageData {
     };
   }
 
-  const data = imageData.data;
+  const data = getDataFromImageBitmap(imageBitmap);
   const pixelAt = bindPixelAt(data);
   const setGreyscalePixelAt = bindSetPixelAt(greyscaleData);
   let x, y, i, j;

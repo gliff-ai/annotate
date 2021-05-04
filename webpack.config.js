@@ -19,7 +19,6 @@ module.exports = {
         use: "ts-loader",
         exclude: /node_modules/,
       },
-
       {
         test: /\.m?js$/,
         exclude: /(node_modules|bower_components)/,
@@ -50,7 +49,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          from: "examples/zebrafish-heart.jpg",
+          from: "examples/test.png",
           to: "zebrafish-heart.jpg",
         },
       ],
