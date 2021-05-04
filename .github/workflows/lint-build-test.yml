@@ -11,9 +11,9 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 15
       - name: Setup dependencies
-        run: npm i -g eslint prettier && npm ci
+        run: npm i -g eslint prettier && npm i
       - name: Lint
         run: npm run lint
       - name: Prettier
@@ -27,9 +27,9 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 15
       - name: Setup dependencies
-        run: npm ci
+        run: npm i
       - name: Build
         run: npm run build
   Test:
@@ -41,8 +41,27 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 15
       - name: Setup dependencies
-        run: npm ci
-      - name: Build
+        run: npm i
+      - name: Test
         run: npm run test
+  publish:
+    name: Publish
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 15
+    - name: Setup dependencies
+      run: npm i --omit=peer
+    - name: Publish
+      uses: mikeal/merge-release@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

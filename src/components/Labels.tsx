@@ -74,53 +74,58 @@ export const Labels: FunctionComponent<Props> = ({
   }, [activeAnnotationID]);
 
   return (
-    <List style={{ width: "100%" }}>
-      <ListItem button onClick={handleClick}>
-        <ListItemIcon>
-          <LibraryAddIcon />
-          {isOpen ? <ExpandLess /> : <ExpandMore />}
-        </ListItemIcon>
-      </ListItem>
-
-      <Collapse
-        in={isOpen}
-        timeout="auto"
-        unmountOnExit
-        style={{
-          backgroundColor: theme.palette.divider,
-        }}
-      >
-        <List component="div" disablePadding>
-          {menuLabels.map((label) => (
-            <ListItem key={label} dense>
-              <ListItemText primary={label} />
-              <ListItemSecondaryAction>
-                <IconButton
-                  edge="end"
-                  aria-label="add"
-                  onClick={handleAddLabel(label)}
-                >
-                  <AddIcon />
-                </IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
-        </List>
-      </Collapse>
-      {assignedLabels.map((label) => (
-        <ListItem key={label} dense>
-          <ListItemText primary={label} />
-          <ListItemSecondaryAction>
-            <IconButton
-              edge="end"
-              aria-label="delete"
-              onClick={handleRemoveLabel(label)}
-            >
-              <BackspaceIcon />
-            </IconButton>
-          </ListItemSecondaryAction>
+    <>
+      <List component="div" disablePadding>
+        {assignedLabels.map((label) => (
+          <ListItem key={label} dense>
+            <ListItemText primary={label} />
+            <ListItemSecondaryAction>
+              <IconButton
+                edge="end"
+                aria-label="delete"
+                onClick={handleRemoveLabel(label)}
+              >
+                <BackspaceIcon />
+              </IconButton>
+            </ListItemSecondaryAction>
+          </ListItem>
+        ))}
+      </List>
+      <List style={{ width: "100%" }}>
+        <ListItem button onClick={handleClick}>
+          <ListItemIcon>
+            <LibraryAddIcon />
+            Add Labels
+            {isOpen ? <ExpandLess /> : <ExpandMore />}
+          </ListItemIcon>
         </ListItem>
-      ))}
-    </List>
+
+        <Collapse
+          in={isOpen}
+          timeout="auto"
+          unmountOnExit
+          style={{
+            backgroundColor: theme.palette.divider,
+          }}
+        >
+          <List component="div" disablePadding>
+            {menuLabels.map((label) => (
+              <ListItem key={label} dense>
+                <ListItemText primary={label} />
+                <ListItemSecondaryAction>
+                  <IconButton
+                    edge="end"
+                    aria-label="add"
+                    onClick={handleAddLabel(label)}
+                  >
+                    <AddIcon />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+            ))}
+          </List>
+        </Collapse>
+      </List>
+    </>
   );
 };

@@ -4,7 +4,6 @@ import {
   Container,
   Toolbar,
   Tooltip,
-  IconButton,
   Button,
   ButtonGroup,
   Grid,
@@ -13,6 +12,7 @@ import {
   Typography,
   AccordionDetails,
   CssBaseline,
+  Slider,
 } from "@material-ui/core";
 
 import {
@@ -29,18 +29,15 @@ import {
 } from "@material-ui/icons";
 
 import { Annotations } from "@/annotation";
+import { PositionAndSize } from "@/annotation/interfaces";
 import { ThemeProvider, theme } from "@/theme";
-import { PositionAndSize } from "@/baseCanvas";
-import {
-  BackgroundCanvas,
-  BackgroundMinimap,
-  BackgroundUI,
-} from "@/toolboxes/background";
+import { MinimapCanvas } from "@/baseCanvas";
+import { BackgroundCanvas, BackgroundUI } from "@/toolboxes/background";
 import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
 import { Labels } from "@/components/Labels";
 import { keydownListener } from "@/keybindings";
-import Upload3DImage from "@/upload3DImage";
+import UploadImage from "@/UploadImage";
 import ImageFileInfo from "@/ImageFileInfo";
 
 import { Tools, Tool } from "@/tools";
@@ -63,48 +60,58 @@ interface State {
     scale: number;
   };
   activeTool?: Tool;
-  imageData?: ImageData;
+  displayedImage?: ImageBitmap;
   activeAnnotationID: number;
-  imageLoaded: boolean;
   viewportPositionAndSize: Required<PositionAndSize>;
   minimapPositionAndSize: Required<PositionAndSize>;
   expanded: string | boolean;
   callRedraw: number;
+  sliceIndex: number;
+  channels: boolean[];
 }
 
-export class UserInterface extends Component<Record<string, never>, State> {
-  annotationsObject: Annotations;
+interface Props {
+  slicesData?: Array<Array<ImageBitmap>>;
+  annotationsObject?: Annotations;
+  presetLabels?: string[];
+}
 
-  imageSource: string;
+export class UserInterface extends Component<Props, State> {
+  annotationsObject: Annotations;
 
   private presetLabels: string[];
 
-  private slicesData: Array<ImageData>;
+  private slicesData: Array<Array<ImageBitmap>>;
 
   private imageFileInfo: ImageFileInfo | null;
 
-  constructor(props: never) {
+  constructor(props: Props) {
     super(props);
-    this.annotationsObject = new Annotations();
+    this.annotationsObject = this.props.annotationsObject || new Annotations();
+    this.slicesData = this.props.slicesData || null;
+
     this.state = {
       scaleAndPan: {
         scale: 1,
         x: 0,
         y: 0,
       },
-      activeTool: Tools.paintbrush,
       activeAnnotationID: 0,
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       minimapPositionAndSize: { top: 0, left: 0, width: 200, height: 200 },
-      expanded: false,
-      imageLoaded: false,
+      expanded: "labels-toolbox",
       callRedraw: 0,
+      sliceIndex: 0,
+      channels: [true],
+      displayedImage: this.slicesData[0][0] || null,
     };
 
-    this.imageSource = "zebrafish-heart.jpg";
-
     this.annotationsObject.addAnnotation(this.state.activeTool);
-    this.presetLabels = ["label-1", "label-2", "label-3"]; // TODO: find a place for this
+    this.presetLabels = this.props.presetLabels || [
+      "label-1",
+      "label-2",
+      "label-3",
+    ];
     this.imageFileInfo = null;
   }
 
@@ -113,6 +120,7 @@ export class UserInterface extends Component<Record<string, never>, State> {
     for (const event of events) {
       document.addEventListener(event, this.handleEvent);
     }
+    this.mixChannels();
   };
 
   componentWillUnmount(): void {
@@ -185,32 +193,34 @@ export class UserInterface extends Component<Record<string, never>, State> {
       const { scaleAndPan } = prevState;
       scaleAndPan[key] += increment;
       return { scaleAndPan };
-    });
+    }, this.limitPan);
 
   multiplyScaleAndPan = (key: "x" | "y" | "scale", multiple: number): void =>
     this.setState((prevState: State) => {
       const { scaleAndPan } = prevState;
       scaleAndPan[key] *= multiple;
       return { scaleAndPan };
-    });
+    }, this.limitPan);
 
   limitPan = (): void => {
     // adjust pan such that image borders are not inside the canvas
 
     // calculate how much bigger the image is than the canvas, in canvas space:
     const imageScalingFactor = Math.min(
-      this.state.viewportPositionAndSize.width / this.state.imageData.width,
-      this.state.viewportPositionAndSize.height / this.state.imageData.height
+      this.state.viewportPositionAndSize.width /
+        this.state.displayedImage.width,
+      this.state.viewportPositionAndSize.height /
+        this.state.displayedImage.height
     );
 
     const xMargin =
-      this.state.imageData.width *
+      this.state.displayedImage.width *
         imageScalingFactor *
         this.state.scaleAndPan.scale -
       this.state.viewportPositionAndSize.width;
 
     const yMargin =
-      this.state.imageData.height *
+      this.state.displayedImage.height *
         imageScalingFactor *
         this.state.scaleAndPan.scale -
       this.state.viewportPositionAndSize.height;
@@ -275,19 +285,43 @@ export class UserInterface extends Component<Record<string, never>, State> {
     this.incrementScaleAndPan("y", -CONFIG.PAN_AMOUNT);
   };
 
-  updateImageData = (imageData: ImageData): void => {
-    this.setState({ imageData });
-  };
-
   setUploadedImage = (
-    slicesData: Array<ImageData>,
-    imageFileInfo: ImageFileInfo
+    imageFileInfo: ImageFileInfo,
+    slicesData: Array<Array<ImageBitmap>>
   ): void => {
     this.imageFileInfo = imageFileInfo;
     this.slicesData = slicesData;
-    this.setState({ imageLoaded: true }, () => {
-      this.updateImageData(slicesData[0]); // go to first slice (if it's a 3D image)
-    });
+    this.setState(
+      {
+        sliceIndex: 0,
+        channels: Array(slicesData[0].length).fill(true) as boolean[],
+      },
+      this.mixChannels
+    );
+  };
+
+  mixChannels = (): void => {
+    // combines the separate channels in this.slicesData[this.state.sliceIndex] into
+    // a single ImageBitmap according to the user's channel picker settings, and stores
+    // the result in this.state.displayedImage
+
+    // draw the channels onto a new canvas using additive composition:
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    canvas.width = this.slicesData[this.state.sliceIndex][0].width;
+    canvas.height = this.slicesData[this.state.sliceIndex][0].height;
+    context.globalCompositeOperation = "lighter";
+    this.slicesData[this.state.sliceIndex].forEach(
+      (channel: ImageBitmap, i: number) => {
+        if (this.state.channels[i]) {
+          context.drawImage(channel, 0, 0);
+        }
+      }
+    );
+
+    createImageBitmap(canvas)
+      .then((displayedImage) => this.setState({ displayedImage }))
+      .catch((e) => console.log(e));
   };
 
   activateTool = (tool: Tool): void => {
@@ -353,17 +387,30 @@ export class UserInterface extends Component<Record<string, never>, State> {
     }));
   };
 
+  changeSlice = (e: ChangeEvent, value: number): void => {
+    this.setState(
+      {
+        sliceIndex: value,
+      },
+      this.mixChannels
+    );
+  };
+
+  toggleChannelAtIndex = (index: number): void => {
+    this.setState((prevState: State) => {
+      const { channels } = prevState;
+      channels[index] = !channels[index];
+      return { channels };
+    }, this.mixChannels);
+  };
+
   render = (): ReactNode => (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container disableGutters>
         <AppBar>
           <Toolbar>
-            <Tooltip title="Annotate new object">
-              <IconButton id="addAnnotation" onClick={this.addAnnotation}>
-                <Add />
-              </IconButton>
-            </Tooltip>
+            <UploadImage setUploadedImage={this.setUploadedImage} />
           </Toolbar>
         </AppBar>
         <Toolbar />
@@ -372,18 +419,16 @@ export class UserInterface extends Component<Record<string, never>, State> {
           <Grid item style={{ width: "85%", position: "relative" }}>
             <BackgroundCanvas
               scaleAndPan={this.state.scaleAndPan}
-              imgSrc={this.state.imageLoaded ? null : this.imageSource}
-              imageData={this.state.imageData}
-              updateImageData={this.updateImageData}
+              displayedImage={this.state.displayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
             />
 
             <SplineCanvas
               scaleAndPan={this.state.scaleAndPan}
-              splineType={this.state.activeTool}
+              activeTool={this.state.activeTool}
               annotationsObject={this.annotationsObject}
-              imageData={this.state.imageData}
+              displayedImage={this.state.displayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
               callRedraw={this.state.callRedraw}
@@ -394,24 +439,52 @@ export class UserInterface extends Component<Record<string, never>, State> {
               scaleAndPan={this.state.scaleAndPan}
               brushType={this.state.activeTool}
               annotationsObject={this.annotationsObject}
-              imageData={this.state.imageData}
+              displayedImage={this.state.displayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
               callRedraw={this.state.callRedraw}
             />
-          </Grid>
 
+            {this.slicesData.length > 1 && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: `${
+                    this.state.viewportPositionAndSize.top +
+                    this.state.viewportPositionAndSize.height +
+                    5
+                  }px`,
+                  left: `${this.state.viewportPositionAndSize.left}px`,
+                  width: `${this.state.viewportPositionAndSize.width}px`,
+                }}
+              >
+                <Slider
+                  value={this.state.sliceIndex}
+                  onChange={this.changeSlice}
+                  aria-labelledby="slice-index-slider"
+                  step={1}
+                  min={0}
+                  max={this.slicesData.length - 1}
+                  valueLabelDisplay="auto"
+                />
+              </div>
+            )}
+          </Grid>
           <Grid item style={{ width: 200, position: "relative" }}>
             <div style={{ height: 200 }}>
-              <BackgroundMinimap
+              <BackgroundCanvas
+                scaleAndPan={{ x: 0, y: 0, scale: 1 }}
+                displayedImage={this.state.displayedImage}
+                canvasPositionAndSize={this.state.minimapPositionAndSize}
+                setCanvasPositionAndSize={this.setMinimapPositionAndSize}
+              />
+              <MinimapCanvas
+                displayedImage={this.state.displayedImage}
                 scaleAndPan={this.state.scaleAndPan}
                 setScaleAndPan={this.setScaleAndPan}
-                imgSrc={this.state.imageLoaded ? null : this.imageSource}
-                imageData={this.state.imageData}
                 canvasPositionAndSize={this.state.viewportPositionAndSize}
                 minimapPositionAndSize={this.state.minimapPositionAndSize}
                 setMinimapPositionAndSize={this.setMinimapPositionAndSize}
-                setCanvasPositionAndSize={this.setViewportPositionAndSize}
               />
             </div>
 
@@ -460,9 +533,45 @@ export class UserInterface extends Component<Record<string, never>, State> {
               </ButtonGroup>
             </Grid>
 
+            <Accordion
+              expanded={this.state.expanded === "labels-toolbox"}
+              onChange={this.handleToolboxChange("labels-toolbox")}
+            >
+              <AccordionSummary expandIcon={<ExpandMore />} id="labels-toolbox">
+                <Typography>Annotations</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid container justify="center">
+                  <ButtonGroup>
+                    <Tooltip title="Annotate new object">
+                      <Button id="addAnnotation" onClick={this.addAnnotation}>
+                        <Add />
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title="Clear selected annotation">
+                      <Button
+                        id="clear-annotation"
+                        onClick={this.clearActiveAnnotation}
+                      >
+                        <Delete />
+                      </Button>
+                    </Tooltip>
+                  </ButtonGroup>
+
+                  <Labels
+                    annotationObject={this.annotationsObject}
+                    presetLabels={this.presetLabels}
+                    activeAnnotationID={this.state.activeAnnotationID}
+                  />
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+
             <BackgroundUI
               expanded={this.state.expanded === "background-toolbox"}
               onChange={this.handleToolboxChange("background-toolbox")}
+              channels={this.state.channels}
+              toggleChannelAtIndex={this.toggleChannelAtIndex}
             />
 
             <PaintbrushUI
@@ -484,36 +593,6 @@ export class UserInterface extends Component<Record<string, never>, State> {
               onChange={this.handleToolboxChange("spline-toolbox")}
               activateTool={this.activateTool}
             />
-
-            <Accordion
-              expanded={this.state.expanded === "labels-toolbox"}
-              onChange={this.handleToolboxChange("labels-toolbox")}
-            >
-              <AccordionSummary expandIcon={<ExpandMore />} id="labels-toolbox">
-                <Typography>Labels</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Labels
-                  annotationObject={this.annotationsObject}
-                  presetLabels={this.presetLabels}
-                  activeAnnotationID={this.state.activeAnnotationID}
-                />
-              </AccordionDetails>
-            </Accordion>
-
-            <Grid container justify="center">
-              <ButtonGroup orientation="vertical" style={{ margin: "5px" }}>
-                <Upload3DImage setUploadedImage={this.setUploadedImage} />
-                <Tooltip title="Clear selected annotation">
-                  <Button
-                    id="clear-annotation"
-                    onClick={this.clearActiveAnnotation}
-                  >
-                    <Delete />
-                  </Button>
-                </Tooltip>
-              </ButtonGroup>
-            </Grid>
           </Grid>
         </Grid>
       </Container>

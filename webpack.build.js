@@ -1,17 +1,29 @@
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const CopyPlugin = require("copy-webpack-plugin");
 const path = require("path");
 
-const port = process.env.PORT || 3000;
-
-function resolve(dir) {
-  return path.join(__dirname, "..", dir);
-}
-
 module.exports = {
-  entry: "./examples/src/index.tsx",
-  mode: "development",
-  devtool: "source-map",
+  entry: {
+    main: "./src/index.tsx",
+  },
+  output: {
+    filename: "main.js",
+    path: path.resolve(__dirname, "dist"),
+    libraryTarget: "commonjs",
+  },
+  externals: {
+    // Don't bundle react or react-dom
+    react: {
+      commonjs: "react",
+      commonjs2: "react",
+      amd: "React",
+      root: "React",
+    },
+    "react-dom": {
+      commonjs: "react-dom",
+      commonjs2: "react-dom",
+      amd: "ReactDOM",
+      root: "ReactDOM",
+    },
+  },
   module: {
     rules: [
       {
@@ -19,7 +31,6 @@ module.exports = {
         use: "ts-loader",
         exclude: /node_modules/,
       },
-
       {
         test: /\.m?js$/,
         exclude: /(node_modules|bower_components)/,
@@ -42,24 +53,5 @@ module.exports = {
     alias: {
       "@": path.resolve(__dirname, "src"),
     },
-  },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: "examples/index.html",
-    }),
-    new CopyPlugin({
-      patterns: [
-        {
-          from: "examples/zebrafish-heart.jpg",
-          to: "zebrafish-heart.jpg",
-        },
-      ],
-    }),
-  ],
-  devServer: {
-    host: "localhost",
-    port,
-    historyApiFallback: true,
-    open: true,
   },
 };

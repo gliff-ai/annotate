@@ -6,8 +6,6 @@ import drawImageOnCanvas from "./drawImage";
 import { useBackgroundStore } from "./Store";
 
 interface Props extends BaseProps {
-  imgSrc: string | null;
-  updateImageData: (imageData: ImageData) => void;
   contrast: number;
   brightness: number;
 }
@@ -15,81 +13,32 @@ interface Props extends BaseProps {
 export class BackgroundCanvasClass extends Component<Props> {
   private baseCanvas: BaseCanvas;
 
-  private image: HTMLImageElement | HTMLCanvasElement;
+  componentDidMount = (): void => {
+    this.drawImage();
+  };
 
   componentDidUpdate(prevProps: Props): void {
-    // imgSrc is used to avoid calling loadImage when the component mounts
-    if (!this.props.imgSrc && prevProps.imageData !== this.props.imageData) {
-      this.loadImage(); // calls this.drawImage() after image loading
-    } else {
-      this.drawImage();
-    }
     if (
       prevProps.brightness !== this.props.brightness ||
-      prevProps.contrast !== this.props.contrast
+      prevProps.contrast !== this.props.contrast ||
+      prevProps.canvasPositionAndSize !== this.props.canvasPositionAndSize
     ) {
       this.updateBrightnessOrContrast();
     }
+    this.drawImage();
   }
-
-  componentDidMount = (): void => {
-    this.loadImage();
-  };
 
   private drawImage = () => {
     // Any annotation that is already on the canvas is put on top of any new annotation
-    this.baseCanvas.canvasContext.globalCompositeOperation = "destination-over";
-
-    if (this.props.imgSrc) {
-      if (this.image && (this.image as HTMLImageElement).complete) {
-        drawImageOnCanvas(
-          this.baseCanvas.canvasContext,
-          this.image,
-          this.props.scaleAndPan
-        );
-      }
-    } else {
+    if (this.props.displayedImage) {
+      this.baseCanvas.canvasContext.globalCompositeOperation =
+        "destination-over";
       drawImageOnCanvas(
         this.baseCanvas.canvasContext,
-        this.image,
+        this.props.displayedImage,
         this.props.scaleAndPan
       );
     }
-  };
-
-  private loadImage = () => {
-    if (this.props.imgSrc) {
-      // Load the image
-      this.image = new Image();
-      // Prevent SecurityError "Tainted canvases may not be exported." #70
-      this.image.crossOrigin = "anonymous";
-      // Draw the image once loaded
-      this.image.onload = () => {
-        this.props.updateImageData(
-          this.baseCanvas.canvasContext.getImageData(
-            0,
-            0,
-            this.image.width,
-            this.image.height
-          )
-        );
-        this.drawImage();
-      };
-      this.image.src = this.props.imgSrc;
-    } else {
-      this.image = this.createCanvasFromImageData();
-      this.drawImage();
-    }
-  };
-
-  private createCanvasFromImageData = (): HTMLCanvasElement => {
-    // Create a canvas element from an array.
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-    canvas.width = this.props.imageData.width;
-    canvas.height = this.props.imageData.height;
-    context.putImageData(this.props.imageData, 0, 0);
-    return canvas;
   };
 
   updateBrightnessOrContrast = (): void => {
@@ -117,13 +66,11 @@ export const BackgroundCanvas = (
 
   return (
     <BackgroundCanvasClass
-      imgSrc={props.imgSrc}
-      updateImageData={props.updateImageData}
       contrast={background.contrast}
       brightness={background.brightness}
       scaleAndPan={props.scaleAndPan}
       canvasPositionAndSize={props.canvasPositionAndSize}
-      imageData={props.imageData}
+      displayedImage={props.displayedImage}
     />
   );
 };

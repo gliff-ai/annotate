@@ -1,13 +1,6 @@
 import React, { Component, ReactNode } from "react";
+import { XYPoint, PositionAndSize } from "@/annotation/interfaces";
 
-import { XYPoint } from "@/annotation/interfaces";
-
-export interface PositionAndSize {
-  top?: number;
-  left?: number;
-  width?: number;
-  height?: number;
-}
 export interface Props {
   name?: string;
   zoomExtents?: {
@@ -28,7 +21,7 @@ export interface Props {
   onContextMenu?: (x: number, y: number) => void;
   canvasPositionAndSize: PositionAndSize;
   setCanvasPositionAndSize?: (canvasPositionAndSize: PositionAndSize) => void;
-  imageData?: ImageData;
+  displayedImage?: ImageBitmap;
 }
 export class BaseCanvas extends Component<Props> {
   private name: string;
@@ -68,14 +61,6 @@ export class BaseCanvas extends Component<Props> {
 
   private applyView = (): void => {
     this.clearWindow();
-    // this.canvasContext.setTransform(
-    //   this.props.scaleAndPan.scale,
-    //   0,
-    //   0,
-    //   this.props.scaleAndPan.scale,
-    //   this.props.scaleAndPan.x,
-    //   this.props.scaleAndPan.y
-    // );
   };
 
   private handleCanvasResize = (entries: ResizeObserverEntry[]): void => {
@@ -172,7 +157,6 @@ export class BaseCanvas extends Component<Props> {
         touchAction: "none",
         width: "100%",
         height: this.props.canvasPositionAndSize.height,
-        zIndex: 100,
         cursor: this.props.cursor || "pointer",
         //   border: "1px solid gray",
         top: this.props.canvasPositionAndSize.top,

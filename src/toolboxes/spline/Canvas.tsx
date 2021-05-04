@@ -4,23 +4,29 @@ import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/transforms";
 import { Annotation, XYPoint } from "@/annotation/interfaces";
-import { theme } from "@/theme";
 import { calculateSobel } from "./sobel";
 import ImageFileInfo from "@/ImageFileInfo";
 
+import {
+  main as mainColor,
+  secondary as secondaryColor,
+  getRGBAString,
+  palette,
+} from "@/palette";
+
 interface Props extends BaseProps {
-  splineType: string;
+  activeTool: string;
   annotationsObject: Annotations;
   callRedraw: number;
   setUploadedImage: (
-    slicesData: Array<ImageData>,
-    imageFileInfo: ImageFileInfo
+    imageFileInfo: ImageFileInfo,
+    slicesData: Array<Array<ImageBitmap>>
   ) => void;
 }
 enum Mode {
   draw,
-  edit,
   magic,
+  select,
 }
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
@@ -30,15 +36,17 @@ export const events = [
   "changeSplineModeToEdit",
   "deselectPoint",
   "closeLoop",
+  "toggleMode",
 ] as const;
 
 interface Event extends CustomEvent {
   type: typeof events[number];
 }
 
+type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 interface State {
-  mode: number;
   isActive: boolean;
+  mode: Mode;
 }
 
 export class SplineCanvas extends Component<Props, State> {
@@ -49,8 +57,6 @@ export class SplineCanvas extends Component<Props, State> {
   private selectedPointIndex: number;
 
   private isDragging: boolean;
-
-  private mode: number;
 
   private gradientImage: ImageData;
 
@@ -72,7 +78,7 @@ export class SplineCanvas extends Component<Props, State> {
     const activeAnnotation = this.props.annotationsObject.getActiveAnnotation();
 
     // Change mode if we change the spline type prop
-    if (this.props.splineType !== prevProps.splineType) {
+    if (this.props.activeTool !== prevProps.activeTool) {
       this.updateMode();
     }
 
@@ -88,19 +94,31 @@ export class SplineCanvas extends Component<Props, State> {
   }
 
   handleEvent = (event: Event): void => {
-    if (event.detail === this.name) {
+    if ((event.detail as string).includes(this.name)) {
       this[event.type]?.call(this);
     }
   };
 
-  drawSplineVector = (splineVector: XYPoint[], isActive = false): void => {
+  drawSplineVector = (
+    splineVector: XYPoint[],
+    isActive = false,
+    color: string
+  ): void => {
     if (splineVector.length === 0) return;
 
     const { canvasContext: context } = this.baseCanvas;
     const lineWidth = isActive ? 2 : 1;
     context.lineWidth = lineWidth;
-    context.strokeStyle = theme.palette.secondary.dark;
-    context.fillStyle = theme.palette.primary.dark;
+
+    if (isActive) {
+      // Lines
+      context.strokeStyle = getRGBAString(mainColor);
+    } else {
+      context.strokeStyle = color;
+    }
+    // Squares
+    context.fillStyle = getRGBAString(secondaryColor);
+
     const pointSize = 6;
     let nextPoint;
 
@@ -110,8 +128,8 @@ export class SplineCanvas extends Component<Props, State> {
       firstPoint = imageToCanvas(
         firstPoint.x,
         firstPoint.y,
-        this.props.imageData.width,
-        this.props.imageData.height,
+        this.props.displayedImage.width,
+        this.props.displayedImage.height,
         this.props.scaleAndPan,
         this.props.canvasPositionAndSize
       );
@@ -124,8 +142,8 @@ export class SplineCanvas extends Component<Props, State> {
         nextPoint = imageToCanvas(
           x,
           y,
-          this.props.imageData.width,
-          this.props.imageData.height,
+          this.props.displayedImage.width,
+          this.props.displayedImage.height,
           this.props.scaleAndPan,
           this.props.canvasPositionAndSize
         );
@@ -141,8 +159,8 @@ export class SplineCanvas extends Component<Props, State> {
         nextPoint = imageToCanvas(
           x,
           y,
-          this.props.imageData.width,
-          this.props.imageData.height,
+          this.props.displayedImage.width,
+          this.props.displayedImage.height,
           this.props.scaleAndPan,
           this.props.canvasPositionAndSize
         );
@@ -184,7 +202,8 @@ export class SplineCanvas extends Component<Props, State> {
         ) {
           this.drawSplineVector(
             annotation.coordinates,
-            i === activeAnnotationID
+            i === activeAnnotationID,
+            getRGBAString(palette[i % palette.length])
           );
         }
       });
@@ -192,7 +211,7 @@ export class SplineCanvas extends Component<Props, State> {
 
   private changeSplineModeToEdit = (): void => {
     // TODO: add keyboard shortcuts for switching between modes
-    this.setState({ mode: Mode.edit });
+    this.setState({ mode: Mode.select }); // Change mode to select mode
     this.deselectPoint();
   };
 
@@ -254,8 +273,8 @@ export class SplineCanvas extends Component<Props, State> {
     const { x: clickPointX, y: clickPointY } = imageToCanvas(
       clickPoint.x,
       clickPoint.y,
-      this.props.imageData.width,
-      this.props.imageData.height,
+      this.props.displayedImage.width,
+      this.props.displayedImage.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
@@ -266,8 +285,8 @@ export class SplineCanvas extends Component<Props, State> {
       point = imageToCanvas(
         point.x,
         point.y,
-        this.props.imageData.width,
-        this.props.imageData.height,
+        this.props.displayedImage.width,
+        this.props.displayedImage.height,
         this.props.scaleAndPan,
         this.props.canvasPositionAndSize
       );
@@ -291,8 +310,8 @@ export class SplineCanvas extends Component<Props, State> {
     const { x: imageX, y: imageY } = canvasToImage(
       x,
       y,
-      this.props.imageData.width,
-      this.props.imageData.height,
+      this.props.displayedImage.width,
+      this.props.displayedImage.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
@@ -304,8 +323,8 @@ export class SplineCanvas extends Component<Props, State> {
     );
     const isClosed = this.isClosed(currentSplineVector);
 
-    // If the mouse click was near an existing point, nudge that point
     if (nudgePointIdx !== -1) {
+      // If the mouse click was near an existing point, nudge that point
       const nudgePoint = currentSplineVector[nudgePointIdx];
 
       this.updateXYPoint(
@@ -329,10 +348,83 @@ export class SplineCanvas extends Component<Props, State> {
       // Add coordinates to the current spline
       currentSplineVector.push({ x: imageX, y: imageY });
       this.selectedPointIndex = currentSplineVector.length - 1;
-    } else if (this.state.mode === Mode.edit) {
-      this.addNewPointNearSpline(imageX, imageY);
+    } else if (this.state.mode === Mode.select) {
+      // In select mode a single click allows to select a different spline
+      const selectedSpline = this.clickNearSpline(imageX, imageY);
+      if (selectedSpline !== null) {
+        this.props.annotationsObject.setActiveAnnotationID(selectedSpline);
+      }
     }
 
+    this.drawAllSplines();
+  };
+
+  clickNearSpline = (imageX: number, imageY: number): number => {
+    // Check if point clicked (in image space) is near an existing spline.
+    // If true, return annotation index, otherwise return null.
+    const annotations = this.props.annotationsObject.getAllAnnotations();
+
+    for (let i = 0; i < annotations.length; i += 1) {
+      if (annotations[i].toolbox === "spline") {
+        const { coordinates } = annotations[i];
+        // For each pair of points, check is point clicked is near the line segment
+        // having for end points two consecutive points in the spline.
+        for (let j = 1; j < coordinates.length; j += 1) {
+          if (
+            this.isClickNearLineSegment(
+              { x: imageX, y: imageY },
+              coordinates[j - 1],
+              coordinates[j]
+            )
+          )
+            return i;
+        }
+      }
+    }
+    return null;
+  };
+
+  isClickNearLineSegment = (
+    point: XYPoint,
+    point1: XYPoint,
+    point2: XYPoint
+  ): boolean => {
+    // Check if a XYpoint belongs to the line segment with endpoints XYpoint 1 and XYpoint 2.
+    const dx = point.x - point1.x;
+    const dy = point.y - point1.y;
+    const dxLine = point2.x - point1.x;
+    const dyLine = point2.y - point1.y;
+    const distance = 700;
+    // Use the cross-product to check whether the XYpoint lies on the line passing
+    // through XYpoint 1 and XYpoint 2.
+    const crossProduct = dx * dyLine - dy * dxLine;
+    // If the XYpoint is exactly on the line the cross-product is zero. Here we set a threshold
+    // based on ease of use, to accept points that are close enough to the spline.
+    if (Math.abs(crossProduct) > distance) return false;
+
+    // Check if the point is on the segment (i.e., between point 1 and point 2).
+    if (Math.abs(dxLine) >= Math.abs(dyLine)) {
+      return dxLine > 0
+        ? point1.x <= point.x && point.x <= point2.x
+        : point2.x <= point.x && point.x <= point1.x;
+    }
+    return dyLine > 0
+      ? point1.y <= point.y && point.y <= point2.y
+      : point2.y <= point.y && point.y <= point1.y;
+  };
+
+  onDoubleClick = (x: number, y: number): void => {
+    // Add new point on double-click.
+    if (this.state.mode === Mode.draw) return;
+    const { x: imageX, y: imageY } = canvasToImage(
+      x,
+      y,
+      this.props.displayedImage.width,
+      this.props.displayedImage.height,
+      this.props.scaleAndPan,
+      this.props.canvasPositionAndSize
+    );
+    this.addNewPointNearSpline(imageX, imageY);
     this.drawAllSplines();
   };
 
@@ -369,11 +461,11 @@ export class SplineCanvas extends Component<Props, State> {
 
     const xMin = Math.floor(Math.max(0, point.x - snapeRadius));
     const xMax = Math.floor(
-      Math.min(this.props.imageData.width - 1, point.x + snapeRadius)
+      Math.min(this.props.displayedImage.width - 1, point.x + snapeRadius)
     );
     const yMin = Math.floor(Math.max(0, point.y - snapeRadius));
     const yMax = Math.floor(
-      Math.min(this.props.imageData.height - 1, point.y + snapeRadius)
+      Math.min(this.props.displayedImage.height - 1, point.y + snapeRadius)
     );
     console.log(xMin, xMax, yMin, yMax);
     let maxGradVal = 0;
@@ -397,8 +489,8 @@ export class SplineCanvas extends Component<Props, State> {
     const clickPoint = canvasToImage(
       x,
       y,
-      this.props.imageData.width,
-      this.props.imageData.height,
+      this.props.displayedImage.width,
+      this.props.displayedImage.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
@@ -406,12 +498,13 @@ export class SplineCanvas extends Component<Props, State> {
     if (this.state.mode == Mode.magic) {
       // add a new point and snap it to the highest gradient point within 25 pixels:
       if (this.gradientImage === undefined) {
-        this.gradientImage = calculateSobel(this.props.imageData);
-        this.baseCanvas.canvasContext.putImageData(this.gradientImage, 0, 0);
-        this.props.setUploadedImage(
-          [this.gradientImage],
-          new ImageFileInfo("balls")
-        );
+        // commented out to make it build; will rework sobel.ts to handle ImageBitmap in next commits
+        // this.gradientImage = calculateSobel(this.props.displayedImage);
+        // this.baseCanvas.canvasContext.putImageData(this.gradientImage, 0, 0);
+        // this.props.setUploadedImage(
+        //   [this.gradientImage],
+        //   new ImageFileInfo("balls")
+        // );
         console.log(this.gradientImage);
       }
       let { coordinates } = this.props.annotationsObject.getActiveAnnotation();
@@ -440,8 +533,8 @@ export class SplineCanvas extends Component<Props, State> {
     const clickPoint = canvasToImage(
       x,
       y,
-      this.props.imageData.width,
-      this.props.imageData.height,
+      this.props.displayedImage.width,
+      this.props.displayedImage.height,
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
@@ -508,7 +601,7 @@ export class SplineCanvas extends Component<Props, State> {
   private updateMode(): void {
     // FIXME this is a bit clumsy
     // Change mode if we change the spline type prop
-    switch (this.props.splineType) {
+    switch (this.props.activeTool) {
       case "spline": {
         this.setState({ mode: Mode.draw, isActive: true });
         break;
@@ -524,14 +617,33 @@ export class SplineCanvas extends Component<Props, State> {
     }
   }
 
+  getCursor = (): Cursor => {
+    if (!this.isActive()) return "none";
+    return this.state.mode === Mode.draw ? "crosshair" : "pointer";
+  };
+
+  isActive = (): boolean =>
+    this.props.activeTool === "spline" ||
+    this.props.activeTool === "magicspline";
+
+  toggleMode = (): void => {
+    if (!this.isActive()) return;
+    if (this.state.mode === Mode.draw) {
+      this.setState({ mode: Mode.select });
+    } else {
+      this.setState({ mode: Mode.draw });
+    }
+  };
+
   render = (): ReactNode => (
     <div style={{ pointerEvents: this.state.isActive ? "auto" : "none" }}>
       <BaseCanvas
         onClick={this.onClick}
+        onDoubleClick={this.onDoubleClick}
         onMouseDown={this.onMouseDown}
         onMouseMove={this.onMouseMove}
         onMouseUp={this.onMouseUp}
-        cursor={this.state.isActive ? "crosshair" : "none"}
+        cursor={this.getCursor()}
         ref={(baseCanvas) => {
           this.baseCanvas = baseCanvas;
         }}
