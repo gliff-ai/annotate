@@ -60,10 +60,13 @@ export class SplineCanvas extends Component<Props, State> {
 
   private gradientImage: ImageData;
 
+  private numberOfMoves: number; // increments on mouse move; used to space out the magic spline points
+
   constructor(props: Props) {
     super(props);
     this.selectedPointIndex = -1;
     this.isDragging = false;
+    this.numberOfMoves = 0;
     this.state = { mode: Mode.draw, isActive: false };
   }
 
@@ -479,7 +482,7 @@ export class SplineCanvas extends Component<Props, State> {
         let i = (y * this.gradientImage.width + x) * 4 + 0; // using red channel values since gradientImage is always greyscale
         val =
           this.gradientImage.data[i] /
-          (1 + Math.sqrt((x - point.x) ^ (2 + (y - point.y)) ^ 2));
+          (2 + Math.sqrt((x - point.x) ^ (2 + (y - point.y)) ^ 2));
         if (val > bestVal) {
           bestVal = this.gradientImage.data[i];
           bestX = x;
@@ -538,6 +541,8 @@ export class SplineCanvas extends Component<Props, State> {
   onMouseMove = (x: number, y: number): void => {
     if (!this.isDragging) return;
 
+    this.numberOfMoves++;
+
     // Replace update the coordinates for the point dragged
     const clickPoint = canvasToImage(
       x,
@@ -548,7 +553,8 @@ export class SplineCanvas extends Component<Props, State> {
       this.props.canvasPositionAndSize
     );
 
-    if (this.state.mode == Mode.magic) {
+    console.log(this.numberOfMoves % 5);
+    if (this.state.mode == Mode.magic && this.numberOfMoves % 5 == 0) {
       // add a new point and snap it to the highest gradient point within 25 pixels:
       let { coordinates } = this.props.annotationsObject.getActiveAnnotation();
       coordinates.push({ x: clickPoint.x, y: clickPoint.y });
