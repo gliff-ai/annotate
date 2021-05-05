@@ -14,6 +14,7 @@ import {
   ListItemIcon,
   ListItemSecondaryAction,
   ListItemText,
+  makeStyles,
 } from "@material-ui/core";
 import {
   Add,
@@ -33,6 +34,15 @@ interface Props {
   updatePresetLabels: (label: string) => void;
   activeAnnotationID: number;
 }
+
+const useStyles = makeStyles((theme) => ({
+  padding: {
+    paddingLeft: theme.spacing(1),
+  },
+  fontSize: {
+    fontSize: 0.5,
+  },
+}));
 
 export const Labels: FunctionComponent<Props> = ({
   annotationObject,
@@ -85,6 +95,8 @@ export const Labels: FunctionComponent<Props> = ({
     // Re-render assigned labels at change of active annotation ID.
     updateAllLabels();
   }, [activeAnnotationID]);
+
+  const classes = useStyles();
 
   return (
     <>
@@ -141,11 +153,13 @@ export const Labels: FunctionComponent<Props> = ({
                 placeholder="New label"
                 value={newLabel}
                 onChange={handleNewLabelChange}
+                className={classes.fontSize}
               />
               <IconButton
                 type="submit"
                 aria-label="add-new-label"
                 onClick={handleAddLabel(newLabel)}
+                className={classes.padding}
               >
                 <Add />
               </IconButton>
