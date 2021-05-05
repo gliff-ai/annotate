@@ -131,11 +131,11 @@ export class UserInterface extends Component<Props, State> {
     }
   };
 
-  updatePresetLabels = (label: string): void => {  
+  updatePresetLabels = (label: string): void => {
     function onlyUnique(value: string, index: number, self: string[]) {
-        return self.indexOf(value) === index;
+      return self.indexOf(value) === index;
     }
-    this.presetLabels.push(label)
+    this.presetLabels.push(label);
     this.presetLabels = this.presetLabels.filter(onlyUnique);
   };
 
