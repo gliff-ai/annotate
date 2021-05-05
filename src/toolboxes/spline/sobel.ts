@@ -32,25 +32,20 @@ export function calculateSobel(imageBitmap: ImageBitmap): ImageData {
   const sobelData = new Uint8ClampedArray(width * height * 4);
 
   function bindPixelAt(data: Uint8ClampedArray) {
-    return function (x: number, y: number, channel?: number): number {
+    return (x: number, y: number, channel?: number): number => {
       const actualChannel = channel || 0;
       return data[(width * y + x) * 4 + actualChannel];
     };
   }
 
   function bindSetPixelAt(data: Uint8ClampedArray) {
-    return function (
-      x: number,
-      y: number,
-      r = 0,
-      g = 0,
-      b = 0,
-      alpha = 0
-    ): void {
-      data[(width * y + x) * 4 + 0] = r;
+    return (x: number, y: number, r = 0, g = 0, b = 0, alpha = 0): void => {
+      /* eslint-disable no-param-reassign */
+      data[(width * y + x) * 4] = r;
       data[(width * y + x) * 4 + 1] = g;
       data[(width * y + x) * 4 + 2] = b;
       data[(width * y + x) * 4 + 3] = alpha;
+      /* eslint-enable no-param-reassign */
     };
   }
 
