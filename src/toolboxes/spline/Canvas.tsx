@@ -529,13 +529,6 @@ export class SplineCanvas extends Component<Props, State> {
       // add a new point and snap it to the highest gradient point within 25 pixels:
       if (this.gradientImage === undefined) {
         this.gradientImage = calculateSobel(this.props.displayedImage);
-        // createImageBitmap(this.gradientImage).then(
-        //   (imageBitmap: ImageBitmap) => {
-        //     this.props.setUploadedImage(new ImageFileInfo("test"), [
-        //       [imageBitmap],
-        //     ]);
-        //   }
-        // );
       }
       const {
         coordinates,
