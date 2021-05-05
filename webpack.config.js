@@ -49,7 +49,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          from: "examples/test.png",
+          from: "examples/zebrafish-heart.jpg",
           to: "zebrafish-heart.jpg",
         },
       ],
