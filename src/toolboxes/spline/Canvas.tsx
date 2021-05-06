@@ -4,7 +4,6 @@ import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/transforms";
 import { Annotation, XYPoint } from "@/annotation/interfaces";
-import ImageFileInfo from "@/ImageFileInfo";
 
 import {
   main as mainColor,
@@ -19,10 +18,6 @@ interface Props extends BaseProps {
   activeTool: string;
   annotationsObject: Annotations;
   callRedraw: number;
-  setUploadedImage: (
-    imageFileInfo: ImageFileInfo,
-    slicesData: Array<Array<ImageBitmap>>
-  ) => void;
 }
 enum Mode {
   draw,
