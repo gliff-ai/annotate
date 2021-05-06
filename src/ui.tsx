@@ -108,7 +108,7 @@ export class UserInterface extends Component<Props, State> {
     };
 
     this.annotationsObject.addAnnotation(this.state.activeTool);
-    this.presetLabels = this.props.presetLabels || ["default-label"];
+    this.presetLabels = this.props.presetLabels || [];
     this.imageFileInfo = null;
   }
 
