@@ -420,11 +420,14 @@ export class UserInterface extends Component<Props, State> {
               spanElement={
                 /* eslint-disable react/jsx-wrap-multilines */
                 <Button aria-label="upload-picture" component="span">
-                  <Backup />
+                  {<img src="\examples\upload-icon.svg" />}
                 </Button>
               }
-            />
+            />{" "}
           </Toolbar>
+          <Typography>
+            {<img src="\examples\gliff-master-black.png" width="50px" />}
+          </Typography>
         </AppBar>
         <Toolbar />
 
