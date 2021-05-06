@@ -441,7 +441,6 @@ export class UserInterface extends Component<Props, State> {
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
               callRedraw={this.state.callRedraw}
-              setUploadedImage={this.setUploadedImage}
             />
 
             <PaintbrushCanvas
