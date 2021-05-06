@@ -21,7 +21,6 @@ import {
   ExpandLess,
   ExpandMore,
   LibraryAdd,
-  PinDropSharp,
 } from "@material-ui/icons";
 
 import { Annotations } from "@/annotation";
