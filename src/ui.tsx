@@ -27,7 +27,9 @@ import {
   KeyboardArrowUp,
   ExpandMore,
   Backup,
+  CloudDownload,
 } from "@material-ui/icons";
+
 import { ImageFileInfo } from "@gliff-ai/upload/typings";
 import { UploadImage } from "@gliff-ai/upload";
 
@@ -40,6 +42,7 @@ import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
 import { Labels } from "@/components/Labels";
 import { keydownListener } from "@/keybindings";
+import { downloadAnnotations } from "@/download/DownloadAnnotations";
 
 import { Tools, Tool } from "@/tools";
 
@@ -419,11 +422,30 @@ export class UserInterface extends Component<Props, State> {
               setUploadedImage={this.setUploadedImage}
               spanElement={
                 /* eslint-disable react/jsx-wrap-multilines */
-                <Button aria-label="upload-picture" component="span">
-                  <Backup />
-                </Button>
+                <Tooltip title="Uplaod image">
+                  <Button aria-label="upload-picture" component="span">
+                    <Backup />
+                  </Button>
+                </Tooltip>
               }
             />
+
+            {downloadAnnotations && (
+              <Tooltip title="Download annotations">
+                <Button
+                  aria-label="download-annotations"
+                  onClick={() =>
+                    downloadAnnotations(
+                      this.annotationsObject.getAllAnnotations(),
+                      this.imageFileInfo,
+                      this.slicesData.length //TODO: add slices to ImageFileInfo class
+                    )
+                  }
+                >
+                  <CloudDownload />
+                </Button>
+              </Tooltip>
+            )}
           </Toolbar>
         </AppBar>
         <Toolbar />
