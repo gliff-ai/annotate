@@ -1,10 +1,14 @@
 import { red } from "@material-ui/core/colors";
 import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
-import { secondary } from "./palette";
 
 const theme: Theme = createMuiTheme({
   palette: {
-    type: "dark",
+    primary: {
+      main: "#FFFFFF",
+    },
+    secondary: {
+      main: "#02FFAD",
+    },
   },
   typography: {
     fontFamily: "Roboto",
@@ -15,26 +19,33 @@ const theme: Theme = createMuiTheme({
   overrides: {
     MuiButton: {
       root: {
-        padding: "10px",
+        color: "#000000",
       },
     },
-    MuiGrid: {
-      container: {
-        marginTop: "50px",
-      },
-    },
-    MuiPaper: {
+
+    MuiButtonGroup: {
       root: {
-        marginBottom: "20px",
+        borderRadius: "9px",
       },
     },
-    MuiAppBar: {
-      root: {},
+
+    MuiToolbar: {
+      root: {
+        boxShadow: "0px, 0px, 0px, 0px",
+        // background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
+      },
     },
   },
+
   props: {
     MuiButton: {
       disableRipple: true,
+    },
+
+    MuiButtonGroup: {
+      orientation: "vertical",
+      color: "secondary",
+      variant: "outlined",
     },
   },
 });

@@ -415,19 +415,23 @@ export class UserInterface extends Component<Props, State> {
       <Container disableGutters>
         <AppBar>
           <Toolbar>
-            <UploadImage
-              setUploadedImage={this.setUploadedImage}
-              spanElement={
-                /* eslint-disable react/jsx-wrap-multilines */
-                <Button aria-label="upload-picture" component="span">
-                  {<img src="\examples\upload-icon.svg" />}
-                </Button>
-              }
-            />{" "}
+            <Grid container direction="row">
+              <Grid item justify="flex-start">
+                {<img src="\examples\gliff-master-black.png" width="50px" />}
+              </Grid>
+            </Grid>
+            <Grid item justify="flex-end">
+              <UploadImage
+                setUploadedImage={this.setUploadedImage}
+                spanElement={
+                  /* eslint-disable react/jsx-wrap-multilines */
+                  <Button aria-label="upload-picture" component="span">
+                    {<img src="\examples\upload-icon.svg" />}
+                  </Button>
+                }
+              />
+            </Grid>
           </Toolbar>
-          <Typography>
-            {<img src="\examples\gliff-master-black.png" width="50px" />}
-          </Typography>
         </AppBar>
         <Toolbar />
 
@@ -582,6 +586,18 @@ export class UserInterface extends Component<Props, State> {
                 </Grid>
               </AccordionDetails>
             </Accordion>
+
+            <ButtonGroup>
+              <Button> {<img src="\examples\select-icon.svg" />}</Button>
+              <Button>{<img src="\examples\brush-icon.svg" />}</Button>
+              <Button>{<img src="\examples\eraser-icon.svg" />}</Button>
+              <Button>{<img src="\examples\splines-icon.svg" />}</Button>
+              <Button>{<img src="\examples\contrast-icon.svg" />}</Button>
+              <Button>{<img src="\examples\brightness-icon.svg" />}</Button>
+              <Button>
+                {<img src="\examples\annotation-label-icon.svg" />}
+              </Button>
+            </ButtonGroup>
 
             <BackgroundUI
               expanded={this.state.expanded === "background-toolbox"}
