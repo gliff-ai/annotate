@@ -13,7 +13,14 @@ import {
   AccordionDetails,
   CssBaseline,
   Slider,
+  withStyles,
+  Theme,
+  Avatar,
+  Box,
+  IconButton,
 } from "@material-ui/core";
+
+import { spacing } from "@material-ui/system";
 
 import {
   Add,
@@ -76,6 +83,15 @@ interface Props {
   annotationsObject?: Annotations;
   presetLabels?: string[];
 }
+
+const HtmlTooltip = withStyles((theme: Theme) => ({
+  tooltip: {
+    backgroundColor: "#FFFFFF",
+    fontSize: theme.typography.pxToRem(12),
+    border: "1px solid #dadde9",
+    color: "#2B2F3A",
+  },
+}))(Tooltip);
 
 export class UserInterface extends Component<Props, State> {
   annotationsObject: Annotations;
@@ -409,6 +425,24 @@ export class UserInterface extends Component<Props, State> {
     }, this.mixChannels);
   };
 
+  toolTips = [
+    { name: "Select", icon: `/examples/select-icon.svg`, shortcut: "V" },
+    { name: "Brush", icon: `/examples/brush-icon.svg`, shortcut: "B" },
+    { name: "Eraser", icon: `/examples/eraser-icon.svg`, shortcut: "E" },
+    { name: "Spline", icon: `/examples/splines-icon.svg`, shortcut: "S" },
+    { name: "Contrast", icon: `/examples/contrast-icon.svg`, shortcut: `"\"` },
+    {
+      name: "Brightness",
+      icon: `/examples/brightness-icon.svg`,
+      shortcut: `"/"`,
+    },
+    {
+      name: "Annonation Label",
+      icon: `/examples/annotation-label-icon.svg`,
+      shortcut: "L",
+    },
+  ];
+
   render = (): ReactNode => (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -497,6 +531,47 @@ export class UserInterface extends Component<Props, State> {
                 canvasPositionAndSize={this.state.minimapPositionAndSize}
                 setCanvasPositionAndSize={this.setMinimapPositionAndSize}
               />
+            </div>
+            {/* To do: Map through tool tips */}
+            <Grid container direction="row">
+              <ButtonGroup size="small" style={{ margin: "5px" }}>
+                <Tooltip title="Zoom in">
+                  <IconButton id="zoom-in" onClick={this.incrementScale}>
+                    {
+                      <img
+                        src="examples/zoom-in-icon.svg"
+                        style={{ width: "60%" }}
+                      />
+                    }
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Zoom out">
+                  <IconButton id="zoom-out" onClick={this.decrementScale}>
+                    {
+                      <img
+                        src="examples/zoom-out-icon.svg"
+                        style={{ width: "60%" }}
+                      />
+                    }
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Reset zoom and pan">
+                  <IconButton
+                    color="secondary"
+                    size="small"
+                    style={{ marginBottom: "10px" }}
+                  >
+                    <Avatar sizes="large">
+                      {
+                        <img
+                          src="examples/zoom-out-icon.svg"
+                          style={{ width: "60%" }}
+                        />
+                      }
+                    </Avatar>
+                  </IconButton>
+                </Tooltip>
+              </ButtonGroup>
               <MinimapCanvas
                 displayedImage={this.state.displayedImage}
                 scaleAndPan={this.state.scaleAndPan}
@@ -505,50 +580,48 @@ export class UserInterface extends Component<Props, State> {
                 minimapPositionAndSize={this.state.minimapPositionAndSize}
                 setMinimapPositionAndSize={this.setMinimapPositionAndSize}
               />
-            </div>
+            </Grid>
 
-            <Grid container justify="center">
+            <Grid container direction="row">
               <ButtonGroup size="small" style={{ margin: "5px" }}>
-                <Tooltip title="Zoom out">
-                  <Button id="zoom-out" onClick={this.decrementScale}>
-                    <ZoomOut />
-                  </Button>
-                </Tooltip>
-                <Tooltip title="Reset zoom and pan">
-                  <Button id="reset" onClick={this.resetScaleAndPan}>
-                    <AspectRatio />
-                  </Button>
-                </Tooltip>
-                <Tooltip title="Zoom in">
-                  <Button id="zoom-in" onClick={this.incrementScale}>
-                    <ZoomIn />
-                  </Button>
-                </Tooltip>
-              </ButtonGroup>
-
-              <ButtonGroup size="small" style={{ marginBottom: "5px" }}>
-                <Tooltip title="Pan up">
-                  <Button id="pan-up" onClick={this.incrementPanY}>
-                    <KeyboardArrowUp />
-                  </Button>
-                </Tooltip>
-                <ButtonGroup size="small">
-                  <Tooltip title="Pan left">
-                    <Button id="pan-left" onClick={this.incrementPanX}>
-                      <KeyboardArrowLeft />
-                    </Button>
-                  </Tooltip>
-                  <Tooltip title="Pan right">
-                    <Button id="pan-right" onClick={this.decrementPanX}>
-                      <KeyboardArrowRight />
-                    </Button>
-                  </Tooltip>
-                </ButtonGroup>
-                <Tooltip title="Pan down">
-                  <Button id="pan-down" onClick={this.decrementPanY}>
-                    <KeyboardArrowDown />
-                  </Button>
-                </Tooltip>
+                {this.toolTips.map((toolTip) => {
+                  return (
+                    <HtmlTooltip
+                      title={
+                        <Box
+                          display="flex"
+                          alignItems="center"
+                          justifyItems="space-between"
+                        >
+                          <Box mr={6}>
+                            <Typography color="inherit">
+                              {toolTip.name}
+                            </Typography>
+                          </Box>
+                          <Avatar
+                            style={{
+                              backgroundColor: "#02FFAD",
+                              color: "#2B2F3A",
+                            }}
+                          >
+                            {toolTip.shortcut}
+                          </Avatar>
+                        </Box>
+                      }
+                      placement="right"
+                    >
+                      <IconButton
+                        color="secondary"
+                        size="small"
+                        style={{ marginBottom: "10px" }}
+                      >
+                        <Avatar sizes="large">
+                          {<img src={toolTip.icon} style={{ width: "60%" }} />}
+                        </Avatar>
+                      </IconButton>
+                    </HtmlTooltip>
+                  );
+                })}
               </ButtonGroup>
             </Grid>
 
@@ -586,18 +659,6 @@ export class UserInterface extends Component<Props, State> {
                 </Grid>
               </AccordionDetails>
             </Accordion>
-
-            <ButtonGroup>
-              <Button> {<img src="\examples\select-icon.svg" />}</Button>
-              <Button>{<img src="\examples\brush-icon.svg" />}</Button>
-              <Button>{<img src="\examples\eraser-icon.svg" />}</Button>
-              <Button>{<img src="\examples\splines-icon.svg" />}</Button>
-              <Button>{<img src="\examples\contrast-icon.svg" />}</Button>
-              <Button>{<img src="\examples\brightness-icon.svg" />}</Button>
-              <Button>
-                {<img src="\examples\annotation-label-icon.svg" />}
-              </Button>
-            </ButtonGroup>
 
             <BackgroundUI
               expanded={this.state.expanded === "background-toolbox"}

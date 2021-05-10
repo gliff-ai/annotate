@@ -25,14 +25,17 @@ const theme: Theme = createMuiTheme({
 
     MuiButtonGroup: {
       root: {
+        border: "1px solid #dadde9",
         borderRadius: "9px",
+        padding: "12px",
       },
     },
 
-    MuiToolbar: {
+    MuiAvatar: {
       root: {
-        boxShadow: "0px, 0px, 0px, 0px",
-        // background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
+        backgroundColor: "#02FFAD",
+        width: "30px",
+        height: "30px",
       },
     },
   },
@@ -44,8 +47,8 @@ const theme: Theme = createMuiTheme({
 
     MuiButtonGroup: {
       orientation: "vertical",
-      color: "secondary",
       variant: "outlined",
+      disableRipple: true,
     },
   },
 });
