@@ -405,7 +405,6 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
         this.props.canvasPositionAndSize
       );
       const selectedBrushStroke = this.clickNearBrushStroke(imageX, imageY);
-      console.log(selectedBrushStroke);
       if (selectedBrushStroke !== null) {
         this.props.annotationsObject.setActiveAnnotationID(selectedBrushStroke);
         this.drawAllStrokes();
