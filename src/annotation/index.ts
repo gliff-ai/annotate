@@ -12,8 +12,8 @@ export class Annotations {
 
   addAnnotation = (
     toolbox: string,
-    labels: string[] = [],
     spaceTimeInfo: ZTPoint = { z: 0, t: 0 },
+    labels: string[] = [],
     coordinates: XYPoint[] = [],
     brushStrokes: BrushStrokes[] = [],
     parameters: Annotation["parameters"] = {}
@@ -72,4 +72,15 @@ export class Annotations {
     this.data[this.activeAnnotationID].brushStrokes.length === 0;
 
   getAllAnnotations = (): Annotation[] => this.data;
+
+  setSpaceTimeInfo = (z?: number, t?: number): void => {
+    // Set space and time data for active annotation.
+    const { z: prevZ, t: prevT } = this.data[
+      this.activeAnnotationID
+    ].spaceTimeInfo;
+    this.data[this.activeAnnotationID].spaceTimeInfo = {
+      z: z || prevZ,
+      t: t || prevT,
+    };
+  };
 }
