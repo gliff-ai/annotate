@@ -189,7 +189,8 @@ export class SplineCanvas extends Component<Props, State> {
 
     // Clear all the splines:
     const { canvasContext: context } = this.baseCanvas;
-    const activeAnnotationID = this.props.annotationsObject.getActiveAnnotationID();
+    const activeAnnotationID =
+      this.props.annotationsObject.getActiveAnnotationID();
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
     // Draw all the splines:
@@ -315,9 +316,8 @@ export class SplineCanvas extends Component<Props, State> {
     );
 
     if (this.sliceIndexMatch()) {
-      const {
-        coordinates,
-      } = this.props.annotationsObject.getActiveAnnotation();
+      const { coordinates } =
+        this.props.annotationsObject.getActiveAnnotation();
       // check if we clicked within the nudge radius of an existing point:
       const nudgePointIdx = this.clickNearPoint(
         { x: imageX, y: imageY },
@@ -569,9 +569,8 @@ export class SplineCanvas extends Component<Props, State> {
 
     if (this.state.mode === Mode.magic && this.numberOfMoves % 5 === 0) {
       // add a new point and snap it to the highest gradient point within 25 pixels:
-      const {
-        coordinates,
-      } = this.props.annotationsObject.getActiveAnnotation();
+      const { coordinates } =
+        this.props.annotationsObject.getActiveAnnotation();
       coordinates.push({ x: clickPoint.x, y: clickPoint.y });
       this.snapToGradient(
         coordinates.length - 1,
@@ -579,8 +578,8 @@ export class SplineCanvas extends Component<Props, State> {
       );
     } else {
       // If dragging first point, update also last
-      const activeSpline = this.props.annotationsObject.getActiveAnnotation()
-        .coordinates;
+      const activeSpline =
+        this.props.annotationsObject.getActiveAnnotation().coordinates;
       if (this.selectedPointIndex === 0 && this.isClosed(activeSpline)) {
         this.updateXYPoint(clickPoint.x, clickPoint.y, activeSpline.length - 1);
       }

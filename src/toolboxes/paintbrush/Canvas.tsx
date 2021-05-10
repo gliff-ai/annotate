@@ -189,19 +189,17 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     context: CanvasRenderingContext2D,
     isActive = true
   ): void => {
-    const points = imagePoints.map(
-      (point): XYPoint => {
-        const { x, y } = imageToCanvas(
-          point.x,
-          point.y,
-          this.props.displayedImage.width,
-          this.props.displayedImage.height,
-          this.props.scaleAndPan,
-          this.props.canvasPositionAndSize
-        );
-        return { x, y };
-      }
-    );
+    const points = imagePoints.map((point): XYPoint => {
+      const { x, y } = imageToCanvas(
+        point.x,
+        point.y,
+        this.props.displayedImage.width,
+        this.props.displayedImage.height,
+        this.props.scaleAndPan,
+        this.props.canvasPositionAndSize
+      );
+      return { x, y };
+    });
 
     function midPointBetween(p1: XYPoint, p2: XYPoint) {
       return {
@@ -267,7 +265,8 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     // Draw strokes on active layer whiles showing existing paintbrush layers
 
     // Get active annotation ID
-    const activeAnnotationID = this.props.annotationsObject.getActiveAnnotationID();
+    const activeAnnotationID =
+      this.props.annotationsObject.getActiveAnnotationID();
 
     // Clear paintbrush canvas
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
