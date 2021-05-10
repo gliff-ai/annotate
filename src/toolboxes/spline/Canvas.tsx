@@ -228,11 +228,7 @@ export class SplineCanvas extends Component<Props, State> {
   };
 
   deleteSelectedPoint = (): void => {
-    if (this.selectedPointIndex === -1) return;
-    const {
-      spaceTimeInfo,
-    } = this.props.annotationsObject.getActiveAnnotation();
-    if (spaceTimeInfo.z !== this.props.sliceIndex) return;
+    if (this.selectedPointIndex === -1 || !this.sliceIndexMatch()) return;
 
     const { coordinates } = this.props.annotationsObject.getActiveAnnotation();
     const isClosed = this.isClosed(coordinates);
@@ -309,12 +305,9 @@ export class SplineCanvas extends Component<Props, State> {
 
   // X and Y are in CanvasSpace
   onClick = (x: number, y: number): void => {
-    const {
-      coordinates,
-      spaceTimeInfo,
-    } = this.props.annotationsObject.getActiveAnnotation();
-    if (spaceTimeInfo.z !== this.props.sliceIndex) return;
+    if (!this.sliceIndexMatch()) return;
 
+    const { coordinates } = this.props.annotationsObject.getActiveAnnotation();
     const { x: imageX, y: imageY } = canvasToImage(
       x,
       y,
@@ -423,11 +416,7 @@ export class SplineCanvas extends Component<Props, State> {
 
   onDoubleClick = (x: number, y: number): void => {
     // Add new point on double-click.
-    if (this.state.mode === Mode.draw) return;
-    const {
-      spaceTimeInfo,
-    } = this.props.annotationsObject.getActiveAnnotation();
-    if (spaceTimeInfo.z !== this.props.sliceIndex) return;
+    if (this.state.mode === Mode.draw || !this.sliceIndexMatch()) return;
 
     const { x: imageX, y: imageY } = canvasToImage(
       x,
@@ -448,12 +437,9 @@ export class SplineCanvas extends Component<Props, State> {
 
   closeLoop = (): void => {
     // Append the first spline point to the end, making a closed polygon
+    if (!this.sliceIndexMatch()) return;
 
-    const {
-      coordinates,
-      spaceTimeInfo,
-    } = this.props.annotationsObject.getActiveAnnotation();
-    if (spaceTimeInfo.z !== this.props.sliceIndex) return;
+    const { coordinates } = this.props.annotationsObject.getActiveAnnotation();
     if (coordinates.length < 3) {
       return; // need at least three points to make a closed polygon
     }
@@ -528,11 +514,9 @@ export class SplineCanvas extends Component<Props, State> {
   };
 
   onMouseDown = (x: number, y: number): void => {
-    const {
-      coordinates,
-      spaceTimeInfo,
-    } = this.props.annotationsObject.getActiveAnnotation();
-    if (spaceTimeInfo.z !== this.props.sliceIndex) return;
+    if (!this.sliceIndexMatch()) return;
+
+    const { coordinates } = this.props.annotationsObject.getActiveAnnotation();
 
     const clickPoint = canvasToImage(
       x,
@@ -648,6 +632,10 @@ export class SplineCanvas extends Component<Props, State> {
   isActive = (): boolean =>
     this.props.activeTool === "spline" ||
     this.props.activeTool === "magicspline";
+
+  sliceIndexMatch = (): boolean =>
+    this.props.annotationsObject.getActiveAnnotation().spaceTimeInfo.z ===
+    this.props.sliceIndex;
 
   toggleMode = (): void => {
     if (!this.isActive()) return;

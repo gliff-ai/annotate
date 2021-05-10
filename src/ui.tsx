@@ -466,6 +466,7 @@ export class UserInterface extends Component<Props, State> {
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
               callRedraw={this.state.callRedraw}
+              sliceIndex={this.state.sliceIndex}
             />
 
             {this.slicesData.length > 1 && (
