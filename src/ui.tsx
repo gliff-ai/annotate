@@ -377,12 +377,11 @@ export class UserInterface extends Component<Props, State> {
     }
   };
 
-  handleToolboxChange = (panel: string) => (
-    event: ChangeEvent,
-    isExpanded: boolean
-  ): void => {
-    this.setState({ expanded: isExpanded ? panel : false });
-  };
+  handleToolboxChange =
+    (panel: string) =>
+    (event: ChangeEvent, isExpanded: boolean): void => {
+      this.setState({ expanded: isExpanded ? panel : false });
+    };
 
   clearActiveAnnotation = (): void => {
     this.annotationsObject.setAnnotationCoordinates([]);
