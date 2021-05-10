@@ -75,6 +75,7 @@ export class Annotations {
 
   setSpaceTimeInfo = (z?: number, t?: number): void => {
     // Set space and time data for active annotation.
+    if (z === undefined && t === undefined) return;
     const { z: prevZ, t: prevT } = this.data[
       this.activeAnnotationID
     ].spaceTimeInfo;
