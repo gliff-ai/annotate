@@ -300,7 +300,10 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     const annotations = this.props.annotationsObject.getAllAnnotations();
 
     for (let i = 0; i < annotations.length; i += 1) {
-      if (annotations[i].toolbox === "paintbrush") {
+      if (
+        annotations[i].spaceTimeInfo.z === this.props.sliceIndex &&
+        annotations[i].toolbox === "paintbrush"
+      ) {
         let finalIndex = null;
         for (let j = 0; j < annotations[i].brushStrokes.length; j += 1) {
           const { coordinates, brush } = annotations[i].brushStrokes[j];
@@ -376,9 +379,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
   /** * Mouse events *** */
   onMouseDown = (canvasX: number, canvasY: number): void => {
-    if (!this.sliceIndexMatch()) return;
-
-    if (this.state.mode === Mode.draw) {
+    if (this.state.mode === Mode.draw && this.sliceIndexMatch()) {
       // Start drawing
       if (this.props.brushType === "eraser") {
         // Copy the current BACK strokes to the front canvas
@@ -404,6 +405,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
         this.props.canvasPositionAndSize
       );
       const selectedBrushStroke = this.clickNearBrushStroke(imageX, imageY);
+      console.log(selectedBrushStroke);
       if (selectedBrushStroke !== null) {
         this.props.annotationsObject.setActiveAnnotationID(selectedBrushStroke);
         this.drawAllStrokes();

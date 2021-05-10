@@ -305,9 +305,6 @@ export class SplineCanvas extends Component<Props, State> {
 
   // X and Y are in CanvasSpace
   onClick = (x: number, y: number): void => {
-    if (!this.sliceIndexMatch()) return;
-
-    const { coordinates } = this.props.annotationsObject.getActiveAnnotation();
     const { x: imageX, y: imageY } = canvasToImage(
       x,
       y,
@@ -317,39 +314,46 @@ export class SplineCanvas extends Component<Props, State> {
       this.props.canvasPositionAndSize
     );
 
-    // check if we clicked within the nudge radius of an existing point:
-    const nudgePointIdx = this.clickNearPoint(
-      { x: imageX, y: imageY },
-      coordinates
-    );
-    const isClosed = this.isClosed(coordinates);
-
-    if (nudgePointIdx !== -1) {
-      // If the mouse click was near an existing point, nudge that point
-      const nudgePoint = coordinates[nudgePointIdx];
-
-      this.updateXYPoint(
-        (nudgePoint.x + imageX) / 2,
-        (nudgePoint.y + imageY) / 2,
-        nudgePointIdx
+    if (this.sliceIndexMatch()) {
+      const {
+        coordinates,
+      } = this.props.annotationsObject.getActiveAnnotation();
+      // check if we clicked within the nudge radius of an existing point:
+      const nudgePointIdx = this.clickNearPoint(
+        { x: imageX, y: imageY },
+        coordinates
       );
+      const isClosed = this.isClosed(coordinates);
 
-      if (nudgePointIdx === 0 && isClosed) {
-        // need to update the final point as well if we're nudging the first point of a closed spline,
-        // or else the loop gets broken
+      if (nudgePointIdx !== -1) {
+        // If the mouse click was near an existing point, nudge that point
+        const nudgePoint = coordinates[nudgePointIdx];
+
         this.updateXYPoint(
           (nudgePoint.x + imageX) / 2,
           (nudgePoint.y + imageY) / 2,
-          coordinates.length - 1
+          nudgePointIdx
         );
-      }
 
-      // If the spline is not closed, append a new point
-    } else if (this.state.mode === Mode.draw && !isClosed) {
-      // Add coordinates to the current spline
-      coordinates.push({ x: imageX, y: imageY });
-      this.selectedPointIndex = coordinates.length - 1;
-    } else if (this.state.mode === Mode.select) {
+        if (nudgePointIdx === 0 && isClosed) {
+          // need to update the final point as well if we're nudging the first point of a closed spline,
+          // or else the loop gets broken
+          this.updateXYPoint(
+            (nudgePoint.x + imageX) / 2,
+            (nudgePoint.y + imageY) / 2,
+            coordinates.length - 1
+          );
+        }
+
+        // If the spline is not closed, append a new point
+      } else if (this.state.mode === Mode.draw && !isClosed) {
+        // Add coordinates to the current spline
+        coordinates.push({ x: imageX, y: imageY });
+        this.selectedPointIndex = coordinates.length - 1;
+      }
+    }
+
+    if (this.state.mode === Mode.select) {
       // In select mode a single click allows to select a different spline
       const selectedSpline = this.clickNearSpline(imageX, imageY);
       if (selectedSpline !== null) {
@@ -366,7 +370,10 @@ export class SplineCanvas extends Component<Props, State> {
     const annotations = this.props.annotationsObject.getAllAnnotations();
 
     for (let i = 0; i < annotations.length; i += 1) {
-      if (annotations[i].toolbox === "spline") {
+      if (
+        annotations[i].spaceTimeInfo.z === this.props.sliceIndex &&
+        annotations[i].toolbox === "spline"
+      ) {
         const { coordinates } = annotations[i];
         // For each pair of points, check is point clicked is near the line segment
         // having for end points two consecutive points in the spline.
