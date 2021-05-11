@@ -1,6 +1,7 @@
 export interface BrushStrokes {
   // Todo move this into Paintbrush Toolbox
   coordinates: XYPoint[];
+  spaceTimeInfo: ZTPoint;
   brush: {
     radius: number;
     type: "paint" | "erase";

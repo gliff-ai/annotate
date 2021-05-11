@@ -275,18 +275,17 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     this.props.annotationsObject
       .getAllAnnotations()
       .forEach((annotationsObject, i) => {
-        if (
-          annotationsObject.spaceTimeInfo.z === this.props.sliceIndex &&
-          annotationsObject.toolbox === "paintbrush"
-        ) {
+        if (annotationsObject.toolbox === "paintbrush") {
           annotationsObject.brushStrokes.forEach((brushStrokes) => {
-            this.drawPoints(
-              brushStrokes.coordinates,
-              brushStrokes.brush,
-              false,
-              context,
-              i === activeAnnotationID
-            );
+            if (brushStrokes.spaceTimeInfo.z === this.props.sliceIndex) {
+              this.drawPoints(
+                brushStrokes.coordinates,
+                brushStrokes.brush,
+                false,
+                context,
+                i === activeAnnotationID
+              );
+            }
           });
         }
       });
@@ -299,27 +298,28 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     const annotations = this.props.annotationsObject.getAllAnnotations();
 
     for (let i = 0; i < annotations.length; i += 1) {
-      if (
-        annotations[i].spaceTimeInfo.z === this.props.sliceIndex &&
-        annotations[i].toolbox === "paintbrush"
-      ) {
+      if (annotations[i].toolbox === "paintbrush") {
         let finalIndex = null;
-        for (let j = 0; j < annotations[i].brushStrokes.length; j += 1) {
-          const { coordinates, brush } = annotations[i].brushStrokes[j];
-          for (let k = 0; k < coordinates.length; k += 1) {
-            if (
-              this.isClickNearPoint(
-                { x: imageX, y: imageY },
-                coordinates[k],
-                brush.radius
-              )
-            ) {
-              // If the region near the clicked point has been erased,
-              // finalIndex will be reset to null.
-              finalIndex = brush.type === "paint" ? i : null;
+
+        annotations[i].brushStrokes.forEach(
+          ({ spaceTimeInfo, coordinates, brush }) => {
+            if (spaceTimeInfo.z === this.props.sliceIndex) {
+              coordinates.forEach((point: XYPoint) => {
+                if (
+                  this.isClickNearPoint(
+                    { x: imageX, y: imageY },
+                    point,
+                    brush.radius
+                  )
+                ) {
+                  // If the region near the clicked point has been erased,
+                  // finalIndex will be reset to null.
+                  finalIndex = brush.type === "paint" ? i : null;
+                }
+              });
             }
           }
-        }
+        );
         if (finalIndex !== null) return i;
       }
     }
@@ -347,7 +347,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     this.props.brushType === "paintbrush" || this.props.brushType === "eraser";
 
   saveLine = (radius = 20): void => {
-    if (this.points.length < 2 || !this.sliceIndexMatch()) return;
+    if (this.points.length < 2) return;
 
     const { brushStrokes } = this.props.annotationsObject.getActiveAnnotation();
     // Do we already have a colour for this layer?
@@ -361,6 +361,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
     brushStrokes.push({
       coordinates: [...this.points],
+      spaceTimeInfo: { z: this.props.sliceIndex, t: 0 },
       brush: {
         color,
         radius,
@@ -378,7 +379,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
   /** * Mouse events *** */
   onMouseDown = (canvasX: number, canvasY: number): void => {
-    if (this.state.mode === Mode.draw && this.sliceIndexMatch()) {
+    if (this.state.mode === Mode.draw) {
       // Start drawing
       if (this.props.brushType === "eraser") {
         // Copy the current BACK strokes to the front canvas
@@ -412,15 +413,12 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
   };
 
   onMouseMove = (canvasX: number, canvasY: number): void => {
-    if (!this.sliceIndexMatch()) return;
     if (this.state.mode === Mode.draw) {
       this.handlePointerMove(canvasX, canvasY);
     }
   };
 
   onMouseUp = (canvasX: number, canvasY: number): void => {
-    if (!this.sliceIndexMatch()) return;
-
     if (this.state.mode === Mode.draw) {
       // End painting & save painting
       this.isPressing = false;
@@ -435,10 +433,6 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       this.drawAllStrokes();
     }
   };
-
-  sliceIndexMatch = (): boolean =>
-    this.props.annotationsObject.getActiveAnnotation().spaceTimeInfo.z ===
-    this.props.sliceIndex;
 
   getCursor = (): Cursor => {
     if (
