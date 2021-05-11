@@ -1,6 +1,5 @@
 import {
   Annotation,
-  ZTPoint,
   XYPoint,
   BrushStroke,
   Spline,
