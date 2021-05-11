@@ -27,15 +27,16 @@ const theme: Theme = createMuiTheme({
       root: {
         border: "1px solid #dadde9",
         borderRadius: "9px",
-        padding: "12px",
+        padding: "8px",
       },
     },
 
     MuiAvatar: {
-      root: {
-        backgroundColor: "#02FFAD",
-        width: "30px",
-        height: "30px",
+      colorDefault: {
+        backgroundColor: "#FFFFFF",
+        "&:hover": {
+          background: "#02FFAD",
+        },
       },
     },
   },

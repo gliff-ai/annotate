@@ -430,11 +430,11 @@ export class UserInterface extends Component<Props, State> {
     { name: "Brush", icon: `/examples/brush-icon.svg`, shortcut: "B" },
     { name: "Eraser", icon: `/examples/eraser-icon.svg`, shortcut: "E" },
     { name: "Spline", icon: `/examples/splines-icon.svg`, shortcut: "S" },
-    { name: "Contrast", icon: `/examples/contrast-icon.svg`, shortcut: `"\"` },
+    { name: "Contrast", icon: `/examples/contrast-icon.svg`, shortcut: `\\` },
     {
       name: "Brightness",
       icon: `/examples/brightness-icon.svg`,
-      shortcut: `"/"`,
+      shortcut: `/`,
     },
     {
       name: "Annonation Label",
@@ -443,8 +443,77 @@ export class UserInterface extends Component<Props, State> {
     },
   ];
 
+  visualToolTips = [
+    { name: "Zoom In", icon: `/examples/zoom-in-icon.svg`, shortcut: "Ctrl++" },
+    {
+      name: "Zoom Out",
+      icon: `/examples/zoom-out-icon.svg`,
+      shortcut: "Ctrl--",
+    },
+    {
+      name: "Fit to Page",
+      icon: `/examples/reset-zoom-and-pan-icon.svg`,
+      shortcut: "Ctrl+[",
+    },
+  ];
+
   render = (): ReactNode => (
     <ThemeProvider theme={theme}>
+      <div
+        style={{
+          position: "fixed",
+          left: "18px",
+          bottom: "0",
+          marginBottom: "30px",
+        }}
+      >
+        <Grid container direction="row">
+          <ButtonGroup
+            size="small"
+            style={{ margin: "5px", height: "419px", width: "63px" }}
+          >
+            {this.toolTips.map((toolTip) => {
+              return (
+                <HtmlTooltip
+                  title={
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      justifyItems="space-between"
+                    >
+                      <Box mr={6}>
+                        <Typography color="inherit">{toolTip.name}</Typography>
+                      </Box>
+                      <Avatar
+                        style={{
+                          backgroundColor: "#02FFAD",
+                          color: "#2B2F3A",
+                        }}
+                      >
+                        {toolTip.shortcut}
+                      </Avatar>
+                    </Box>
+                  }
+                  placement="right"
+                >
+                  <IconButton
+                    color="secondary"
+                    size="small"
+                    style={{
+                      marginBottom: "5px",
+                      marginTop: "7px",
+                    }}
+                  >
+                    <Avatar sizes="large">
+                      {<img src={toolTip.icon} style={{ width: "48%" }} />}
+                    </Avatar>
+                  </IconButton>
+                </HtmlTooltip>
+              );
+            })}
+          </ButtonGroup>
+        </Grid>
+      </div>
       <CssBaseline />
       <Container disableGutters>
         <AppBar>
@@ -532,59 +601,9 @@ export class UserInterface extends Component<Props, State> {
                 setCanvasPositionAndSize={this.setMinimapPositionAndSize}
               />
             </div>
-            {/* To do: Map through tool tips */}
             <Grid container direction="row">
               <ButtonGroup size="small" style={{ margin: "5px" }}>
-                <Tooltip title="Zoom in">
-                  <IconButton id="zoom-in" onClick={this.incrementScale}>
-                    {
-                      <img
-                        src="examples/zoom-in-icon.svg"
-                        style={{ width: "60%" }}
-                      />
-                    }
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Zoom out">
-                  <IconButton id="zoom-out" onClick={this.decrementScale}>
-                    {
-                      <img
-                        src="examples/zoom-out-icon.svg"
-                        style={{ width: "60%" }}
-                      />
-                    }
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Reset zoom and pan">
-                  <IconButton
-                    color="secondary"
-                    size="small"
-                    style={{ marginBottom: "10px" }}
-                  >
-                    <Avatar sizes="large">
-                      {
-                        <img
-                          src="examples/zoom-out-icon.svg"
-                          style={{ width: "60%" }}
-                        />
-                      }
-                    </Avatar>
-                  </IconButton>
-                </Tooltip>
-              </ButtonGroup>
-              <MinimapCanvas
-                displayedImage={this.state.displayedImage}
-                scaleAndPan={this.state.scaleAndPan}
-                setScaleAndPan={this.setScaleAndPan}
-                canvasPositionAndSize={this.state.viewportPositionAndSize}
-                minimapPositionAndSize={this.state.minimapPositionAndSize}
-                setMinimapPositionAndSize={this.setMinimapPositionAndSize}
-              />
-            </Grid>
-
-            <Grid container direction="row">
-              <ButtonGroup size="small" style={{ margin: "5px" }}>
-                {this.toolTips.map((toolTip) => {
+                {this.visualToolTips.map((toolTip) => {
                   return (
                     <HtmlTooltip
                       title={
@@ -623,6 +642,15 @@ export class UserInterface extends Component<Props, State> {
                   );
                 })}
               </ButtonGroup>
+
+              <MinimapCanvas
+                displayedImage={this.state.displayedImage}
+                scaleAndPan={this.state.scaleAndPan}
+                setScaleAndPan={this.setScaleAndPan}
+                canvasPositionAndSize={this.state.viewportPositionAndSize}
+                minimapPositionAndSize={this.state.minimapPositionAndSize}
+                setMinimapPositionAndSize={this.setMinimapPositionAndSize}
+              />
             </Grid>
 
             <Accordion
