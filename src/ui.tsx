@@ -107,10 +107,7 @@ export class UserInterface extends Component<Props, State> {
       displayedImage: this.slicesData[0][0] || null,
     };
 
-    this.annotationsObject.addAnnotation(this.state.activeTool, {
-      z: this.state.sliceIndex,
-      t: 0,
-    });
+    this.annotationsObject.addAnnotation(this.state.activeTool);
     this.presetLabels = this.props.presetLabels || [];
     this.imageFileInfo = null;
   }
@@ -339,10 +336,8 @@ export class UserInterface extends Component<Props, State> {
   };
 
   addAnnotation = (): void => {
-    this.annotationsObject.addAnnotation(this.state.activeTool, {
-      z: this.state.sliceIndex,
-      t: 0,
-    });
+    this.annotationsObject.addAnnotation(this.state.activeTool);
+    this.annotationsObject.setSplineSpaceTimeInfo(this.state.sliceIndex);
     this.setState({
       activeAnnotationID: this.annotationsObject.getActiveAnnotationID(),
     });
@@ -380,7 +375,7 @@ export class UserInterface extends Component<Props, State> {
     to match the active tool. */
     if (this.annotationsObject.isActiveAnnotationEmpty()) {
       this.annotationsObject.setActiveAnnotationToolbox(this.state.activeTool);
-      this.annotationsObject.setSpaceTimeInfo(this.state.sliceIndex);
+      this.annotationsObject.setSplineSpaceTimeInfo(this.state.sliceIndex);
     }
   };
 
@@ -391,7 +386,7 @@ export class UserInterface extends Component<Props, State> {
     };
 
   clearActiveAnnotation = (): void => {
-    this.annotationsObject.setAnnotationCoordinates([]);
+    this.annotationsObject.setSplineCoordinates([]);
     this.annotationsObject.setAnnotationBrushStrokes([]);
     this.setState((prevState) => ({
       callRedraw: prevState.callRedraw + 1,

@@ -1,4 +1,10 @@
-import { Annotation, ZTPoint, XYPoint, BrushStrokes } from "./interfaces";
+import {
+  Annotation,
+  ZTPoint,
+  XYPoint,
+  BrushStroke,
+  Spline,
+} from "./interfaces";
 
 export class Annotations {
   private data: Array<Annotation>;
@@ -12,18 +18,19 @@ export class Annotations {
 
   addAnnotation = (
     toolbox: string,
-    spaceTimeInfo: ZTPoint = { z: 0, t: 0 },
     labels: string[] = [],
-    coordinates: XYPoint[] = [],
-    brushStrokes: BrushStrokes[] = [],
+    spline: Spline = {
+      coordinates: [],
+      spaceTimeInfo: { z: 0, t: 0 },
+    },
+    brushStrokes: BrushStroke[] = [],
     parameters: Annotation["parameters"] = {}
   ): void => {
     this.activeAnnotationID =
       this.data.push({
         labels,
         toolbox,
-        spaceTimeInfo,
-        coordinates,
+        spline,
         brushStrokes,
         parameters,
       }) - 1;
@@ -47,17 +54,20 @@ export class Annotations {
 
   getActiveAnnotation = (): Annotation => this.data[this.activeAnnotationID];
 
+  getSplineForActiveAnnotation = (): Spline =>
+    this.data[this.activeAnnotationID].spline;
+
   length = (): number => this.data.length;
 
   setActiveAnnotationID = (id: number): void => {
     this.activeAnnotationID = id;
   };
 
-  setAnnotationCoordinates = (newCoordinates: XYPoint[]): void => {
-    this.data[this.activeAnnotationID].coordinates = newCoordinates;
+  setSplineCoordinates = (newCoordinates: XYPoint[]): void => {
+    this.data[this.activeAnnotationID].spline.coordinates = newCoordinates;
   };
 
-  setAnnotationBrushStrokes = (newBrushStrokes: BrushStrokes[]): void => {
+  setAnnotationBrushStrokes = (newBrushStrokes: BrushStroke[]): void => {
     this.data[this.activeAnnotationID].brushStrokes = newBrushStrokes;
   };
 
@@ -68,17 +78,17 @@ export class Annotations {
   isActiveAnnotationEmpty = (): boolean =>
     // Check whether the active annotation object contains any
     // paintbrush or spline annotations.
-    this.data[this.activeAnnotationID].coordinates.length === 0 &&
+    this.data[this.activeAnnotationID].spline.coordinates.length === 0 &&
     this.data[this.activeAnnotationID].brushStrokes.length === 0;
 
   getAllAnnotations = (): Annotation[] => this.data;
 
-  setSpaceTimeInfo = (z?: number, t?: number): void => {
-    // Set space and time data for active annotation.
+  setSplineSpaceTimeInfo = (z?: number, t?: number): void => {
+    // Set space and time data for spline of active annotation.
     if (z === undefined && t === undefined) return;
     const { z: prevZ, t: prevT } =
-      this.data[this.activeAnnotationID].spaceTimeInfo;
-    this.data[this.activeAnnotationID].spaceTimeInfo = {
+      this.data[this.activeAnnotationID].spline.spaceTimeInfo;
+    this.data[this.activeAnnotationID].spline.spaceTimeInfo = {
       z: z || prevZ,
       t: t || prevT,
     };
