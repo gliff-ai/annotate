@@ -1,19 +1,22 @@
-export interface BrushStrokes {
+export interface BrushStroke {
   // Todo move this into Paintbrush Toolbox
   coordinates: XYPoint[];
+  spaceTimeInfo: ZTPoint;
   brush: {
     radius: number;
     type: "paint" | "erase";
     color: string; // rgb(a) string
   };
 }
-
+export interface Spline {
+  coordinates: XYPoint[];
+  spaceTimeInfo: ZTPoint;
+}
 export interface Annotation {
   labels: string[];
   toolbox: string;
-  spaceTimeInfo: ZTPoint;
-  coordinates: XYPoint[];
-  brushStrokes: BrushStrokes[];
+  spline: Spline;
+  brushStrokes: BrushStroke[];
   parameters: Record<string, unknown>;
 }
 

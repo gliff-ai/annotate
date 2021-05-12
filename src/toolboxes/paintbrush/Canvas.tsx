@@ -25,6 +25,7 @@ interface Props extends CanvasProps {
   annotationsObject: Annotations;
   brushRadius: number;
   callRedraw: number;
+  sliceIndex: number;
 }
 
 interface Brush {
@@ -188,19 +189,17 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     context: CanvasRenderingContext2D,
     isActive = true
   ): void => {
-    const points = imagePoints.map(
-      (point): XYPoint => {
-        const { x, y } = imageToCanvas(
-          point.x,
-          point.y,
-          this.props.displayedImage.width,
-          this.props.displayedImage.height,
-          this.props.scaleAndPan,
-          this.props.canvasPositionAndSize
-        );
-        return { x, y };
-      }
-    );
+    const points = imagePoints.map((point): XYPoint => {
+      const { x, y } = imageToCanvas(
+        point.x,
+        point.y,
+        this.props.displayedImage.width,
+        this.props.displayedImage.height,
+        this.props.scaleAndPan,
+        this.props.canvasPositionAndSize
+      );
+      return { x, y };
+    });
 
     function midPointBetween(p1: XYPoint, p2: XYPoint) {
       return {
@@ -266,7 +265,8 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     // Draw strokes on active layer whiles showing existing paintbrush layers
 
     // Get active annotation ID
-    const activeAnnotationID = this.props.annotationsObject.getActiveAnnotationID();
+    const activeAnnotationID =
+      this.props.annotationsObject.getActiveAnnotationID();
 
     // Clear paintbrush canvas
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
@@ -277,13 +277,15 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       .forEach((annotationsObject, i) => {
         if (annotationsObject.toolbox === "paintbrush") {
           annotationsObject.brushStrokes.forEach((brushStrokes) => {
-            this.drawPoints(
-              brushStrokes.coordinates,
-              brushStrokes.brush,
-              false,
-              context,
-              i === activeAnnotationID
-            );
+            if (brushStrokes.spaceTimeInfo.z === this.props.sliceIndex) {
+              this.drawPoints(
+                brushStrokes.coordinates,
+                brushStrokes.brush,
+                false,
+                context,
+                i === activeAnnotationID
+              );
+            }
           });
         }
       });
@@ -298,22 +300,26 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     for (let i = 0; i < annotations.length; i += 1) {
       if (annotations[i].toolbox === "paintbrush") {
         let finalIndex = null;
-        for (let j = 0; j < annotations[i].brushStrokes.length; j += 1) {
-          const { coordinates, brush } = annotations[i].brushStrokes[j];
-          for (let k = 0; k < coordinates.length; k += 1) {
-            if (
-              this.isClickNearPoint(
-                { x: imageX, y: imageY },
-                coordinates[k],
-                brush.radius
-              )
-            ) {
-              // If the region near the clicked point has been erased,
-              // finalIndex will be reset to null.
-              finalIndex = brush.type === "paint" ? i : null;
+
+        annotations[i].brushStrokes.forEach(
+          ({ spaceTimeInfo, coordinates, brush }) => {
+            if (spaceTimeInfo.z === this.props.sliceIndex) {
+              coordinates.forEach((point: XYPoint) => {
+                if (
+                  this.isClickNearPoint(
+                    { x: imageX, y: imageY },
+                    point,
+                    brush.radius
+                  )
+                ) {
+                  // If the region near the clicked point has been erased,
+                  // finalIndex will be reset to null.
+                  finalIndex = brush.type === "paint" ? i : null;
+                }
+              });
             }
           }
-        }
+        );
         if (finalIndex !== null) return i;
       }
     }
@@ -344,7 +350,6 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     if (this.points.length < 2) return;
 
     const { brushStrokes } = this.props.annotationsObject.getActiveAnnotation();
-
     // Do we already have a colour for this layer?
     const color =
       brushStrokes?.[0]?.brush.color ||
@@ -356,6 +361,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
     brushStrokes.push({
       coordinates: [...this.points],
+      spaceTimeInfo: { z: this.props.sliceIndex, t: 0 },
       brush: {
         color,
         radius,
@@ -429,7 +435,10 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
   };
 
   getCursor = (): Cursor => {
-    if (this.props.brushType === "paintbrush" || this.props.brushType === "eraser") {
+    if (
+      this.props.brushType === "paintbrush" ||
+      this.props.brushType === "eraser"
+    ) {
       return this.state.mode === Mode.draw ? "none" : "pointer";
     }
     return "none";
@@ -511,6 +520,7 @@ export const PaintbrushCanvas = (
       canvasPositionAndSize={props.canvasPositionAndSize}
       brushRadius={paintbrush.brushRadius}
       callRedraw={props.callRedraw}
+      sliceIndex={props.sliceIndex}
     />
   );
 };
