@@ -42,7 +42,7 @@ import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
 import { Labels } from "@/components/Labels";
 import { keydownListener } from "@/keybindings";
-import { downloadAnnotations } from "@/download/DownloadAnnotations";
+import { downloadPaintbrushAsTiff } from "@/download/DownloadAnnotations";
 
 import { Tools, Tool } from "@/tools";
 
@@ -108,6 +108,7 @@ export class UserInterface extends Component<Props, State> {
       sliceIndex: 0,
       channels: [true],
       displayedImage: this.slicesData[0][0] || null,
+      activeTool: Tools.paintbrush,
     };
 
     this.annotationsObject.addAnnotation(this.state.activeTool);
@@ -380,11 +381,12 @@ export class UserInterface extends Component<Props, State> {
     }
   };
 
-  handleToolboxChange =
-    (panel: string) =>
-    (event: ChangeEvent, isExpanded: boolean): void => {
-      this.setState({ expanded: isExpanded ? panel : false });
-    };
+  handleToolboxChange = (panel: string) => (
+    event: ChangeEvent,
+    isExpanded: boolean
+  ): void => {
+    this.setState({ expanded: isExpanded ? panel : false });
+  };
 
   clearActiveAnnotation = (): void => {
     this.annotationsObject.setAnnotationCoordinates([]);
@@ -428,23 +430,22 @@ export class UserInterface extends Component<Props, State> {
                 </Tooltip>
               }
             />
-
-            {downloadAnnotations && (
-              <Tooltip title="Download annotations">
-                <Button
-                  aria-label="download-annotations"
-                  onClick={() =>
-                    downloadAnnotations(
-                      this.annotationsObject.getAllAnnotations(),
-                      this.imageFileInfo,
-                      this.slicesData.length //TODO: add slices to ImageFileInfo class
-                    )
-                  }
-                >
-                  <CloudDownload />
-                </Button>
-              </Tooltip>
-            )}
+            <Tooltip title="Download annotations">
+              <Button
+                aria-label="download-annotations"
+                onClick={() =>
+                  downloadPaintbrushAsTiff(
+                    this.annotationsObject.getAllAnnotations(),
+                    "someFileName",
+                    this.state.displayedImage.width,
+                    this.state.displayedImage.height,
+                    this.slicesData.length
+                  )
+                }
+              >
+                <CloudDownload />
+              </Button>
+            </Tooltip>
           </Toolbar>
         </AppBar>
         <Toolbar />
