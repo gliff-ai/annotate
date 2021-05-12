@@ -6,48 +6,54 @@ export function downloadPaintbrushAsTiff(
   fileName: string,
   width: number,
   height: number,
-  slices: number
+  slices: number,
+  xResolution: number,
+  yResolution: number
 ) {
-  const ifd = {
-    t256: [width], // ImageWidth
-    t257: [height], // ImageLength
-    t258: [8], // BitsPerSample
-    t259: [1], // Compression: No compression
-    t262: [1], // PhotometricInterpretation: Grayscale
-    t273: [0], // StripOffsets, placeholder
-    t277: [1], // SamplesPerPixel
-    t278: [height], // RowsPerStrip
-    t279: [width * height], // StripByteCounts
-    t282: [1], // XResolution
-    t283: [1], // YResolution
-    t286: [0], // XPosition
-    t287: [0], // YPosition
-    t296: [1], // ResolutionUnit: No absolute unit
-    t305: ["gliff.ai"], // Software
-  };
-
-  const ifds = new Array<UTIF.IFD>(slices).fill((ifd as unknown) as UTIF.IFD);
-  const slicesData = new Array<Uint8Array>(slices).fill(
-    new Uint8Array(width * height)
+  const ifds = [...new Array<UTIF.IFD>(slices)].map(
+    () =>
+      (({
+        t256: [width], // ImageWidth
+        t257: [height], // ImageLength
+        t258: [8], // BitsPerSample
+        t259: [1], // Compression: No compression
+        t262: [1], // PhotometricInterpretation: Grayscale
+        t273: [0], // StripOffsets, placeholder
+        t277: [1], // SamplesPerPixel
+        t278: [height], // RowsPerStrip
+        t279: [width * height], // StripByteCounts
+        t282: [xResolution], // XResolution
+        t283: [yResolution], // YResolution
+        t286: [0], // XPosition
+        t287: [0], // YPosition
+        t296: [1], // ResolutionUnit: No absolute unit
+        t305: ["gliff.ai"], // Software
+      } as unknown) as UTIF.IFD)
   );
+  const slicesData = [...new Array<Uint8Array>(slices)].map(
+    () => new Uint8Array(width * height)
+  );
+  console.log(slicesData.length);
 
-  annotations.forEach(({ toolbox, spaceTimeInfo, brushStrokes }) => {
-    // console.log(spaceTimeInfo.z);
-
+  let inputValue: number;
+  let prevZ: number;
+  annotations.forEach(({ toolbox, brushStrokes }) => {
+    prevZ = null;
     if (toolbox === "paintbrush") {
-      // Get annotation count for the given slice
-      let annotationValue = getMax(slicesData[spaceTimeInfo.z]);
+      brushStrokes.forEach(({ coordinates, brush, spaceTimeInfo }) => {
+        if (prevZ !== spaceTimeInfo.z) {
+          inputValue = getNextMin(slicesData[spaceTimeInfo.z]);
+          prevZ = spaceTimeInfo.z;
+        }
 
-      brushStrokes.forEach(({ coordinates, brush }) => {
-        const brushRadius = brush.radius * 2;
         coordinates.forEach((point0, i) => {
           drawCapsule(
             point0,
             i + 1 < coordinates.length ? coordinates[i + 1] : point0,
-            brushRadius,
+            brush.radius * 2,
             slicesData[spaceTimeInfo.z],
             width,
-            annotationValue === 0 ? 255 : annotationValue - 1,
+            inputValue,
             brush.type
           );
         });
@@ -80,19 +86,8 @@ export function downloadPaintbrushAsTiff(
 
     offset += data.byteLength;
   }
+
   downloadData(fileName, imageData);
-}
-
-function getMax(arr: Uint8Array): number {
-  // Get max of an array of numbers
-  // Note: Math.max with large arrays exceedes maximum call stack size.
-  let len = arr.length;
-  let max = -Infinity;
-
-  while (len--) {
-    max = arr[len] > max ? arr[len] : max;
-  }
-  return max;
 }
 
 function downloadData(fileName: string, data: Uint8Array): void {
@@ -107,6 +102,16 @@ function downloadData(fileName: string, data: Uint8Array): void {
   anchor.download = `${name}_annotations.tiff`;
   anchor.click();
   window.URL.revokeObjectURL(url);
+}
+
+function getNextMin(arr: Uint8Array): number {
+  let len = arr.length;
+  let min = 256;
+
+  while (len--) {
+    min = arr[len] < min && arr[len] !== 0 ? arr[len] : min;
+  }
+  return min - 1;
 }
 
 function drawCapsule(
