@@ -1,4 +1,4 @@
-import React, { Component, ChangeEvent, ReactNode } from "react";
+import React, { Component, ChangeEvent, ReactNode, useRef } from "react";
 import {
   AppBar,
   Container,
@@ -20,7 +20,7 @@ import {
   IconButton,
 } from "@material-ui/core";
 
-import { spacing } from "@material-ui/system";
+import SVG, { Props as SVGProps } from "react-inlinesvg";
 
 import {
   Add,
@@ -76,6 +76,7 @@ interface State {
   callRedraw: number;
   sliceIndex: number;
   channels: boolean[];
+  colour: boolean;
 }
 
 interface Props {
@@ -92,6 +93,10 @@ const HtmlTooltip = withStyles((theme: Theme) => ({
     color: "#2B2F3A",
   },
 }))(Tooltip);
+
+const Logo = React.forwardRef<SVGElement, SVGProps>((props, ref) => (
+  <SVG innerRef={ref} title="MyLogo" {...props} />
+));
 
 export class UserInterface extends Component<Props, State> {
   annotationsObject: Annotations;
@@ -121,6 +126,7 @@ export class UserInterface extends Component<Props, State> {
       sliceIndex: 0,
       channels: [true],
       displayedImage: this.slicesData[0][0] || null,
+      colour: null,
     };
 
     this.annotationsObject.addAnnotation(this.state.activeTool);
@@ -427,8 +433,18 @@ export class UserInterface extends Component<Props, State> {
 
   toolTips = [
     { name: "Select", icon: `/examples/select-icon.svg`, shortcut: "V" },
-    { name: "Brush", icon: `/examples/brush-icon.svg`, shortcut: "B" },
-    { name: "Eraser", icon: `/examples/eraser-icon.svg`, shortcut: "E" },
+    {
+      name: "Brush",
+      icon: `/examples/brush-icon.svg`,
+      shortcut: "B",
+      selected: true,
+    },
+    {
+      name: "Eraser",
+      icon: `/examples/eraser-icon.svg`,
+      shortcut: "E",
+      selected: "",
+    },
     { name: "Spline", icon: `/examples/splines-icon.svg`, shortcut: "S" },
     { name: "Contrast", icon: `/examples/contrast-icon.svg`, shortcut: `\\` },
     {
@@ -444,7 +460,11 @@ export class UserInterface extends Component<Props, State> {
   ];
 
   visualToolTips = [
-    { name: "Zoom In", icon: `/examples/zoom-in-icon.svg`, shortcut: "Ctrl++" },
+    {
+      name: "Zoom In",
+      icon: `/examples/zoom-in-icon.svg`,
+      shortcut: "Ctrl++",
+    },
     {
       name: "Zoom Out",
       icon: `/examples/zoom-out-icon.svg`,
@@ -452,7 +472,7 @@ export class UserInterface extends Component<Props, State> {
     },
     {
       name: "Fit to Page",
-      icon: `/examples/reset-zoom-and-pan-icon.svg`,
+      icon: `examples/reset-zoom-and-pan-icon.svg`,
       shortcut: "Ctrl+[",
     },
   ];
@@ -503,9 +523,16 @@ export class UserInterface extends Component<Props, State> {
                       marginBottom: "5px",
                       marginTop: "7px",
                     }}
+                    className={toolTip.selected ? "selected" : null}
                   >
                     <Avatar sizes="large">
-                      {<img src={toolTip.icon} style={{ width: "48%" }} />}
+                      <SVG
+                        src={`${toolTip.icon}`}
+                        title="Menu"
+                        width="55%"
+                        height="auto"
+                        fill={toolTip.selected ? "#02FFAD" : null}
+                      />
                     </Avatar>
                   </IconButton>
                 </HtmlTooltip>
@@ -629,11 +656,7 @@ export class UserInterface extends Component<Props, State> {
                       }
                       placement="right"
                     >
-                      <IconButton
-                        color="secondary"
-                        size="small"
-                        style={{ marginBottom: "10px" }}
-                      >
+                      <IconButton size="small" style={{ marginBottom: "10px" }}>
                         <Avatar sizes="large">
                           {<img src={toolTip.icon} style={{ width: "60%" }} />}
                         </Avatar>
