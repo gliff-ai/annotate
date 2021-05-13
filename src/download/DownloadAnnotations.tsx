@@ -33,7 +33,6 @@ export function downloadPaintbrushAsTiff(
   const slicesData = [...new Array<Uint8Array>(slices)].map(
     () => new Uint8Array(width * height)
   );
-  console.log(slicesData.length);
 
   let inputValue: number;
   let prevZ: number;
@@ -50,7 +49,7 @@ export function downloadPaintbrushAsTiff(
           drawCapsule(
             point0,
             i + 1 < coordinates.length ? coordinates[i + 1] : point0,
-            brush.radius * 2,
+            brush.radius,
             slicesData[spaceTimeInfo.z],
             width,
             inputValue,
@@ -77,14 +76,11 @@ export function downloadPaintbrushAsTiff(
   }
 
   offset = ifdsLength;
-
   for (let i = 0; i < slices; i++) {
-    const data = slicesData[i];
-    for (let j = 0; j < data.byteLength; j++) {
-      imageData[offset + j] = data[j];
+    for (let j = 0; j < slicesData[i].byteLength; j++) {
+      imageData[offset + j] = slicesData[i][j];
     }
-
-    offset += data.byteLength;
+    offset += slicesData[i].byteLength;
   }
 
   downloadData(fileName, imageData);
@@ -99,7 +95,7 @@ function downloadData(fileName: string, data: Uint8Array): void {
   const url = window.URL.createObjectURL(blob);
   anchor.href = url;
 
-  anchor.download = `${name}_annotations.tiff`;
+  anchor.download = `${name}_annotations.tif`;
   anchor.click();
   window.URL.revokeObjectURL(url);
 }
@@ -178,8 +174,6 @@ function drawCapsule(
   const right1x = ax + nrx;
   const right1y = ay + nry;
   const right2y = by + nry;
-
-  // const arr = [];
 
   // We remember the previous [xmin, xmax] range.
   let lastXmin = -Infinity;
