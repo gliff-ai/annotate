@@ -18,6 +18,7 @@ import {
   Avatar,
   Box,
   IconButton,
+  Popover,
 } from "@material-ui/core";
 
 import SVG, { Props as SVGProps } from "react-inlinesvg";
@@ -34,6 +35,8 @@ import {
   KeyboardArrowUp,
   ExpandMore,
   Backup,
+  Brush,
+  RadioButtonUncheckedSharp,
 } from "@material-ui/icons";
 import { ImageFileInfo } from "@gliff-ai/upload/typings";
 import { UploadImage } from "@gliff-ai/upload";
@@ -49,6 +52,7 @@ import { Labels } from "@/components/Labels";
 import { keydownListener } from "@/keybindings";
 
 import { Tools, Tool } from "@/tools";
+import { BaseSlider } from "./components/BaseSlider";
 
 const CONFIG = {
   PAN_AMOUNT: 20,
@@ -77,6 +81,8 @@ interface State {
   sliceIndex: number;
   channels: boolean[];
   colour: boolean;
+  popover: boolean;
+  anchorEl: any;
 }
 
 interface Props {
@@ -127,6 +133,8 @@ export class UserInterface extends Component<Props, State> {
       channels: [true],
       displayedImage: this.slicesData[0][0] || null,
       colour: null,
+      popover: null,
+      anchorEl: null,
     };
 
     this.annotationsObject.addAnnotation(this.state.activeTool);
@@ -431,13 +439,23 @@ export class UserInterface extends Component<Props, State> {
     }, this.mixChannels);
   };
 
+  handleClose = () => {
+    this.setState({ anchorEl: null });
+  };
+
   toolTips = [
-    { name: "Select", icon: `/examples/select-icon.svg`, shortcut: "V" },
+    {
+      name: "Select",
+      icon: `/examples/select-icon.svg`,
+      shortcut: "V",
+      onClick: (e: React.MouseEvent): void => this.setState({ popover: true }),
+    },
     {
       name: "Brush",
       icon: `/examples/brush-icon.svg`,
       shortcut: "B",
-      onClick: (): void => this.setState({ expanded: "paintbrush-toolbox" }),
+      onClick: (e: React.MouseEvent): void =>
+        this.setState({ expanded: "paintbrush-toolbox" }),
       selected: (state: State): boolean => {
         return (
           state.expanded === "paintbrush-toolbox" ||
@@ -449,6 +467,8 @@ export class UserInterface extends Component<Props, State> {
       name: "Eraser",
       icon: `/examples/eraser-icon.svg`,
       shortcut: "E",
+      onClick: (e: React.MouseEvent): void =>
+        this.setState({ expanded: "paintbrush-toolbox" }),
     },
     {
       name: "Spline",
@@ -460,17 +480,29 @@ export class UserInterface extends Component<Props, State> {
           ["spline"].includes(state.activeTool)
         );
       },
+      onClick: (e: React.MouseEvent): void =>
+        this.setState({ expanded: "paintbrush-toolbox" }),
     },
-    { name: "Contrast", icon: `/examples/contrast-icon.svg`, shortcut: `\\` },
+    {
+      name: "Contrast",
+      icon: `/examples/contrast-icon.svg`,
+      shortcut: `\\`,
+      onClick: (e: React.MouseEvent): void =>
+        this.setState({ expanded: "paintbrush-toolbox" }),
+    },
     {
       name: "Brightness",
       icon: `/examples/brightness-icon.svg`,
       shortcut: `/`,
+      onClick: (e: React.MouseEvent): void =>
+        this.setState({ expanded: "paintbrush-toolbox" }),
     },
     {
       name: "Annonation Label",
       icon: `/examples/annotation-label-icon.svg`,
       shortcut: "L",
+      onClick: (e: React.MouseEvent): void =>
+        this.setState({ expanded: "paintbrush-toolbox" }),
     },
   ];
 
@@ -479,18 +511,28 @@ export class UserInterface extends Component<Props, State> {
       name: "Zoom In",
       icon: `/examples/zoom-in-icon.svg`,
       shortcut: "Ctrl++",
+      onClick: (e: React.MouseEvent): void =>
+        this.setState({ expanded: "paintbrush-toolbox" }),
     },
     {
       name: "Zoom Out",
       icon: `/examples/zoom-out-icon.svg`,
       shortcut: "Ctrl--",
+      onClick: (e: React.MouseEvent): void =>
+        this.setState({ expanded: "paintbrush-toolbox" }),
     },
     {
       name: "Fit to Page",
       icon: `examples/reset-zoom-and-pan-icon.svg`,
       shortcut: "Ctrl+[",
+      onClick: (e: React.MouseEvent): void =>
+        this.setState({ expanded: "paintbrush-toolbox" }),
     },
   ];
+
+  handleClick = (event: React.MouseEvent) => {
+    this.setState({ anchorEl: event.currentTarget });
+  };
 
   render = (): ReactNode => (
     <ThemeProvider theme={theme}>
@@ -539,7 +581,7 @@ export class UserInterface extends Component<Props, State> {
                       marginTop: "7px",
                     }}
                     className={toolTip.selected ? "selected" : null}
-                    onClick={toolTip?.onClick?.()}
+                    onClick={toolTip?.onClick}
                   >
                     <Avatar sizes="large">
                       <SVG
@@ -567,7 +609,13 @@ export class UserInterface extends Component<Props, State> {
           <Toolbar>
             <Grid container direction="row">
               <Grid item justify="flex-start">
-                {<img src="\examples\gliff-master-black.png" width="50px" />}
+                {
+                  <img
+                    src="\examples\gliff-master-black.png"
+                    width="79px"
+                    height="60px"
+                  />
+                }
               </Grid>
             </Grid>
             <Grid item justify="flex-end">
@@ -695,7 +743,6 @@ export class UserInterface extends Component<Props, State> {
                 setMinimapPositionAndSize={this.setMinimapPositionAndSize}
               />
             </Grid>
-
             <Accordion
               expanded={this.state.expanded === "labels-toolbox"}
               onChange={this.handleToolboxChange("labels-toolbox")}
@@ -730,14 +777,12 @@ export class UserInterface extends Component<Props, State> {
                 </Grid>
               </AccordionDetails>
             </Accordion>
-
             <BackgroundUI
               expanded={this.state.expanded === "background-toolbox"}
               onChange={this.handleToolboxChange("background-toolbox")}
               channels={this.state.channels}
               toggleChannelAtIndex={this.toggleChannelAtIndex}
             />
-
             <PaintbrushUI
               expanded={
                 this.state.expanded === "paintbrush-toolbox" ||
@@ -747,7 +792,6 @@ export class UserInterface extends Component<Props, State> {
               onChange={this.handleToolboxChange("paintbrush-toolbox")}
               activateTool={this.activateTool}
             />
-
             <SplineUI
               expanded={
                 this.state.expanded === "spline-toolbox" ||
@@ -757,6 +801,37 @@ export class UserInterface extends Component<Props, State> {
               onChange={this.handleToolboxChange("spline-toolbox")}
               activateTool={this.activateTool}
             />
+
+            <Popover
+              open={this.state.popover}
+              anchorEl={this.state.anchorEl}
+              onClose={this.handleClose}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "left",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+            >
+              <Typography>
+                <Grid container spacing={0} justify="center" wrap="nowrap">
+                  <Grid item style={{ width: "85%", position: "relative" }}>
+                    <Tooltip title="Activate paintbrush">
+                      <IconButton id="activate-paintbrush">
+                        <Brush />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Activate Eraser">
+                      <IconButton>
+                        <RadioButtonUncheckedSharp />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                </Grid>
+              </Typography>
+            </Popover>
           </Grid>
         </Grid>
       </Container>
