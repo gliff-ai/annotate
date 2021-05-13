@@ -437,15 +437,30 @@ export class UserInterface extends Component<Props, State> {
       name: "Brush",
       icon: `/examples/brush-icon.svg`,
       shortcut: "B",
-      selected: true,
+      onClick: (): void => this.setState({ expanded: "paintbrush-toolbox" }),
+      selected: (state: State): boolean => {
+        return (
+          state.expanded === "paintbrush-toolbox" ||
+          ["paintbrush", "eraser"].includes(state.activeTool)
+        );
+      },
     },
     {
       name: "Eraser",
       icon: `/examples/eraser-icon.svg`,
       shortcut: "E",
-      selected: "",
     },
-    { name: "Spline", icon: `/examples/splines-icon.svg`, shortcut: "S" },
+    {
+      name: "Spline",
+      icon: `/examples/splines-icon.svg`,
+      shortcut: "S",
+      selected: (state: State): boolean => {
+        return (
+          state.expanded === "spline-toolbox" ||
+          ["spline"].includes(state.activeTool)
+        );
+      },
+    },
     { name: "Contrast", icon: `/examples/contrast-icon.svg`, shortcut: `\\` },
     {
       name: "Brightness",
@@ -524,6 +539,7 @@ export class UserInterface extends Component<Props, State> {
                       marginTop: "7px",
                     }}
                     className={toolTip.selected ? "selected" : null}
+                    onClick={toolTip?.onClick?.()}
                   >
                     <Avatar sizes="large">
                       <SVG
@@ -531,7 +547,11 @@ export class UserInterface extends Component<Props, State> {
                         title="Menu"
                         width="55%"
                         height="auto"
-                        fill={toolTip.selected ? "#02FFAD" : null}
+                        fill={
+                          toolTip?.selected && toolTip?.selected(this.state)
+                            ? "#02FFAD"
+                            : null
+                        }
                       />
                     </Avatar>
                   </IconButton>
