@@ -91,10 +91,10 @@ interface Props {
   presetLabels?: string[];
 }
 
-const HtmlTooltip = withStyles((theme: Theme) => ({
+const HtmlTooltip = withStyles((t: Theme) => ({
   tooltip: {
     backgroundColor: "#FFFFFF",
-    fontSize: theme.typography.pxToRem(12),
+    fontSize: t.typography.pxToRem(12),
     border: "1px solid #dadde9",
     color: "#2B2F3A",
   },
@@ -108,6 +108,8 @@ export class UserInterface extends Component<Props, State> {
   private slicesData: Array<Array<ImageBitmap>>;
 
   private imageFileInfo: ImageFileInfo | null;
+
+  private canvasContainer: HTMLDivElement;
 
   constructor(props: Props) {
     super(props);
@@ -138,10 +140,14 @@ export class UserInterface extends Component<Props, State> {
 
   componentDidMount = (): void => {
     document.addEventListener("keydown", keydownListener);
+
     for (const event of events) {
       document.addEventListener(event, this.handleEvent);
     }
     this.mixChannels();
+
+    const { clientHeight: height, clientWidth: width } = this.canvasContainer;
+    this.setViewportPositionAndSize({ top: 0, left: 0, width, height });
   };
 
   componentWillUnmount(): void {
@@ -602,6 +608,11 @@ export class UserInterface extends Component<Props, State> {
               width: "85%",
               position: "relative",
               backgroundColor: "#555",
+            }}
+            ref={(container) => {
+              if (container) {
+                this.canvasContainer = container;
+              }
             }}
           >
             <BackgroundCanvas
