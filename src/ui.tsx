@@ -444,9 +444,7 @@ export class UserInterface extends Component<Props, State> {
                     "someFileName",
                     this.state.displayedImage.width,
                     this.state.displayedImage.height,
-                    this.slicesData.length,
-                    this.imageFileInfo.resolution_x || 1,
-                    this.imageFileInfo.resolution_y || 1
+                    this.slicesData.length
                   )
                 }
               >

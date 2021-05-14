@@ -1,129 +1,21 @@
 import * as UTIF from "utif";
 import { Annotation, XYPoint } from "@/annotation/interfaces";
 
-export function downloadPaintbrushAsTiff(
-  annotations: Annotation[],
-  fileName: string,
-  width: number,
-  height: number,
-  slices: number,
-  xResolution: number,
-  yResolution: number
-) {
-  const ifds = [...new Array<UTIF.IFD>(slices)].map(
-    () =>
-      (({
-        t256: [width], // ImageWidth
-        t257: [height], // ImageLength
-        t258: [8], // BitsPerSample
-        t259: [1], // Compression: No compression
-        t262: [1], // PhotometricInterpretation: Grayscale
-        t273: [0], // StripOffsets, placeholder
-        t277: [1], // SamplesPerPixel
-        t278: [height], // RowsPerStrip
-        t279: [width * height], // StripByteCounts
-        t282: [xResolution], // XResolution
-        t283: [yResolution], // YResolution
-        t286: [0], // XPosition
-        t287: [0], // YPosition
-        t296: [1], // ResolutionUnit: No absolute unit
-        t305: ["gliff.ai"], // Software
-      } as unknown) as UTIF.IFD)
-  );
-  const slicesData = [...new Array<Uint8Array>(slices)].map(
-    () => new Uint8Array(width * height)
-  );
-
-  let inputValue: number;
-  let prevZ: number;
-  annotations.forEach(({ toolbox, brushStrokes }) => {
-    prevZ = null;
-    if (toolbox === "paintbrush") {
-      brushStrokes.forEach(({ coordinates, brush, spaceTimeInfo }) => {
-        if (prevZ !== spaceTimeInfo.z) {
-          inputValue = getNextMin(slicesData[spaceTimeInfo.z]);
-          prevZ = spaceTimeInfo.z;
-        }
-
-        coordinates.forEach((point0, i) => {
-          drawCapsule(
-            point0,
-            i + 1 < coordinates.length ? coordinates[i + 1] : point0,
-            brush.radius,
-            slicesData[spaceTimeInfo.z],
-            width,
-            inputValue,
-            brush.type
-          );
-        });
-      });
-    }
-  });
-
-  const ifdsLength = UTIF.encode(ifds).byteLength;
-  let offset = ifdsLength;
-
-  for (let i = 0; i < slices; i++) {
-    ifds[i].t273 = [offset];
-    offset += slicesData[i].byteLength;
-  }
-
-  const headers = new Uint8Array(UTIF.encode(ifds));
-  const imageData = new Uint8Array(offset);
-
-  for (let i = 0; i < headers.byteLength; i++) {
-    imageData[i] = headers[i];
-  }
-
-  offset = ifdsLength;
-  for (let i = 0; i < slices; i++) {
-    for (let j = 0; j < slicesData[i].byteLength; j++) {
-      imageData[offset + j] = slicesData[i][j];
-    }
-    offset += slicesData[i].byteLength;
-  }
-
-  downloadData(fileName, imageData);
-}
-
-function downloadData(fileName: string, data: Uint8Array): void {
-  const [name, format] = fileName.split(".");
-
-  const anchor = document.createElement("a");
-  anchor.style.display = "none";
-  const blob = new Blob([data], { type: "image/tiff" });
-  const url = window.URL.createObjectURL(blob);
-  anchor.href = url;
-
-  anchor.download = `${name}_annotations.tif`;
-  anchor.click();
-  window.URL.revokeObjectURL(url);
-}
-
-function getNextMin(arr: Uint8Array): number {
-  let len = arr.length;
-  let min = 256;
-
-  while (len--) {
-    min = arr[len] < min && arr[len] !== 0 ? arr[len] : min;
-  }
-  return min - 1;
-}
-
 function drawCapsule(
   point0: XYPoint,
   point1: XYPoint,
   r: number,
-  arr: Uint8Array,
+  dataSlice: Uint8Array,
   width: number,
   inputValue: number,
   brushType: "paint" | "erase"
-): void {
+): Uint8Array {
   // Draw a capsule between points (x0, y0) and (x1,y1) of radius r.
   // We draw the capsule from top to bottom.
   // For each scanline, we determine the left and right x coordinates and draw the line.
   // This means that we must identify the left and right edges of the line.
   // Each edge can be divided into three part: the top cap, the straight line, the bottom cap.
+  const arr = dataSlice;
 
   let fillFunc;
   if (brushType === "paint") {
@@ -138,9 +30,10 @@ function drawCapsule(
     y: Math.round(point.y),
   });
 
-  // Sort the points so that A=(ax,ay) is at the top and B=(bx,by) at the bottom.
   const { x: x0, y: y0 } = roundXYPoint(point0);
   const { x: x1, y: y1 } = roundXYPoint(point1);
+
+  // Sort the points so that A=(ax,ay) is at the top and B=(bx,by) at the bottom.
   const [ax, bx] = y0 < y1 ? [x0, x1] : [x1, x0];
   const [ay, by] = y0 < y1 ? [y0, y1] : [y1, y0];
 
@@ -180,7 +73,7 @@ function drawCapsule(
   let lastXmax = Infinity;
 
   // Loop through the scanlines. The vertical range is the rounded [ay-r,by+r].
-  for (let y = Math.round(ay - r); y <= Math.round(by + r); y++) {
+  for (let y = Math.round(ay - r); y < Math.round(by + r); y += 1) {
     let xmin;
     let xmax;
 
@@ -221,8 +114,8 @@ function drawCapsule(
     }
 
     // Round the range
-    xmin = Math.ceil(xmin);
-    xmax = Math.ceil(xmax);
+    xmin = Math.round(xmin);
+    xmax = Math.round(xmax);
 
     // Ensure that the [xmin,xmax] range the new scanlines overlaps
     // at least by one pixel with the range of the previous scanline.
@@ -234,8 +127,113 @@ function drawCapsule(
     lastXmax = xmax;
 
     // Draw the scanline between [xmin,xmax].
-    for (let x = xmin; x <= xmax; x++) {
+    for (let x = xmin; x < xmax; x += 1) {
       arr[width * y + x] = fillFunc(inputValue, arr[width * y + x]);
     }
   }
+  return arr;
+}
+
+function downloadData(fileName: string, data: Uint8Array): void {
+  const anchor = document.createElement("a");
+  // anchor.style.display = "none";
+  const blob = new Blob([data], { type: "image/tiff" });
+  const url = window.URL.createObjectURL(blob);
+  anchor.href = url;
+
+  const name = fileName.split(".").shift();
+  anchor.download = `${name}_annotations.tif`;
+  anchor.click();
+  window.URL.revokeObjectURL(url);
+}
+
+export function downloadPaintbrushAsTiff(
+  annotations: Annotation[],
+  fileName: string,
+  width: number,
+  height: number,
+  slices: number
+): void {
+  const ifds = [...new Array<UTIF.IFD>(slices)].map(
+    () =>
+      (({
+        t256: [width], // ImageWidth
+        t257: [height], // ImageLength
+        t258: [8], // BitsPerSample
+        t259: [1], // Compression: No compression
+        t262: [1], // PhotometricInterpretation: Grayscale
+        t273: [0], // StripOffsets, placeholder
+        t277: [1], // SamplesPerPixel
+        t278: [height], // RowsPerStrip
+        t279: [width * height], // StripByteCounts
+        t282: [1], // XResolution
+        t283: [1], // YResolution
+        t286: [0], // XPosition
+        t287: [0], // YPosition
+        t296: [1], // ResolutionUnit: No absolute unit
+        t305: ["gliff.ai"], // Software
+      } as unknown) as UTIF.IFD)
+  );
+  const slicesData = [...new Array<Uint8Array>(slices)].map(
+    () => new Uint8Array(width * height)
+  );
+
+  function getNextMin(arr: Uint8Array): number {
+    let min = 256;
+    for (let i = 0; i < arr.length; i += 1) {
+      min = arr[i] < min && arr[i] !== 0 ? arr[i] : min;
+    }
+    return min - 1;
+  }
+
+  let inputValue: number;
+  let prevZ: number;
+  annotations.forEach(({ toolbox, brushStrokes }) => {
+    prevZ = null;
+    if (toolbox === "paintbrush") {
+      brushStrokes.forEach(({ coordinates, brush, spaceTimeInfo }) => {
+        if (prevZ !== spaceTimeInfo.z) {
+          inputValue = getNextMin(slicesData[spaceTimeInfo.z]);
+          prevZ = spaceTimeInfo.z;
+        }
+
+        coordinates.forEach((point0, i) => {
+          slicesData[spaceTimeInfo.z] = drawCapsule(
+            point0,
+            i + 1 < coordinates.length ? coordinates[i + 1] : point0,
+            brush.radius,
+            slicesData[spaceTimeInfo.z],
+            width,
+            inputValue,
+            brush.type
+          );
+        });
+      });
+    }
+  });
+
+  const ifdsLength = UTIF.encode(ifds).byteLength;
+  let offset = ifdsLength;
+
+  for (let i = 0; i < slices; i += 1) {
+    ifds[i].t273 = [offset];
+    offset += slicesData[i].byteLength;
+  }
+
+  const headers = new Uint8Array(UTIF.encode(ifds));
+  const imageData = new Uint8Array(offset);
+
+  for (let i = 0; i < headers.byteLength; i += 1) {
+    imageData[i] = headers[i];
+  }
+
+  offset = ifdsLength;
+  for (let i = 0; i < slices; i += 1) {
+    for (let j = 0; j < slicesData[i].byteLength; j += 1) {
+      imageData[offset + j] = slicesData[i][j];
+    }
+    offset += slicesData[i].byteLength;
+  }
+
+  downloadData(fileName, imageData);
 }
