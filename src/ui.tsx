@@ -439,8 +439,8 @@ export class UserInterface extends Component<Props, State> {
     }, this.mixChannels);
   };
 
-  handleClose = () => {
-    this.setState({ anchorEl: null });
+  handleClose = (event: React.MouseEvent) => {
+    this.setState({ anchorEl: null, popover: null });
   };
 
   toolTips = [
@@ -449,6 +449,12 @@ export class UserInterface extends Component<Props, State> {
       icon: `/examples/select-icon.svg`,
       shortcut: "V",
       onClick: (e: React.MouseEvent): void => this.setState({ popover: true }),
+      selected: (state: State): boolean => {
+        return (
+          state.expanded === "paintbrush-toolbox" ||
+          ["paintbrush", "eraser"].includes(state.activeTool)
+        );
+      },
     },
     {
       name: "Brush",
@@ -552,6 +558,7 @@ export class UserInterface extends Component<Props, State> {
             {this.toolTips.map((toolTip) => {
               return (
                 <HtmlTooltip
+                  key={toolTip.name}
                   title={
                     <Box
                       display="flex"
@@ -701,6 +708,7 @@ export class UserInterface extends Component<Props, State> {
                 {this.visualToolTips.map((toolTip) => {
                   return (
                     <HtmlTooltip
+                      key={toolTip.name}
                       title={
                         <Box
                           display="flex"
@@ -743,65 +751,6 @@ export class UserInterface extends Component<Props, State> {
                 setMinimapPositionAndSize={this.setMinimapPositionAndSize}
               />
             </Grid>
-            <Accordion
-              expanded={this.state.expanded === "labels-toolbox"}
-              onChange={this.handleToolboxChange("labels-toolbox")}
-            >
-              <AccordionSummary expandIcon={<ExpandMore />} id="labels-toolbox">
-                <Typography>Annotations</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Grid container justify="center">
-                  <ButtonGroup>
-                    <Tooltip title="Annotate new object">
-                      <Button id="addAnnotation" onClick={this.addAnnotation}>
-                        <Add />
-                      </Button>
-                    </Tooltip>
-                    <Tooltip title="Clear selected annotation">
-                      <Button
-                        id="clear-annotation"
-                        onClick={this.clearActiveAnnotation}
-                      >
-                        <Delete />
-                      </Button>
-                    </Tooltip>
-                  </ButtonGroup>
-
-                  <Labels
-                    annotationObject={this.annotationsObject}
-                    presetLabels={this.presetLabels}
-                    updatePresetLabels={this.updatePresetLabels}
-                    activeAnnotationID={this.state.activeAnnotationID}
-                  />
-                </Grid>
-              </AccordionDetails>
-            </Accordion>
-            <BackgroundUI
-              expanded={this.state.expanded === "background-toolbox"}
-              onChange={this.handleToolboxChange("background-toolbox")}
-              channels={this.state.channels}
-              toggleChannelAtIndex={this.toggleChannelAtIndex}
-            />
-            <PaintbrushUI
-              expanded={
-                this.state.expanded === "paintbrush-toolbox" ||
-                ["paintbrush", "eraser"].includes(this.state.activeTool)
-              }
-              activeTool={this.state.activeTool}
-              onChange={this.handleToolboxChange("paintbrush-toolbox")}
-              activateTool={this.activateTool}
-            />
-            <SplineUI
-              expanded={
-                this.state.expanded === "spline-toolbox" ||
-                ["spline"].includes(this.state.activeTool)
-              }
-              activeTool={this.state.activeTool}
-              onChange={this.handleToolboxChange("spline-toolbox")}
-              activateTool={this.activateTool}
-            />
-
             <Popover
               open={this.state.popover}
               anchorEl={this.state.anchorEl}
@@ -815,23 +764,55 @@ export class UserInterface extends Component<Props, State> {
                 horizontal: "left",
               }}
             >
-              <Typography>
-                <Grid container spacing={0} justify="center" wrap="nowrap">
-                  <Grid item style={{ width: "85%", position: "relative" }}>
-                    <Tooltip title="Activate paintbrush">
-                      <IconButton id="activate-paintbrush">
-                        <Brush />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Activate Eraser">
-                      <IconButton>
-                        <RadioButtonUncheckedSharp />
-                      </IconButton>
-                    </Tooltip>
-                  </Grid>
-                </Grid>
-              </Typography>
+              <Typography>Annotations</Typography>
+              <Grid container justify="center">
+                <ButtonGroup>
+                  <Tooltip title="Annotate new object">
+                    <Button id="addAnnotation" onClick={this.addAnnotation}>
+                      <Add />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip title="Clear selected annotation">
+                    <Button
+                      id="clear-annotation"
+                      onClick={this.clearActiveAnnotation}
+                    >
+                      <Delete />
+                    </Button>
+                  </Tooltip>
+                </ButtonGroup>
+
+                <Labels
+                  annotationObject={this.annotationsObject}
+                  presetLabels={this.presetLabels}
+                  updatePresetLabels={this.updatePresetLabels}
+                  activeAnnotationID={this.state.activeAnnotationID}
+                />
+              </Grid>
             </Popover>
+            <BackgroundUI
+              expanded={this.state.expanded === "background-toolbox"}
+              onChange={this.handleToolboxChange("background-toolbox")}
+              channels={this.state.channels}
+              toggleChannelAtIndex={this.toggleChannelAtIndex}
+            />
+            <PaintbrushUI
+              open={this.state.popover}
+              anchorEl={this.state.anchorEl}
+              onClose={this.handleClose}
+              activeTool={this.state.activeTool}
+              onChange={this.handleToolboxChange("paintbrush-toolbox")}
+              activateTool={this.activateTool}
+            />
+            <SplineUI
+              expanded={
+                this.state.expanded === "spline-toolbox" ||
+                ["spline"].includes(this.state.activeTool)
+              }
+              activeTool={this.state.activeTool}
+              onChange={this.handleToolboxChange("spline-toolbox")}
+              activateTool={this.activateTool}
+            />
           </Grid>
         </Grid>
       </Container>
