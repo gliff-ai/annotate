@@ -1,5 +1,7 @@
+/* eslint-disable no-param-reassign */
 import * as UTIF from "utif";
 import { Annotation, XYPoint } from "@/annotation/interfaces";
+import { colorMap } from "./colorMap";
 
 function drawCapsule(
   point0: XYPoint,
@@ -7,23 +9,18 @@ function drawCapsule(
   r: number,
   dataSlice: Uint8Array,
   width: number,
-  inputValue: number,
-  brushType: "paint" | "erase"
+  annotationIndex: number,
+  brushType: "paint" | "erase",
+  samplesPerPixel = 3
 ): Uint8Array {
-  // Draw a capsule between points (x0, y0) and (x1,y1) of radius r.
+  // Draw a capsule between points0 (x0, y0) and point1 (x1,y1) of radius r.
+  // Procedure:
   // We draw the capsule from top to bottom.
   // For each scanline, we determine the left and right x coordinates and draw the line.
   // This means that we must identify the left and right edges of the line.
   // Each edge can be divided into three part: the top cap, the straight line, the bottom cap.
   const arr = dataSlice;
-
-  let fillFunc;
-  if (brushType === "paint") {
-    fillFunc = (value: number, oldValue?: number): number => value;
-  } else if (brushType === "erase") {
-    fillFunc = (value: number, oldValue?: number): number =>
-      oldValue === value ? 0 : oldValue;
-  }
+  const annotationColor = colorMap[annotationIndex];
 
   const roundXYPoint = (point: XYPoint): XYPoint => ({
     x: Math.round(point.x),
@@ -127,22 +124,65 @@ function drawCapsule(
     lastXmax = xmax;
 
     // Draw the scanline between [xmin,xmax].
-    for (let x = xmin; x < xmax; x += 1) {
-      arr[width * y + x] = fillFunc(inputValue, arr[width * y + x]);
+
+    if (brushType === "paint") {
+      for (let x = xmin; x < xmax; x += 1) {
+        const index = samplesPerPixel * (width * y + x);
+        annotationColor.forEach((c, i) => {
+          arr[index + i] = c;
+        });
+      }
+    } else {
+      for (let x = xmin; x < xmax; x += 1) {
+        const index = samplesPerPixel * (width * y + x);
+        if (
+          arr.slice(index, index + 3).toString() === annotationColor.toString()
+        ) {
+          annotationColor.forEach((c, i) => {
+            arr[index + i] = 0;
+          });
+        }
+      }
     }
   }
   return arr;
 }
 
-function downloadData(fileName: string, data: Uint8Array): void {
+function getImageData(data: Uint8Array[], ifds: UTIF.IFD[]): Uint8Array {
+  const ifdsLength = UTIF.encode(ifds).byteLength;
+  let offset = ifdsLength;
+
+  data.forEach((dataSlice, i) => {
+    ifds[i].t273 = [offset];
+    offset += dataSlice.byteLength;
+  });
+
+  const headers = new Uint8Array(UTIF.encode(ifds));
+  const imageData = new Uint8Array(offset);
+
+  for (let i = 0; i < headers.byteLength; i += 1) {
+    imageData[i] = headers[i];
+  }
+
+  offset = ifdsLength;
+  data.forEach((dataSlice) => {
+    for (let j = 0; j < dataSlice.byteLength; j += 1) {
+      imageData[offset + j] = dataSlice[j];
+    }
+    offset += dataSlice.byteLength;
+  });
+
+  return imageData;
+}
+
+function downloadImageData(imageData: Uint8Array, fileName: string): void {
   const anchor = document.createElement("a");
-  // anchor.style.display = "none";
-  const blob = new Blob([data], { type: "image/tiff" });
+  const blob = new Blob([imageData], { type: "image/tiff" });
   const url = window.URL.createObjectURL(blob);
   anchor.href = url;
 
   const name = fileName.split(".").shift();
-  anchor.download = `${name}_annotations.tif`;
+  anchor.download = `${name}_annotations.tiff`;
   anchor.click();
   window.URL.revokeObjectURL(url);
 }
@@ -154,6 +194,9 @@ export function downloadPaintbrushAsTiff(
   height: number,
   slices: number
 ): void {
+  // const uint16ColorMap = getColorMap(uint8ColorMap);
+  const samplesPerPixel = 3;
+
   const ifds = [...new Array<UTIF.IFD>(slices)].map(
     () =>
       (({
@@ -161,11 +204,11 @@ export function downloadPaintbrushAsTiff(
         t257: [height], // ImageLength
         t258: [8], // BitsPerSample
         t259: [1], // Compression: No compression
-        t262: [1], // PhotometricInterpretation: Grayscale
+        t262: [2], // PhotometricInterpretation (1 for Grayscale; 2 for Full color)
         t273: [0], // StripOffsets, placeholder
-        t277: [1], // SamplesPerPixel
+        t277: [samplesPerPixel], // SamplesPerPixel (1 for Grayscale, 3+ for Full color)
         t278: [height], // RowsPerStrip
-        t279: [width * height], // StripByteCounts
+        t279: [width * height * samplesPerPixel], // StripByteCounts
         t282: [1], // XResolution
         t283: [1], // YResolution
         t286: [0], // XPosition
@@ -175,28 +218,12 @@ export function downloadPaintbrushAsTiff(
       } as unknown) as UTIF.IFD)
   );
   const slicesData = [...new Array<Uint8Array>(slices)].map(
-    () => new Uint8Array(width * height)
+    () => new Uint8Array(width * height * samplesPerPixel)
   );
 
-  function getNextMin(arr: Uint8Array): number {
-    let min = 256;
-    for (let i = 0; i < arr.length; i += 1) {
-      min = arr[i] < min && arr[i] !== 0 ? arr[i] : min;
-    }
-    return min - 1;
-  }
-
-  let inputValue: number;
-  let prevZ: number;
-  annotations.forEach(({ toolbox, brushStrokes }) => {
-    prevZ = null;
+  annotations.forEach(({ toolbox, brushStrokes }, annotationIndex) => {
     if (toolbox === "paintbrush") {
       brushStrokes.forEach(({ coordinates, brush, spaceTimeInfo }) => {
-        if (prevZ !== spaceTimeInfo.z) {
-          inputValue = getNextMin(slicesData[spaceTimeInfo.z]);
-          prevZ = spaceTimeInfo.z;
-        }
-
         coordinates.forEach((point0, i) => {
           slicesData[spaceTimeInfo.z] = drawCapsule(
             point0,
@@ -204,7 +231,7 @@ export function downloadPaintbrushAsTiff(
             brush.radius,
             slicesData[spaceTimeInfo.z],
             width,
-            inputValue,
+            annotationIndex,
             brush.type
           );
         });
@@ -212,28 +239,9 @@ export function downloadPaintbrushAsTiff(
     }
   });
 
-  const ifdsLength = UTIF.encode(ifds).byteLength;
-  let offset = ifdsLength;
+  // Prepare data for export, combining slicesData wi ifds
+  const imageData = getImageData(slicesData, ifds);
 
-  for (let i = 0; i < slices; i += 1) {
-    ifds[i].t273 = [offset];
-    offset += slicesData[i].byteLength;
-  }
-
-  const headers = new Uint8Array(UTIF.encode(ifds));
-  const imageData = new Uint8Array(offset);
-
-  for (let i = 0; i < headers.byteLength; i += 1) {
-    imageData[i] = headers[i];
-  }
-
-  offset = ifdsLength;
-  for (let i = 0; i < slices; i += 1) {
-    for (let j = 0; j < slicesData[i].byteLength; j += 1) {
-      imageData[offset + j] = slicesData[i][j];
-    }
-    offset += slicesData[i].byteLength;
-  }
-
-  downloadData(fileName, imageData);
+  // Download image data as tiff file
+  downloadImageData(imageData, fileName);
 }
