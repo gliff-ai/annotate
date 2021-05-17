@@ -427,6 +427,7 @@ export class UserInterface extends Component<Props, State> {
                   <Backup />
                 </Button>
               }
+              multiple={false}
             />
           </Toolbar>
         </AppBar>
