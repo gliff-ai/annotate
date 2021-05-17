@@ -1,9 +1,4 @@
-import {
-  Annotation,
-  XYPoint,
-  BrushStroke,
-  Spline,
-} from "./interfaces";
+import { Annotation, XYPoint, BrushStroke, Spline } from "./interfaces";
 
 export class Annotations {
   private data: Array<Annotation>;
