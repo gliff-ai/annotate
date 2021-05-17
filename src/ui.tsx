@@ -383,12 +383,11 @@ export class UserInterface extends Component<Props, State> {
     }
   };
 
-  handleToolboxChange = (panel: string) => (
-    event: ChangeEvent,
-    isExpanded: boolean
-  ): void => {
-    this.setState({ expanded: isExpanded ? panel : false });
-  };
+  handleToolboxChange =
+    (panel: string) =>
+    (event: ChangeEvent, isExpanded: boolean): void => {
+      this.setState({ expanded: isExpanded ? panel : false });
+    };
 
   clearActiveAnnotation = (): void => {
     this.annotationsObject.setSplineCoordinates([]);
@@ -425,6 +424,7 @@ export class UserInterface extends Component<Props, State> {
         <AppBar>
           <Toolbar>
             <UploadImage
+              multiple
               setUploadedImage={this.setUploadedImage}
               spanElement={
                 /* eslint-disable react/jsx-wrap-multilines */

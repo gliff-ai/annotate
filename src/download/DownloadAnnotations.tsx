@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import * as UTIF from "utif";
 import { Annotation, XYPoint } from "@/annotation/interfaces";
-import { colorMap } from "./colorMap";
+import { palette } from "@/palette";
 
 function drawCapsule(
   point0: XYPoint,
@@ -20,7 +20,7 @@ function drawCapsule(
   // This means that we must identify the left and right edges of the line.
   // Each edge can be divided into three part: the top cap, the straight line, the bottom cap.
   const arr = dataSlice;
-  const annotationColor = colorMap[annotationIndex];
+  const annotationColor = palette[annotationIndex];
 
   const roundXYPoint = (point: XYPoint): XYPoint => ({
     x: Math.round(point.x),
@@ -199,7 +199,7 @@ export function downloadPaintbrushAsTiff(
 
   const ifds = [...new Array<UTIF.IFD>(slices)].map(
     () =>
-      (({
+      ({
         t256: [width], // ImageWidth
         t257: [height], // ImageLength
         t258: [8], // BitsPerSample
@@ -215,7 +215,7 @@ export function downloadPaintbrushAsTiff(
         t287: [0], // YPosition
         t296: [1], // ResolutionUnit: No absolute unit
         t305: ["gliff.ai"], // Software
-      } as unknown) as UTIF.IFD)
+      } as unknown as UTIF.IFD)
   );
   const slicesData = [...new Array<Uint8Array>(slices)].map(
     () => new Uint8Array(width * height * samplesPerPixel)
