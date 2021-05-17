@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 import * as UTIF from "utif";
+import { ImageFileInfo } from "@gliff-ai/upload";
 import { Annotation, XYPoint } from "@/annotation/interfaces";
 import { palette } from "@/palette";
 
@@ -8,7 +9,7 @@ function drawCapsule(
   point1: XYPoint,
   r: number,
   dataSlice: Uint8Array,
-  width: number,
+  imageWidth: number,
   annotationIndex: number,
   brushType: "paint" | "erase",
   samplesPerPixel = 3
@@ -127,14 +128,14 @@ function drawCapsule(
 
     if (brushType === "paint") {
       for (let x = xmin; x < xmax; x += 1) {
-        const index = samplesPerPixel * (width * y + x);
+        const index = samplesPerPixel * (imageWidth * y + x);
         annotationColor.forEach((c, i) => {
           arr[index + i] = c;
         });
       }
     } else {
       for (let x = xmin; x < xmax; x += 1) {
-        const index = samplesPerPixel * (width * y + x);
+        const index = samplesPerPixel * (imageWidth * y + x);
         if (
           arr.slice(index, index + 3).toString() === annotationColor.toString()
         ) {
@@ -175,7 +176,7 @@ function getImageData(data: Uint8Array[], ifds: UTIF.IFD[]): Uint8Array {
   return imageData;
 }
 
-function downloadImageData(imageData: Uint8Array, fileName: string): void {
+function exportImageDataAsTiff(imageData: Uint8Array, fileName: string): void {
   const anchor = document.createElement("a");
   const blob = new Blob([imageData], { type: "image/tiff" });
   const url = window.URL.createObjectURL(blob);
@@ -189,13 +190,11 @@ function downloadImageData(imageData: Uint8Array, fileName: string): void {
 
 export function downloadPaintbrushAsTiff(
   annotations: Annotation[],
-  fileName: string,
-  width: number,
-  height: number,
-  slices: number
+  imageFileInfo: ImageFileInfo
 ): void {
   // const uint16ColorMap = getColorMap(uint8ColorMap);
   const samplesPerPixel = 3;
+  const { width, height, num_slices: slices, fileName } = imageFileInfo;
 
   const ifds = [...new Array<UTIF.IFD>(slices)].map(
     () =>
@@ -242,6 +241,6 @@ export function downloadPaintbrushAsTiff(
   // Prepare data for export, combining slicesData wi ifds
   const imageData = getImageData(slicesData, ifds);
 
-  // Download image data as tiff file
-  downloadImageData(imageData, fileName);
+  // export image data as tiff file
+  exportImageDataAsTiff(imageData, fileName);
 }
