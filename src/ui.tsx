@@ -89,12 +89,20 @@ interface State {
   colour: boolean;
   popover: boolean;
   anchorEl: any;
+  openedPopoverId: number;
 }
 
 interface Props {
   slicesData?: Array<Array<ImageBitmap>>;
   annotationsObject?: Annotations;
   presetLabels?: string[];
+}
+
+interface ToolTips {
+  key: number;
+  name: string;
+  icon: string;
+  shortcut: string;
 }
 
 const HtmlTooltip = withStyles((t: Theme) => ({
@@ -139,6 +147,7 @@ export class UserInterface extends Component<Props, State> {
       colour: null,
       popover: null,
       anchorEl: null,
+      openedPopoverId: null,
     };
 
     this.annotationsObject.addAnnotation(this.state.activeTool);
@@ -451,72 +460,48 @@ export class UserInterface extends Component<Props, State> {
     this.setState({ anchorEl: null, popover: null });
   };
 
-  toolTips = [
+  toolTips: ToolTips[] = [
     {
+      key: 0,
       name: "Select",
       icon: `/examples/select-icon.svg`,
       shortcut: "V",
-      onClick: (e: React.MouseEvent): void => this.setState({ popover: true }),
-      selected: (state: State): boolean => {
-        return (
-          state.expanded === "paintbrush-toolbox" ||
-          ["paintbrush", "eraser"].includes(state.activeTool)
-        );
-      },
     },
     {
+      key: 1,
       name: "Brush",
       icon: `/examples/brush-icon.svg`,
       shortcut: "B",
-      onClick: (e: React.MouseEvent): void =>
-        this.setState({ expanded: "paintbrush-toolbox" }),
-      selected: (state: State): boolean => {
-        return (
-          state.expanded === "paintbrush-toolbox" ||
-          ["paintbrush", "eraser"].includes(state.activeTool)
-        );
-      },
     },
     {
+      key: 2,
       name: "Eraser",
       icon: `/examples/eraser-icon.svg`,
       shortcut: "E",
-      onClick: (e: React.MouseEvent): void =>
-        this.setState({ expanded: "paintbrush-toolbox" }),
     },
     {
+      key: 3,
       name: "Spline",
       icon: `/examples/splines-icon.svg`,
       shortcut: "S",
-      selected: (state: State): boolean => {
-        return (
-          state.expanded === "spline-toolbox" ||
-          ["spline"].includes(state.activeTool)
-        );
-      },
-      onClick: (e: React.MouseEvent): void =>
-        this.setState({ expanded: "paintbrush-toolbox" }),
     },
     {
+      key: 4,
       name: "Contrast",
       icon: `/examples/contrast-icon.svg`,
       shortcut: `\\`,
-      onClick: (e: React.MouseEvent): void =>
-        this.setState({ expanded: "paintbrush-toolbox" }),
     },
     {
+      key: 5,
       name: "Brightness",
       icon: `/examples/brightness-icon.svg`,
       shortcut: `/`,
-      onClick: (e: React.MouseEvent): void =>
-        this.setState({ expanded: "paintbrush-toolbox" }),
     },
     {
+      key: 6,
       name: "Annonation Label",
       icon: `/examples/annotation-label-icon.svg`,
       shortcut: "L",
-      onClick: (e: React.MouseEvent): void =>
-        this.setState({ expanded: "paintbrush-toolbox" }),
     },
   ];
 
@@ -557,7 +542,7 @@ export class UserInterface extends Component<Props, State> {
           bottom: "0",
           marginBottom: "30px",
           zIndex: 100,
-          background: "#fff",
+          background: "#fafafa",
         }}
       >
         <Grid container direction="row">
@@ -576,9 +561,10 @@ export class UserInterface extends Component<Props, State> {
                       justifyItems="space-between"
                     >
                       <Box mr={6}>
-                        <Typography color="inherit">{toolTip.name}</Typography>
+                        <Typography>{toolTip.name}</Typography>
                       </Box>
                       <Avatar
+                        variant="circle"
                         style={{
                           backgroundColor: "#02FFAD",
                           color: "#2B2F3A",
@@ -591,26 +577,30 @@ export class UserInterface extends Component<Props, State> {
                   placement="right"
                 >
                   <IconButton
-                    color="secondary"
                     size="small"
                     style={{
                       marginBottom: "5px",
                       marginTop: "7px",
                     }}
-                    className={toolTip.selected ? "selected" : null}
-                    onClick={toolTip?.onClick}
+                    // className={toolTip.selected ? "selected" : null}
+                    // onClick={toolTip?.onClick}
+                    onClick={(e: React.MouseEvent): void =>
+                      this.setState({
+                        popover: true,
+                        openedPopoverId: this.toolTips.key,
+                      })
+                    }
                   >
-                    <Avatar sizes="large">
+                    <Avatar sizes="large" variant="circular">
                       <SVG
                         src={`${toolTip.icon}`}
-                        title="Menu"
                         width="55%"
                         height="auto"
-                        fill={
-                          toolTip?.selected && toolTip?.selected(this.state)
-                            ? "#02FFAD"
-                            : null
-                        }
+                        // fill={
+                        //   toolTip?.selected && toolTip?.selected(this.state)
+                        //     ? "#02FFAD"
+                        //     : null
+                        // }
                       />
                     </Avatar>
                   </IconButton>
@@ -622,13 +612,13 @@ export class UserInterface extends Component<Props, State> {
       </div>
       <CssBaseline />
       <Container disableGutters>
-        <AppBar position={"static"}>
+        <AppBar position={"static"} style={{ backgroundColor: "#fafafa" }}>
           <Toolbar>
             <Grid container direction="row">
               <Grid item justify="flex-start">
                 {
                   <img
-                    src="\examples\gliff-master-black.png"
+                    src="examples/gliff-master-black.png"
                     width="79px"
                     height="60px"
                   />
@@ -661,7 +651,7 @@ export class UserInterface extends Component<Props, State> {
             style={{
               width: "85%",
               position: "relative",
-              backgroundColor: "#555",
+              backgroundColor: "#fafafa",
             }}
             ref={(container) => {
               if (container) {

@@ -4,10 +4,10 @@ import { ThemeProvider, createMuiTheme, Theme } from "@material-ui/core/styles";
 const theme: Theme = createMuiTheme({
   palette: {
     primary: {
-      main: "#FFFFFF",
+      main: "#02FFAD",
     },
     secondary: {
-      main: "#02FFAD",
+      main: "#AE79FF",
     },
   },
   typography: {
@@ -33,9 +33,9 @@ const theme: Theme = createMuiTheme({
 
     MuiAvatar: {
       colorDefault: {
-        backgroundColor: "#FFFFFF",
+        backgroundColor: "#fff",
         "&:hover": {
-          background: "#02FFAD",
+          backgroundColor: "#02FFAD",
         },
       },
     },
