@@ -425,7 +425,6 @@ export class UserInterface extends Component<Props, State> {
         <AppBar>
           <Toolbar>
             <UploadImage
-              multiple={false}
               setUploadedImage={this.setUploadedImage}
               spanElement={
                 /* eslint-disable react/jsx-wrap-multilines */
@@ -435,6 +434,7 @@ export class UserInterface extends Component<Props, State> {
                   </Button>
                 </Tooltip>
               }
+              multiple={false}
             />
             <Tooltip title="Download annotations">
               <Button
