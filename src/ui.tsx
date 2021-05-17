@@ -42,7 +42,7 @@ import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
 import { Labels } from "@/components/Labels";
 import { keydownListener } from "@/keybindings";
-import { downloadPaintbrushAsTiff } from "@/download/DownloadAnnotations";
+import { downloadPaintbrushAsTiff } from "@/download/DownloadAsTiff";
 
 import { Tools, Tool } from "@/tools";
 
@@ -76,6 +76,7 @@ interface State {
 
 interface Props {
   slicesData?: Array<Array<ImageBitmap>>;
+  imageFileInfo?: ImageFileInfo;
   annotationsObject?: Annotations;
   presetLabels?: string[];
 }
@@ -113,7 +114,7 @@ export class UserInterface extends Component<Props, State> {
 
     this.annotationsObject.addAnnotation(this.state.activeTool);
     this.presetLabels = this.props.presetLabels || [];
-    this.imageFileInfo = null;
+    this.imageFileInfo = this.props.imageFileInfo || null;
   }
 
   componentDidMount = (): void => {
@@ -441,10 +442,7 @@ export class UserInterface extends Component<Props, State> {
                 onClick={() =>
                   downloadPaintbrushAsTiff(
                     this.annotationsObject.getAllAnnotations(),
-                    "someFileName",
-                    this.state.displayedImage.width,
-                    this.state.displayedImage.height,
-                    this.slicesData.length
+                    this.imageFileInfo
                   )
                 }
               >
