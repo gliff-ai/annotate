@@ -425,7 +425,7 @@ export class UserInterface extends Component<Props, State> {
         <AppBar>
           <Toolbar>
             <UploadImage
-              multiple
+              multiple={false}
               setUploadedImage={this.setUploadedImage}
               spanElement={
                 /* eslint-disable react/jsx-wrap-multilines */
