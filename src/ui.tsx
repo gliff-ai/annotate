@@ -27,7 +27,6 @@ import {
   KeyboardArrowUp,
   ExpandMore,
   Backup,
-  CloudDownload,
 } from "@material-ui/icons";
 
 import { ImageFileInfo } from "@gliff-ai/upload/typings";
@@ -41,8 +40,8 @@ import { BackgroundCanvas, BackgroundUI } from "@/toolboxes/background";
 import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
 import { Labels } from "@/components/Labels";
+import { Download } from "@/download/UI";
 import { keydownListener } from "@/keybindings";
-import { downloadPaintbrushAsTiff } from "@/download/DownloadAsTiff";
 
 import { Tools, Tool } from "@/tools";
 
@@ -436,19 +435,10 @@ export class UserInterface extends Component<Props, State> {
                 </Tooltip>
               }
             />
-            <Tooltip title="Download annotations">
-              <Button
-                aria-label="download-annotations"
-                onClick={() =>
-                  downloadPaintbrushAsTiff(
-                    this.annotationsObject.getAllAnnotations(),
-                    this.imageFileInfo
-                  )
-                }
-              >
-                <CloudDownload />
-              </Button>
-            </Tooltip>
+            <Download
+              annotations={this.annotationsObject.getAllAnnotations()}
+              imageFileInfo={this.imageFileInfo}
+            />
           </Toolbar>
         </AppBar>
         <Toolbar />
