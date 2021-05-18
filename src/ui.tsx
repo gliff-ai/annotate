@@ -42,7 +42,6 @@ import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
 import { Labels } from "@/components/Labels";
 import { Download } from "@/download/UI";
 import { keydownListener } from "@/keybindings";
-
 import { Tools, Tool } from "@/tools";
 
 const CONFIG = {
@@ -424,7 +423,6 @@ export class UserInterface extends Component<Props, State> {
         <AppBar>
           <Toolbar>
             <UploadImage
-              multiple={false}
               setUploadedImage={this.setUploadedImage}
               spanElement={
                 /* eslint-disable react/jsx-wrap-multilines */
@@ -434,6 +432,7 @@ export class UserInterface extends Component<Props, State> {
                   </Button>
                 </Tooltip>
               }
+              multiple={false}
             />
             <Download
               annotations={this.annotationsObject.getAllAnnotations()}
