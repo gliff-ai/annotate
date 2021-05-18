@@ -596,11 +596,11 @@ export class UserInterface extends Component<Props, State> {
                         src={`${toolTip.icon}`}
                         width="55%"
                         height="auto"
-                        // fill={
-                        //   toolTip?.selected && toolTip?.selected(this.state)
-                        //     ? "#02FFAD"
-                        //     : null
-                        // }
+                        fill={
+                          this.state.openedPopoverId === toolTip.key
+                            ? "#02FFAD"
+                            : null
+                        }
                       />
                     </Avatar>
                   </IconButton>
