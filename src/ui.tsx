@@ -1,4 +1,10 @@
-import React, { Component, ChangeEvent, ReactNode, useRef } from "react";
+import React, {
+  Component,
+  ChangeEvent,
+  ReactNode,
+  useRef,
+  MouseEventHandler,
+} from "react";
 import {
   AppBar,
   Container,
@@ -85,18 +91,14 @@ interface Props {
   presetLabels?: string[];
 }
 
-const HtmlTooltip = withStyles((theme: Theme) => ({
+const HtmlTooltip = withStyles((t: Theme) => ({
   tooltip: {
     backgroundColor: "#FFFFFF",
-    fontSize: theme.typography.pxToRem(12),
+    fontSize: t.typography.pxToRem(12),
     border: "1px solid #dadde9",
     color: "#2B2F3A",
   },
 }))(Tooltip);
-
-const Logo = React.forwardRef<SVGElement, SVGProps>((props, ref) => (
-  <SVG innerRef={ref} title="MyLogo" {...props} />
-));
 
 export class UserInterface extends Component<Props, State> {
   annotationsObject: Annotations;
@@ -106,6 +108,8 @@ export class UserInterface extends Component<Props, State> {
   private slicesData: Array<Array<ImageBitmap>>;
 
   private imageFileInfo: ImageFileInfo | null;
+
+  private canvasContainer: HTMLDivElement;
 
   constructor(props: Props) {
     super(props);
@@ -136,10 +140,14 @@ export class UserInterface extends Component<Props, State> {
 
   componentDidMount = (): void => {
     document.addEventListener("keydown", keydownListener);
+
     for (const event of events) {
       document.addEventListener(event, this.handleEvent);
     }
     this.mixChannels();
+
+    const { clientHeight: height, clientWidth: width } = this.canvasContainer;
+    this.setViewportPositionAndSize({ top: 0, left: 0, width, height });
   };
 
   componentWillUnmount(): void {
@@ -437,7 +445,8 @@ export class UserInterface extends Component<Props, State> {
       name: "Brush",
       icon: `/examples/brush-icon.svg`,
       shortcut: "B",
-      onClick: (): void => this.setState({ expanded: "paintbrush-toolbox" }),
+      onClick: (e: React.MouseEvent): void =>
+        this.setState({ expanded: "paintbrush-toolbox" }),
       selected: (state: State): boolean => {
         return (
           state.expanded === "paintbrush-toolbox" ||
@@ -500,6 +509,8 @@ export class UserInterface extends Component<Props, State> {
           left: "18px",
           bottom: "0",
           marginBottom: "30px",
+          zIndex: 100,
+          background: "#fff",
         }}
       >
         <Grid container direction="row">
@@ -539,7 +550,7 @@ export class UserInterface extends Component<Props, State> {
                       marginTop: "7px",
                     }}
                     className={toolTip.selected ? "selected" : null}
-                    onClick={toolTip?.onClick?.()}
+                    onClick={toolTip?.onClick}
                   >
                     <Avatar sizes="large">
                       <SVG
@@ -563,7 +574,7 @@ export class UserInterface extends Component<Props, State> {
       </div>
       <CssBaseline />
       <Container disableGutters>
-        <AppBar>
+        <AppBar position={"static"}>
           <Toolbar>
             <Grid container direction="row">
               <Grid item justify="flex-start">
@@ -583,10 +594,27 @@ export class UserInterface extends Component<Props, State> {
             </Grid>
           </Toolbar>
         </AppBar>
-        <Toolbar />
 
-        <Grid container spacing={0} justify="center" wrap="nowrap">
-          <Grid item style={{ width: "85%", position: "relative" }}>
+        <Grid
+          container
+          spacing={0}
+          justify="center"
+          wrap="nowrap"
+          style={{ height: "calc(100% - 64px)" }}
+        >
+          <Grid
+            item
+            style={{
+              width: "85%",
+              position: "relative",
+              backgroundColor: "#fafafa",
+            }}
+            ref={(container) => {
+              if (container) {
+                this.canvasContainer = container;
+              }
+            }}
+          >
             <BackgroundCanvas
               scaleAndPan={this.state.scaleAndPan}
               displayedImage={this.state.displayedImage}
