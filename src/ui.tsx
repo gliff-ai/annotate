@@ -533,6 +533,12 @@ export class UserInterface extends Component<Props, State> {
     this.setState({ anchorEl: event.currentTarget });
   };
 
+  handleRequestClose = () => {
+    this.setState({
+      popover: false,
+    });
+  };
+
   render = (): ReactNode => (
     <ThemeProvider theme={theme}>
       <div
@@ -582,8 +588,6 @@ export class UserInterface extends Component<Props, State> {
                       marginBottom: "5px",
                       marginTop: "7px",
                     }}
-                    // className={toolTip.selected ? "selected" : null}
-                    // onClick={toolTip?.onClick}
                     onClick={(e: React.MouseEvent): void =>
                       this.setState({
                         popover: true,
@@ -823,6 +827,7 @@ export class UserInterface extends Component<Props, State> {
               open={this.state.openedPopoverId === 1 && this.state.popover}
               anchorEl={this.state.anchorEl}
               onClose={this.handleClose}
+              onClick={this.handleRequestClose}
               activeTool={this.state.activeTool}
               onChange={this.handleToolboxChange("paintbrush-toolbox")}
               activateTool={this.activateTool}
@@ -830,6 +835,7 @@ export class UserInterface extends Component<Props, State> {
             <SplineUI
               open={this.state.openedPopoverId === 3 && this.state.popover}
               anchorEl={this.state.anchorEl}
+              onClick={this.handleRequestClose}
               onClose={this.handleClose}
               activeTool={this.state.activeTool}
               onChange={this.handleToolboxChange("spline-toolbox")}

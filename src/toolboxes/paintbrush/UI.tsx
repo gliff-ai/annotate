@@ -21,6 +21,7 @@ interface Props {
   activeTool: Tool;
   anchorEl: any;
   onClose: (event: React.MouseEvent) => void;
+  onClick: (event: React.MouseEvent) => void;
   onChange: (event: ChangeEvent, isExpanded: boolean) => void;
   activateTool: (tool: Tool) => void;
 }
@@ -39,6 +40,7 @@ const PaintbrushUI = (props: Props): ReactElement => {
       open={props.open}
       anchorEl={props.anchorEl}
       onClose={props.onClose}
+      onClick={props.onClick}
       anchorOrigin={{
         vertical: "bottom",
         horizontal: "left",
