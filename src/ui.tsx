@@ -464,43 +464,43 @@ export class UserInterface extends Component<Props, State> {
     {
       key: 0,
       name: "Select",
-      icon: `/examples/select-icon.svg`,
+      icon: `./src/assets/select-icon.svg`,
       shortcut: "V",
     },
     {
       key: 1,
       name: "Brush",
-      icon: `/examples/brush-icon.svg`,
+      icon: `./src/assets/brush-icon.svg`,
       shortcut: "B",
     },
     {
       key: 2,
       name: "Eraser",
-      icon: `/examples/eraser-icon.svg`,
+      icon: `./src/assets/eraser-icon.svg`,
       shortcut: "E",
     },
     {
       key: 3,
       name: "Spline",
-      icon: `/examples/splines-icon.svg`,
+      icon: `./src/assets/splines-icon.svg`,
       shortcut: "S",
     },
     {
       key: 4,
       name: "Contrast",
-      icon: `/examples/contrast-icon.svg`,
+      icon: `./src/assets/contrast-icon.svg`,
       shortcut: `\\`,
     },
     {
       key: 5,
       name: "Brightness",
-      icon: `/examples/brightness-icon.svg`,
+      icon: `./src/assets/brightness-icon.svg`,
       shortcut: `/`,
     },
     {
       key: 6,
       name: "Annonation Label",
-      icon: `/examples/annotation-label-icon.svg`,
+      icon: `./src/assets/annotation-label-icon.svg`,
       shortcut: "L",
     },
   ];
@@ -508,21 +508,21 @@ export class UserInterface extends Component<Props, State> {
   visualToolTips = [
     {
       name: "Zoom In",
-      icon: `/examples/zoom-in-icon.svg`,
+      icon: `./src/assets/zoom-in-icon.svg`,
       shortcut: "Ctrl++",
       onClick: (e: React.MouseEvent): void =>
         this.setState({ expanded: "paintbrush-toolbox" }),
     },
     {
       name: "Zoom Out",
-      icon: `/examples/zoom-out-icon.svg`,
+      icon: `./src/assets/zoom-out-icon.svg`,
       shortcut: "Ctrl--",
       onClick: (e: React.MouseEvent): void =>
         this.setState({ expanded: "paintbrush-toolbox" }),
     },
     {
       name: "Fit to Page",
-      icon: `examples/reset-zoom-and-pan-icon.svg`,
+      icon: `./src/assets/reset-zoom-and-pan-icon.svg`,
       shortcut: "Ctrl+[",
       onClick: (e: React.MouseEvent): void =>
         this.setState({ expanded: "paintbrush-toolbox" }),
@@ -587,7 +587,7 @@ export class UserInterface extends Component<Props, State> {
                     onClick={(e: React.MouseEvent): void =>
                       this.setState({
                         popover: true,
-                        openedPopoverId: this.toolTips.key,
+                        openedPopoverId: toolTip.key,
                       })
                     }
                   >
@@ -618,7 +618,9 @@ export class UserInterface extends Component<Props, State> {
               <Grid item justify="flex-start">
                 {
                   <img
-                    src="examples/gliff-master-black.png"
+                    src="
+                    ./src/assets/gliff-master-black.png
+                   "
                     width="79px"
                     height="60px"
                   />
@@ -631,7 +633,7 @@ export class UserInterface extends Component<Props, State> {
                 spanElement={
                   /* eslint-disable react/jsx-wrap-multilines */
                   <Button aria-label="upload-picture" component="span">
-                    {<img src="\examples\upload-icon.svg" />}
+                    {<img src="./src/assets/upload-icon.svg" />}
                   </Button>
                 }
               />
@@ -769,7 +771,7 @@ export class UserInterface extends Component<Props, State> {
               />
             </Grid>
             <Popover
-              open={this.state.popover}
+              open={this.state.openedPopoverId === 6 && this.state.popover}
               anchorEl={this.state.anchorEl}
               onClose={this.handleClose}
               anchorOrigin={{
@@ -808,13 +810,17 @@ export class UserInterface extends Component<Props, State> {
               </Grid>
             </Popover>
             <BackgroundUI
-              expanded={this.state.expanded === "background-toolbox"}
-              onChange={this.handleToolboxChange("background-toolbox")}
+              open={
+                this.state.openedPopoverId === 4 ||
+                (this.state.openedPopoverId === 5 && this.state.popover)
+              }
+              anchorEl={this.state.anchorEl}
+              onClose={this.handleClose}
               channels={this.state.channels}
               toggleChannelAtIndex={this.toggleChannelAtIndex}
             />
             <PaintbrushUI
-              open={this.state.popover}
+              open={this.state.openedPopoverId === 1 && this.state.popover}
               anchorEl={this.state.anchorEl}
               onClose={this.handleClose}
               activeTool={this.state.activeTool}
@@ -822,10 +828,9 @@ export class UserInterface extends Component<Props, State> {
               activateTool={this.activateTool}
             />
             <SplineUI
-              expanded={
-                this.state.expanded === "spline-toolbox" ||
-                ["spline"].includes(this.state.activeTool)
-              }
+              open={this.state.openedPopoverId === 3 && this.state.popover}
+              anchorEl={this.state.anchorEl}
+              onClose={this.handleClose}
               activeTool={this.state.activeTool}
               onChange={this.handleToolboxChange("spline-toolbox")}
               activateTool={this.activateTool}

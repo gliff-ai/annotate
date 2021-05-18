@@ -10,6 +10,7 @@ import {
   FormGroup,
   FormLabel,
   FormControl,
+  Popover,
 } from "@material-ui/core";
 
 import { ExpandMore } from "@material-ui/icons";
@@ -20,8 +21,9 @@ import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { useBackgroundStore } from "./Store";
 
 interface Props {
-  expanded: boolean;
-  onChange: (event: ChangeEvent, isExpanded: boolean) => void;
+  open: boolean;
+  anchorEl: any;
+  onClose: (event: React.MouseEvent) => void;
   channels: boolean[];
   toggleChannelAtIndex: (index: number) => void;
 }
@@ -53,11 +55,21 @@ const BackgroundUI = (props: Props): ReactElement => {
   ));
 
   return (
-    <Accordion expanded={props.expanded} onChange={props.onChange}>
-      <AccordionSummary expandIcon={<ExpandMore />} id="background-toolbox">
+    <>
+      <Popover
+        open={props.open}
+        anchorEl={props.anchorEl}
+        onClose={props.onClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+      >
         <Typography>Image</Typography>
-      </AccordionSummary>
-      <AccordionDetails>
         <Grid container spacing={0} justify="center" wrap="nowrap">
           <Grid item style={{ width: "85%", position: "relative" }}>
             <BaseSlider
@@ -88,8 +100,8 @@ const BackgroundUI = (props: Props): ReactElement => {
             </FormControl>
           </Grid>
         </Grid>
-      </AccordionDetails>
-    </Accordion>
+      </Popover>
+    </>
   );
 };
 
