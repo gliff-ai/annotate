@@ -87,13 +87,13 @@ const FauxCursor: React.FC<CursorProps> = ({
           brushType === "paintbrush" || brushType === "eraser"
             ? "visible"
             : "hidden",
-        width: brushRadius * 2,
-        height: brushRadius * 2,
+        width: brushRadius,
+        height: brushRadius,
         border: "2px solid #666666",
         borderRadius: "50%",
         position: "absolute",
-        top: mousePosition.y - brushRadius - canvasTopAndLeft.top,
-        left: mousePosition.x - brushRadius - canvasTopAndLeft.left,
+        top: mousePosition.y - brushRadius / 2 - canvasTopAndLeft.top,
+        left: mousePosition.x - brushRadius / 2 - canvasTopAndLeft.left,
       }}
     />
   );
@@ -189,17 +189,19 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     context: CanvasRenderingContext2D,
     isActive = true
   ): void => {
-    const points = imagePoints.map((point): XYPoint => {
-      const { x, y } = imageToCanvas(
-        point.x,
-        point.y,
-        this.props.displayedImage.width,
-        this.props.displayedImage.height,
-        this.props.scaleAndPan,
-        this.props.canvasPositionAndSize
-      );
-      return { x, y };
-    });
+    const points = imagePoints.map(
+      (point): XYPoint => {
+        const { x, y } = imageToCanvas(
+          point.x,
+          point.y,
+          this.props.displayedImage.width,
+          this.props.displayedImage.height,
+          this.props.scaleAndPan,
+          this.props.canvasPositionAndSize
+        );
+        return { x, y };
+      }
+    );
 
     function midPointBetween(p1: XYPoint, p2: XYPoint) {
       return {
@@ -236,7 +238,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       }
     }
 
-    context.lineWidth = brush.radius * 2 * this.props.scaleAndPan.scale;
+    context.lineWidth = this.getCanvasBrushRadius(brush.radius);
 
     let p1 = points[0];
     let p2 = points[1];
@@ -265,8 +267,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     // Draw strokes on active layer whiles showing existing paintbrush layers
 
     // Get active annotation ID
-    const activeAnnotationID =
-      this.props.annotationsObject.getActiveAnnotationID();
+    const activeAnnotationID = this.props.annotationsObject.getActiveAnnotationID();
 
     // Clear paintbrush canvas
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
@@ -289,6 +290,18 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
           });
         }
       });
+  };
+
+  getCanvasBrushRadius = (brushRadius: number): number => {
+    // Get brush radius given image to canvas scaling factor
+    // and image scaling (zoom level).
+    const imageScalingFactor =
+      Math.min(
+        this.props.canvasPositionAndSize.height /
+          this.props.displayedImage.height,
+        this.props.canvasPositionAndSize.width / this.props.displayedImage.width
+      ) || 1;
+    return brushRadius * imageScalingFactor * 2 * this.props.scaleAndPan.scale;
   };
 
   clickNearBrushStroke = (imageX: number, imageY: number): number => {
@@ -455,7 +468,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       {/* this div is basically a fake cursor */}
       <FauxCursor
         brushType={this.props.brushType}
-        brushRadius={this.props.brushRadius * this.props.scaleAndPan.scale}
+        brushRadius={this.getCanvasBrushRadius(this.props.brushRadius)}
         canvasTopAndLeft={{
           top:
             this.backgroundCanvas?.canvasContext?.canvas?.getBoundingClientRect()

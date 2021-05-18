@@ -1,5 +1,12 @@
-const loadImage = (filename: string): Promise<Array<Array<ImageBitmap>>> =>
-  new Promise((resolve: (slicesData: Array<Array<ImageBitmap>>) => void) => {
+import { ImageFileInfo } from "@gliff-ai/upload";
+
+type UploadData = {
+  slicesData: Array<Array<ImageBitmap>>;
+  imageFileInfo: ImageFileInfo;
+};
+
+const loadImage = (filename: string): Promise<UploadData> =>
+  new Promise((resolve: (data: UploadData) => void) => {
     const image = new Image();
     image.crossOrigin = "anonymous";
 
@@ -7,7 +14,14 @@ const loadImage = (filename: string): Promise<Array<Array<ImageBitmap>>> =>
       createImageBitmap(image)
         .then((imageBitmap) => {
           const slicesData: Array<Array<ImageBitmap>> = [[imageBitmap]];
-          resolve(slicesData);
+          const imageFileInfo: ImageFileInfo = new ImageFileInfo({
+            fileName: filename,
+            width: image.width,
+            height: image.height,
+            num_slices: 1,
+            num_channels: 1,
+          });
+          resolve({ slicesData, imageFileInfo });
         })
         .catch((e) => {
           console.log(e);
