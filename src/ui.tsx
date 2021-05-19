@@ -25,6 +25,9 @@ import {
   Box,
   IconButton,
   Popover,
+  Card,
+  CardHeader,
+  Paper,
 } from "@material-ui/core";
 
 import SVG, { Props as SVGProps } from "react-inlinesvg";
@@ -43,6 +46,7 @@ import {
   Backup,
   Brush,
   RadioButtonUncheckedSharp,
+  Height,
 } from "@material-ui/icons";
 import { ImageFileInfo } from "@gliff-ai/upload/typings";
 import { UploadImage } from "@gliff-ai/upload";
@@ -566,7 +570,7 @@ export class UserInterface extends Component<Props, State> {
                       alignItems="center"
                       justifyItems="space-between"
                     >
-                      <Box mr={6}>
+                      <Box mr={5}>
                         <Typography>{toolTip.name}</Typography>
                       </Box>
                       <Avatar
@@ -779,39 +783,73 @@ export class UserInterface extends Component<Props, State> {
               anchorEl={this.state.anchorEl}
               onClose={this.handleClose}
               anchorOrigin={{
+                vertical: "center",
+                horizontal: "right",
+              }}
+              transformOrigin={{
                 vertical: "bottom",
                 horizontal: "left",
               }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "left",
-              }}
             >
-              <Typography>Annotations</Typography>
-              <Grid container justify="center">
-                <ButtonGroup>
-                  <Tooltip title="Annotate new object">
-                    <Button id="addAnnotation" onClick={this.addAnnotation}>
-                      <Add />
-                    </Button>
-                  </Tooltip>
-                  <Tooltip title="Clear selected annotation">
-                    <Button
-                      id="clear-annotation"
-                      onClick={this.clearActiveAnnotation}
-                    >
-                      <Delete />
-                    </Button>
-                  </Tooltip>
-                </ButtonGroup>
+              <Card
+                style={{
+                  width: "271px",
+                }}
+              >
+                <Paper
+                  elevation={0}
+                  variant="outlined"
+                  square
+                  style={{
+                    padding: "10px",
+                    backgroundColor: "#02FFAD",
+                    width: "271px",
+                    height: "44px",
+                  }}
+                >
+                  <Typography style={{ display: "inline", fontSize: "21px" }}>
+                    Annotation
+                  </Typography>
+                  {/* <Avatar style={{ backgroundColor: "#02FFAD" }}>
+                    <SVG
+                      src="./src/assets/pin-icon.svg"
+                      width="9px"
+                      height="auto"
+                      // fill={
+                      //   this.state.openedPopoverId === toolTip.key
+                      //     ? "#02FFAD"
+                      //     : null
+                      // }
+                    />
+                  </Avatar> */}
+                </Paper>
+                <Paper elevation={0} square>
+                  <Grid container justify="center">
+                    <ButtonGroup>
+                      <Tooltip title="Annotate new object">
+                        <Button id="addAnnotation" onClick={this.addAnnotation}>
+                          <Add />
+                        </Button>
+                      </Tooltip>
+                      <Tooltip title="Clear selected annotation">
+                        <Button
+                          id="clear-annotation"
+                          onClick={this.clearActiveAnnotation}
+                        >
+                          <Delete />
+                        </Button>
+                      </Tooltip>
+                    </ButtonGroup>
 
-                <Labels
-                  annotationObject={this.annotationsObject}
-                  presetLabels={this.presetLabels}
-                  updatePresetLabels={this.updatePresetLabels}
-                  activeAnnotationID={this.state.activeAnnotationID}
-                />
-              </Grid>
+                    <Labels
+                      annotationObject={this.annotationsObject}
+                      presetLabels={this.presetLabels}
+                      updatePresetLabels={this.updatePresetLabels}
+                      activeAnnotationID={this.state.activeAnnotationID}
+                    />
+                  </Grid>
+                </Paper>
+              </Card>
             </Popover>
             <BackgroundUI
               open={

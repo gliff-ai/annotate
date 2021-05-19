@@ -105,56 +105,39 @@ export const Labels: FunctionComponent<Props> = ({
         ))}
       </List>
       <List style={{ width: "100%" }}>
-        <ListItem button onClick={handleClick}>
-          <ListItemIcon>
-            <LibraryAdd />
-            Add Labels
-            {isOpen ? <ExpandLess /> : <ExpandMore />}
-          </ListItemIcon>
-        </ListItem>
-
-        <Collapse
-          in={isOpen}
-          timeout="auto"
-          unmountOnExit
-          style={{
-            backgroundColor: theme.palette.divider,
-          }}
-        >
-          <List component="div" disablePadding>
-            {menuLabels.map((label) => (
-              <ListItem key={label} dense>
-                <ListItemText primary={label} />
-                <ListItemSecondaryAction>
-                  <IconButton
-                    edge="end"
-                    aria-label="add"
-                    onClick={handleAddLabel(label)}
-                  >
-                    <Add />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-            ))}
-            <ListItem dense>
-              <InputBase
-                placeholder="New label"
-                value={newLabel}
-                onChange={handleNewLabelChange}
-                inputProps={{ style: { fontSize: 14 } }}
-              />
-
-              <IconButton
-                type="submit"
-                aria-label="add-new-label"
-                onClick={handleAddLabel(newLabel)}
-                edge="end"
-              >
-                <Add />
-              </IconButton>
+        <List component="div" disablePadding>
+          {menuLabels.map((label) => (
+            <ListItem key={label} dense>
+              <ListItemText primary={label} />
+              <ListItemSecondaryAction>
+                <IconButton
+                  edge="end"
+                  aria-label="add"
+                  onClick={handleAddLabel(label)}
+                >
+                  <Add />
+                </IconButton>
+              </ListItemSecondaryAction>
             </ListItem>
-          </List>
-        </Collapse>
+          ))}
+          <ListItem dense>
+            <InputBase
+              placeholder="New label"
+              value={newLabel}
+              onChange={handleNewLabelChange}
+              inputProps={{ style: { fontSize: 14 } }}
+            />
+
+            <IconButton
+              type="submit"
+              aria-label="add-new-label"
+              onClick={handleAddLabel(newLabel)}
+              edge="end"
+            >
+              <Add />
+            </IconButton>
+          </ListItem>
+        </List>
       </List>
     </>
   );

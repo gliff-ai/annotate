@@ -5,6 +5,7 @@ import {
   Typography,
   Grid,
   Popover,
+  Card,
 } from "@material-ui/core";
 
 import { Brush, RadioButtonUncheckedSharp } from "@material-ui/icons";
@@ -50,38 +51,40 @@ const PaintbrushUI = (props: Props): ReactElement => {
         horizontal: "left",
       }}
     >
-      <Typography>Paintbrushes</Typography>
+      <Card>
+        <Typography>Paintbrushes</Typography>
 
-      <Grid container spacing={0} justify="center" wrap="nowrap">
-        <Grid item style={{ width: "85%", position: "relative" }}>
-          <Tooltip title="Activate paintbrush">
-            <IconButton
-              id="activate-paintbrush"
-              onClick={() => props.activateTool("paintbrush")}
-              color={
-                props.activeTool === "paintbrush" ? "secondary" : "default"
-              }
-            >
-              <Brush />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Activate Eraser">
-            <IconButton
-              id="activate-eraser"
-              onClick={() => props.activateTool("eraser")}
-              color={props.activeTool === "eraser" ? "secondary" : "default"}
-            >
-              <RadioButtonUncheckedSharp />
-            </IconButton>
-          </Tooltip>
+        <Grid container spacing={0} justify="center" wrap="nowrap">
+          <Grid item style={{ width: "85%", position: "relative" }}>
+            <Tooltip title="Activate paintbrush">
+              <IconButton
+                id="activate-paintbrush"
+                onClick={() => props.activateTool("paintbrush")}
+                color={
+                  props.activeTool === "paintbrush" ? "secondary" : "default"
+                }
+              >
+                <Brush />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Activate Eraser">
+              <IconButton
+                id="activate-eraser"
+                onClick={() => props.activateTool("eraser")}
+                color={props.activeTool === "eraser" ? "secondary" : "default"}
+              >
+                <RadioButtonUncheckedSharp />
+              </IconButton>
+            </Tooltip>
 
-          <BaseSlider
-            value={paintbrush.brushRadius}
-            config={SLIDER_CONFIG[Sliders.brushRadius]}
-            onChange={() => changeBrushRadius}
-          />
+            <BaseSlider
+              value={paintbrush.brushRadius}
+              config={SLIDER_CONFIG[Sliders.brushRadius]}
+              onChange={() => changeBrushRadius}
+            />
+          </Grid>
         </Grid>
-      </Grid>
+      </Card>
     </Popover>
   );
 };
