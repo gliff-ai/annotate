@@ -16,6 +16,7 @@ const loadImage = (filename: string): Promise<UploadData> =>
           const slicesData: Array<Array<ImageBitmap>> = [[imageBitmap]];
           const imageFileInfo: ImageFileInfo = new ImageFileInfo({
             fileName: filename,
+            size: image.width * image.height,
             width: image.width,
             height: image.height,
             num_slices: 1,
