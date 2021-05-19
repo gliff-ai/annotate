@@ -21,6 +21,7 @@ interface Props {
   open: boolean;
   activeTool: Tool;
   anchorEl: any;
+  buttonID: number;
   onClose: (event: React.MouseEvent) => void;
   onClick: (event: React.MouseEvent) => void;
   onChange: (event: ChangeEvent, isExpanded: boolean) => void;
@@ -65,15 +66,6 @@ const PaintbrushUI = (props: Props): ReactElement => {
                 }
               >
                 <Brush />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Activate Eraser">
-              <IconButton
-                id="activate-eraser"
-                onClick={() => props.activateTool("eraser")}
-                color={props.activeTool === "eraser" ? "secondary" : "default"}
-              >
-                <RadioButtonUncheckedSharp />
               </IconButton>
             </Tooltip>
 

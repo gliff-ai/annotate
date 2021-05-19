@@ -592,11 +592,18 @@ export class UserInterface extends Component<Props, State> {
                       marginBottom: "5px",
                       marginTop: "7px",
                     }}
-                    onClick={(e: React.MouseEvent): void =>
-                      this.setState({
-                        popover: true,
-                        openedPopoverId: toolTip.key,
-                      })
+                    onClick={(e: React.MouseEvent) =>
+                      this.setState(
+                        {
+                          popover: true,
+                          openedPopoverId: toolTip.key,
+                        },
+                        () => {
+                          if (this.state.openedPopoverId === 2) {
+                            this.activateTool("eraser");
+                          }
+                        }
+                      )
                     }
                   >
                     <Avatar sizes="large" variant="circular">
@@ -810,7 +817,7 @@ export class UserInterface extends Component<Props, State> {
                   <Typography style={{ display: "inline", fontSize: "21px" }}>
                     Annotation
                   </Typography>
-                  {/* <Avatar style={{ backgroundColor: "#02FFAD" }}>
+                  <Avatar style={{ backgroundColor: "#02FFAD" }}>
                     <SVG
                       src="./src/assets/pin-icon.svg"
                       width="9px"
@@ -821,7 +828,7 @@ export class UserInterface extends Component<Props, State> {
                       //     : null
                       // }
                     />
-                  </Avatar> */}
+                  </Avatar>
                 </Paper>
                 <Paper elevation={0} square>
                   <Grid container justify="center">
@@ -865,7 +872,8 @@ export class UserInterface extends Component<Props, State> {
               open={this.state.openedPopoverId === 1 && this.state.popover}
               anchorEl={this.state.anchorEl}
               onClose={this.handleClose}
-              onClick={this.handleRequestClose}
+              buttonID={this.state.openedPopoverId}
+              onClick={this.handleClose}
               activeTool={this.state.activeTool}
               onChange={this.handleToolboxChange("paintbrush-toolbox")}
               activateTool={this.activateTool}
