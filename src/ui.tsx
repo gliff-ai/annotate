@@ -307,6 +307,7 @@ export class UserInterface extends Component<Props, State> {
     this.multiplyScaleAndPan("x", panMultiplier);
     this.multiplyScaleAndPan("y", panMultiplier);
     this.incrementScaleAndPan("scale", 1);
+    console.log("hellp");
   };
 
   decrementScale = (): void => {
@@ -509,27 +510,24 @@ export class UserInterface extends Component<Props, State> {
     },
   ];
 
-  visualToolTips = [
+  zoomToolTips = [
     {
+      key: 7,
       name: "Zoom In",
       icon: `./src/assets/zoom-in-icon.svg`,
       shortcut: "Ctrl++",
-      onClick: (e: React.MouseEvent): void =>
-        this.setState({ expanded: "paintbrush-toolbox" }),
     },
     {
+      key: 8,
       name: "Zoom Out",
       icon: `./src/assets/zoom-out-icon.svg`,
       shortcut: "Ctrl--",
-      onClick: (e: React.MouseEvent): void =>
-        this.setState({ expanded: "paintbrush-toolbox" }),
     },
     {
+      key: 9,
       name: "Fit to Page",
       icon: `./src/assets/reset-zoom-and-pan-icon.svg`,
       shortcut: "Ctrl+[",
-      onClick: (e: React.MouseEvent): void =>
-        this.setState({ expanded: "paintbrush-toolbox" }),
     },
   ];
 
@@ -566,7 +564,7 @@ export class UserInterface extends Component<Props, State> {
                       alignItems="center"
                       justifyItems="space-between"
                     >
-                      <Box mr={5}>
+                      <Box mr={3}>
                         <Typography>{toolTip.name}</Typography>
                       </Box>
                       <Avatar
@@ -737,19 +735,19 @@ export class UserInterface extends Component<Props, State> {
             </div>
             <Grid container direction="row">
               <ButtonGroup size="small" style={{ margin: "5px" }}>
-                {this.visualToolTips.map((toolTip) => {
+                {this.zoomToolTips.map((zoomToolTip) => {
                   return (
                     <HtmlTooltip
-                      key={toolTip.name}
+                      key={zoomToolTip.name}
                       title={
                         <Box
                           display="flex"
                           alignItems="center"
                           justifyItems="space-between"
                         >
-                          <Box mr={6}>
+                          <Box mr={3}>
                             <Typography color="inherit">
-                              {toolTip.name}
+                              {zoomToolTip.name}
                             </Typography>
                           </Box>
                           <Avatar
@@ -758,15 +756,34 @@ export class UserInterface extends Component<Props, State> {
                               color: "#2B2F3A",
                             }}
                           >
-                            {toolTip.shortcut}
+                            {zoomToolTip.shortcut}
                           </Avatar>
                         </Box>
                       }
                       placement="right"
                     >
-                      <IconButton size="small" style={{ marginBottom: "10px" }}>
+                      <IconButton
+                        size="small"
+                        style={{ marginBottom: "10px" }}
+                        onClick={(e: React.MouseEvent) => {
+                          if (zoomToolTip.key === 7) {
+                            this.incrementScale();
+                          }
+                          if (zoomToolTip.key === 8) {
+                            this.decrementScale();
+                          }
+                          if (zoomToolTip.key === 9) {
+                            this.resetScaleAndPan();
+                          }
+                        }}
+                      >
                         <Avatar sizes="large">
-                          {<img src={toolTip.icon} style={{ width: "60%" }} />}
+                          {
+                            <img
+                              src={zoomToolTip.icon}
+                              style={{ width: "60%" }}
+                            />
+                          }
                         </Avatar>
                       </IconButton>
                     </HtmlTooltip>
