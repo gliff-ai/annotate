@@ -93,7 +93,7 @@ interface State {
   colour: boolean;
   popover: boolean;
   anchorEl: any;
-  openedPopoverId: number;
+  clickedButtonId: number;
 }
 
 interface Props {
@@ -151,7 +151,7 @@ export class UserInterface extends Component<Props, State> {
       colour: null,
       popover: null,
       anchorEl: null,
-      openedPopoverId: null,
+      clickedButtonId: null,
     };
 
     this.annotationsObject.addAnnotation(this.state.activeTool);
@@ -515,19 +515,22 @@ export class UserInterface extends Component<Props, State> {
       key: 7,
       name: "Zoom In",
       icon: `./src/assets/zoom-in-icon.svg`,
-      shortcut: "Ctrl++",
+      shortcut: "Ctrl",
+      shortcutSymbol: "+",
     },
     {
       key: 8,
       name: "Zoom Out",
       icon: `./src/assets/zoom-out-icon.svg`,
-      shortcut: "Ctrl--",
+      shortcut: "Ctrl",
+      shortcutSymbol: "-",
     },
     {
       key: 9,
       name: "Fit to Page",
       icon: `./src/assets/reset-zoom-and-pan-icon.svg`,
-      shortcut: "Ctrl+[",
+      shortcut: "Ctrl",
+      shortcutSymbol: "[",
     },
   ];
 
@@ -590,14 +593,13 @@ export class UserInterface extends Component<Props, State> {
                       this.setState(
                         {
                           popover: true,
-                          openedPopoverId: toolTip.key,
+                          clickedButtonId: toolTip.key,
                           anchorEl: e.currentTarget,
                         },
                         () => {
-                          if (this.state.openedPopoverId === 2) {
+                          if (this.state.clickedButtonId === 2) {
                             this.activateTool("eraser");
                           }
-                          console.log(this.state.anchorEl);
                         }
                       )
                     }
@@ -608,7 +610,7 @@ export class UserInterface extends Component<Props, State> {
                         width="55%"
                         height="auto"
                         fill={
-                          this.state.openedPopoverId === toolTip.key
+                          this.state.clickedButtonId === toolTip.key
                             ? "#02FFAD"
                             : null
                         }
@@ -623,7 +625,10 @@ export class UserInterface extends Component<Props, State> {
       </div>
       <CssBaseline />
       <Container disableGutters>
-        <AppBar position={"static"} style={{ backgroundColor: "#fafafa" }}>
+        <AppBar
+          position={"static"}
+          style={{ backgroundColor: "#fafafa", height: "90px" }}
+        >
           <Toolbar>
             <Grid container direction="row">
               <Grid item justify="flex-start">
@@ -754,9 +759,18 @@ export class UserInterface extends Component<Props, State> {
                             style={{
                               backgroundColor: "#02FFAD",
                               color: "#2B2F3A",
+                              margin: "3px",
                             }}
                           >
                             {zoomToolTip.shortcut}
+                          </Avatar>
+                          <Avatar
+                            style={{
+                              backgroundColor: "#02FFAD",
+                              color: "#2B2F3A",
+                            }}
+                          >
+                            {zoomToolTip.shortcutSymbol}
                           </Avatar>
                         </Box>
                       }
@@ -765,25 +779,36 @@ export class UserInterface extends Component<Props, State> {
                       <IconButton
                         size="small"
                         style={{ marginBottom: "10px" }}
-                        onClick={(e: React.MouseEvent) => {
-                          if (zoomToolTip.key === 7) {
-                            this.incrementScale();
-                          }
-                          if (zoomToolTip.key === 8) {
-                            this.decrementScale();
-                          }
-                          if (zoomToolTip.key === 9) {
-                            this.resetScaleAndPan();
-                          }
-                        }}
+                        onClick={(e: React.MouseEvent) =>
+                          this.setState(
+                            {
+                              clickedButtonId: zoomToolTip.key,
+                            },
+                            () => {
+                              if (zoomToolTip.key === 7) {
+                                this.incrementScale();
+                              }
+                              if (zoomToolTip.key === 8) {
+                                this.decrementScale();
+                              }
+                              if (zoomToolTip.key === 9) {
+                                this.resetScaleAndPan();
+                              }
+                            }
+                          )
+                        }
                       >
-                        <Avatar sizes="large">
-                          {
-                            <img
-                              src={zoomToolTip.icon}
-                              style={{ width: "60%" }}
-                            />
-                          }
+                        <Avatar sizes="large" variant="circular">
+                          <SVG
+                            src={`${zoomToolTip.icon}`}
+                            width="55%"
+                            height="auto"
+                            fill={
+                              this.state.clickedButtonId === zoomToolTip.key
+                                ? "#02FFAD"
+                                : null
+                            }
+                          />
                         </Avatar>
                       </IconButton>
                     </HtmlTooltip>
@@ -801,7 +826,7 @@ export class UserInterface extends Component<Props, State> {
               />
             </Grid>
             <Popover
-              open={this.state.openedPopoverId === 6 && this.state.popover}
+              open={this.state.clickedButtonId === 6 && this.state.popover}
               anchorEl={this.state.anchorEl}
               onClose={this.handleClose}
             >
@@ -830,7 +855,7 @@ export class UserInterface extends Component<Props, State> {
                       width="9px"
                       height="auto"
                       // fill={
-                      //   this.state.openedPopoverId === toolTip.key
+                      //   this.state.clickedButtonId === toolTip.key
                       //     ? "#02FFAD"
                       //     : null
                       // }
@@ -867,8 +892,8 @@ export class UserInterface extends Component<Props, State> {
             </Popover>
             <BackgroundUI
               open={
-                this.state.openedPopoverId === 4 ||
-                (this.state.openedPopoverId === 5 && this.state.popover)
+                this.state.clickedButtonId === 4 ||
+                (this.state.clickedButtonId === 5 && this.state.popover)
               }
               anchorEl={this.state.anchorEl}
               onClose={this.handleClose}
@@ -876,17 +901,17 @@ export class UserInterface extends Component<Props, State> {
               toggleChannelAtIndex={this.toggleChannelAtIndex}
             />
             <PaintbrushUI
-              open={this.state.openedPopoverId === 1 && this.state.popover}
+              open={this.state.clickedButtonId === 1 && this.state.popover}
               anchorEl={this.state.anchorEl}
               onClose={this.handleClose}
-              buttonID={this.state.openedPopoverId}
+              buttonID={this.state.clickedButtonId}
               onClick={this.handleClose}
               activeTool={this.state.activeTool}
               onChange={this.handleToolboxChange("paintbrush-toolbox")}
               activateTool={this.activateTool}
             />
             <SplineUI
-              open={this.state.openedPopoverId === 3 && this.state.popover}
+              open={this.state.clickedButtonId === 3 && this.state.popover}
               anchorEl={this.state.anchorEl}
               onClick={this.handleRequestClose}
               onClose={this.handleClose}
