@@ -60,14 +60,6 @@ const BackgroundUI = (props: Props): ReactElement => {
         open={props.open}
         anchorEl={props.anchorEl}
         onClose={props.onClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
-        }}
       >
         <Typography>Image</Typography>
         <Grid container spacing={0} justify="center" wrap="nowrap">

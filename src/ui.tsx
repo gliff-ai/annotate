@@ -533,10 +533,6 @@ export class UserInterface extends Component<Props, State> {
     },
   ];
 
-  handleClick = (event: React.MouseEvent) => {
-    this.setState({ anchorEl: event.currentTarget });
-  };
-
   handleRequestClose = () => {
     this.setState({
       popover: false,
@@ -597,11 +593,13 @@ export class UserInterface extends Component<Props, State> {
                         {
                           popover: true,
                           openedPopoverId: toolTip.key,
+                          anchorEl: e.currentTarget,
                         },
                         () => {
                           if (this.state.openedPopoverId === 2) {
                             this.activateTool("eraser");
                           }
+                          console.log(this.state.anchorEl);
                         }
                       )
                     }
@@ -789,14 +787,6 @@ export class UserInterface extends Component<Props, State> {
               open={this.state.openedPopoverId === 6 && this.state.popover}
               anchorEl={this.state.anchorEl}
               onClose={this.handleClose}
-              anchorOrigin={{
-                vertical: "center",
-                horizontal: "right",
-              }}
-              transformOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
-              }}
             >
               <Card
                 style={{

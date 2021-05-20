@@ -23,6 +23,12 @@ const theme: Theme = createMuiTheme({
       },
     },
 
+    MuiPopover: {
+      root: {
+        marginLeft: "20px",
+      },
+    },
+
     MuiButtonGroup: {
       root: {
         border: "1px solid #dadde9",
@@ -50,6 +56,17 @@ const theme: Theme = createMuiTheme({
       orientation: "vertical",
       variant: "outlined",
       disableRipple: true,
+    },
+
+    MuiPopover: {
+      anchorOrigin: {
+        vertical: "top",
+        horizontal: "right",
+      },
+      transformOrigin: {
+        vertical: "top",
+        horizontal: "left",
+      },
     },
   },
 });

@@ -29,14 +29,6 @@ const SplineUI = (props: Props): ReactElement => (
     anchorEl={props.anchorEl}
     onClose={props.onClose}
     onClick={props.onClick}
-    anchorOrigin={{
-      vertical: "bottom",
-      horizontal: "left",
-    }}
-    transformOrigin={{
-      vertical: "top",
-      horizontal: "left",
-    }}
   >
     <Typography>Splines</Typography>
 
