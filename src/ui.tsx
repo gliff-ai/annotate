@@ -833,6 +833,7 @@ export class UserInterface extends Component<Props, State> {
               <Card
                 style={{
                   width: "271px",
+                  height: "375px",
                 }}
               >
                 <Paper
@@ -843,13 +844,20 @@ export class UserInterface extends Component<Props, State> {
                     padding: "10px",
                     backgroundColor: "#02FFAD",
                     width: "271px",
-                    height: "44px",
                   }}
                 >
-                  <Typography style={{ display: "inline", fontSize: "21px" }}>
+                  <Typography
+                    style={{
+                      display: "inline",
+                      fontSize: "21px",
+                      marginRight: "125px",
+                    }}
+                  >
                     Annotation
                   </Typography>
-                  <Avatar style={{ backgroundColor: "#02FFAD" }}>
+                  <Avatar
+                    style={{ backgroundColor: "#02FFAD", display: "inline" }}
+                  >
                     <SVG
                       src="./src/assets/pin-icon.svg"
                       width="9px"
@@ -864,7 +872,7 @@ export class UserInterface extends Component<Props, State> {
                 </Paper>
                 <Paper elevation={0} square>
                   <Grid container justify="center">
-                    <ButtonGroup>
+                    {/* <ButtonGroup>
                       <Tooltip title="Annotate new object">
                         <Button id="addAnnotation" onClick={this.addAnnotation}>
                           <Add />
@@ -878,7 +886,7 @@ export class UserInterface extends Component<Props, State> {
                           <Delete />
                         </Button>
                       </Tooltip>
-                    </ButtonGroup>
+                    </ButtonGroup> */}
 
                     <Labels
                       annotationObject={this.annotationsObject}

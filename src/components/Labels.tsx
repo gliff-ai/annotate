@@ -7,6 +7,7 @@ import React, {
 
 import {
   Collapse,
+  Divider,
   IconButton,
   InputBase,
   List,
@@ -15,13 +16,8 @@ import {
   ListItemSecondaryAction,
   ListItemText,
 } from "@material-ui/core";
-import {
-  Add,
-  Backspace,
-  ExpandLess,
-  ExpandMore,
-  LibraryAdd,
-} from "@material-ui/icons";
+
+import SVG, { Props as SVGProps } from "react-inlinesvg";
 
 import { Annotations } from "@/annotation";
 import { theme } from "@/theme";
@@ -88,56 +84,85 @@ export const Labels: FunctionComponent<Props> = ({
 
   return (
     <>
-      <List component="div" disablePadding>
+      <List component="div" disablePadding style={{ width: "100%" }}>
+        <ListItem>
+          <InputBase
+            placeholder="New label"
+            value={newLabel}
+            onChange={handleNewLabelChange}
+            inputProps={{ style: { fontSize: 18, marginRight: 57 } }}
+            startAdornment
+          />
+
+          <IconButton
+            type="submit"
+            aria-label="add-new-label"
+            onClick={handleAddLabel(newLabel)}
+            edge="end"
+          >
+            <SVG
+              src="./src/assets/add-icon.svg"
+              width="12px"
+              height="auto"
+              fill="#A1A1A1"
+            />
+          </IconButton>
+        </ListItem>
+        <Divider
+          style={{
+            marginTop: "-15px",
+            width: "90%",
+            marginLeft: "12px",
+            marginBottom: "17px",
+          }}
+        />
+      </List>
+
+      <List component="div" disablePadding style={{ width: "100%" }}>
         {assignedLabels.map((label) => (
           <ListItem key={label} dense>
-            <ListItemText primary={label} />
+            <ListItemText
+              primary={label}
+              style={{ color: "#02FFAD", fontSize: "20px" }}
+            />
             <ListItemSecondaryAction>
               <IconButton
                 edge="end"
                 aria-label="delete"
                 onClick={handleRemoveLabel(label)}
               >
-                <Backspace />
+                <SVG
+                  src="./src/assets/backspace-icon.svg"
+                  width="28px"
+                  height="auto"
+                  fill="#02FFAD"
+                />
               </IconButton>
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
-      <List style={{ width: "100%" }}>
-        <List component="div" disablePadding>
-          {menuLabels.map((label) => (
-            <ListItem key={label} dense>
-              <ListItemText primary={label} />
-              <ListItemSecondaryAction>
-                <IconButton
-                  edge="end"
-                  aria-label="add"
-                  onClick={handleAddLabel(label)}
-                >
-                  <Add />
-                </IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
-          <ListItem dense>
-            <InputBase
-              placeholder="New label"
-              value={newLabel}
-              onChange={handleNewLabelChange}
-              inputProps={{ style: { fontSize: 14 } }}
-            />
 
-            <IconButton
-              type="submit"
-              aria-label="add-new-label"
-              onClick={handleAddLabel(newLabel)}
-              edge="end"
-            >
-              <Add />
-            </IconButton>
+      <List component="div" disablePadding style={{ width: "100%" }}>
+        {menuLabels.map((label) => (
+          <ListItem key={label} dense>
+            <ListItemText primary={label} />
+            <ListItemSecondaryAction>
+              <IconButton
+                edge="end"
+                aria-label="add"
+                onClick={handleAddLabel(label)}
+              >
+                <SVG
+                  src="./src/assets/add-icon.svg"
+                  width="12px"
+                  height="auto"
+                  fill="#000000"
+                />
+              </IconButton>
+            </ListItemSecondaryAction>
           </ListItem>
-        </List>
+        ))}
       </List>
     </>
   );
