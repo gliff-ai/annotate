@@ -365,9 +365,12 @@ export class SplineCanvas extends Component<Props, State> {
     const splines = this.props.annotationsObject.getAllSplines(
       this.props.sliceIndex
     );
-    splines.forEach(([spline, index]) => {
+    for (let i = 0; i < splines.length; i += 1) {
       // index here is the index of the annotation this spline is from among all annotations,
       // not the index within `splines`
+
+      const [spline, index] = splines[i];
+      // here `i` is the index of the spline in `splines`, while `index` is the index of the spline in all annotations
 
       // For each pair of points, check if point clicked is near the line segment
       // having for end points two consecutive points in the spline:
@@ -381,7 +384,7 @@ export class SplineCanvas extends Component<Props, State> {
         )
           return index;
       }
-    });
+    }
 
     return null;
   };
