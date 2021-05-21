@@ -390,7 +390,7 @@ export class UserInterface extends Component<Props, State> {
 
   clearActiveAnnotation = (): void => {
     this.annotationsObject.setSplineCoordinates([]);
-    this.annotationsObject.setAnnotationBrushStrokes([]);
+    this.annotationsObject.clearBrushStrokes();
     this.setState((prevState) => ({
       callRedraw: prevState.callRedraw + 1,
     }));
@@ -438,6 +438,15 @@ export class UserInterface extends Component<Props, State> {
               annotations={this.annotationsObject.getAllAnnotations()}
               imageFileInfo={this.imageFileInfo}
             />
+            <Button
+              onClick={() => {
+                const t0 = performance.now();
+                this.annotationsObject.getSplineCoordinates();
+                alert(performance.now() - t0);
+              }}
+            >
+              HELLO
+            </Button>
           </Toolbar>
         </AppBar>
         <Toolbar />
