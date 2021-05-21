@@ -361,28 +361,28 @@ export class SplineCanvas extends Component<Props, State> {
   clickNearSpline = (imageX: number, imageY: number): number => {
     // Check if point clicked (in image space) is near an existing spline.
     // If true, return annotation index, otherwise return null.
-    const annotations = this.props.annotationsObject.getAllAnnotations();
 
-    for (let i = 0; i < annotations.length; i += 1) {
-      if (
-        annotations[i].spline.spaceTimeInfo.z === this.props.sliceIndex &&
-        annotations[i].toolbox === "spline"
-      ) {
-        const { spline } = annotations[i];
-        // For each pair of points, check is point clicked is near the line segment
-        // having for end points two consecutive points in the spline.
-        for (let j = 1; j < spline.coordinates.length; j += 1) {
-          if (
-            this.isClickNearLineSegment(
-              { x: imageX, y: imageY },
-              spline.coordinates[j - 1],
-              spline.coordinates[j]
-            )
+    const splines = this.props.annotationsObject.getAllSplines(
+      this.props.sliceIndex
+    );
+    splines.forEach(([spline, index]) => {
+      // index here is the index of the annotation this spline is from among all annotations,
+      // not the index within `splines`
+
+      // For each pair of points, check if point clicked is near the line segment
+      // having for end points two consecutive points in the spline:
+      for (let j = 1; j < spline.coordinates.length; j += 1) {
+        if (
+          this.isClickNearLineSegment(
+            { x: imageX, y: imageY },
+            spline.coordinates[j - 1],
+            spline.coordinates[j]
           )
-            return i;
-        }
+        )
+          return index;
       }
-    }
+    });
+
     return null;
   };
 
@@ -625,7 +625,6 @@ export class SplineCanvas extends Component<Props, State> {
       }
     }
     this.props.annotationsObject.insertSplinePoint(newPointIndex, { x, y }); // Add new point to the coordinates array
-    this.props.annotationsObject.setSplineCoordinates(coordinates); // Save new coordinates inside active annotation
   };
 
   getCursor = (): Cursor => {
