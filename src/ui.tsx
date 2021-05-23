@@ -438,15 +438,6 @@ export class UserInterface extends Component<Props, State> {
               annotations={this.annotationsObject.getAllAnnotations()}
               imageFileInfo={this.imageFileInfo}
             />
-            <Button
-              onClick={() => {
-                const t0 = performance.now();
-                this.annotationsObject.getSplineCoordinates();
-                alert(performance.now() - t0);
-              }}
-            >
-              HELLO
-            </Button>
           </Toolbar>
         </AppBar>
         <Toolbar />
