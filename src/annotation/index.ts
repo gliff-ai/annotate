@@ -46,6 +46,9 @@ export class Annotations {
     );
   };
 
+  getSplineLength = (): number =>
+    this.data[this.activeAnnotationID].spline.coordinates.length;
+
   isActiveAnnotationEmpty = (): boolean =>
     // Check whether the active annotation object contains any
     // paintbrush or spline annotations.

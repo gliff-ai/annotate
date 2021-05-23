@@ -343,7 +343,8 @@ export class SplineCanvas extends Component<Props, State> {
       } else if (this.state.mode === Mode.draw && !isClosed) {
         // Add coordinates to the current spline
         this.props.annotationsObject.addSplinePoint({ x: imageX, y: imageY });
-        this.selectedPointIndex = coordinates.length - 1;
+        this.selectedPointIndex =
+          this.props.annotationsObject.getSplineLength() - 1;
       }
     }
 
@@ -532,7 +533,7 @@ export class SplineCanvas extends Component<Props, State> {
         this.gradientImage = calculateSobel(this.props.displayedImage);
       }
       this.props.annotationsObject.addSplinePoint(clickPoint);
-      this.snapToGradient(coordinates.length - 1);
+      this.snapToGradient(this.props.annotationsObject.getSplineLength() - 1);
       this.isDragging = true;
       this.drawAllSplines();
     } else {
@@ -568,7 +569,7 @@ export class SplineCanvas extends Component<Props, State> {
         y: clickPoint.y,
       });
       this.snapToGradient(
-        coordinates.length - 1,
+        this.props.annotationsObject.getSplineLength() - 1,
         25 / this.props.scaleAndPan.scale
       );
     } else {
@@ -577,7 +578,7 @@ export class SplineCanvas extends Component<Props, State> {
         this.props.annotationsObject.updateSplinePoint(
           clickPoint.x,
           clickPoint.y,
-          coordinates.length - 1
+          this.props.annotationsObject.getSplineLength() - 1
         );
       }
 
