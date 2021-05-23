@@ -389,7 +389,7 @@ export class UserInterface extends Component<Props, State> {
     };
 
   clearActiveAnnotation = (): void => {
-    this.annotationsObject.setSplineCoordinates([]);
+    this.annotationsObject.clearSplineCoordinates();
     this.annotationsObject.clearBrushStrokes();
     this.setState((prevState) => ({
       callRedraw: prevState.callRedraw + 1,

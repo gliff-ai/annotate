@@ -241,7 +241,7 @@ export class SplineCanvas extends Component<Props, State> {
       // If selected index is first index, delete also point at last index
       if (this.selectedPointIndex === 0) {
         if (this.props.annotationsObject.getSplineLength() === 1) {
-          this.props.annotationsObject.setSplineCoordinates([]);
+          this.props.annotationsObject.clearSplineCoordinates();
         } else {
           this.props.annotationsObject.updateSplinePoint(
             coordinates[1].x, // coordinates is outdated here due to deleteSplinePoint; coordinates[1] is therefore coordinates[0] now that we've deleted the previous first point

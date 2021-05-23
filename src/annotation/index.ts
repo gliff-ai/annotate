@@ -90,16 +90,16 @@ export class Annotations {
     this.activeAnnotationID = id;
   };
 
-  setSplineCoordinates = (newCoordinates: XYPoint[]): void => {
-    this.data[this.activeAnnotationID].spline.coordinates = newCoordinates;
-  };
-
   addBrushStroke = (newBrushStroke: BrushStroke): void => {
     this.data[this.activeAnnotationID].brushStrokes.push(newBrushStroke);
   };
 
   clearBrushStrokes = (): void => {
     this.data[this.activeAnnotationID].brushStrokes = [];
+  };
+
+  clearSplineCoordinates = (): void => {
+    this.data[this.activeAnnotationID].spline.coordinates = [];
   };
 
   addSplinePoint = (point: XYPoint): void => {
