@@ -62,7 +62,8 @@ export class Annotations {
     // index needed for identifying the active spline
     const annotations = this.data.filter(
       (annotation: Annotation) =>
-        (annotation.toolbox === "spline" || annotation.toolbox === "magic") &&
+        (annotation.toolbox === "spline" ||
+          annotation.toolbox === "magicspline") &&
         annotation.spline.spaceTimeInfo.z === z
     );
     return annotations.map((annotation: Annotation, i) => [
