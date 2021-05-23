@@ -236,25 +236,25 @@ export class SplineCanvas extends Component<Props, State> {
       }
 
       // Delete x,y point at selected index
-      coordinates.splice(this.selectedPointIndex, 1);
+      this.props.annotationsObject.deleteSplinePoint(this.selectedPointIndex);
 
       // If selected index is first index, delete also point at last index
       if (this.selectedPointIndex === 0) {
-        if (coordinates.length === 1) {
+        if (this.props.annotationsObject.getSplineLength() === 1) {
           this.props.annotationsObject.setSplineCoordinates([]);
         } else {
           this.props.annotationsObject.updateSplinePoint(
-            coordinates[0].x,
-            coordinates[0].y,
-            coordinates.length - 1
+            coordinates[1].x, // coordinates is outdated here due to deleteSplinePoint; coordinates[1] is therefore coordinates[0] now that we've deleted the previous first point
+            coordinates[1].y,
+            this.props.annotationsObject.getSplineLength() - 1
           );
         }
       }
     } else {
       // Delete x,y point at selected index
-      coordinates.splice(this.selectedPointIndex, 1);
+      this.props.annotationsObject.deleteSplinePoint(this.selectedPointIndex);
     }
-    if (coordinates.length === 0) {
+    if (this.props.annotationsObject.getSplineLength() === 0) {
       this.setState({ mode: Mode.draw });
     }
 

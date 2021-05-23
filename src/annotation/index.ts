@@ -106,6 +106,10 @@ export class Annotations {
     this.data[this.activeAnnotationID].spline.coordinates.push(point);
   };
 
+  deleteSplinePoint = (idx: number): void => {
+    this.data[this.activeAnnotationID].spline.coordinates.splice(idx, 1);
+  };
+
   updateSplinePoint = (newX: number, newY: number, index: number): void => {
     this.data[this.activeAnnotationID].spline.coordinates[index] = {
       x: newX,
