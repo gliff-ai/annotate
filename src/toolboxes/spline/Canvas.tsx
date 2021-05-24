@@ -53,7 +53,7 @@ export class SplineCanvas extends Component<Props, State> {
 
   private selectedPointIndex: number;
 
-  private isDragging: boolean;
+  private isMouseDown: boolean;
 
   private gradientImage: ImageData;
 
@@ -62,7 +62,7 @@ export class SplineCanvas extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.selectedPointIndex = -1;
-    this.isDragging = false;
+    this.isMouseDown = false;
     this.numberOfMoves = 0;
     this.state = { mode: Mode.draw, isActive: false };
   }
@@ -534,19 +534,19 @@ export class SplineCanvas extends Component<Props, State> {
       }
       this.props.annotationsObject.addSplinePoint(clickPoint);
       this.snapToGradient(this.props.annotationsObject.getSplineLength() - 1);
-      this.isDragging = true;
+      this.isMouseDown = true;
       this.drawAllSplines();
     } else {
       const nearPoint = this.clickNearPoint(clickPoint, coordinates);
       if (nearPoint !== -1) {
         this.selectedPointIndex = nearPoint;
-        this.isDragging = true;
+        this.isMouseDown = true;
       }
     }
   };
 
   onMouseMove = (x: number, y: number): void => {
-    if (!this.isDragging) return;
+    if (!this.isMouseDown) return;
 
     this.numberOfMoves += 1;
 
@@ -572,7 +572,7 @@ export class SplineCanvas extends Component<Props, State> {
         this.props.annotationsObject.getSplineLength() - 1,
         25 / this.props.scaleAndPan.scale
       );
-    } else {
+    } else if (this.state.mode !== Mode.magic) {
       // If dragging first point, update also last
       if (this.selectedPointIndex === 0 && this.isClosed(coordinates)) {
         this.props.annotationsObject.updateSplinePoint(
@@ -595,7 +595,7 @@ export class SplineCanvas extends Component<Props, State> {
 
   onMouseUp = (): void => {
     // Works as part of drag and drop for points.
-    this.isDragging = false;
+    this.isMouseDown = false;
   };
 
   isClosed = (splineVector: XYPoint[]): boolean =>
