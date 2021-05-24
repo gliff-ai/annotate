@@ -60,16 +60,19 @@ export class Annotations {
   getAllSplines = (z: number): Array<[Spline, number]> => {
     // returns an array of [spline, index] pairs for all splines at the given z-index.
     // index needed for identifying the active spline
-    const annotations = this.data.filter(
-      (annotation: Annotation) =>
+    const splines: Array<[Spline, number]> = [];
+
+    this.data.forEach((annotation, i) => {
+      if (
         (annotation.toolbox === "spline" ||
           annotation.toolbox === "magicspline") &&
         annotation.spline.spaceTimeInfo.z === z
-    );
-    return annotations.map((annotation: Annotation, i) => [
-      annotation.spline,
-      i,
-    ]);
+      ) {
+        splines.push([annotation.spline, i]);
+      }
+    });
+
+    return splines;
   };
 
   length = (): number => this.data.length;
