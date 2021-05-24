@@ -104,7 +104,13 @@ export class Annotations {
   };
 
   addBrushStroke = (newBrushStroke: BrushStroke): void => {
-    this.data[this.activeAnnotationID].brushStrokes.push(newBrushStroke);
+    if (
+      ["paintbrush", "eraser"].includes(
+        this.data[this.activeAnnotationID].toolbox
+      )
+    ) {
+      this.data[this.activeAnnotationID].brushStrokes.push(newBrushStroke);
+    }
   };
 
   clearBrushStrokes = (): void => {
@@ -116,7 +122,13 @@ export class Annotations {
   };
 
   addSplinePoint = (point: XYPoint): void => {
-    this.data[this.activeAnnotationID].spline.coordinates.push(point);
+    if (
+      ["spline", "magicspline"].includes(
+        this.data[this.activeAnnotationID].toolbox
+      )
+    ) {
+      this.data[this.activeAnnotationID].spline.coordinates.push(point);
+    }
   };
 
   deleteSplinePoint = (idx: number): void => {

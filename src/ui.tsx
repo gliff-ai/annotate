@@ -390,6 +390,11 @@ export class UserInterface extends Component<Props, State> {
 
   clearActiveAnnotation = (): void => {
     this.annotationsObject.deleteActiveAnnotation();
+    if (this.annotationsObject.length() === 1) {
+      // if we delete the last annotation, annotationsObject will make a new one with the paintbrush toolbox
+      // (since it doesn't know which tool is active), so we set the toolbox correctly here:
+      this.annotationsObject.setActiveAnnotationToolbox(this.state.activeTool);
+    }
     this.setState((prevState) => ({
       callRedraw: prevState.callRedraw + 1,
     }));
