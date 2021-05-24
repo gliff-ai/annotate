@@ -40,11 +40,10 @@ export class Annotations {
   getSplineForActiveAnnotation = (): Spline =>
     this.data[this.activeAnnotationID].spline;
 
-  getSplineCoordinates = (): Array<XYPoint> => {
-    return JSON.parse(
+  getSplineCoordinates = (): Array<XYPoint> =>
+    JSON.parse(
       JSON.stringify(this.data[this.activeAnnotationID].spline.coordinates)
-    );
-  };
+    ) as Array<XYPoint>;
 
   getSplineLength = (): number =>
     this.data[this.activeAnnotationID].spline.coordinates.length;
@@ -55,7 +54,8 @@ export class Annotations {
     this.data[this.activeAnnotationID].spline.coordinates.length === 0 &&
     this.data[this.activeAnnotationID].brushStrokes.length === 0;
 
-  getAllAnnotations = (): Annotation[] => JSON.parse(JSON.stringify(this.data)); // deep copy to ensure no modification without audit logging
+  getAllAnnotations = (): Annotation[] =>
+    JSON.parse(JSON.stringify(this.data)) as Annotation[]; // deep copy to ensure no modification without audit logging
 
   getAllSplines = (z: number): Array<[Spline, number]> => {
     // returns an array of [spline, index] pairs for all splines at the given z-index.
