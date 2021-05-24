@@ -258,7 +258,7 @@ export class SplineCanvas extends Component<Props, State> {
       this.setState({ mode: Mode.draw });
     }
 
-    this.selectedPointIndex -= 1;
+    this.selectedPointIndex = Math.max(0, this.selectedPointIndex - 1);
     this.drawAllSplines();
   };
 
