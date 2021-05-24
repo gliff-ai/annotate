@@ -28,6 +28,7 @@ import {
   ExpandMore,
   Backup,
 } from "@material-ui/icons";
+
 import { ImageFileInfo } from "@gliff-ai/upload/typings";
 import { UploadImage } from "@gliff-ai/upload";
 
@@ -39,8 +40,8 @@ import { BackgroundCanvas, BackgroundUI } from "@/toolboxes/background";
 import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
 import { Labels } from "@/components/Labels";
+import { Download } from "@/download/UI";
 import { keydownListener } from "@/keybindings";
-
 import { Tools, Tool } from "@/tools";
 
 const CONFIG = {
@@ -73,6 +74,7 @@ interface State {
 
 interface Props {
   slicesData?: Array<Array<ImageBitmap>>;
+  imageFileInfo?: ImageFileInfo;
   annotationsObject?: Annotations;
   presetLabels?: string[];
 }
@@ -105,11 +107,12 @@ export class UserInterface extends Component<Props, State> {
       sliceIndex: 0,
       channels: [true],
       displayedImage: this.slicesData[0][0] || null,
+      activeTool: Tools.paintbrush,
     };
 
     this.annotationsObject.addAnnotation(this.state.activeTool);
     this.presetLabels = this.props.presetLabels || [];
-    this.imageFileInfo = null;
+    this.imageFileInfo = this.props.imageFileInfo || null;
   }
 
   componentDidMount = (): void => {
@@ -423,10 +426,17 @@ export class UserInterface extends Component<Props, State> {
               setUploadedImage={this.setUploadedImage}
               spanElement={
                 /* eslint-disable react/jsx-wrap-multilines */
-                <Button aria-label="upload-picture" component="span">
-                  <Backup />
-                </Button>
+                <Tooltip title="Uplaod image">
+                  <Button aria-label="upload-picture" component="span">
+                    <Backup />
+                  </Button>
+                </Tooltip>
               }
+              multiple={false}
+            />
+            <Download
+              annotations={this.annotationsObject.getAllAnnotations()}
+              imageFileInfo={this.imageFileInfo}
             />
           </Toolbar>
         </AppBar>
