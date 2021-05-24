@@ -1,5 +1,17 @@
 import React, { Component, ReactNode } from "react";
 import { XYPoint, PositionAndSize } from "@/annotation/interfaces";
+import {
+  Avatar,
+  Box,
+  ButtonGroup,
+  Grid,
+  IconButton,
+  Theme,
+  Tooltip,
+  Typography,
+  withStyles,
+} from "@material-ui/core";
+import SVG, { Props as SVGProps } from "react-inlinesvg";
 
 export interface Props {
   name?: string;
@@ -23,6 +35,15 @@ export interface Props {
   setCanvasPositionAndSize?: (canvasPositionAndSize: PositionAndSize) => void;
   displayedImage?: ImageBitmap;
 }
+
+const HtmlTooltip = withStyles((t: Theme) => ({
+  tooltip: {
+    backgroundColor: "#FFFFFF",
+    fontSize: t.typography.pxToRem(12),
+    border: "1px solid #dadde9",
+    color: "#2B2F3A",
+  },
+}))(Tooltip);
 export class BaseCanvas extends Component<Props> {
   private name: string;
 
@@ -146,6 +167,30 @@ export class BaseCanvas extends Component<Props> {
     }
   };
 
+  zoomToolTips = [
+    {
+      key: 7,
+      name: "Zoom In",
+      icon: `./src/assets/zoom-in-icon.svg`,
+      shortcut: "Ctrl",
+      shortcutSymbol: "+",
+    },
+    {
+      key: 8,
+      name: "Zoom Out",
+      icon: `./src/assets/zoom-out-icon.svg`,
+      shortcut: "Ctrl",
+      shortcutSymbol: "-",
+    },
+    {
+      key: 9,
+      name: "Fit to Page",
+      icon: `./src/assets/reset-zoom-and-pan-icon.svg`,
+      shortcut: "Ctrl",
+      shortcutSymbol: "[",
+    },
+  ];
+
   render = (): ReactNode => (
     <div
       ref={(canvasContainer) => {
@@ -159,11 +204,102 @@ export class BaseCanvas extends Component<Props> {
         height: this.props.canvasPositionAndSize.height,
         cursor: this.props.cursor || "pointer",
         //   border: "1px solid gray",
-        top: this.props.canvasPositionAndSize.top,
+        // top: this.props.canvasPositionAndSize.top,
         left: this.props.canvasPositionAndSize.left,
         position: "absolute",
+        bottom: "0",
+        marginBottom: "30px",
       }}
     >
+      <div
+        style={{
+          position: "fixed",
+          right: "18px",
+          bottom: "0",
+
+          marginBottom: "30px",
+          background: "#fafafa",
+        }}
+      >
+        <Grid container direction="row">
+          <ButtonGroup size="small" style={{ margin: "5px" }}>
+            {this.zoomToolTips.map((zoomToolTip) => {
+              return (
+                <HtmlTooltip
+                  key={zoomToolTip.name}
+                  title={
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      justifyItems="space-between"
+                    >
+                      <Box mr={3}>
+                        <Typography color="inherit">
+                          {zoomToolTip.name}
+                        </Typography>
+                      </Box>
+                      <Avatar
+                        style={{
+                          backgroundColor: "#02FFAD",
+                          color: "#2B2F3A",
+                          margin: "3px",
+                        }}
+                      >
+                        {zoomToolTip.shortcut}
+                      </Avatar>
+                      <Avatar
+                        style={{
+                          backgroundColor: "#02FFAD",
+                          color: "#2B2F3A",
+                        }}
+                      >
+                        {zoomToolTip.shortcutSymbol}
+                      </Avatar>
+                    </Box>
+                  }
+                  placement="left"
+                >
+                  <IconButton
+                    size="small"
+                    style={{ marginBottom: "10px" }}
+                    // onClick={(e: React.MouseEvent) =>
+                    //   this.setState(
+                    //     {
+                    //       clickedButtonId: zoomToolTip.key,
+                    //     },
+                    //     () => {
+                    //       if (zoomToolTip.key === 7) {
+                    //         this.incrementScale();
+                    //       }
+                    //       if (zoomToolTip.key === 8) {
+                    //         this.decrementScale();
+                    //       }
+                    //       if (zoomToolTip.key === 9) {
+                    //         this.resetScaleAndPan();
+                    //       }
+                    //     }
+                    //   )
+                    // }
+                  >
+                    <Avatar sizes="large" variant="circular">
+                      <SVG
+                        src={`${zoomToolTip.icon}`}
+                        width="55%"
+                        height="auto"
+                        // fill={
+                        //   this.state.clickedButtonId === zoomToolTip.key
+                        //     ? "#02FFAD"
+                        //     : null
+                        // }
+                      />
+                    </Avatar>
+                  </IconButton>
+                </HtmlTooltip>
+              );
+            })}
+          </ButtonGroup>
+        </Grid>
+      </div>
       <canvas
         style={{ pointerEvents: "inherit" }}
         width="100%"

@@ -90,7 +90,9 @@ export const Labels: FunctionComponent<Props> = ({
             placeholder="New label"
             value={newLabel}
             onChange={handleNewLabelChange}
-            inputProps={{ style: { fontSize: 18, marginRight: 57 } }}
+            inputProps={{
+              style: { fontSize: 18, marginRight: 57, marginLeft: -7 },
+            }}
             startAdornment
           />
 
@@ -123,7 +125,7 @@ export const Labels: FunctionComponent<Props> = ({
           <ListItem key={label} dense>
             <ListItemText
               primary={label}
-              style={{ color: "#02FFAD", fontSize: "20px" }}
+              style={{ color: "#02FFAD", fontSize: "50px", marginLeft: "-7px" }}
             />
             <ListItemSecondaryAction>
               <IconButton
