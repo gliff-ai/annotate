@@ -389,8 +389,7 @@ export class UserInterface extends Component<Props, State> {
     };
 
   clearActiveAnnotation = (): void => {
-    this.annotationsObject.clearSplineCoordinates();
-    this.annotationsObject.clearBrushStrokes();
+    this.annotationsObject.deleteActiveAnnotation();
     this.setState((prevState) => ({
       callRedraw: prevState.callRedraw + 1,
     }));
@@ -616,7 +615,7 @@ export class UserInterface extends Component<Props, State> {
             <SplineUI
               expanded={
                 this.state.expanded === "spline-toolbox" ||
-                ["spline"].includes(this.state.activeTool)
+                ["spline", "magicspline"].includes(this.state.activeTool)
               }
               activeTool={this.state.activeTool}
               onChange={this.handleToolboxChange("spline-toolbox")}

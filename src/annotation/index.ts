@@ -30,6 +30,16 @@ export class Annotations {
       }) - 1;
   };
 
+  deleteActiveAnnotation = (): void => {
+    this.data.splice(this.activeAnnotationID, 1);
+    if (this.activeAnnotationID >= this.data.length) {
+      this.activeAnnotationID = this.data.length - 1; // necessary if we delete the one on the end
+    }
+    if (this.data.length === 0) {
+      this.addAnnotation("paintbrush"); // re-create a new empty annotation if we delete the last one (toolbox will be re-assigned by reuseEmptyAnnotation if necessary)
+    }
+  };
+
   getLabels = (): string[] => this.data[this.activeAnnotationID].labels;
 
   getActiveAnnotationID = (): number => this.activeAnnotationID;
