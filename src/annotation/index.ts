@@ -30,6 +30,63 @@ export class Annotations {
       }) - 1;
   };
 
+  deleteActiveAnnotation = (): void => {
+    this.data.splice(this.activeAnnotationID, 1);
+    if (this.activeAnnotationID >= this.data.length) {
+      this.activeAnnotationID = this.data.length - 1; // necessary if we delete the one on the end
+    }
+    if (this.data.length === 0) {
+      this.addAnnotation("paintbrush"); // re-create a new empty annotation if we delete the last one (toolbox will be re-assigned by reuseEmptyAnnotation if necessary)
+    }
+  };
+
+  getLabels = (): string[] => this.data[this.activeAnnotationID].labels;
+
+  getActiveAnnotationID = (): number => this.activeAnnotationID;
+
+  getActiveAnnotationColor = (): string =>
+    this.data[this.activeAnnotationID].brushStrokes[0]?.brush.color;
+
+  getSplineForActiveAnnotation = (): Spline =>
+    this.data[this.activeAnnotationID].spline;
+
+  getSplineCoordinates = (): Array<XYPoint> =>
+    JSON.parse(
+      JSON.stringify(this.data[this.activeAnnotationID].spline.coordinates)
+    ) as Array<XYPoint>;
+
+  getSplineLength = (): number =>
+    this.data[this.activeAnnotationID].spline.coordinates.length;
+
+  isActiveAnnotationEmpty = (): boolean =>
+    // Check whether the active annotation object contains any
+    // paintbrush or spline annotations.
+    this.data[this.activeAnnotationID].spline.coordinates.length === 0 &&
+    this.data[this.activeAnnotationID].brushStrokes.length === 0;
+
+  getAllAnnotations = (): Annotation[] =>
+    JSON.parse(JSON.stringify(this.data)) as Annotation[]; // deep copy to ensure no modification without audit logging
+
+  getAllSplines = (z: number): Array<[Spline, number]> => {
+    // returns an array of [spline, index] pairs for all splines at the given z-index.
+    // index needed for identifying the active spline
+    const splines: Array<[Spline, number]> = [];
+
+    this.data.forEach((annotation, i) => {
+      if (
+        (annotation.toolbox === "spline" ||
+          annotation.toolbox === "magicspline") &&
+        annotation.spline.spaceTimeInfo.z === z
+      ) {
+        splines.push([annotation.spline, i]);
+      }
+    });
+
+    return splines;
+  };
+
+  length = (): number => this.data.length;
+
   addLabel = (newLabel: string): void => {
     if (!this.data[this.activeAnnotationID].labels.includes(newLabel)) {
       this.data[this.activeAnnotationID].labels.push(newLabel);
@@ -42,40 +99,56 @@ export class Annotations {
     ].labels.filter((label) => label !== existingLabel);
   };
 
-  getLabels = (): string[] => this.data[this.activeAnnotationID].labels;
-
-  getActiveAnnotationID = (): number => this.activeAnnotationID;
-
-  getActiveAnnotation = (): Annotation => this.data[this.activeAnnotationID];
-
-  getSplineForActiveAnnotation = (): Spline =>
-    this.data[this.activeAnnotationID].spline;
-
-  length = (): number => this.data.length;
-
   setActiveAnnotationID = (id: number): void => {
     this.activeAnnotationID = id;
   };
 
-  setSplineCoordinates = (newCoordinates: XYPoint[]): void => {
-    this.data[this.activeAnnotationID].spline.coordinates = newCoordinates;
+  addBrushStroke = (newBrushStroke: BrushStroke): void => {
+    if (
+      ["paintbrush", "eraser"].includes(
+        this.data[this.activeAnnotationID].toolbox
+      )
+    ) {
+      this.data[this.activeAnnotationID].brushStrokes.push(newBrushStroke);
+    }
   };
 
-  setAnnotationBrushStrokes = (newBrushStrokes: BrushStroke[]): void => {
-    this.data[this.activeAnnotationID].brushStrokes = newBrushStrokes;
+  clearBrushStrokes = (): void => {
+    this.data[this.activeAnnotationID].brushStrokes = [];
+  };
+
+  clearSplineCoordinates = (): void => {
+    this.data[this.activeAnnotationID].spline.coordinates = [];
+  };
+
+  addSplinePoint = (point: XYPoint): void => {
+    if (
+      ["spline", "magicspline"].includes(
+        this.data[this.activeAnnotationID].toolbox
+      )
+    ) {
+      this.data[this.activeAnnotationID].spline.coordinates.push(point);
+    }
+  };
+
+  deleteSplinePoint = (idx: number): void => {
+    this.data[this.activeAnnotationID].spline.coordinates.splice(idx, 1);
+  };
+
+  updateSplinePoint = (newX: number, newY: number, index: number): void => {
+    this.data[this.activeAnnotationID].spline.coordinates[index] = {
+      x: newX,
+      y: newY,
+    };
+  };
+
+  insertSplinePoint = (idx: number, point: XYPoint): void => {
+    this.data[this.activeAnnotationID].spline.coordinates.splice(idx, 0, point);
   };
 
   setActiveAnnotationToolbox = (newToolbox: string): void => {
     this.data[this.activeAnnotationID].toolbox = newToolbox;
   };
-
-  isActiveAnnotationEmpty = (): boolean =>
-    // Check whether the active annotation object contains any
-    // paintbrush or spline annotations.
-    this.data[this.activeAnnotationID].spline.coordinates.length === 0 &&
-    this.data[this.activeAnnotationID].brushStrokes.length === 0;
-
-  getAllAnnotations = (): Annotation[] => this.data;
 
   setSplineSpaceTimeInfo = (z?: number, t?: number): void => {
     // Set space and time data for spline of active annotation.
