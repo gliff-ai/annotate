@@ -38,3 +38,8 @@ export interface PositionAndSize {
   width?: number;
   height?: number;
 }
+
+export interface AuditAction {
+  method: string;
+  args: Array<any>;
+}
