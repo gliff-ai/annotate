@@ -252,4 +252,6 @@ export class Annotations {
       timestamp: Date.now(),
     });
   };
+
+  getAuditObject = (): Array<AuditAction> => this.audit;
 }
