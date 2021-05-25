@@ -40,6 +40,7 @@ export class Annotations {
     this.audit.push({
       method: "addAnnotation",
       args: [toolbox, labels, spline, brushStrokes, parameters],
+      timestamp: Date.now(),
     });
   };
 
@@ -52,7 +53,11 @@ export class Annotations {
       this.addAnnotation("paintbrush"); // re-create a new empty annotation if we delete the last one (toolbox will be re-assigned by reuseEmptyAnnotation if necessary)
     }
 
-    this.audit.push({ method: "deleteActiveAnnotation", args: [] });
+    this.audit.push({
+      method: "deleteActiveAnnotation",
+      args: [],
+      timestamp: Date.now(),
+    });
   };
 
   getLabels = (): string[] => this.data[this.activeAnnotationID].labels;
@@ -107,7 +112,11 @@ export class Annotations {
       this.data[this.activeAnnotationID].labels.push(newLabel);
     }
 
-    this.audit.push({ method: "addLabel", args: [newLabel] });
+    this.audit.push({
+      method: "addLabel",
+      args: [newLabel],
+      timestamp: Date.now(),
+    });
   };
 
   removeLabel = (existingLabel: string): void => {
@@ -115,13 +124,21 @@ export class Annotations {
       this.activeAnnotationID
     ].labels.filter((label) => label !== existingLabel);
 
-    this.audit.push({ method: "removeLabel", args: [existingLabel] });
+    this.audit.push({
+      method: "removeLabel",
+      args: [existingLabel],
+      timestamp: Date.now(),
+    });
   };
 
   setActiveAnnotationID = (id: number): void => {
     this.activeAnnotationID = id;
 
-    this.audit.push({ method: "setActiveAnnotationID", args: [id] });
+    this.audit.push({
+      method: "setActiveAnnotationID",
+      args: [id],
+      timestamp: Date.now(),
+    });
   };
 
   addBrushStroke = (newBrushStroke: BrushStroke): void => {
@@ -133,19 +150,31 @@ export class Annotations {
       this.data[this.activeAnnotationID].brushStrokes.push(newBrushStroke);
     }
 
-    this.audit.push({ method: "addBrushStroke", args: [newBrushStroke] });
+    this.audit.push({
+      method: "addBrushStroke",
+      args: [newBrushStroke],
+      timestamp: Date.now(),
+    });
   };
 
   clearBrushStrokes = (): void => {
     this.data[this.activeAnnotationID].brushStrokes = [];
 
-    this.audit.push({ method: "clearBrushStrokes", args: [] });
+    this.audit.push({
+      method: "clearBrushStrokes",
+      args: [],
+      timestamp: Date.now(),
+    });
   };
 
   clearSplineCoordinates = (): void => {
     this.data[this.activeAnnotationID].spline.coordinates = [];
 
-    this.audit.push({ method: "clearSplineCoordinates", args: [] });
+    this.audit.push({
+      method: "clearSplineCoordinates",
+      args: [],
+      timestamp: Date.now(),
+    });
   };
 
   addSplinePoint = (point: XYPoint): void => {
@@ -157,13 +186,21 @@ export class Annotations {
       this.data[this.activeAnnotationID].spline.coordinates.push(point);
     }
 
-    this.audit.push({ method: "addSplinePoint", args: [point] });
+    this.audit.push({
+      method: "addSplinePoint",
+      args: [point],
+      timestamp: Date.now(),
+    });
   };
 
   deleteSplinePoint = (idx: number): void => {
     this.data[this.activeAnnotationID].spline.coordinates.splice(idx, 1);
 
-    this.audit.push({ method: "deleteSplinePoint", args: [idx] });
+    this.audit.push({
+      method: "deleteSplinePoint",
+      args: [idx],
+      timestamp: Date.now(),
+    });
   };
 
   updateSplinePoint = (newX: number, newY: number, index: number): void => {
@@ -172,13 +209,21 @@ export class Annotations {
       y: newY,
     };
 
-    this.audit.push({ method: "updateSplinePoint", args: [newX, newY, index] });
+    this.audit.push({
+      method: "updateSplinePoint",
+      args: [newX, newY, index],
+      timestamp: Date.now(),
+    });
   };
 
   insertSplinePoint = (idx: number, point: XYPoint): void => {
     this.data[this.activeAnnotationID].spline.coordinates.splice(idx, 0, point);
 
-    this.audit.push({ method: "insertSplinePoint", args: [idx, point] });
+    this.audit.push({
+      method: "insertSplinePoint",
+      args: [idx, point],
+      timestamp: Date.now(),
+    });
   };
 
   setActiveAnnotationToolbox = (newToolbox: string): void => {
@@ -187,6 +232,7 @@ export class Annotations {
     this.audit.push({
       method: "setActiveAnnotationToolbox",
       args: [newToolbox],
+      timestamp: Date.now(),
     });
   };
 
@@ -200,6 +246,10 @@ export class Annotations {
       t: t || prevT,
     };
 
-    this.audit.push({ method: "setSplineSpaceTimeInfo", args: [z, t] });
+    this.audit.push({
+      method: "setSplineSpaceTimeInfo",
+      args: [z, t],
+      timestamp: Date.now(),
+    });
   };
 }

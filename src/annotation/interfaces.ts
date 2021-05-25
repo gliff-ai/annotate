@@ -42,4 +42,5 @@ export interface PositionAndSize {
 export interface AuditAction {
   method: string;
   args: Array<any>;
+  timestamp: number; // milliseconds since epoch
 }
