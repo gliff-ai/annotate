@@ -19,6 +19,7 @@ interface Props extends BaseProps {
   annotationsObject: Annotations;
   callRedraw: number;
   sliceIndex: number;
+  setUIActiveAnnotationID: (id: number) => void;
 }
 enum Mode {
   draw,
@@ -353,6 +354,7 @@ export class SplineCanvas extends Component<Props, State> {
       const selectedSpline = this.clickNearSpline(imageX, imageY);
       if (selectedSpline !== null) {
         this.props.annotationsObject.setActiveAnnotationID(selectedSpline);
+        this.props.setUIActiveAnnotationID(selectedSpline);
       }
     }
 

@@ -26,6 +26,7 @@ interface Props extends CanvasProps {
   brushRadius: number;
   callRedraw: number;
   sliceIndex: number;
+  setUIActiveAnnotationID: (id: number) => void;
 }
 
 interface Brush {
@@ -419,6 +420,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       const selectedBrushStroke = this.clickNearBrushStroke(imageX, imageY);
       if (selectedBrushStroke !== null) {
         this.props.annotationsObject.setActiveAnnotationID(selectedBrushStroke);
+        this.props.setUIActiveAnnotationID(selectedBrushStroke);
         this.drawAllStrokes();
       }
     }
@@ -533,6 +535,7 @@ export const PaintbrushCanvas = (
       brushRadius={paintbrush.brushRadius}
       callRedraw={props.callRedraw}
       sliceIndex={props.sliceIndex}
+      setUIActiveAnnotationID={props.setUIActiveAnnotationID}
     />
   );
 };

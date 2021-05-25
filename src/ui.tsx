@@ -464,6 +464,9 @@ export class UserInterface extends Component<Props, State> {
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
               callRedraw={this.state.callRedraw}
               sliceIndex={this.state.sliceIndex}
+              setUIActiveAnnotationID={(id) => {
+                this.setState({ activeAnnotationID: id });
+              }}
             />
 
             <PaintbrushCanvas
@@ -475,6 +478,9 @@ export class UserInterface extends Component<Props, State> {
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
               callRedraw={this.state.callRedraw}
               sliceIndex={this.state.sliceIndex}
+              setUIActiveAnnotationID={(id) => {
+                this.setState({ activeAnnotationID: id });
+              }}
             />
 
             {this.slicesData.length > 1 && (
