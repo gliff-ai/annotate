@@ -623,7 +623,6 @@ export class UserInterface extends Component<Props, State> {
           </ButtonGroup>
         </Grid>
       </div>
-
       <CssBaseline />
       <Container disableGutters>
         <AppBar
@@ -813,6 +812,93 @@ export class UserInterface extends Component<Props, State> {
                 </Paper>
               </Card>
             </Popover>
+            <div>
+              <ButtonGroup size="small" style={{ margin: "5px" }}>
+                {this.zoomToolTips.map((zoomToolTip) => {
+                  return (
+                    <HtmlTooltip
+                      key={zoomToolTip.name}
+                      title={
+                        <Box
+                          display="flex"
+                          alignItems="center"
+                          justifyItems="space-between"
+                        >
+                          <Box mr={3}>
+                            <Typography color="inherit">
+                              {zoomToolTip.name}
+                            </Typography>
+                          </Box>
+                          <Avatar
+                            style={{
+                              backgroundColor: "#02FFAD",
+                              color: "#2B2F3A",
+                              margin: "3px",
+                            }}
+                          >
+                            {zoomToolTip.shortcut}
+                          </Avatar>
+                          <Avatar
+                            style={{
+                              backgroundColor: "#02FFAD",
+                              color: "#2B2F3A",
+                            }}
+                          >
+                            {zoomToolTip.shortcutSymbol}
+                          </Avatar>
+                        </Box>
+                      }
+                      placement="right"
+                    >
+                      <IconButton
+                        size="small"
+                        style={{ marginBottom: "10px" }}
+                        onClick={(e: React.MouseEvent) =>
+                          this.setState(
+                            {
+                              clickedButtonId: zoomToolTip.key,
+                            },
+                            () => {
+                              if (zoomToolTip.key === 7) {
+                                this.incrementScale();
+                              }
+                              if (zoomToolTip.key === 8) {
+                                this.decrementScale();
+                              }
+                              if (zoomToolTip.key === 9) {
+                                this.resetScaleAndPan();
+                              }
+                            }
+                          )
+                        }
+                      >
+                        <Avatar sizes="large" variant="circular">
+                          <SVG
+                            src={`${zoomToolTip.icon}`}
+                            width="55%"
+                            height="auto"
+                            // fill={
+                            //   this.state.clickedButtonId === zoomToolTip.key
+                            //     ? "#02FFAD"
+                            //     : null
+                            // }
+                          />
+                        </Avatar>
+                      </IconButton>
+                    </HtmlTooltip>
+                  );
+                })}
+              </ButtonGroup>
+              <MinimapCanvas
+                displayedImage={this.state.displayedImage}
+                scaleAndPan={this.state.scaleAndPan}
+                setScaleAndPan={this.setScaleAndPan}
+                canvasPositionAndSize={this.state.viewportPositionAndSize}
+                minimapPositionAndSize={this.state.minimapPositionAndSize}
+                setMinimapPositionAndSize={this.setMinimapPositionAndSize}
+              />
+            </div>
+
             <BackgroundUI
               open={
                 this.state.clickedButtonId === 4 ||
