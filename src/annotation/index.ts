@@ -255,6 +255,14 @@ export class Annotations {
 
   getAuditObject = (): Array<AuditAction> => this.audit;
 
+  popAuditObject = (): Array<AuditAction> => {
+    // returns the audit array and deletes it from this object, so they can be stored separately without duplicating data
+
+    const audit = this.audit;
+    this.audit = [];
+    return audit;
+  };
+
   testAudit = (): boolean => {
     // make a new Annotations object and apply the AuditActions from this.audit to it one by one
     // if its resulting state is not identical to this object's state, then there's a problem
