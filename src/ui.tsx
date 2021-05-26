@@ -93,7 +93,7 @@ interface State {
   colour: boolean;
   popover: boolean;
   anchorEl: any;
-  clickedButtonId: number;
+  buttonClicked: string;
 }
 
 interface Props {
@@ -103,7 +103,6 @@ interface Props {
 }
 
 interface ToolTips {
-  key: number;
   name: string;
   icon: string;
   shortcut: string;
@@ -151,7 +150,7 @@ export class UserInterface extends Component<Props, State> {
       colour: null,
       popover: null,
       anchorEl: null,
-      clickedButtonId: null,
+      buttonClicked: null,
     };
 
     this.annotationsObject.addAnnotation(this.state.activeTool);
@@ -467,43 +466,42 @@ export class UserInterface extends Component<Props, State> {
 
   toolTips: ToolTips[] = [
     {
-      key: 0,
       name: "Select",
       icon: `./src/assets/select-icon.svg`,
       shortcut: "V",
     },
     {
-      key: 1,
       name: "Brush",
       icon: `./src/assets/brush-icon.svg`,
       shortcut: "B",
     },
     {
-      key: 2,
       name: "Eraser",
       icon: `./src/assets/eraser-icon.svg`,
       shortcut: "E",
     },
     {
-      key: 3,
       name: "Spline",
       icon: `./src/assets/splines-icon.svg`,
       shortcut: "S",
     },
     {
-      key: 4,
+      name: "Spline",
+      icon: `./src/assets/splines-icon.svg`,
+      shortcut: "S",
+    },
+
+    {
       name: "Contrast",
       icon: `./src/assets/contrast-icon.svg`,
       shortcut: `\\`,
     },
     {
-      key: 5,
       name: "Brightness",
       icon: `./src/assets/brightness-icon.svg`,
       shortcut: `/`,
     },
     {
-      key: 6,
       name: "Annonation Label",
       icon: `./src/assets/annotation-label-icon.svg`,
       shortcut: "L",
@@ -512,21 +510,18 @@ export class UserInterface extends Component<Props, State> {
 
   zoomToolTips = [
     {
-      key: 7,
       name: "Zoom In",
       icon: `./src/assets/zoom-in-icon.svg`,
       shortcut: "Ctrl",
       shortcutSymbol: "+",
     },
     {
-      key: 8,
       name: "Zoom Out",
       icon: `./src/assets/zoom-out-icon.svg`,
       shortcut: "Ctrl",
       shortcutSymbol: "-",
     },
     {
-      key: 9,
       name: "Fit to Page",
       icon: `./src/assets/reset-zoom-and-pan-icon.svg`,
       shortcut: "Ctrl",
@@ -536,14 +531,12 @@ export class UserInterface extends Component<Props, State> {
 
   annotationToolTips = [
     {
-      key: 10,
       name: "Add New Annotation",
       icon: `./src/assets/new-annotation-icon.svg`,
       shortcut: "Shift",
       shortcutSymbol: "+",
     },
     {
-      key: 11,
       name: "Clear Annotation",
       icon: `./src/assets/delete-annotation-icon.svg`,
       shortcut: "Shift",
@@ -614,13 +607,15 @@ export class UserInterface extends Component<Props, State> {
                     onClick={(e: React.MouseEvent) =>
                       this.setState(
                         {
-                          clickedButtonId: toolTip.key,
+                          buttonClicked: toolTip.name,
                         },
                         () => {
-                          if (this.state.clickedButtonId === 10) {
+                          if (
+                            this.state.buttonClicked === "Add New Annotation"
+                          ) {
                             this.addAnnotation();
                           }
-                          if (this.state.clickedButtonId === 11) {
+                          if (this.state.buttonClicked === "Clear Annotation") {
                             this.clearActiveAnnotation();
                           }
                         }
@@ -633,7 +628,7 @@ export class UserInterface extends Component<Props, State> {
                         width="55%"
                         height="auto"
                         fill={
-                          this.state.clickedButtonId === toolTip.key
+                          this.state.buttonClicked === toolTip.name
                             ? "#02FFAD"
                             : null
                         }
@@ -700,14 +695,14 @@ export class UserInterface extends Component<Props, State> {
                       this.setState(
                         {
                           popover: true,
-                          clickedButtonId: toolTip.key,
+                          buttonClicked: toolTip.name,
                           anchorEl: e.currentTarget,
                         },
                         () => {
-                          if (this.state.clickedButtonId === 2) {
+                          if (this.state.buttonClicked === "Eraser") {
                             this.activateTool("eraser");
                           }
-                          if (this.state.clickedButtonId === 1) {
+                          if (this.state.buttonClicked === "Brush") {
                             this.activateTool("paintbrush");
                           }
                         }
@@ -720,7 +715,7 @@ export class UserInterface extends Component<Props, State> {
                         width="55%"
                         height="auto"
                         fill={
-                          this.state.clickedButtonId === toolTip.key
+                          this.state.buttonClicked === toolTip.name
                             ? "#02FFAD"
                             : null
                         }
@@ -850,7 +845,10 @@ export class UserInterface extends Component<Props, State> {
             </div>
 
             <Popover
-              open={this.state.clickedButtonId === 6 && this.state.popover}
+              open={
+                this.state.buttonClicked === "Annonation Label" &&
+                this.state.popover
+              }
               anchorEl={this.state.anchorEl}
               onClose={this.handleClose}
             >
@@ -945,16 +943,16 @@ export class UserInterface extends Component<Props, State> {
                         onClick={(e: React.MouseEvent) =>
                           this.setState(
                             {
-                              clickedButtonId: zoomToolTip.key,
+                              buttonClicked: zoomToolTip.name,
                             },
                             () => {
-                              if (zoomToolTip.key === 7) {
+                              if (zoomToolTip.name === "Zoom In") {
                                 this.incrementScale();
                               }
-                              if (zoomToolTip.key === 8) {
+                              if (zoomToolTip.name === "Zoom Out") {
                                 this.decrementScale();
                               }
-                              if (zoomToolTip.key === 9) {
+                              if (zoomToolTip.name === "Fit to Page") {
                                 this.resetScaleAndPan();
                               }
                             }
@@ -967,7 +965,7 @@ export class UserInterface extends Component<Props, State> {
                             width="55%"
                             height="auto"
                             fill={
-                              this.state.clickedButtonId === zoomToolTip.key
+                              this.state.buttonClicked === zoomToolTip.name
                                 ? "#02FFAD"
                                 : null
                             }
@@ -990,8 +988,9 @@ export class UserInterface extends Component<Props, State> {
 
             <BackgroundUI
               open={
-                this.state.clickedButtonId === 4 ||
-                (this.state.clickedButtonId === 5 && this.state.popover)
+                this.state.buttonClicked === "Contrast" ||
+                (this.state.buttonClicked === "Brightness" &&
+                  this.state.popover)
               }
               anchorEl={this.state.anchorEl}
               onClose={this.handleClose}
@@ -999,17 +998,17 @@ export class UserInterface extends Component<Props, State> {
               toggleChannelAtIndex={this.toggleChannelAtIndex}
             />
             <PaintbrushUI
-              open={this.state.clickedButtonId === 1 && this.state.popover}
+              open={this.state.buttonClicked === "Brush" && this.state.popover}
               anchorEl={this.state.anchorEl}
               onClose={this.handleClose}
-              buttonID={this.state.clickedButtonId}
+              buttonClicked={this.state.buttonClicked}
               onClick={this.handleClose}
               activeTool={this.state.activeTool}
               onChange={this.handleToolboxChange("paintbrush-toolbox")}
               activateTool={this.activateTool}
             />
             <SplineUI
-              open={this.state.clickedButtonId === 3 && this.state.popover}
+              open={this.state.buttonClicked === "Spline" && this.state.popover}
               anchorEl={this.state.anchorEl}
               onClick={this.handleRequestClose}
               onClose={this.handleClose}

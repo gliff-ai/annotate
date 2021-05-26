@@ -21,7 +21,7 @@ interface Props {
   open: boolean;
   activeTool: Tool;
   anchorEl: any;
-  buttonID: number;
+  buttonClicked: string;
   onClose: (event: React.MouseEvent) => void;
   onClick: (event: React.MouseEvent) => void;
   onChange: (event: ChangeEvent, isExpanded: boolean) => void;
