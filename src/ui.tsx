@@ -486,9 +486,9 @@ export class UserInterface extends Component<Props, State> {
       shortcut: "S",
     },
     {
-      name: "Spline",
-      icon: `./src/assets/splines-icon.svg`,
-      shortcut: "S",
+      name: "Magic Spline",
+      icon: `./src/assets/magic-spline-icon.svg`,
+      shortcut: "MS",
     },
 
     {
@@ -501,6 +501,12 @@ export class UserInterface extends Component<Props, State> {
       icon: `./src/assets/brightness-icon.svg`,
       shortcut: `/`,
     },
+    {
+      name: "Channel",
+      icon: `./src/assets/channels-icon.svg`,
+      shortcut: `|`,
+    },
+
     {
       name: "Annonation Label",
       icon: `./src/assets/annotation-label-icon.svg`,
@@ -704,6 +710,12 @@ export class UserInterface extends Component<Props, State> {
                           }
                           if (this.state.buttonClicked === "Brush") {
                             this.activateTool("paintbrush");
+                          }
+                          if (this.state.buttonClicked === "Magic Spline") {
+                            this.activateTool("magicspline");
+                          }
+                          if (this.state.buttonClicked === "Spline") {
+                            this.activateTool("spline");
                           }
                         }
                       )
