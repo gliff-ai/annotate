@@ -16,10 +16,21 @@ const theme: Theme = createMuiTheme({
   shape: {
     borderRadius: 6,
   },
+
   overrides: {
     MuiButton: {
       root: {
         color: "#000000",
+      },
+    },
+
+    MuiSlider: {
+      root: {
+        color: "#000000",
+        height: "70px",
+      },
+      vertical: {
+        height: "auto",
       },
     },
 

@@ -707,6 +707,9 @@ export class UserInterface extends Component<Props, State> {
                           if (this.state.clickedButtonId === 2) {
                             this.activateTool("eraser");
                           }
+                          if (this.state.clickedButtonId === 1) {
+                            this.activateTool("paintbrush");
+                          }
                         }
                       )
                     }

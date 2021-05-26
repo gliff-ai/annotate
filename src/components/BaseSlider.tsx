@@ -23,19 +23,19 @@ function getAriaValueText(value: number): string {
   return `${value}`;
 }
 
-function getMarks(config: Config): Marks {
-  return [config.min, config.initial, config.max].map((value) => ({
-    value,
-    label: `${value} ${config.unit}`,
-  }));
-}
+// function getMarks(config: Config): Marks {
+//   return [config.min, config.initial, config.max].map((value) => ({
+//     value,
+//     label: `${value} ${config.unit}`,
+//   }));
+// }
 
 export const BaseSlider: FunctionComponent<Props> = ({
   value,
   config,
   onChange,
 }: Props): ReactElement => {
-  const marks = getMarks(config);
+  // const marks = getMarks(config);
   return (
     <>
       <Typography
@@ -43,18 +43,34 @@ export const BaseSlider: FunctionComponent<Props> = ({
         gutterBottom
         style={{ textTransform: "capitalize" }}
       >
-        {config.name}
+        <div
+          style={{
+            width: "42px",
+            height: "42px",
+            border: "1px solid #02FFAD",
+            borderRadius: "9px",
+            margin: "auto",
+            textAlign: "center",
+            padding: "7px 0",
+            marginTop: "11px",
+            marginBottom: "11px",
+          }}
+        >
+          {value}
+        </div>
       </Typography>
       <Slider
+        color="primary"
+        orientation="vertical"
         value={value}
         onChange={onChange(config.name)}
         aria-labelledby={config.id}
         step={config.step}
         min={config.min}
         max={config.max}
-        marks={marks}
+        // marks={marks}
         getAriaValueText={getAriaValueText}
-        valueLabelDisplay="auto"
+        // valueLabelDisplay="auto"
       />
     </>
   );

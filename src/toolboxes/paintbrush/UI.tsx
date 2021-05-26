@@ -44,31 +44,19 @@ const PaintbrushUI = (props: Props): ReactElement => {
       onClose={props.onClose}
       onClick={props.onClick}
     >
-      <Card>
-        <Typography>Paintbrushes</Typography>
-
-        <Grid container spacing={0} justify="center" wrap="nowrap">
-          <Grid item style={{ width: "85%", position: "relative" }}>
-            <Tooltip title="Activate paintbrush">
-              <IconButton
-                id="activate-paintbrush"
-                onClick={() => props.activateTool("paintbrush")}
-                color={
-                  props.activeTool === "paintbrush" ? "secondary" : "default"
-                }
-              >
-                <Brush />
-              </IconButton>
-            </Tooltip>
-
-            <BaseSlider
-              value={paintbrush.brushRadius}
-              config={SLIDER_CONFIG[Sliders.brushRadius]}
-              onChange={() => changeBrushRadius}
-            />
-          </Grid>
-        </Grid>
-      </Card>
+      <div
+        style={{
+          width: "63px",
+          height: "350px",
+          textAlign: "center",
+        }}
+      >
+        <BaseSlider
+          value={paintbrush.brushRadius}
+          config={SLIDER_CONFIG[Sliders.brushRadius]}
+          onChange={() => changeBrushRadius}
+        />
+      </div>
     </Popover>
   );
 };
