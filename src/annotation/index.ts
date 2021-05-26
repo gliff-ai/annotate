@@ -39,7 +39,7 @@ export class Annotations {
 
     this.audit.push({
       method: "addAnnotation",
-      args: [toolbox, labels, spline, brushStrokes, parameters],
+      args: JSON.stringify([toolbox, labels, spline, brushStrokes, parameters]),
       timestamp: Date.now(),
     });
   };
@@ -55,7 +55,7 @@ export class Annotations {
 
     this.audit.push({
       method: "deleteActiveAnnotation",
-      args: [],
+      args: JSON.stringify([]),
       timestamp: Date.now(),
     });
   };
@@ -114,7 +114,7 @@ export class Annotations {
 
     this.audit.push({
       method: "addLabel",
-      args: [newLabel],
+      args: JSON.stringify([newLabel]),
       timestamp: Date.now(),
     });
   };
@@ -126,7 +126,7 @@ export class Annotations {
 
     this.audit.push({
       method: "removeLabel",
-      args: [existingLabel],
+      args: JSON.stringify([existingLabel]),
       timestamp: Date.now(),
     });
   };
@@ -136,7 +136,7 @@ export class Annotations {
 
     this.audit.push({
       method: "setActiveAnnotationID",
-      args: [id],
+      args: JSON.stringify([id]),
       timestamp: Date.now(),
     });
   };
@@ -152,7 +152,7 @@ export class Annotations {
 
     this.audit.push({
       method: "addBrushStroke",
-      args: [newBrushStroke],
+      args: JSON.stringify([newBrushStroke]),
       timestamp: Date.now(),
     });
   };
@@ -162,7 +162,7 @@ export class Annotations {
 
     this.audit.push({
       method: "clearBrushStrokes",
-      args: [],
+      args: JSON.stringify([]),
       timestamp: Date.now(),
     });
   };
@@ -172,7 +172,7 @@ export class Annotations {
 
     this.audit.push({
       method: "clearSplineCoordinates",
-      args: [],
+      args: JSON.stringify([]),
       timestamp: Date.now(),
     });
   };
@@ -188,7 +188,7 @@ export class Annotations {
 
     this.audit.push({
       method: "addSplinePoint",
-      args: [point],
+      args: JSON.stringify([point]),
       timestamp: Date.now(),
     });
   };
@@ -198,7 +198,7 @@ export class Annotations {
 
     this.audit.push({
       method: "deleteSplinePoint",
-      args: [idx],
+      args: JSON.stringify([idx]),
       timestamp: Date.now(),
     });
   };
@@ -211,7 +211,7 @@ export class Annotations {
 
     this.audit.push({
       method: "updateSplinePoint",
-      args: [newX, newY, index],
+      args: JSON.stringify([newX, newY, index]),
       timestamp: Date.now(),
     });
   };
@@ -221,7 +221,7 @@ export class Annotations {
 
     this.audit.push({
       method: "insertSplinePoint",
-      args: [idx, point],
+      args: JSON.stringify([idx, point]),
       timestamp: Date.now(),
     });
   };
@@ -231,7 +231,7 @@ export class Annotations {
 
     this.audit.push({
       method: "setActiveAnnotationToolbox",
-      args: [newToolbox],
+      args: JSON.stringify([newToolbox]),
       timestamp: Date.now(),
     });
   };
@@ -248,7 +248,7 @@ export class Annotations {
 
     this.audit.push({
       method: "setSplineSpaceTimeInfo",
-      args: [z, t],
+      args: JSON.stringify([z, t]),
       timestamp: Date.now(),
     });
   };
@@ -270,16 +270,12 @@ export class Annotations {
     const annotationsObject = new Annotations();
 
     for (const action of this.audit) {
-      annotationsObject[action.method as keyof Annotations].call(
-        this,
-        ...action.args
+      annotationsObject[action.method as keyof Annotations].apply(
+        annotationsObject,
+        JSON.parse(action.args)
       );
     }
 
-    console.log(JSON.stringify(this.data));
-    console.log(JSON.stringify(annotationsObject.data));
     return JSON.stringify(this.data) === JSON.stringify(annotationsObject.data);
   };
 }
-
-const methods = ["addSplinePoint", "updateSplinePoint", "insertSplinePoint"];
