@@ -11,7 +11,7 @@ export class Annotations {
 
   private activeAnnotationID: number;
 
-  private audit: Array<AuditAction>;
+  private audit: Array<AuditAction> = [];
 
   constructor() {
     this.data = [];
@@ -254,4 +254,24 @@ export class Annotations {
   };
 
   getAuditObject = (): Array<AuditAction> => this.audit;
+
+  testAudit = (): boolean => {
+    // make a new Annotations object and apply the AuditActions from this.audit to it one by one
+    // if its resulting state is not identical to this object's state, then there's a problem
+
+    const annotationsObject = new Annotations();
+
+    for (const action of this.audit) {
+      annotationsObject[action.method as keyof Annotations].call(
+        this,
+        ...action.args
+      );
+    }
+
+    console.log(JSON.stringify(this.data));
+    console.log(JSON.stringify(annotationsObject.data));
+    return JSON.stringify(this.data) === JSON.stringify(annotationsObject.data);
+  };
 }
+
+const methods = ["addSplinePoint", "updateSplinePoint", "insertSplinePoint"];

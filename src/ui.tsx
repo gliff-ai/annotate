@@ -442,6 +442,13 @@ export class UserInterface extends Component<Props, State> {
               annotations={this.annotationsObject.getAllAnnotations()}
               imageFileInfo={this.imageFileInfo}
             />
+            <Button
+              onClick={() => {
+                alert(this.annotationsObject.testAudit());
+              }}
+            >
+              TEST AUDIT
+            </Button>
           </Toolbar>
         </AppBar>
         <Toolbar />
