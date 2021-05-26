@@ -534,6 +534,23 @@ export class UserInterface extends Component<Props, State> {
     },
   ];
 
+  annotationToolTips = [
+    {
+      key: 10,
+      name: "Add New Annotation",
+      icon: `./src/assets/new-annotation-icon.svg`,
+      shortcut: "Shift",
+      shortcutSymbol: "+",
+    },
+    {
+      key: 11,
+      name: "Clear Annotation",
+      icon: `./src/assets/delete-annotation-icon.svg`,
+      shortcut: "Shift",
+      shortcutSymbol: "-",
+    },
+  ];
+
   handleRequestClose = () => {
     this.setState({
       popover: false,
@@ -546,16 +563,106 @@ export class UserInterface extends Component<Props, State> {
         style={{
           position: "fixed",
           left: "18px",
+          top: "80px",
+          marginTop: "30px",
+          zIndex: 100,
+        }}
+      >
+        <Grid container direction="row">
+          <ButtonGroup size="small" style={{ background: "#fafafa" }}>
+            {this.annotationToolTips.map((toolTip) => {
+              return (
+                <HtmlTooltip
+                  key={toolTip.name}
+                  title={
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      justifyItems="space-between"
+                    >
+                      <Box mr={3}>
+                        <Typography>{toolTip.name}</Typography>
+                      </Box>
+                      <Avatar
+                        variant="circle"
+                        style={{
+                          backgroundColor: "#02FFAD",
+                          color: "#2B2F3A",
+                          margin: "3px",
+                        }}
+                      >
+                        {toolTip.shortcut}
+                      </Avatar>
+                      <Avatar
+                        style={{
+                          backgroundColor: "#02FFAD",
+                          color: "#2B2F3A",
+                        }}
+                      >
+                        {toolTip.shortcutSymbol}
+                      </Avatar>
+                    </Box>
+                  }
+                  placement="right"
+                >
+                  <IconButton
+                    size="small"
+                    style={{
+                      marginBottom: "5px",
+                      marginTop: "7px",
+                    }}
+                    onClick={(e: React.MouseEvent) =>
+                      this.setState(
+                        {
+                          clickedButtonId: toolTip.key,
+                        },
+                        () => {
+                          if (this.state.clickedButtonId === 10) {
+                            this.addAnnotation();
+                          }
+                          if (this.state.clickedButtonId === 11) {
+                            this.clearActiveAnnotation();
+                          }
+                        }
+                      )
+                    }
+                  >
+                    <Avatar sizes="large" variant="circular">
+                      <SVG
+                        src={`${toolTip.icon}`}
+                        width="55%"
+                        height="auto"
+                        fill={
+                          this.state.clickedButtonId === toolTip.key
+                            ? "#02FFAD"
+                            : null
+                        }
+                      />
+                    </Avatar>
+                  </IconButton>
+                </HtmlTooltip>
+              );
+            })}
+          </ButtonGroup>
+        </Grid>
+      </div>
+
+      <div
+        style={{
+          position: "fixed",
+          left: "18px",
           bottom: "0",
           marginBottom: "30px",
           zIndex: 100,
-          background: "#fafafa",
         }}
       >
         <Grid container direction="row">
           <ButtonGroup
             size="small"
-            style={{ margin: "5px", height: "419px", width: "63px" }}
+            style={{
+              margin: "-5px",
+              background: "#fafafa",
+            }}
           >
             {this.toolTips.map((toolTip) => {
               return (
@@ -776,32 +883,11 @@ export class UserInterface extends Component<Props, State> {
                       src="./src/assets/pin-icon.svg"
                       width="18px"
                       height="auto"
-                      // fill={
-                      //   this.state.clickedButtonId === toolTip.key
-                      //     ? "#02FFAD"
-                      //     : null
-                      // }
                     />
                   </Avatar>
                 </Paper>
                 <Paper elevation={0} square>
                   <Grid container justify="center">
-                    {/* <ButtonGroup>
-                      <Tooltip title="Annotate new object">
-                        <Button id="addAnnotation" onClick={this.addAnnotation}>
-                          <Add />
-                        </Button>
-                      </Tooltip>
-                      <Tooltip title="Clear selected annotation">
-                        <Button
-                          id="clear-annotation"
-                          onClick={this.clearActiveAnnotation}
-                        >
-                          <Delete />
-                        </Button>
-                      </Tooltip>
-                    </ButtonGroup> */}
-
                     <Labels
                       annotationObject={this.annotationsObject}
                       presetLabels={this.presetLabels}
@@ -813,7 +899,7 @@ export class UserInterface extends Component<Props, State> {
               </Card>
             </Popover>
             <div>
-              <ButtonGroup size="small" style={{ margin: "5px" }}>
+              <ButtonGroup size="small" style={{ background: "#fafafa" }}>
                 {this.zoomToolTips.map((zoomToolTip) => {
                   return (
                     <HtmlTooltip
@@ -877,11 +963,11 @@ export class UserInterface extends Component<Props, State> {
                             src={`${zoomToolTip.icon}`}
                             width="55%"
                             height="auto"
-                            // fill={
-                            //   this.state.clickedButtonId === zoomToolTip.key
-                            //     ? "#02FFAD"
-                            //     : null
-                            // }
+                            fill={
+                              this.state.clickedButtonId === zoomToolTip.key
+                                ? "#02FFAD"
+                                : null
+                            }
                           />
                         </Avatar>
                       </IconButton>
