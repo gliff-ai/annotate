@@ -258,7 +258,7 @@ export class Annotations {
   popAuditObject = (): Array<AuditAction> => {
     // returns the audit array and deletes it from this object, so they can be stored separately without duplicating data
 
-    const audit = this.audit;
+    const { audit } = this;
     this.audit = [];
     return audit;
   };
@@ -270,10 +270,8 @@ export class Annotations {
     const annotationsObject = new Annotations();
 
     for (const action of this.audit) {
-      annotationsObject[action.method as keyof Annotations].apply(
-        annotationsObject,
-        JSON.parse(action.args)
-      );
+      const method = annotationsObject[action.method as keyof Annotations];
+      method.apply(annotationsObject, JSON.parse(action.args));
     }
 
     return JSON.stringify(this.data) === JSON.stringify(annotationsObject.data);
