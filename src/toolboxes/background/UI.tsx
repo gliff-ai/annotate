@@ -8,7 +8,11 @@ import {
   FormLabel,
   FormControl,
   Popover,
+  Card,
+  Paper,
+  Avatar,
 } from "@material-ui/core";
+import SVG, { Props as SVGProps } from "react-inlinesvg";
 
 import { BaseSlider } from "@/components/BaseSlider";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
@@ -18,6 +22,7 @@ import { useBackgroundStore } from "./Store";
 interface Props {
   open: boolean;
   anchorEl: any;
+  buttonClicked: string;
   onClose: (event: React.MouseEvent) => void;
   channels: boolean[];
   toggleChannelAtIndex: (index: number) => void;
@@ -56,37 +61,65 @@ const BackgroundUI = (props: Props): ReactElement => {
         anchorEl={props.anchorEl}
         onClose={props.onClose}
       >
-        <Typography>Image</Typography>
-        <Grid container spacing={0} justify="center" wrap="nowrap">
-          <Grid item style={{ width: "85%", position: "relative" }}>
+        <div
+          style={{
+            width: "63px",
+            height: "297px",
+          }}
+        >
+          {props.buttonClicked === "Contrast" && (
             <BaseSlider
               value={background.contrast}
               config={SLIDER_CONFIG[Sliders.contrast]}
               onChange={() => changeContrast}
             />
+          )}
+
+          {props.buttonClicked === "Brightness" && (
             <BaseSlider
               value={background.brightness}
               config={SLIDER_CONFIG[Sliders.brightness]}
               onChange={() => changeBrightness}
             />
+          )}
+        </div>
 
-            <FormControl component="fieldset">
-              <FormLabel component="legend">Channels</FormLabel>
-              <FormGroup aria-label="position" row>
-                {controls.map((control, i) => (
-                  <FormControlLabel
-                    key={`C${i + 1}`}
-                    value="top"
-                    control={control}
-                    label={`C${i + 1}`}
-                    labelPlacement="top"
-                    style={{ margin: "0", padding: "0" }}
-                  />
-                ))}
-              </FormGroup>
-            </FormControl>
-          </Grid>
-        </Grid>
+        {props.buttonClicked === "Channel" && (
+          <Card
+            style={{
+              width: "271px",
+              height: "375px",
+            }}
+          >
+            <Paper
+              elevation={0}
+              variant="outlined"
+              square
+              style={{
+                padding: "10px",
+                backgroundColor: "#02FFAD",
+                width: "271px",
+              }}
+            >
+              <Typography
+                style={{
+                  display: "inline",
+                  fontSize: "21px",
+                  marginRight: "125px",
+                }}
+              >
+                Channels
+              </Typography>
+              <Avatar style={{ backgroundColor: "#02FFAD", display: "inline" }}>
+                <SVG
+                  src="./src/assets/pin-icon.svg"
+                  width="18px"
+                  height="auto"
+                />
+              </Avatar>
+            </Paper>
+          </Card>
+        )}
       </Popover>
     </>
   );

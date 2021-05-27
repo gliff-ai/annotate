@@ -1,10 +1,4 @@
-import React, {
-  Component,
-  ChangeEvent,
-  ReactNode,
-  useRef,
-  MouseEventHandler,
-} from "react";
+import React, { Component, ChangeEvent, ReactNode, useRef } from "react";
 import {
   AppBar,
   Container,
@@ -13,10 +7,7 @@ import {
   Button,
   ButtonGroup,
   Grid,
-  Accordion,
-  AccordionSummary,
   Typography,
-  AccordionDetails,
   CssBaseline,
   Slider,
   withStyles,
@@ -26,28 +17,11 @@ import {
   IconButton,
   Popover,
   Card,
-  CardHeader,
   Paper,
 } from "@material-ui/core";
 
 import SVG, { Props as SVGProps } from "react-inlinesvg";
 
-import {
-  Add,
-  AspectRatio,
-  Delete,
-  ZoomOut,
-  ZoomIn,
-  KeyboardArrowDown,
-  KeyboardArrowLeft,
-  KeyboardArrowRight,
-  KeyboardArrowUp,
-  ExpandMore,
-  Backup,
-  Brush,
-  RadioButtonUncheckedSharp,
-  Height,
-} from "@material-ui/icons";
 import { ImageFileInfo } from "@gliff-ai/upload/typings";
 import { UploadImage } from "@gliff-ai/upload";
 
@@ -1006,6 +980,7 @@ export class UserInterface extends Component<Props, State> {
                   this.state.popover) ||
                 (this.state.buttonClicked === "Channel" && this.state.popover)
               }
+              buttonClicked={this.state.buttonClicked}
               anchorEl={this.state.anchorEl}
               onClose={this.handleClose}
               channels={this.state.channels}
