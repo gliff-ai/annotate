@@ -1000,9 +1000,11 @@ export class UserInterface extends Component<Props, State> {
 
             <BackgroundUI
               open={
-                this.state.buttonClicked === "Contrast" ||
+                (this.state.buttonClicked === "Contrast" &&
+                  this.state.popover) ||
                 (this.state.buttonClicked === "Brightness" &&
-                  this.state.popover)
+                  this.state.popover) ||
+                (this.state.buttonClicked === "Channel" && this.state.popover)
               }
               anchorEl={this.state.anchorEl}
               onClose={this.handleClose}
