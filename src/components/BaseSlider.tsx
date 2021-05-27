@@ -52,26 +52,30 @@ export const BaseSlider: FunctionComponent<Props> = ({
             margin: "auto",
             textAlign: "center",
             padding: "7px 0",
-            marginTop: "11px",
-            marginBottom: "11px",
+            marginTop: "14px",
+            marginBottom: "24px",
           }}
         >
           {value}
         </div>
       </Typography>
-      <Slider
-        color="primary"
-        orientation="vertical"
-        value={value}
-        onChange={onChange(config.name)}
-        aria-labelledby={config.id}
-        step={config.step}
-        min={config.min}
-        max={config.max}
-        // marks={marks}
-        getAriaValueText={getAriaValueText}
-        // valueLabelDisplay="auto"
-      />
+      <div
+        style={{ textAlign: "center", height: "204px", marginBottom: "18px" }}
+      >
+        <Slider
+          color="primary"
+          orientation="vertical"
+          value={value}
+          onChange={onChange(config.name)}
+          aria-labelledby={config.id}
+          step={config.step}
+          min={config.min}
+          max={config.max}
+          // marks={marks}
+          getAriaValueText={getAriaValueText}
+          // valueLabelDisplay="auto"
+        />
+      </div>
     </>
   );
 };

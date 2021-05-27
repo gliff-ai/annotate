@@ -28,6 +28,7 @@ const theme: Theme = createMuiTheme({
       root: {
         color: "#000000",
         height: "70px",
+        textAlign: "center",
       },
       vertical: {
         height: "auto",

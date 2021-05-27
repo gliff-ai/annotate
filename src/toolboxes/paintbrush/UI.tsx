@@ -47,7 +47,7 @@ const PaintbrushUI = (props: Props): ReactElement => {
       <div
         style={{
           width: "63px",
-          height: "350px",
+          height: "297px",
           textAlign: "center",
         }}
       >

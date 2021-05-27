@@ -1,10 +1,7 @@
 import React, { ChangeEvent, ReactElement } from "react";
 import {
   Grid,
-  Accordion,
-  AccordionSummary,
   Typography,
-  AccordionDetails,
   Checkbox,
   FormControlLabel,
   FormGroup,
@@ -12,8 +9,6 @@ import {
   FormControl,
   Popover,
 } from "@material-ui/core";
-
-import { ExpandMore } from "@material-ui/icons";
 
 import { BaseSlider } from "@/components/BaseSlider";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
