@@ -24,6 +24,12 @@ const theme: Theme = createMuiTheme({
       },
     },
 
+    MuiCheckbox: {
+      root: {
+        color: "#000000",
+      },
+    },
+
     MuiSlider: {
       root: {
         color: "#000000",

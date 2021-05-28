@@ -48,6 +48,21 @@ const BackgroundUI = (props: Props): ReactElement => {
   const controls = props.channels.map((channel, i) => (
     <Checkbox
       checked={channel}
+      icon={
+        <SVG
+          src="./src/assets/not-selected-tickbox-icon.svg"
+          width="18px"
+          height="auto"
+        />
+      }
+      checkedIcon={
+        <SVG
+          src="./src/assets/selected-tickbox-icon.svg"
+          width="18px"
+          height="auto"
+        />
+      }
+      style={{ marginLeft: "104px" }}
       onChange={() => {
         props.toggleChannelAtIndex(i);
       }}
@@ -61,34 +76,41 @@ const BackgroundUI = (props: Props): ReactElement => {
         anchorEl={props.anchorEl}
         onClose={props.onClose}
       >
-        <div
-          style={{
-            width: "63px",
-            height: "297px",
-          }}
-        >
-          {props.buttonClicked === "Contrast" && (
+        {props.buttonClicked === "Contrast" && (
+          <div
+            style={{
+              width: "63px",
+              height: "297px",
+            }}
+          >
             <BaseSlider
               value={background.contrast}
               config={SLIDER_CONFIG[Sliders.contrast]}
               onChange={() => changeContrast}
             />
-          )}
+          </div>
+        )}
 
-          {props.buttonClicked === "Brightness" && (
+        {props.buttonClicked === "Brightness" && (
+          <div
+            style={{
+              width: "63px",
+              height: "297px",
+            }}
+          >
             <BaseSlider
               value={background.brightness}
               config={SLIDER_CONFIG[Sliders.brightness]}
               onChange={() => changeBrightness}
             />
-          )}
-        </div>
+          </div>
+        )}
 
         {props.buttonClicked === "Channel" && (
           <Card
             style={{
-              width: "271px",
-              height: "375px",
+              width: "189px",
+              height: "176px",
             }}
           >
             <Paper
@@ -98,14 +120,16 @@ const BackgroundUI = (props: Props): ReactElement => {
               style={{
                 padding: "10px",
                 backgroundColor: "#02FFAD",
-                width: "271px",
+                width: "189px",
+                marginBottom: "15px",
               }}
             >
               <Typography
                 style={{
                   display: "inline",
                   fontSize: "21px",
-                  marginRight: "125px",
+                  marginRight: "54px",
+                  marginLeft: "3px",
                 }}
               >
                 Channels
@@ -118,6 +142,20 @@ const BackgroundUI = (props: Props): ReactElement => {
                 />
               </Avatar>
             </Paper>
+            <FormControl component="fieldset">
+              <FormGroup aria-label="position" row>
+                {controls.map((control, i) => (
+                  <FormControlLabel
+                    key={`C${i + 1}`}
+                    value="top"
+                    control={control}
+                    label={`C${i + 1}`}
+                    labelPlacement="start"
+                    style={{ margin: "0", padding: "0", marginLeft: "17px" }}
+                  />
+                ))}
+              </FormGroup>
+            </FormControl>
           </Card>
         )}
       </Popover>
