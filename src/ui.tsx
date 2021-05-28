@@ -462,7 +462,7 @@ export class UserInterface extends Component<Props, State> {
     {
       name: "Magic Spline",
       icon: `./src/assets/magic-spline-icon.svg`,
-      shortcut: "MS",
+      shortcut: "M",
     },
 
     {
@@ -478,7 +478,7 @@ export class UserInterface extends Component<Props, State> {
     {
       name: "Channel",
       icon: `./src/assets/channels-icon.svg`,
-      shortcut: `|`,
+      shortcut: `C`,
     },
 
     {
@@ -513,13 +513,11 @@ export class UserInterface extends Component<Props, State> {
     {
       name: "Add New Annotation",
       icon: `./src/assets/new-annotation-icon.svg`,
-      shortcut: "Shift",
       shortcutSymbol: "+",
     },
     {
       name: "Clear Annotation",
       icon: `./src/assets/delete-annotation-icon.svg`,
-      shortcut: "Shift",
       shortcutSymbol: "-",
     },
   ];
@@ -556,16 +554,7 @@ export class UserInterface extends Component<Props, State> {
                       <Box mr={3}>
                         <Typography>{toolTip.name}</Typography>
                       </Box>
-                      <Avatar
-                        variant="circle"
-                        style={{
-                          backgroundColor: "#02FFAD",
-                          color: "#2B2F3A",
-                          margin: "3px",
-                        }}
-                      >
-                        {toolTip.shortcut}
-                      </Avatar>
+
                       <Avatar
                         style={{
                           backgroundColor: "#02FFAD",
@@ -902,7 +891,7 @@ export class UserInterface extends Component<Props, State> {
                               {zoomToolTip.name}
                             </Typography>
                           </Box>
-                          <Avatar
+                          {/* <Avatar
                             style={{
                               backgroundColor: "#02FFAD",
                               color: "#2B2F3A",
@@ -910,7 +899,7 @@ export class UserInterface extends Component<Props, State> {
                             }}
                           >
                             {zoomToolTip.shortcut}
-                          </Avatar>
+                          </Avatar> */}
                           <Avatar
                             style={{
                               backgroundColor: "#02FFAD",
