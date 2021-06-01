@@ -6,24 +6,24 @@ import {
   AuditAction,
 } from "./interfaces";
 
-/* eslint-disable */
+interface Descriptor extends Omit<PropertyDescriptor, "value"> {
+  // Ideally this would be the methods of Annotations
+  value?: (...args: unknown[]) => unknown;
+}
+
 function log(
-  target: any,
+  target: Annotations,
   propertyKey: string,
-  descriptor: PropertyDescriptor
+  descriptor: Descriptor
 ): void {
   const targetMethod = descriptor.value;
 
-  descriptor.value = function (...args: any[]) {
-    this.audit.push({
-      method: propertyKey,
-      args: JSON.stringify(args),
-      timestamp: Date.now(),
-    });
+  descriptor.value = (...args) => {
+    (this as Annotations).addAudit(propertyKey, args);
+
     return targetMethod.apply(this, args);
   };
 }
-/* eslint-enable */
 
 export class Annotations {
   private data: Array<Annotation>;
@@ -200,6 +200,14 @@ export class Annotations {
       z: z || prevZ,
       t: t || prevT,
     };
+  }
+
+  addAudit(method: string, args: unknown): void {
+    this.audit.push({
+      method,
+      args: JSON.stringify(args),
+      timestamp: Date.now(),
+    });
   }
 
   getAuditObject = (): Array<AuditAction> => this.audit;
