@@ -391,8 +391,12 @@ export class UserInterface extends Component<Props, State> {
     };
 
   clearActiveAnnotation = (): void => {
-    this.annotationsObject.setSplineCoordinates([]);
-    this.annotationsObject.setAnnotationBrushStrokes([]);
+    this.annotationsObject.deleteActiveAnnotation();
+    if (this.annotationsObject.length() === 1) {
+      // if we delete the last annotation, annotationsObject will make a new one with the paintbrush toolbox
+      // (since it doesn't know which tool is active), so we set the toolbox correctly here:
+      this.annotationsObject.setActiveAnnotationToolbox(this.state.activeTool);
+    }
     this.setState((prevState) => ({
       callRedraw: prevState.callRedraw + 1,
     }));
@@ -474,6 +478,9 @@ export class UserInterface extends Component<Props, State> {
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
               callRedraw={this.state.callRedraw}
               sliceIndex={this.state.sliceIndex}
+              setUIActiveAnnotationID={(id) => {
+                this.setState({ activeAnnotationID: id });
+              }}
             />
 
             <PaintbrushCanvas
@@ -485,6 +492,9 @@ export class UserInterface extends Component<Props, State> {
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
               callRedraw={this.state.callRedraw}
               sliceIndex={this.state.sliceIndex}
+              setUIActiveAnnotationID={(id) => {
+                this.setState({ activeAnnotationID: id });
+              }}
             />
 
             {this.slicesData.length > 1 && (
@@ -630,7 +640,7 @@ export class UserInterface extends Component<Props, State> {
             <SplineUI
               expanded={
                 this.state.expanded === "spline-toolbox" ||
-                ["spline"].includes(this.state.activeTool)
+                ["spline", "magicspline"].includes(this.state.activeTool)
               }
               activeTool={this.state.activeTool}
               onChange={this.handleToolboxChange("spline-toolbox")}

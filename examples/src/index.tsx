@@ -12,7 +12,7 @@ loadImage("zebrafish-heart.jpg").then(
       document.getElementById("react-container")
     );
   },
-  (e) => {
+  () => {
     ReactDOM.render(
       <UserInterface />,
       document.getElementById("react-container")
