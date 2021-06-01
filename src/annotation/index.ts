@@ -243,14 +243,6 @@ export class Annotations {
     // If true, return annotation index, otherwise return null.
     // If more than one annotation at clicked point, select first drawn.
 
-    const isClickNearPoint = (
-      point: XYPoint,
-      point1: XYPoint,
-      radius: number
-    ): boolean =>
-      Math.abs(point.x - point1.x) < radius &&
-      Math.abs(point.y - point1.y) < radius;
-
     for (let i = 0; i < this.data.length; i += 1) {
       if (this.data[i].toolbox === "paintbrush") {
         let finalIndex = null;
@@ -318,7 +310,7 @@ export class Annotations {
     p: XYPoint, // test point
     a: XYPoint, // line segment endpoint 1
     b: XYPoint, // line segment endpoint 2
-    threshold: number = 12
+    threshold = 12
   ): boolean => {
     const pa: XYPoint = { x: p.x - a.x, y: p.y - a.y };
     const ba: XYPoint = { x: b.x - a.x, y: b.y - a.y };

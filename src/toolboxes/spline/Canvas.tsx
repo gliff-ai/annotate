@@ -325,7 +325,7 @@ export class SplineCanvas extends Component<Props, State> {
           imageY,
           this.props.sliceIndex
         );
-      console.log(selectedSpline, selectedBrushStroke);
+
       if (
         selectedSpline !== null &&
         selectedSpline !== this.props.annotationsObject.getActiveAnnotationID()
@@ -479,7 +479,6 @@ export class SplineCanvas extends Component<Props, State> {
   };
 
   onMouseDown = (x: number, y: number): void => {
-    console.log("SPLINE CANVAS MOUSEDOWN");
     if (!this.isActive()) return;
     if (!this.sliceIndexMatch()) return;
 
