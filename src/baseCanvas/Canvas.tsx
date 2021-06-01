@@ -76,29 +76,29 @@ export class BaseCanvas extends Component<Props> {
       this.canvasContext.restore();
     }
   };
-  // zoomToolTips = [
-  //   {
-  //     key: 7,
-  //     name: "Zoom In",
-  //     icon: `./src/assets/zoom-in-icon.svg`,
-  //     shortcut: "Ctrl",
-  //     shortcutSymbol: "+",
-  //   },
-  //   {
-  //     key: 8,
-  //     name: "Zoom Out",
-  //     icon: `./src/assets/zoom-out-icon.svg`,
-  //     shortcut: "Ctrl",
-  //     shortcutSymbol: "-",
-  //   },
-  //   {
-  //     key: 9,
-  //     name: "Fit to Page",
-  //     icon: `./src/assets/reset-zoom-and-pan-icon.svg`,
-  //     shortcut: "Ctrl",
-  //     shortcutSymbol: "[",
-  //   },
-  // ];
+  zoomToolTips = [
+    {
+      key: 7,
+      name: "Zoom In",
+      icon: `./src/assets/zoom-in-icon.svg`,
+      shortcut: "Ctrl",
+      shortcutSymbol: "+",
+    },
+    {
+      key: 8,
+      name: "Zoom Out",
+      icon: `./src/assets/zoom-out-icon.svg`,
+      shortcut: "Ctrl",
+      shortcutSymbol: "-",
+    },
+    {
+      key: 9,
+      name: "Fit to Page",
+      icon: `./src/assets/reset-zoom-and-pan-icon.svg`,
+      shortcut: "Ctrl",
+      shortcutSymbol: "[",
+    },
+  ];
 
   componentDidUpdate = (): void => {
     this.applyView();
@@ -200,12 +200,13 @@ export class BaseCanvas extends Component<Props> {
         pointerEvents: "inherit",
         display: "block",
         touchAction: "none",
-        width: "100%",
         height: this.props.canvasPositionAndSize.height,
         cursor: this.props.cursor || "pointer",
         left: this.props.canvasPositionAndSize.left,
-        position: "absolute",
         bottom: "0px",
+        position: "fixed",
+        right: "250px",
+        marginTop: "30px",
       }}
     >
       <canvas

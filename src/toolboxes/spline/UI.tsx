@@ -11,7 +11,6 @@ interface Props {
   anchorEl: any;
   onClose: (event: React.MouseEvent) => void;
   onClick: (event: React.MouseEvent) => void;
-  onChange: (event: ChangeEvent, isExpanded: boolean) => void;
   activateTool: (tool: Tool) => void;
 }
 
