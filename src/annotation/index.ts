@@ -258,11 +258,12 @@ export class Annotations {
         this.data[i].brushStrokes.forEach(
           ({ spaceTimeInfo, coordinates, brush }) => {
             if (spaceTimeInfo.z === sliceIndex) {
-              coordinates.forEach((point: XYPoint) => {
+              for (let j = 0; j < coordinates.length - 1; j += 1) {
                 if (
-                  isClickNearPoint(
+                  this.isClickNearLineSegment(
                     { x: imageX, y: imageY },
-                    point,
+                    coordinates[j],
+                    coordinates[j + 1],
                     brush.radius
                   )
                 ) {
@@ -270,7 +271,7 @@ export class Annotations {
                   // finalIndex will be reset to null.
                   finalIndex = brush.type === "paint" ? i : null;
                 }
-              });
+              }
             }
           }
         );
@@ -288,35 +289,6 @@ export class Annotations {
     // Check if point clicked (in image space) is near an existing spline.
     // If true, return annotation index, otherwise return null.
 
-    const isClickNearLineSegment = (
-      point: XYPoint,
-      point1: XYPoint,
-      point2: XYPoint
-    ): boolean => {
-      // Check if a XYpoint belongs to the line segment with endpoints XYpoint 1 and XYpoint 2.
-      const dx = point.x - point1.x;
-      const dy = point.y - point1.y;
-      const dxLine = point2.x - point1.x;
-      const dyLine = point2.y - point1.y;
-      const distance = 700;
-      // Use the cross-product to check whether the XYpoint lies on the line passing
-      // through XYpoint 1 and XYpoint 2.
-      const crossProduct = dx * dyLine - dy * dxLine;
-      // If the XYpoint is exactly on the line the cross-product is zero. Here we set a threshold
-      // based on ease of use, to accept points that are close enough to the spline.
-      if (Math.abs(crossProduct) > distance) return false;
-
-      // Check if the point is on the segment (i.e., between point 1 and point 2).
-      if (Math.abs(dxLine) >= Math.abs(dyLine)) {
-        return dxLine > 0
-          ? point1.x <= point.x && point.x <= point2.x
-          : point2.x <= point.x && point.x <= point1.x;
-      }
-      return dyLine > 0
-        ? point1.y <= point.y && point.y <= point2.y
-        : point2.y <= point.y && point.y <= point1.y;
-    };
-
     const splines = this.getAllSplines(sliceIndex);
     for (let i = 0; i < splines.length; i += 1) {
       // index here is the index of the annotation this spline is from among all annotations,
@@ -329,7 +301,7 @@ export class Annotations {
       // having for end points two consecutive points in the spline:
       for (let j = 1; j < spline.coordinates.length; j += 1) {
         if (
-          isClickNearLineSegment(
+          this.isClickNearLineSegment(
             { x: imageX, y: imageY },
             spline.coordinates[j - 1],
             spline.coordinates[j]
@@ -340,5 +312,19 @@ export class Annotations {
     }
 
     return null;
+  };
+
+  isClickNearLineSegment = (
+    p: XYPoint, // test point
+    a: XYPoint, // line segment endpoint 1
+    b: XYPoint, // line segment endpoint 2
+    threshold: number = 12
+  ): boolean => {
+    const pa: XYPoint = { x: p.x - a.x, y: p.y - a.y };
+    const ba: XYPoint = { x: b.x - a.x, y: b.y - a.y };
+    let h = (pa.x * ba.x + pa.y * ba.y) / (ba.x ** 2 + ba.y ** 2);
+    h = Math.max(Math.min(h, 1), 0); // clamp between 0 and 1
+    const r = Math.sqrt((pa.x - h * ba.x) ** 2 + (pa.y - h * ba.y) ** 2);
+    return r < threshold;
   };
 }
