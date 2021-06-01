@@ -467,6 +467,9 @@ export class UserInterface extends Component<Props, State> {
               setUIActiveAnnotationID={(id) => {
                 this.setState({ activeAnnotationID: id });
               }}
+              setActiveTool={(tool: Tool) => {
+                this.setState({ activeTool: tool });
+              }}
             />
 
             <PaintbrushCanvas
@@ -480,6 +483,9 @@ export class UserInterface extends Component<Props, State> {
               sliceIndex={this.state.sliceIndex}
               setUIActiveAnnotationID={(id) => {
                 this.setState({ activeAnnotationID: id });
+              }}
+              setActiveTool={(tool: Tool) => {
+                this.setState({ activeTool: tool });
               }}
             />
 

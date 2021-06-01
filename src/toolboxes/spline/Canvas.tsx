@@ -4,6 +4,7 @@ import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/transforms";
 import { XYPoint } from "@/annotation/interfaces";
+import { Tool, Tools } from "@/tools";
 
 import {
   main as mainColor,
@@ -20,6 +21,7 @@ interface Props extends BaseProps {
   callRedraw: number;
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
+  setActiveTool: (tool: Tool) => void;
 }
 enum Mode {
   draw,
@@ -310,6 +312,36 @@ export class SplineCanvas extends Component<Props, State> {
       this.props.canvasPositionAndSize
     );
 
+    if (this.state.mode === Mode.select) {
+      // In select mode a single click allows to select a different spline
+      const selectedSpline = this.props.annotationsObject.clickNearSpline(
+        imageX,
+        imageY,
+        this.props.sliceIndex
+      );
+      const selectedBrushStroke =
+        this.props.annotationsObject.clickNearBrushStroke(
+          imageX,
+          imageY,
+          this.props.sliceIndex
+        );
+      console.log(selectedSpline, selectedBrushStroke);
+      if (
+        selectedSpline !== null &&
+        selectedSpline !== this.props.annotationsObject.getActiveAnnotationID()
+      ) {
+        this.props.annotationsObject.setActiveAnnotationID(selectedSpline);
+        this.props.setUIActiveAnnotationID(selectedSpline);
+        this.props.setActiveTool(Tools.spline);
+      } else if (selectedBrushStroke !== null) {
+        this.props.annotationsObject.setActiveAnnotationID(selectedBrushStroke);
+        this.props.setUIActiveAnnotationID(selectedBrushStroke);
+        this.props.setActiveTool(Tools.paintbrush);
+      }
+    }
+
+    if (!this.isActive()) return;
+
     if (this.sliceIndexMatch()) {
       const coordinates = this.props.annotationsObject.getSplineCoordinates();
 
@@ -349,76 +381,7 @@ export class SplineCanvas extends Component<Props, State> {
       }
     }
 
-    if (this.state.mode === Mode.select) {
-      // In select mode a single click allows to select a different spline
-      const selectedSpline = this.clickNearSpline(imageX, imageY);
-      if (selectedSpline !== null) {
-        this.props.annotationsObject.setActiveAnnotationID(selectedSpline);
-        this.props.setUIActiveAnnotationID(selectedSpline);
-      }
-    }
-
     this.drawAllSplines();
-  };
-
-  clickNearSpline = (imageX: number, imageY: number): number => {
-    // Check if point clicked (in image space) is near an existing spline.
-    // If true, return annotation index, otherwise return null.
-
-    const splines = this.props.annotationsObject.getAllSplines(
-      this.props.sliceIndex
-    );
-    for (let i = 0; i < splines.length; i += 1) {
-      // index here is the index of the annotation this spline is from among all annotations,
-      // not the index within `splines`
-
-      const [spline, index] = splines[i];
-      // here `i` is the index of the spline in `splines`, while `index` is the index of the spline in all annotations
-
-      // For each pair of points, check if point clicked is near the line segment
-      // having for end points two consecutive points in the spline:
-      for (let j = 1; j < spline.coordinates.length; j += 1) {
-        if (
-          this.isClickNearLineSegment(
-            { x: imageX, y: imageY },
-            spline.coordinates[j - 1],
-            spline.coordinates[j]
-          )
-        )
-          return index;
-      }
-    }
-
-    return null;
-  };
-
-  isClickNearLineSegment = (
-    point: XYPoint,
-    point1: XYPoint,
-    point2: XYPoint
-  ): boolean => {
-    // Check if a XYpoint belongs to the line segment with endpoints XYpoint 1 and XYpoint 2.
-    const dx = point.x - point1.x;
-    const dy = point.y - point1.y;
-    const dxLine = point2.x - point1.x;
-    const dyLine = point2.y - point1.y;
-    const distance = 700;
-    // Use the cross-product to check whether the XYpoint lies on the line passing
-    // through XYpoint 1 and XYpoint 2.
-    const crossProduct = dx * dyLine - dy * dxLine;
-    // If the XYpoint is exactly on the line the cross-product is zero. Here we set a threshold
-    // based on ease of use, to accept points that are close enough to the spline.
-    if (Math.abs(crossProduct) > distance) return false;
-
-    // Check if the point is on the segment (i.e., between point 1 and point 2).
-    if (Math.abs(dxLine) >= Math.abs(dyLine)) {
-      return dxLine > 0
-        ? point1.x <= point.x && point.x <= point2.x
-        : point2.x <= point.x && point.x <= point1.x;
-    }
-    return dyLine > 0
-      ? point1.y <= point.y && point.y <= point2.y
-      : point2.y <= point.y && point.y <= point1.y;
   };
 
   onDoubleClick = (x: number, y: number): void => {
@@ -516,6 +479,8 @@ export class SplineCanvas extends Component<Props, State> {
   };
 
   onMouseDown = (x: number, y: number): void => {
+    console.log("SPLINE CANVAS MOUSEDOWN");
+    if (!this.isActive()) return;
     if (!this.sliceIndexMatch()) return;
 
     const coordinates = this.props.annotationsObject.getSplineCoordinates();
@@ -548,6 +513,7 @@ export class SplineCanvas extends Component<Props, State> {
   };
 
   onMouseMove = (x: number, y: number): void => {
+    if (!this.isActive()) return;
     if (!this.isMouseDown) return;
 
     this.numberOfMoves += 1;
@@ -597,6 +563,8 @@ export class SplineCanvas extends Component<Props, State> {
 
   onMouseUp = (): void => {
     // Works as part of drag and drop for points.
+    if (!this.isActive()) return;
+
     this.isMouseDown = false;
   };
 

@@ -10,6 +10,7 @@ import { BaseCanvas, CanvasProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/transforms";
 import { XYPoint } from "@/annotation/interfaces";
+import { Tool, Tools } from "@/tools";
 
 import {
   main as mainColor,
@@ -27,6 +28,7 @@ interface Props extends CanvasProps {
   callRedraw: number;
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
+  setActiveTool: (tool: Tool) => void;
 }
 
 interface Brush {
@@ -304,49 +306,6 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     return brushRadius * imageScalingFactor * 2 * this.props.scaleAndPan.scale;
   };
 
-  clickNearBrushStroke = (imageX: number, imageY: number): number => {
-    // Check if point clicked is near an existing paintbrush annotation.
-    // If true, return annotation index, otherwise return null.
-    // If more than one annotation at clicked point, select first drawn.
-    const annotations = this.props.annotationsObject.getAllAnnotations();
-
-    for (let i = 0; i < annotations.length; i += 1) {
-      if (annotations[i].toolbox === "paintbrush") {
-        let finalIndex = null;
-
-        annotations[i].brushStrokes.forEach(
-          ({ spaceTimeInfo, coordinates, brush }) => {
-            if (spaceTimeInfo.z === this.props.sliceIndex) {
-              coordinates.forEach((point: XYPoint) => {
-                if (
-                  this.isClickNearPoint(
-                    { x: imageX, y: imageY },
-                    point,
-                    brush.radius
-                  )
-                ) {
-                  // If the region near the clicked point has been erased,
-                  // finalIndex will be reset to null.
-                  finalIndex = brush.type === "paint" ? i : null;
-                }
-              });
-            }
-          }
-        );
-        if (finalIndex !== null) return i;
-      }
-    }
-    return null;
-  };
-
-  isClickNearPoint = (
-    point: XYPoint,
-    point1: XYPoint,
-    radius: number
-  ): boolean =>
-    Math.abs(point.x - point1.x) < radius &&
-    Math.abs(point.y - point1.y) < radius;
-
   toggleMode = (): void => {
     if (!this.isActive()) return;
     if (this.state.mode === Mode.draw) {
@@ -390,7 +349,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
   };
 
-  /** * Mouse events *** */
+  /* *** Mouse events *** */
   onMouseDown = (canvasX: number, canvasY: number): void => {
     if (this.state.mode === Mode.draw) {
       // Start drawing
@@ -408,7 +367,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       // Ensure the initial down position gets added to our line
       this.handlePointerMove(canvasX, canvasY);
     } else if (this.state.mode === Mode.select) {
-      // In select mode a single click allows to select a different paintbrush annotation
+      // In select mode a single click allows to select a different paintbrush or spline annotation
       const { x: imageX, y: imageY } = canvasToImage(
         canvasX,
         canvasY,
@@ -417,11 +376,30 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
         this.props.scaleAndPan,
         this.props.canvasPositionAndSize
       );
-      const selectedBrushStroke = this.clickNearBrushStroke(imageX, imageY);
-      if (selectedBrushStroke !== null) {
+      const selectedBrushStroke =
+        this.props.annotationsObject.clickNearBrushStroke(
+          imageX,
+          imageY,
+          this.props.sliceIndex
+        );
+      const selectedSpline = this.props.annotationsObject.clickNearSpline(
+        imageX,
+        imageY,
+        this.props.sliceIndex
+      );
+      if (
+        selectedBrushStroke !== null &&
+        selectedBrushStroke !==
+          this.props.annotationsObject.getActiveAnnotationID()
+      ) {
         this.props.annotationsObject.setActiveAnnotationID(selectedBrushStroke);
         this.props.setUIActiveAnnotationID(selectedBrushStroke);
+        this.props.setActiveTool(Tools.paintbrush);
         this.drawAllStrokes();
+      } else if (selectedSpline !== null) {
+        this.props.annotationsObject.setActiveAnnotationID(selectedSpline);
+        this.props.setUIActiveAnnotationID(selectedSpline);
+        this.props.setActiveTool(Tools.spline);
       }
     }
   };
@@ -536,6 +514,7 @@ export const PaintbrushCanvas = (
       callRedraw={props.callRedraw}
       sliceIndex={props.sliceIndex}
       setUIActiveAnnotationID={props.setUIActiveAnnotationID}
+      setActiveTool={props.setActiveTool}
     />
   );
 };
