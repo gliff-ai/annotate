@@ -18,7 +18,7 @@ function log(
 ): void {
   const targetMethod = descriptor.value;
 
-  descriptor.value = (...args) => {
+  descriptor.value = function auditWrapper(...args) {
     (this as Annotations).addAudit(propertyKey, args);
 
     return targetMethod.apply(this, args);
