@@ -479,7 +479,6 @@ export class SplineCanvas extends Component<Props, State> {
   };
 
   onMouseDown = (x: number, y: number): void => {
-    if (!this.isActive()) return;
     if (!this.sliceIndexMatch()) return;
 
     const coordinates = this.props.annotationsObject.getSplineCoordinates();
@@ -512,7 +511,6 @@ export class SplineCanvas extends Component<Props, State> {
   };
 
   onMouseMove = (x: number, y: number): void => {
-    if (!this.isActive()) return;
     if (!this.isMouseDown) return;
 
     this.numberOfMoves += 1;
@@ -562,8 +560,6 @@ export class SplineCanvas extends Component<Props, State> {
 
   onMouseUp = (): void => {
     // Works as part of drag and drop for points.
-    if (!this.isActive()) return;
-
     this.isMouseDown = false;
   };
 
