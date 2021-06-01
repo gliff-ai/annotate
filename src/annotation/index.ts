@@ -312,6 +312,8 @@ export class Annotations {
     b: XYPoint, // line segment endpoint 2
     threshold = 12
   ): boolean => {
+    // returns true if point p is within a capsule with endpoints a and b, and radius `threshold`
+    // math from https://iquilezles.org/www/articles/distfunctions/distfunctions.htm
     const pa: XYPoint = { x: p.x - a.x, y: p.y - a.y };
     const ba: XYPoint = { x: b.x - a.x, y: b.y - a.y };
     let h = (pa.x * ba.x + pa.y * ba.y) / (ba.x ** 2 + ba.y ** 2);
