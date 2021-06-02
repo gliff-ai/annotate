@@ -27,6 +27,7 @@ import {
   KeyboardArrowUp,
   ExpandMore,
   Backup,
+  Save,
 } from "@material-ui/icons";
 
 import { ImageFileInfo } from "@gliff-ai/upload/typings";
@@ -77,6 +78,7 @@ interface Props {
   imageFileInfo?: ImageFileInfo;
   annotationsObject?: Annotations;
   presetLabels?: string[];
+  saveAnnotationsCallback?: (annotationsObject: Annotations) => void;
 }
 
 export class UserInterface extends Component<Props, State> {
@@ -442,6 +444,18 @@ export class UserInterface extends Component<Props, State> {
               annotations={this.annotationsObject.getAllAnnotations()}
               imageFileInfo={this.imageFileInfo}
             />
+            {this.props.saveAnnotationsCallback && (
+              <Tooltip title="Save annotations data">
+                <Button
+                  aria-label="save"
+                  onClick={() =>
+                    this.props.saveAnnotationsCallback(this.annotationsObject)
+                  }
+                >
+                  <Save />
+                </Button>
+              </Tooltip>
+            )}
           </Toolbar>
         </AppBar>
         <Toolbar />
