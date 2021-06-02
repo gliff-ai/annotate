@@ -724,6 +724,201 @@ export class UserInterface extends Component<Props, State> {
         </Grid>
       </div>
 
+      <CssBaseline />
+      <Container disableGutters>
+        <AppBar
+          position={"static"}
+          style={{ backgroundColor: "#fafafa", height: "90px" }}
+        >
+          <Toolbar>
+            <Grid container direction="row">
+              <Grid item justify="flex-start" style={{ marginTop: "18px" }}>
+                {
+                  <img
+                    src="
+                    ./src/assets/gliff-master-black.png
+                   "
+                    width="79px"
+                    height="60px"
+                  />
+                }
+              </Grid>
+            </Grid>
+            <Grid item justify="flex-end">
+              <UploadImage
+                setUploadedImage={this.setUploadedImage}
+                spanElement={
+                  /* eslint-disable react/jsx-wrap-multilines */
+                  <Button aria-label="upload-picture" component="span">
+                    {<img src="./src/assets/upload-icon.svg" />}
+                  </Button>
+                }
+              />
+            </Grid>
+          </Toolbar>
+        </AppBar>
+
+        <Grid
+          container
+          spacing={0}
+          justify="center"
+          wrap="nowrap"
+          style={{ height: "calc(100% - 64px)" }}
+        >
+          <Grid
+            item
+            style={{
+              width: "100%",
+              position: "relative",
+              backgroundColor: "#fafafa",
+            }}
+            ref={(container) => {
+              if (container) {
+                this.canvasContainer = container;
+              }
+            }}
+          >
+            <BackgroundCanvas
+              scaleAndPan={this.state.scaleAndPan}
+              displayedImage={this.state.displayedImage}
+              canvasPositionAndSize={this.state.viewportPositionAndSize}
+              setCanvasPositionAndSize={this.setViewportPositionAndSize}
+            />
+
+            <SplineCanvas
+              scaleAndPan={this.state.scaleAndPan}
+              activeTool={this.state.activeTool}
+              annotationsObject={this.annotationsObject}
+              displayedImage={this.state.displayedImage}
+              canvasPositionAndSize={this.state.viewportPositionAndSize}
+              setCanvasPositionAndSize={this.setViewportPositionAndSize}
+              callRedraw={this.state.callRedraw}
+            />
+
+            <PaintbrushCanvas
+              scaleAndPan={this.state.scaleAndPan}
+              brushType={this.state.activeTool}
+              annotationsObject={this.annotationsObject}
+              displayedImage={this.state.displayedImage}
+              canvasPositionAndSize={this.state.viewportPositionAndSize}
+              setCanvasPositionAndSize={this.setViewportPositionAndSize}
+              callRedraw={this.state.callRedraw}
+            />
+
+            {this.slicesData.length > 1 && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: `${
+                    this.state.viewportPositionAndSize.top +
+                    this.state.viewportPositionAndSize.height +
+                    5
+                  }px`,
+                  left: `${this.state.viewportPositionAndSize.left}px`,
+                  width: `${this.state.viewportPositionAndSize.width}px`,
+                }}
+              >
+                <Slider
+                  value={this.state.sliceIndex}
+                  onChange={this.changeSlice}
+                  aria-labelledby="slice-index-slider"
+                  step={1}
+                  min={0}
+                  max={this.slicesData.length - 1}
+                  valueLabelDisplay="auto"
+                />
+              </div>
+            )}
+          </Grid>
+
+          <Popover
+            open={
+              this.state.buttonClicked === "Annonation Label" &&
+              this.state.popover
+            }
+            anchorEl={this.state.anchorEl}
+            onClose={this.handleClose}
+          >
+            <Card
+              style={{
+                width: "271px",
+                height: "375px",
+              }}
+            >
+              <Paper
+                elevation={0}
+                variant="outlined"
+                square
+                style={{
+                  padding: "10px",
+                  backgroundColor: "#02FFAD",
+                  width: "271px",
+                }}
+              >
+                <Typography
+                  style={{
+                    display: "inline",
+                    fontSize: "21px",
+                    marginRight: "125px",
+                  }}
+                >
+                  Annotation
+                </Typography>
+                <Avatar
+                  style={{ backgroundColor: "#02FFAD", display: "inline" }}
+                >
+                  <SVG
+                    src="./src/assets/pin-icon.svg"
+                    width="18px"
+                    height="auto"
+                  />
+                </Avatar>
+              </Paper>
+              <Paper elevation={0} square>
+                <Grid container justify="center">
+                  <Labels
+                    annotationObject={this.annotationsObject}
+                    presetLabels={this.presetLabels}
+                    updatePresetLabels={this.updatePresetLabels}
+                    activeAnnotationID={this.state.activeAnnotationID}
+                  />
+                </Grid>
+              </Paper>
+            </Card>
+          </Popover>
+
+          <BackgroundUI
+            open={
+              (this.state.buttonClicked === "Contrast" && this.state.popover) ||
+              (this.state.buttonClicked === "Brightness" &&
+                this.state.popover) ||
+              (this.state.buttonClicked === "Channel" && this.state.popover)
+            }
+            buttonClicked={this.state.buttonClicked}
+            anchorEl={this.state.anchorEl}
+            onClose={this.handleClose}
+            channels={this.state.channels}
+            toggleChannelAtIndex={this.toggleChannelAtIndex}
+          />
+          <PaintbrushUI
+            open={this.state.buttonClicked === "Brush" && this.state.popover}
+            anchorEl={this.state.anchorEl}
+            onClose={this.handleClose}
+            onClick={this.handleRequestClose}
+            buttonClicked={this.state.buttonClicked}
+            activeTool={this.state.activeTool}
+            activateTool={this.activateTool}
+          />
+          <SplineUI
+            open={this.state.buttonClicked === "Spline" && this.state.popover}
+            anchorEl={this.state.anchorEl}
+            onClick={this.handleRequestClose}
+            onClose={this.handleClose}
+            activeTool={this.state.activeTool}
+            activateTool={this.activateTool}
+          />
+        </Grid>
+      </Container>
       <div
         style={{
           position: "fixed",
@@ -750,6 +945,7 @@ export class UserInterface extends Component<Props, State> {
               width: "344px",
               height: "248px",
               paddingTop: "7px",
+              position: "relative",
             }}
           >
             {this.minimapToolTips.map((minimapToolTip) => {
@@ -828,217 +1024,17 @@ export class UserInterface extends Component<Props, State> {
                 </HtmlTooltip>
               );
             })}
+            <MinimapCanvas
+              displayedImage={this.state.displayedImage}
+              scaleAndPan={this.state.scaleAndPan}
+              setScaleAndPan={this.setScaleAndPan}
+              canvasPositionAndSize={this.state.viewportPositionAndSize}
+              minimapPositionAndSize={this.state.minimapPositionAndSize}
+              setMinimapPositionAndSize={this.setMinimapPositionAndSize}
+            />
           </Card>
         </Slide>
       </div>
-
-      <CssBaseline />
-      <Container disableGutters>
-        <AppBar
-          position={"static"}
-          style={{ backgroundColor: "#fafafa", height: "90px" }}
-        >
-          <Toolbar>
-            <Grid container direction="row">
-              <Grid item justify="flex-start">
-                {
-                  <img
-                    src="
-                    ./src/assets/gliff-master-black.png
-                   "
-                    width="79px"
-                    height="60px"
-                  />
-                }
-              </Grid>
-            </Grid>
-            <Grid item justify="flex-end">
-              <UploadImage
-                setUploadedImage={this.setUploadedImage}
-                spanElement={
-                  /* eslint-disable react/jsx-wrap-multilines */
-                  <Button aria-label="upload-picture" component="span">
-                    {<img src="./src/assets/upload-icon.svg" />}
-                  </Button>
-                }
-              />
-            </Grid>
-          </Toolbar>
-        </AppBar>
-
-        <Grid
-          container
-          spacing={0}
-          justify="center"
-          wrap="nowrap"
-          style={{ height: "calc(100% - 64px)" }}
-        >
-          <Grid
-            item
-            style={{
-              width: "85%",
-              position: "relative",
-              backgroundColor: "#fafafa",
-            }}
-            ref={(container) => {
-              if (container) {
-                this.canvasContainer = container;
-              }
-            }}
-          >
-            <BackgroundCanvas
-              scaleAndPan={this.state.scaleAndPan}
-              displayedImage={this.state.displayedImage}
-              canvasPositionAndSize={this.state.viewportPositionAndSize}
-              setCanvasPositionAndSize={this.setViewportPositionAndSize}
-            />
-
-            <SplineCanvas
-              scaleAndPan={this.state.scaleAndPan}
-              activeTool={this.state.activeTool}
-              annotationsObject={this.annotationsObject}
-              displayedImage={this.state.displayedImage}
-              canvasPositionAndSize={this.state.viewportPositionAndSize}
-              setCanvasPositionAndSize={this.setViewportPositionAndSize}
-              callRedraw={this.state.callRedraw}
-            />
-
-            <PaintbrushCanvas
-              scaleAndPan={this.state.scaleAndPan}
-              brushType={this.state.activeTool}
-              annotationsObject={this.annotationsObject}
-              displayedImage={this.state.displayedImage}
-              canvasPositionAndSize={this.state.viewportPositionAndSize}
-              setCanvasPositionAndSize={this.setViewportPositionAndSize}
-              callRedraw={this.state.callRedraw}
-            />
-
-            {this.slicesData.length > 1 && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: `${
-                    this.state.viewportPositionAndSize.top +
-                    this.state.viewportPositionAndSize.height +
-                    5
-                  }px`,
-                  left: `${this.state.viewportPositionAndSize.left}px`,
-                  width: `${this.state.viewportPositionAndSize.width}px`,
-                }}
-              >
-                <Slider
-                  value={this.state.sliceIndex}
-                  onChange={this.changeSlice}
-                  aria-labelledby="slice-index-slider"
-                  step={1}
-                  min={0}
-                  max={this.slicesData.length - 1}
-                  valueLabelDisplay="auto"
-                />
-              </div>
-            )}
-          </Grid>
-
-          <Grid item style={{ width: 200, position: "relative" }}>
-            <div style={{ height: 200 }}>
-              <BackgroundCanvas
-                scaleAndPan={{ x: 0, y: 0, scale: 1 }}
-                displayedImage={this.state.displayedImage}
-                canvasPositionAndSize={this.state.minimapPositionAndSize}
-                setCanvasPositionAndSize={this.setMinimapPositionAndSize}
-              />
-            </div>
-
-            <Popover
-              open={
-                this.state.buttonClicked === "Annonation Label" &&
-                this.state.popover
-              }
-              anchorEl={this.state.anchorEl}
-              onClose={this.handleClose}
-            >
-              <Card
-                style={{
-                  width: "271px",
-                  height: "375px",
-                }}
-              >
-                <Paper
-                  elevation={0}
-                  variant="outlined"
-                  square
-                  style={{
-                    padding: "10px",
-                    backgroundColor: "#02FFAD",
-                    width: "271px",
-                  }}
-                >
-                  <Typography
-                    style={{
-                      display: "inline",
-                      fontSize: "21px",
-                      marginRight: "125px",
-                    }}
-                  >
-                    Annotation
-                  </Typography>
-                  <Avatar
-                    style={{ backgroundColor: "#02FFAD", display: "inline" }}
-                  >
-                    <SVG
-                      src="./src/assets/pin-icon.svg"
-                      width="18px"
-                      height="auto"
-                    />
-                  </Avatar>
-                </Paper>
-                <Paper elevation={0} square>
-                  <Grid container justify="center">
-                    <Labels
-                      annotationObject={this.annotationsObject}
-                      presetLabels={this.presetLabels}
-                      updatePresetLabels={this.updatePresetLabels}
-                      activeAnnotationID={this.state.activeAnnotationID}
-                    />
-                  </Grid>
-                </Paper>
-              </Card>
-            </Popover>
-
-            <BackgroundUI
-              open={
-                (this.state.buttonClicked === "Contrast" &&
-                  this.state.popover) ||
-                (this.state.buttonClicked === "Brightness" &&
-                  this.state.popover) ||
-                (this.state.buttonClicked === "Channel" && this.state.popover)
-              }
-              buttonClicked={this.state.buttonClicked}
-              anchorEl={this.state.anchorEl}
-              onClose={this.handleClose}
-              channels={this.state.channels}
-              toggleChannelAtIndex={this.toggleChannelAtIndex}
-            />
-            <PaintbrushUI
-              open={this.state.buttonClicked === "Brush" && this.state.popover}
-              anchorEl={this.state.anchorEl}
-              onClose={this.handleClose}
-              onClick={this.handleRequestClose}
-              buttonClicked={this.state.buttonClicked}
-              activeTool={this.state.activeTool}
-              activateTool={this.activateTool}
-            />
-            <SplineUI
-              open={this.state.buttonClicked === "Spline" && this.state.popover}
-              anchorEl={this.state.anchorEl}
-              onClick={this.handleRequestClose}
-              onClose={this.handleClose}
-              activeTool={this.state.activeTool}
-              activateTool={this.activateTool}
-            />
-          </Grid>
-        </Grid>
-      </Container>
     </ThemeProvider>
   );
 }

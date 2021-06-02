@@ -1,18 +1,16 @@
 import React, { ChangeEvent, ReactElement } from "react";
 import {
-  Grid,
   Typography,
   Checkbox,
   FormControlLabel,
   FormGroup,
-  FormLabel,
   FormControl,
   Popover,
   Card,
   Paper,
   Avatar,
 } from "@material-ui/core";
-import SVG, { Props as SVGProps } from "react-inlinesvg";
+import SVG from "react-inlinesvg";
 
 import { BaseSlider } from "@/components/BaseSlider";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";

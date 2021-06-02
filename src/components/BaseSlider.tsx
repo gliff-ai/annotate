@@ -40,7 +40,7 @@ export const BaseSlider: FunctionComponent<Props> = ({
           borderRadius: "9px",
           margin: "auto",
           textAlign: "center",
-          padding: "7px 0",
+          padding: "10px 0",
           marginTop: "10px",
           marginBottom: "20px",
         }}
