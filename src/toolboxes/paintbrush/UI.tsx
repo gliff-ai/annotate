@@ -1,14 +1,5 @@
 import React, { ChangeEvent, ReactElement } from "react";
-import {
-  Tooltip,
-  IconButton,
-  Typography,
-  Grid,
-  Popover,
-  Card,
-} from "@material-ui/core";
-
-import { Brush, RadioButtonUncheckedSharp } from "@material-ui/icons";
+import { Popover } from "@material-ui/core";
 
 import { Tool } from "@/tools";
 
@@ -22,6 +13,7 @@ interface Props {
   activeTool: Tool;
   anchorEl: any;
   buttonClicked: string;
+  onClick: (event: React.MouseEvent) => void;
   onClose: (event: React.MouseEvent) => void;
   activateTool: (tool: Tool) => void;
 }
@@ -40,6 +32,7 @@ const PaintbrushUI = (props: Props): ReactElement => {
       open={props.open}
       anchorEl={props.anchorEl}
       onClose={props.onClose}
+      onClick={props.onClick}
     >
       <div
         style={{
@@ -52,6 +45,7 @@ const PaintbrushUI = (props: Props): ReactElement => {
           value={paintbrush.brushRadius}
           config={SLIDER_CONFIG[Sliders.brushRadius]}
           onChange={() => changeBrushRadius}
+          slider={"paintbrush"}
         />
       </div>
     </Popover>

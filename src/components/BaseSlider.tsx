@@ -1,5 +1,5 @@
 import React, { ChangeEvent, FunctionComponent, ReactElement } from "react";
-import { Slider, Typography } from "@material-ui/core";
+import { Slider } from "@material-ui/core";
 
 export interface Config {
   name: string;
@@ -17,51 +17,45 @@ interface Props {
   value: number;
   config: Config;
   onChange: (arg0: string) => (arg1: ChangeEvent, arg2: number) => void;
+  slider: string;
 }
 
 function getAriaValueText(value: number): string {
   return `${value}`;
 }
 
-// function getMarks(config: Config): Marks {
-//   return [config.min, config.initial, config.max].map((value) => ({
-//     value,
-//     label: `${value} ${config.unit}`,
-//   }));
-// }
-
 export const BaseSlider: FunctionComponent<Props> = ({
   value,
   config,
   onChange,
+  slider,
 }: Props): ReactElement => {
-  // const marks = getMarks(config);
   return (
     <>
-      <Typography
-        id={config.id}
-        gutterBottom
-        style={{ textTransform: "capitalize" }}
+      <div
+        style={{
+          width: "42px",
+          height: "42px",
+          border: "1px solid #02FFAD",
+          borderRadius: "9px",
+          margin: "auto",
+          textAlign: "center",
+          padding: "7px 0",
+          marginTop: "10px",
+          marginBottom: "20px",
+        }}
       >
-        <div
-          style={{
-            width: "42px",
-            height: "42px",
-            border: "1px solid #02FFAD",
-            borderRadius: "9px",
-            margin: "auto",
-            textAlign: "center",
-            padding: "7px 0",
-            marginTop: "14px",
-            marginBottom: "24px",
-          }}
-        >
-          {`${value}${config.unit}`}
-        </div>
-      </Typography>
+        {`${value}`}
+      </div>
+
       <div
         style={{ textAlign: "center", height: "204px", marginBottom: "18px" }}
       >
+        <div>
+          {slider == "brightness" || slider == "contrast"
+            ? `${config.max}${config.unit}`
+            : null}
+        </div>
         <Slider
           color="primary"
           orientation="vertical"
@@ -71,10 +65,13 @@ export const BaseSlider: FunctionComponent<Props> = ({
           step={config.step}
           min={config.min}
           max={config.max}
-          // marks={marks}
           getAriaValueText={getAriaValueText}
-          // valueLabelDisplay="auto"
         />
+        <div>
+          {slider == "brightness" || slider == "contrast"
+            ? `${config.min}${config.unit}`
+            : null}
+        </div>
       </div>
     </>
   );

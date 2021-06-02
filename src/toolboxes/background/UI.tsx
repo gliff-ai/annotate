@@ -80,13 +80,14 @@ const BackgroundUI = (props: Props): ReactElement => {
           <div
             style={{
               width: "63px",
-              height: "297px",
+              height: "335px",
             }}
           >
             <BaseSlider
               value={background.contrast}
               config={SLIDER_CONFIG[Sliders.contrast]}
               onChange={() => changeContrast}
+              slider={"contrast"}
             />
           </div>
         )}
@@ -95,13 +96,14 @@ const BackgroundUI = (props: Props): ReactElement => {
           <div
             style={{
               width: "63px",
-              height: "297px",
+              height: "335px",
             }}
           >
             <BaseSlider
               value={background.brightness}
               config={SLIDER_CONFIG[Sliders.brightness]}
               onChange={() => changeBrightness}
+              slider={"brightness"}
             />
           </div>
         )}

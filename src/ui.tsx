@@ -1023,6 +1023,7 @@ export class UserInterface extends Component<Props, State> {
               open={this.state.buttonClicked === "Brush" && this.state.popover}
               anchorEl={this.state.anchorEl}
               onClose={this.handleClose}
+              onClick={this.handleRequestClose}
               buttonClicked={this.state.buttonClicked}
               activeTool={this.state.activeTool}
               activateTool={this.activateTool}

@@ -27,7 +27,6 @@ const theme: Theme = createMuiTheme({
     MuiSlider: {
       root: {
         color: "#000000",
-        height: "70px",
         textAlign: "center",
       },
       vertical: {
