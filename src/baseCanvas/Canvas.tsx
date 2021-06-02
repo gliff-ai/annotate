@@ -200,6 +200,7 @@ export class BaseCanvas extends Component<Props> {
         pointerEvents: "inherit",
         display: "block",
         touchAction: "none",
+        width: "100%",
         height: this.props.canvasPositionAndSize.height,
         cursor: this.props.cursor || "pointer",
         left: this.props.canvasPositionAndSize.left,

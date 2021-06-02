@@ -39,7 +39,6 @@ import { Labels } from "@/components/Labels";
 import { keydownListener } from "@/keybindings";
 
 import { Tools, Tool } from "@/tools";
-import { BaseSlider } from "./components/BaseSlider";
 
 const CONFIG = {
   PAN_AMOUNT: 20,
@@ -71,7 +70,7 @@ interface State {
   popover: boolean;
   anchorEl: any;
   buttonClicked: string;
-  openDrawer: boolean;
+  toggleMinimap: boolean;
 }
 
 interface Props {
@@ -129,7 +128,7 @@ export class UserInterface extends Component<Props, State> {
       popover: null,
       anchorEl: null,
       buttonClicked: null,
-      openDrawer: false,
+      toggleMinimap: false,
     };
 
     this.annotationsObject.addAnnotation(this.state.activeTool);
@@ -487,18 +486,28 @@ export class UserInterface extends Component<Props, State> {
     },
   ];
 
-  zoomToolTips = [
+  minimapToolTips = [
+    {
+      name: "Minimise Map",
+      icon: `./src/assets/minimise-icon.svg`,
+      shortcut: "Ctrl",
+      shortcutSymbol: "-",
+      styling: { marginRight: "86px", marginLeft: "15px" },
+    },
+
     {
       name: "Zoom In",
       icon: `./src/assets/zoom-in-icon.svg`,
       shortcut: "Ctrl",
       shortcutSymbol: "+",
+      styling: { marginRight: "22px" },
     },
     {
       name: "Zoom Out",
       icon: `./src/assets/zoom-out-icon.svg`,
       shortcut: "Ctrl",
       shortcutSymbol: "-",
+      styling: { marginRight: "30px" },
     },
     {
       name: "Fit to Page",
@@ -529,13 +538,13 @@ export class UserInterface extends Component<Props, State> {
 
   handleDrawerOpen = () => {
     this.setState({
-      openDrawer: true,
+      toggleMinimap: true,
     });
   };
 
   handleDrawerClose = () => {
     this.setState({
-      openDrawer: false,
+      toggleMinimap: false,
     });
   };
 
@@ -731,157 +740,94 @@ export class UserInterface extends Component<Props, State> {
           size="small"
         >
           <Avatar>
-            <SVG
-              src="src/assets/maximise-icon.svg"
-              width="55%"
-              height="auto"
-              // fill={
-              //   this.state.buttonClicked === zoomToolTip.name
-              //     ? "#02FFAD"
-              //     : null
-              // }
-            />
+            <SVG src="src/assets/maximise-icon.svg" width="55%" height="auto" />
           </Avatar>
         </IconButton>
-        <IconButton
-          color="inherit"
-          size="small"
-          onClick={this.handleDrawerClose}
-          edge="start"
-        >
-          <Avatar sizes="large" variant="circular"></Avatar>
-        </IconButton>
-        {this.zoomToolTips.map((zoomToolTip) => {
-          return (
-            <HtmlTooltip
-              key={zoomToolTip.name}
-              title={
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyItems="space-between"
-                >
-                  <Box mr={3}>
-                    <Typography color="inherit">{zoomToolTip.name}</Typography>
-                  </Box>
-                  <Avatar
-                    style={{
-                      backgroundColor: "#02FFAD",
-                      color: "#2B2F3A",
-                    }}
-                  >
-                    {zoomToolTip.shortcut}
-                  </Avatar>
-                  <Avatar
-                    style={{
-                      backgroundColor: "#02FFAD",
-                      color: "#2B2F3A",
-                    }}
-                  >
-                    {zoomToolTip.shortcutSymbol}
-                  </Avatar>
-                </Box>
-              }
-              placement="right"
-            >
-              <IconButton
-                size="small"
-                style={{ marginBottom: "10px" }}
-                onClick={(e: React.MouseEvent) =>
-                  this.setState(
-                    {
-                      buttonClicked: zoomToolTip.name,
-                    },
-                    () => {
-                      if (zoomToolTip.name === "Zoom In") {
-                        this.incrementScale();
-                      }
-                      if (zoomToolTip.name === "Zoom Out") {
-                        this.decrementScale();
-                      }
-                      if (zoomToolTip.name === "Fit to Page") {
-                        this.resetScaleAndPan();
-                      }
-                    }
-                  )
-                }
-              >
-                <Avatar sizes="large" variant="circular">
-                  <SVG
-                    src={`${zoomToolTip.icon}`}
-                    width="55%"
-                    height="auto"
-                    fill={
-                      this.state.buttonClicked === zoomToolTip.name
-                        ? "#02FFAD"
-                        : null
-                    }
-                  />
-                </Avatar>
-              </IconButton>
-            </HtmlTooltip>
-          );
-        })}
 
-        <Slide in={this.state.openDrawer} direction="up">
+        <Slide in={this.state.toggleMinimap} direction="up" timeout={1000}>
           <Card
             style={{
-              width: "271px",
-              height: "375px",
+              width: "344px",
+              height: "248px",
+              paddingTop: "7px",
             }}
           >
-            <Paper
-              elevation={0}
-              variant="outlined"
-              square
-              style={{
-                padding: "10px",
-                backgroundColor: "#02FFAD",
-                width: "271px",
-              }}
-            >
-              <Typography
-                style={{
-                  display: "inline",
-                  fontSize: "21px",
-                  marginRight: "125px",
-                }}
-              >
-                Annotation
-              </Typography>
-              <Avatar style={{ backgroundColor: "#02FFAD", display: "inline" }}>
-                <SVG
-                  src="./src/assets/pin-icon.svg"
-                  width="18px"
-                  height="auto"
-                />
-              </Avatar>
-            </Paper>
-            <Paper elevation={0} square>
-              <Grid container justify="center">
-                <Labels
-                  annotationObject={this.annotationsObject}
-                  presetLabels={this.presetLabels}
-                  updatePresetLabels={this.updatePresetLabels}
-                  activeAnnotationID={this.state.activeAnnotationID}
-                />
-              </Grid>
-            </Paper>
-
-            <div
-              ref={(canvasContainer) => {
-                this.canvasContainer = canvasContainer;
-              }}
-            >
-              <MinimapCanvas
-                displayedImage={this.state.displayedImage}
-                scaleAndPan={this.state.scaleAndPan}
-                setScaleAndPan={this.setScaleAndPan}
-                canvasPositionAndSize={this.state.viewportPositionAndSize}
-                minimapPositionAndSize={this.state.minimapPositionAndSize}
-                setMinimapPositionAndSize={this.setMinimapPositionAndSize}
-              />
-            </div>
+            {this.minimapToolTips.map((minimapToolTip) => {
+              return (
+                <HtmlTooltip
+                  key={minimapToolTip.name}
+                  title={
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      justifyItems="space-between"
+                    >
+                      <Box mr={3}>
+                        <Typography color="inherit">
+                          {minimapToolTip.name}
+                        </Typography>
+                      </Box>
+                      <Avatar
+                        style={{
+                          backgroundColor: "#02FFAD",
+                          color: "#2B2F3A",
+                        }}
+                      >
+                        {minimapToolTip.shortcut}
+                      </Avatar>
+                      <Avatar
+                        style={{
+                          backgroundColor: "#02FFAD",
+                          color: "#2B2F3A",
+                        }}
+                      >
+                        {minimapToolTip.shortcutSymbol}
+                      </Avatar>
+                    </Box>
+                  }
+                  placement="top"
+                >
+                  <IconButton
+                    size="small"
+                    style={minimapToolTip.styling}
+                    onClick={(e: React.MouseEvent) =>
+                      this.setState(
+                        {
+                          buttonClicked: minimapToolTip.name,
+                        },
+                        () => {
+                          if (minimapToolTip.name === "Zoom In") {
+                            this.incrementScale();
+                          }
+                          if (minimapToolTip.name === "Zoom Out") {
+                            this.decrementScale();
+                          }
+                          if (minimapToolTip.name === "Fit to Page") {
+                            this.resetScaleAndPan();
+                          }
+                          if (minimapToolTip.name === "Minimise Map") {
+                            this.handleDrawerClose();
+                          }
+                        }
+                      )
+                    }
+                  >
+                    <Avatar sizes="large">
+                      <SVG
+                        src={`${minimapToolTip.icon}`}
+                        width="55%"
+                        height="auto"
+                        fill={
+                          this.state.buttonClicked === minimapToolTip.name
+                            ? "#02FFAD"
+                            : null
+                        }
+                      />
+                    </Avatar>
+                  </IconButton>
+                </HtmlTooltip>
+              );
+            })}
           </Card>
         </Slide>
       </div>
@@ -992,6 +938,7 @@ export class UserInterface extends Component<Props, State> {
               </div>
             )}
           </Grid>
+
           <Grid item style={{ width: 200, position: "relative" }}>
             <div style={{ height: 200 }}>
               <BackgroundCanvas

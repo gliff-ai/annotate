@@ -56,7 +56,7 @@ export const BaseSlider: FunctionComponent<Props> = ({
             marginBottom: "24px",
           }}
         >
-          {value}
+          {`${value}${config.unit}`}
         </div>
       </Typography>
       <div
