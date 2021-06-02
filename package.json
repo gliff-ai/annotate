@@ -4,7 +4,8 @@
   "description": "gliff.ai ANNOTATE - a user friendly browser interface for annotating multidimensional images for machine learning",
   "repository": "git://github.com/gliff-ai/annotate.git",
   "main": "dist/main.js",
-  "typings": "**/*.d.tsx",
+  "module": "dist/src/index.tsx",
+  "typings": "dist/src/index.d.ts",
   "files": [
     "dist/*"
   ],
