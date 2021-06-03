@@ -36,9 +36,10 @@ import { BackgroundCanvas, BackgroundUI } from "@/toolboxes/background";
 import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
 import { Labels } from "@/components/Labels";
+import { Download } from "@/download/UI";
 import { keydownListener } from "@/keybindings";
-
 import { Tools, Tool } from "@/tools";
+import { Save } from "@material-ui/icons";
 
 const CONFIG = {
   PAN_AMOUNT: 20,
@@ -75,8 +76,10 @@ interface State {
 
 interface Props {
   slicesData?: Array<Array<ImageBitmap>>;
+  imageFileInfo?: ImageFileInfo;
   annotationsObject?: Annotations;
   presetLabels?: string[];
+  saveAnnotationsCallback?: (annotationsObject: Annotations) => void;
 }
 
 interface ToolTips {
@@ -129,11 +132,12 @@ export class UserInterface extends Component<Props, State> {
       anchorEl: null,
       buttonClicked: null,
       toggleMinimap: false,
+      activeTool: Tools.paintbrush,
     };
 
     this.annotationsObject.addAnnotation(this.state.activeTool);
     this.presetLabels = this.props.presetLabels || [];
-    this.imageFileInfo = null;
+    this.imageFileInfo = this.props.imageFileInfo || null;
   }
 
   componentDidMount = (): void => {
@@ -366,6 +370,7 @@ export class UserInterface extends Component<Props, State> {
 
   addAnnotation = (): void => {
     this.annotationsObject.addAnnotation(this.state.activeTool);
+    this.annotationsObject.setSplineSpaceTimeInfo(this.state.sliceIndex);
     this.setState({
       activeAnnotationID: this.annotationsObject.getActiveAnnotationID(),
     });
@@ -403,12 +408,17 @@ export class UserInterface extends Component<Props, State> {
     to match the active tool. */
     if (this.annotationsObject.isActiveAnnotationEmpty()) {
       this.annotationsObject.setActiveAnnotationToolbox(this.state.activeTool);
+      this.annotationsObject.setSplineSpaceTimeInfo(this.state.sliceIndex);
     }
   };
 
   clearActiveAnnotation = (): void => {
-    this.annotationsObject.setAnnotationCoordinates([]);
-    this.annotationsObject.setAnnotationBrushStrokes([]);
+    this.annotationsObject.deleteActiveAnnotation();
+    if (this.annotationsObject.length() === 1) {
+      // if we delete the last annotation, annotationsObject will make a new one with the paintbrush toolbox
+      // (since it doesn't know which tool is active), so we set the toolbox correctly here:
+      this.annotationsObject.setActiveAnnotationToolbox(this.state.activeTool);
+    }
     this.setState((prevState) => ({
       callRedraw: prevState.callRedraw + 1,
     }));
@@ -419,7 +429,10 @@ export class UserInterface extends Component<Props, State> {
       {
         sliceIndex: value,
       },
-      this.mixChannels
+      () => {
+        this.reuseEmptyAnnotation();
+        this.mixChannels();
+      }
     );
   };
 
@@ -753,7 +766,24 @@ export class UserInterface extends Component<Props, State> {
                     {<img src="./src/assets/upload-icon.svg" />}
                   </Button>
                 }
+                multiple={false}
               />
+              <Download
+                annotations={this.annotationsObject.getAllAnnotations()}
+                imageFileInfo={this.imageFileInfo}
+              />
+              {this.props.saveAnnotationsCallback && (
+                <Tooltip title="Save annotations data">
+                  <Button
+                    aria-label="save"
+                    onClick={() =>
+                      this.props.saveAnnotationsCallback(this.annotationsObject)
+                    }
+                  >
+                    <Save />
+                  </Button>
+                </Tooltip>
+              )}
             </Grid>
           </Toolbar>
         </AppBar>
@@ -793,6 +823,10 @@ export class UserInterface extends Component<Props, State> {
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
               callRedraw={this.state.callRedraw}
+              sliceIndex={this.state.sliceIndex}
+              setUIActiveAnnotationID={(id) => {
+                this.setState({ activeAnnotationID: id });
+              }}
             />
 
             <PaintbrushCanvas
@@ -803,6 +837,10 @@ export class UserInterface extends Component<Props, State> {
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
               callRedraw={this.state.callRedraw}
+              sliceIndex={this.state.sliceIndex}
+              setUIActiveAnnotationID={(id) => {
+                this.setState({ activeAnnotationID: id });
+              }}
             />
 
             {this.slicesData.length > 1 && (

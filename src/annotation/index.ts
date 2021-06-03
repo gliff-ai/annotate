@@ -1,75 +1,236 @@
-import { Annotation, ZTPoint, XYPoint, BrushStrokes } from "./interfaces";
+import {
+  Annotation,
+  XYPoint,
+  BrushStroke,
+  Spline,
+  AuditAction,
+} from "./interfaces";
+
+interface Descriptor extends Omit<PropertyDescriptor, "value"> {
+  // Ideally this would be the methods of Annotations
+  value?: (...args: unknown[]) => unknown;
+}
+
+function log(
+  target: Annotations,
+  propertyKey: string,
+  descriptor: Descriptor
+): void {
+  const targetMethod = descriptor.value;
+
+  descriptor.value = function auditWrapper(...args) {
+    (this as Annotations).addAudit(propertyKey, args);
+
+    return targetMethod.apply(this, args);
+  };
+}
 
 export class Annotations {
   private data: Array<Annotation>;
 
   private activeAnnotationID: number;
 
+  private audit: Array<AuditAction> = [];
+
   constructor() {
     this.data = [];
     this.activeAnnotationID = null;
   }
 
-  addAnnotation = (
+  @log
+  addAnnotation(
     toolbox: string,
     labels: string[] = [],
-    spaceTimeInfo: ZTPoint = { z: 0, t: 0 },
-    coordinates: XYPoint[] = [],
-    brushStrokes: BrushStrokes[] = [],
+    spline: Spline = {
+      coordinates: [],
+      spaceTimeInfo: { z: 0, t: 0 },
+    },
+    brushStrokes: BrushStroke[] = [],
     parameters: Annotation["parameters"] = {}
-  ): void => {
+  ): void {
     this.activeAnnotationID =
       this.data.push({
         labels,
         toolbox,
-        spaceTimeInfo,
-        coordinates,
+        spline,
         brushStrokes,
         parameters,
       }) - 1;
-  };
+  }
 
-  addLabel = (newLabel: string): void => {
-    if (!this.data[this.activeAnnotationID].labels.includes(newLabel)) {
-      this.data[this.activeAnnotationID].labels.push(newLabel);
+  @log
+  deleteActiveAnnotation(): void {
+    this.data.splice(this.activeAnnotationID, 1);
+    if (this.activeAnnotationID >= this.data.length) {
+      this.activeAnnotationID = this.data.length - 1; // necessary if we delete the one on the end
     }
-  };
-
-  removeLabel = (existingLabel: string): void => {
-    this.data[this.activeAnnotationID].labels = this.data[
-      this.activeAnnotationID
-    ].labels.filter((label) => label !== existingLabel);
-  };
+    if (this.data.length === 0) {
+      this.addAnnotation("paintbrush"); // re-create a new empty annotation if we delete the last one (toolbox will be re-assigned by reuseEmptyAnnotation if necessary)
+    }
+  }
 
   getLabels = (): string[] => this.data[this.activeAnnotationID].labels;
 
   getActiveAnnotationID = (): number => this.activeAnnotationID;
 
-  getActiveAnnotation = (): Annotation => this.data[this.activeAnnotationID];
+  getActiveAnnotationColor = (): string =>
+    this.data[this.activeAnnotationID].brushStrokes[0]?.brush.color;
 
-  length = (): number => this.data.length;
+  getSplineForActiveAnnotation = (): Spline =>
+    this.data[this.activeAnnotationID].spline;
 
-  setActiveAnnotationID = (id: number): void => {
-    this.activeAnnotationID = id;
-  };
+  getSplineCoordinates = (): Array<XYPoint> =>
+    JSON.parse(
+      JSON.stringify(this.data[this.activeAnnotationID].spline.coordinates)
+    ) as Array<XYPoint>;
 
-  setAnnotationCoordinates = (newCoordinates: XYPoint[]): void => {
-    this.data[this.activeAnnotationID].coordinates = newCoordinates;
-  };
-
-  setAnnotationBrushStrokes = (newBrushStrokes: BrushStrokes[]): void => {
-    this.data[this.activeAnnotationID].brushStrokes = newBrushStrokes;
-  };
-
-  setActiveAnnotationToolbox = (newToolbox: string): void => {
-    this.data[this.activeAnnotationID].toolbox = newToolbox;
-  };
+  getSplineLength = (): number =>
+    this.data[this.activeAnnotationID].spline.coordinates.length;
 
   isActiveAnnotationEmpty = (): boolean =>
     // Check whether the active annotation object contains any
     // paintbrush or spline annotations.
-    this.data[this.activeAnnotationID].coordinates.length === 0 &&
+    this.data[this.activeAnnotationID].spline.coordinates.length === 0 &&
     this.data[this.activeAnnotationID].brushStrokes.length === 0;
 
-  getAllAnnotations = (): Annotation[] => this.data;
+  getAllAnnotations = (): Annotation[] =>
+    JSON.parse(JSON.stringify(this.data)) as Annotation[]; // deep copy to ensure no modification without audit logging
+
+  getAllSplines = (z: number): Array<[Spline, number]> => {
+    // returns an array of [spline, index] pairs for all splines at the given z-index.
+    // index needed for identifying the active spline
+    const splines: Array<[Spline, number]> = [];
+
+    this.data.forEach((annotation, i) => {
+      if (
+        (annotation.toolbox === "spline" ||
+          annotation.toolbox === "magicspline") &&
+        annotation.spline.spaceTimeInfo.z === z
+      ) {
+        splines.push([annotation.spline, i]);
+      }
+    });
+
+    return splines;
+  };
+
+  length = (): number => this.data.length;
+
+  @log
+  addLabel(newLabel: string): void {
+    if (!this.data[this.activeAnnotationID].labels.includes(newLabel)) {
+      this.data[this.activeAnnotationID].labels.push(newLabel);
+    }
+  }
+
+  @log
+  removeLabel(existingLabel: string): void {
+    this.data[this.activeAnnotationID].labels = this.data[
+      this.activeAnnotationID
+    ].labels.filter((label) => label !== existingLabel);
+  }
+
+  @log
+  setActiveAnnotationID(id: number): void {
+    this.activeAnnotationID = id;
+  }
+
+  @log
+  addBrushStroke(newBrushStroke: BrushStroke): void {
+    if (
+      ["paintbrush", "eraser"].includes(
+        this.data[this.activeAnnotationID].toolbox
+      )
+    ) {
+      this.data[this.activeAnnotationID].brushStrokes.push(newBrushStroke);
+    }
+  }
+
+  @log
+  clearBrushStrokes(): void {
+    this.data[this.activeAnnotationID].brushStrokes = [];
+  }
+
+  @log
+  clearSplineCoordinates(): void {
+    this.data[this.activeAnnotationID].spline.coordinates = [];
+  }
+
+  @log
+  addSplinePoint(point: XYPoint): void {
+    if (
+      ["spline", "magicspline"].includes(
+        this.data[this.activeAnnotationID].toolbox
+      )
+    ) {
+      this.data[this.activeAnnotationID].spline.coordinates.push(point);
+    }
+  }
+
+  @log
+  deleteSplinePoint(idx: number): void {
+    this.data[this.activeAnnotationID].spline.coordinates.splice(idx, 1);
+  }
+
+  @log
+  updateSplinePoint(newX: number, newY: number, index: number): void {
+    this.data[this.activeAnnotationID].spline.coordinates[index] = {
+      x: newX,
+      y: newY,
+    };
+  }
+
+  @log
+  insertSplinePoint(idx: number, point: XYPoint): void {
+    this.data[this.activeAnnotationID].spline.coordinates.splice(idx, 0, point);
+  }
+
+  @log
+  setActiveAnnotationToolbox(newToolbox: string): void {
+    this.data[this.activeAnnotationID].toolbox = newToolbox;
+  }
+
+  @log
+  setSplineSpaceTimeInfo(z?: number, t?: number): void {
+    // Set space and time data for spline of active annotation.
+    if (z === undefined && t === undefined) return;
+    const { z: prevZ, t: prevT } =
+      this.data[this.activeAnnotationID].spline.spaceTimeInfo;
+    this.data[this.activeAnnotationID].spline.spaceTimeInfo = {
+      z: z || prevZ,
+      t: t || prevT,
+    };
+  }
+
+  addAudit(method: string, args: unknown): void {
+    this.audit.push({
+      method,
+      args: JSON.stringify(args),
+      timestamp: Date.now(),
+    });
+  }
+
+  getAuditObject = (): Array<AuditAction> => this.audit;
+
+  popAuditObject = (): Array<AuditAction> => {
+    // returns the audit array and deletes it from this object, so they can be stored separately without duplicating data
+
+    const { audit } = this;
+    this.audit = [];
+    return audit;
+  };
+
+  testAudit = (): boolean => {
+    // make a new Annotations object and apply the AuditActions from this.audit to it one by one
+    // if its resulting state is not identical to this object's state, then there's a problem
+
+    const annotationsObject = new Annotations();
+
+    for (const action of this.audit) {
+      const method = annotationsObject[action.method as keyof Annotations];
+      method.apply(annotationsObject, JSON.parse(action.args));
+    }
+
+    return JSON.stringify(this.data) === JSON.stringify(annotationsObject.data);
+  };
 }
