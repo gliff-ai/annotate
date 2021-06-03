@@ -233,4 +233,92 @@ export class Annotations {
 
     return JSON.stringify(this.data) === JSON.stringify(annotationsObject.data);
   };
+
+  clickNearBrushStroke = (
+    imageX: number,
+    imageY: number,
+    sliceIndex: number
+  ): number => {
+    // Check if point clicked is near an existing paintbrush annotation.
+    // If true, return annotation index, otherwise return null.
+    // If more than one annotation at clicked point, select first drawn.
+
+    for (let i = 0; i < this.data.length; i += 1) {
+      if (this.data[i].toolbox === "paintbrush") {
+        let finalIndex = null;
+
+        this.data[i].brushStrokes.forEach(
+          ({ spaceTimeInfo, coordinates, brush }) => {
+            if (spaceTimeInfo.z === sliceIndex) {
+              for (let j = 0; j < coordinates.length - 1; j += 1) {
+                if (
+                  this.isClickNearLineSegment(
+                    { x: imageX, y: imageY },
+                    coordinates[j],
+                    coordinates[j + 1],
+                    brush.radius
+                  )
+                ) {
+                  // If the region near the clicked point has been erased,
+                  // finalIndex will be reset to null.
+                  finalIndex = brush.type === "paint" ? i : null;
+                }
+              }
+            }
+          }
+        );
+        if (finalIndex !== null) return i;
+      }
+    }
+    return null;
+  };
+
+  clickNearSpline = (
+    imageX: number,
+    imageY: number,
+    sliceIndex: number
+  ): number => {
+    // Check if point clicked (in image space) is near an existing spline.
+    // If true, return annotation index, otherwise return null.
+
+    const splines = this.getAllSplines(sliceIndex);
+    for (let i = 0; i < splines.length; i += 1) {
+      // index here is the index of the annotation this spline is from among all annotations,
+      // not the index within `splines`
+
+      const [spline, index] = splines[i];
+      // here `i` is the index of the spline in `splines`, while `index` is the index of the spline in all annotations
+
+      // For each pair of points, check if point clicked is near the line segment
+      // having for end points two consecutive points in the spline:
+      for (let j = 1; j < spline.coordinates.length; j += 1) {
+        if (
+          this.isClickNearLineSegment(
+            { x: imageX, y: imageY },
+            spline.coordinates[j - 1],
+            spline.coordinates[j]
+          )
+        )
+          return index;
+      }
+    }
+
+    return null;
+  };
+
+  isClickNearLineSegment = (
+    p: XYPoint, // test point
+    a: XYPoint, // line segment endpoint 1
+    b: XYPoint, // line segment endpoint 2
+    threshold = 12
+  ): boolean => {
+    // returns true if point p is within a capsule with endpoints a and b, and radius `threshold`
+    // math from https://iquilezles.org/www/articles/distfunctions/distfunctions.htm
+    const pa: XYPoint = { x: p.x - a.x, y: p.y - a.y };
+    const ba: XYPoint = { x: b.x - a.x, y: b.y - a.y };
+    let h = (pa.x * ba.x + pa.y * ba.y) / (ba.x ** 2 + ba.y ** 2);
+    h = Math.max(Math.min(h, 1), 0); // clamp between 0 and 1
+    const r = Math.sqrt((pa.x - h * ba.x) ** 2 + (pa.y - h * ba.y) ** 2);
+    return r < threshold;
+  };
 }

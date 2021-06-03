@@ -10,6 +10,8 @@ import { BaseCanvas, CanvasProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/transforms";
 import { XYPoint } from "@/annotation/interfaces";
+import { Tool, Tools } from "@/tools";
+import { Mode } from "@/ui";
 
 import {
   main as mainColor,
@@ -21,12 +23,14 @@ import {
 import { usePaintbrushStore } from "./Store";
 
 interface Props extends CanvasProps {
-  brushType: string;
+  activeTool: string;
+  mode: Mode;
   annotationsObject: Annotations;
   brushRadius: number;
   callRedraw: number;
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
+  setActiveTool: (tool: Tool) => void;
 }
 
 interface Brush {
@@ -35,19 +39,13 @@ interface Brush {
   color: string; // rgb(a) string
 }
 
-enum Mode {
-  draw,
-  select,
-}
-
 interface State {
   hideBackCanvas: boolean;
-  mode: Mode;
 }
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
 // We should maybe namespace them so we don't get conflicting methods across toolboxes.
-export const events = ["saveLine", "toggleMode"] as const;
+export const events = ["saveLine"] as const;
 
 interface Event extends CustomEvent {
   type: typeof events[number];
@@ -56,13 +54,13 @@ interface Event extends CustomEvent {
 type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 
 type CursorProps = {
-  brushType: string;
+  activeTool: string;
   brushRadius: number;
   canvasTopAndLeft: { top: number; left: number };
 };
 
 const FauxCursor: React.FC<CursorProps> = ({
-  brushType,
+  activeTool,
   brushRadius,
   canvasTopAndLeft,
 }: CursorProps): ReactElement => {
@@ -85,7 +83,7 @@ const FauxCursor: React.FC<CursorProps> = ({
       id="cursor"
       style={{
         visibility:
-          brushType === "paintbrush" || brushType === "eraser"
+          activeTool === "paintbrush" || activeTool === "eraser"
             ? "visible"
             : "hidden",
         width: brushRadius,
@@ -125,7 +123,6 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
     this.state = {
       hideBackCanvas: false,
-      mode: Mode.draw,
     };
   }
 
@@ -170,7 +167,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       const brush = {
         color: getRGBAString(mainColor),
         radius: this.props.brushRadius,
-        type: this.props.brushType === "paintbrush" ? "paint" : "erase",
+        type: this.props.activeTool === "paintbrush" ? "paint" : "erase",
       } as Brush;
 
       // Draw current points
@@ -304,60 +301,9 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     return brushRadius * imageScalingFactor * 2 * this.props.scaleAndPan.scale;
   };
 
-  clickNearBrushStroke = (imageX: number, imageY: number): number => {
-    // Check if point clicked is near an existing paintbrush annotation.
-    // If true, return annotation index, otherwise return null.
-    // If more than one annotation at clicked point, select first drawn.
-    const annotations = this.props.annotationsObject.getAllAnnotations();
-
-    for (let i = 0; i < annotations.length; i += 1) {
-      if (annotations[i].toolbox === "paintbrush") {
-        let finalIndex = null;
-
-        annotations[i].brushStrokes.forEach(
-          ({ spaceTimeInfo, coordinates, brush }) => {
-            if (spaceTimeInfo.z === this.props.sliceIndex) {
-              coordinates.forEach((point: XYPoint) => {
-                if (
-                  this.isClickNearPoint(
-                    { x: imageX, y: imageY },
-                    point,
-                    brush.radius
-                  )
-                ) {
-                  // If the region near the clicked point has been erased,
-                  // finalIndex will be reset to null.
-                  finalIndex = brush.type === "paint" ? i : null;
-                }
-              });
-            }
-          }
-        );
-        if (finalIndex !== null) return i;
-      }
-    }
-    return null;
-  };
-
-  isClickNearPoint = (
-    point: XYPoint,
-    point1: XYPoint,
-    radius: number
-  ): boolean =>
-    Math.abs(point.x - point1.x) < radius &&
-    Math.abs(point.y - point1.y) < radius;
-
-  toggleMode = (): void => {
-    if (!this.isActive()) return;
-    if (this.state.mode === Mode.draw) {
-      this.setState({ mode: Mode.select });
-    } else {
-      this.setState({ mode: Mode.draw });
-    }
-  };
-
   isActive = (): boolean =>
-    this.props.brushType === "paintbrush" || this.props.brushType === "eraser";
+    this.props.activeTool === "paintbrush" ||
+    this.props.activeTool === "eraser";
 
   saveLine = (radius = 20): void => {
     if (this.points.length < 2) return;
@@ -378,7 +324,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       brush: {
         color,
         radius,
-        type: this.props.brushType === "paintbrush" ? "paint" : "erase",
+        type: this.props.activeTool === "paintbrush" ? "paint" : "erase",
       },
     });
 
@@ -390,11 +336,11 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
   };
 
-  /** * Mouse events *** */
+  /* *** Mouse events *** */
   onMouseDown = (canvasX: number, canvasY: number): void => {
-    if (this.state.mode === Mode.draw) {
+    if (this.props.mode === Mode.draw) {
       // Start drawing
-      if (this.props.brushType === "eraser") {
+      if (this.props.activeTool === "eraser") {
         // Copy the current BACK strokes to the front canvas
         this.drawAllStrokes(this.interactionCanvas.canvasContext);
         this.setState({ hideBackCanvas: true }, () => {
@@ -407,8 +353,8 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
       // Ensure the initial down position gets added to our line
       this.handlePointerMove(canvasX, canvasY);
-    } else if (this.state.mode === Mode.select) {
-      // In select mode a single click allows to select a different paintbrush annotation
+    } else if (this.props.mode === Mode.select) {
+      // In select mode a single click allows to select a different paintbrush or spline annotation
       const { x: imageX, y: imageY } = canvasToImage(
         canvasX,
         canvasY,
@@ -417,23 +363,42 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
         this.props.scaleAndPan,
         this.props.canvasPositionAndSize
       );
-      const selectedBrushStroke = this.clickNearBrushStroke(imageX, imageY);
-      if (selectedBrushStroke !== null) {
+      const selectedBrushStroke =
+        this.props.annotationsObject.clickNearBrushStroke(
+          imageX,
+          imageY,
+          this.props.sliceIndex
+        );
+      const selectedSpline = this.props.annotationsObject.clickNearSpline(
+        imageX,
+        imageY,
+        this.props.sliceIndex
+      );
+      if (
+        selectedBrushStroke !== null &&
+        selectedBrushStroke !==
+          this.props.annotationsObject.getActiveAnnotationID()
+      ) {
         this.props.annotationsObject.setActiveAnnotationID(selectedBrushStroke);
         this.props.setUIActiveAnnotationID(selectedBrushStroke);
+        this.props.setActiveTool(Tools.paintbrush);
         this.drawAllStrokes();
+      } else if (selectedSpline !== null) {
+        this.props.annotationsObject.setActiveAnnotationID(selectedSpline);
+        this.props.setUIActiveAnnotationID(selectedSpline);
+        this.props.setActiveTool(Tools.spline);
       }
     }
   };
 
   onMouseMove = (canvasX: number, canvasY: number): void => {
-    if (this.state.mode === Mode.draw) {
+    if (this.props.mode === Mode.draw) {
       this.handlePointerMove(canvasX, canvasY);
     }
   };
 
   onMouseUp = (canvasX: number, canvasY: number): void => {
-    if (this.state.mode === Mode.draw) {
+    if (this.props.mode === Mode.draw) {
       // End painting & save painting
       this.isPressing = false;
 
@@ -450,10 +415,10 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
   getCursor = (): Cursor => {
     if (
-      this.props.brushType === "paintbrush" ||
-      this.props.brushType === "eraser"
+      this.props.activeTool === "paintbrush" ||
+      this.props.activeTool === "eraser"
     ) {
-      return this.state.mode === Mode.draw ? "none" : "pointer";
+      return this.props.mode === Mode.draw ? "none" : "pointer";
     }
     return "none";
   };
@@ -468,7 +433,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     <>
       {/* this div is basically a fake cursor */}
       <FauxCursor
-        brushType={this.props.brushType}
+        activeTool={this.props.activeTool}
         brushRadius={this.getCanvasBrushRadius(this.props.brushRadius)}
         canvasTopAndLeft={{
           top:
@@ -483,8 +448,8 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       <div
         style={{
           pointerEvents:
-            this.props.brushType === "paintbrush" ||
-            this.props.brushType === "eraser"
+            this.props.activeTool === "paintbrush" ||
+            this.props.activeTool === "eraser"
               ? "auto"
               : "none",
         }}
@@ -527,7 +492,8 @@ export const PaintbrushCanvas = (
 
   return (
     <PaintbrushCanvasClass
-      brushType={props.brushType}
+      activeTool={props.activeTool}
+      mode={props.mode}
       annotationsObject={props.annotationsObject}
       displayedImage={props.displayedImage}
       scaleAndPan={props.scaleAndPan}
@@ -536,6 +502,7 @@ export const PaintbrushCanvas = (
       callRedraw={props.callRedraw}
       sliceIndex={props.sliceIndex}
       setUIActiveAnnotationID={props.setUIActiveAnnotationID}
+      setActiveTool={props.setActiveTool}
     />
   );
 };

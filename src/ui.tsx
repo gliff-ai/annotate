@@ -45,12 +45,21 @@ const CONFIG = {
   PAN_AMOUNT: 20,
 } as const;
 
+export enum Mode {
+  draw,
+  select,
+}
+
 interface Event extends CustomEvent {
   type: typeof events[number];
 }
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
-export const events = ["nextAnnotation", "previousAnnotation"] as const;
+export const events = [
+  "nextAnnotation",
+  "previousAnnotation",
+  "toggleMode",
+] as const;
 
 interface State {
   scaleAndPan: {
@@ -72,6 +81,7 @@ interface State {
   anchorEl: any;
   buttonClicked: string;
   toggleMinimap: boolean;
+  mode: Mode;
 }
 
 interface Props {
@@ -133,6 +143,7 @@ export class UserInterface extends Component<Props, State> {
       buttonClicked: null,
       toggleMinimap: false,
       activeTool: Tools.paintbrush,
+      mode: Mode.draw,
     };
 
     this.annotationsObject.addAnnotation(this.state.activeTool);
@@ -382,6 +393,14 @@ export class UserInterface extends Component<Props, State> {
 
   previousAnnotation = (): void => {
     this.cycleActiveAnnotation(false);
+  };
+
+  toggleMode = (): void => {
+    if (this.state.mode === Mode.draw) {
+      this.setState({ mode: Mode.select });
+    } else {
+      this.setState({ mode: Mode.draw });
+    }
   };
 
   cycleActiveAnnotation = (forward = true): void => {
@@ -818,6 +837,7 @@ export class UserInterface extends Component<Props, State> {
             <SplineCanvas
               scaleAndPan={this.state.scaleAndPan}
               activeTool={this.state.activeTool}
+              mode={this.state.mode}
               annotationsObject={this.annotationsObject}
               displayedImage={this.state.displayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
@@ -827,11 +847,15 @@ export class UserInterface extends Component<Props, State> {
               setUIActiveAnnotationID={(id) => {
                 this.setState({ activeAnnotationID: id });
               }}
+              setActiveTool={(tool: Tool) => {
+                this.setState({ activeTool: tool });
+              }}
             />
 
             <PaintbrushCanvas
               scaleAndPan={this.state.scaleAndPan}
-              brushType={this.state.activeTool}
+              activeTool={this.state.activeTool}
+              mode={this.state.mode}
               annotationsObject={this.annotationsObject}
               displayedImage={this.state.displayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
@@ -840,6 +864,9 @@ export class UserInterface extends Component<Props, State> {
               sliceIndex={this.state.sliceIndex}
               setUIActiveAnnotationID={(id) => {
                 this.setState({ activeAnnotationID: id });
+              }}
+              setActiveTool={(tool: Tool) => {
+                this.setState({ activeTool: tool });
               }}
             />
 

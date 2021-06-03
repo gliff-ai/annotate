@@ -4,6 +4,8 @@ import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/transforms";
 import { XYPoint } from "@/annotation/interfaces";
+import { Tool, Tools } from "@/tools";
+import { Mode } from "@/ui";
 
 import {
   main as mainColor,
@@ -16,25 +18,20 @@ import { calculateSobel } from "./sobel";
 
 interface Props extends BaseProps {
   activeTool: string;
+  mode: Mode;
   annotationsObject: Annotations;
   callRedraw: number;
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
-}
-enum Mode {
-  draw,
-  magic,
-  select,
+  setActiveTool: (tool: Tool) => void;
 }
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
 // We should maybe namespace them so we don't get conflicting methods across toolboxes.
 export const events = [
   "deleteSelectedPoint",
-  "changeSplineModeToEdit",
   "deselectPoint",
   "closeLoop",
-  "toggleMode",
 ] as const;
 
 interface Event extends CustomEvent {
@@ -42,12 +39,8 @@ interface Event extends CustomEvent {
 }
 
 type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
-interface State {
-  isActive: boolean;
-  mode: Mode;
-}
 
-export class SplineCanvas extends Component<Props, State> {
+export class SplineCanvas extends Component<Props> {
   readonly name = "spline";
 
   private baseCanvas: BaseCanvas;
@@ -65,7 +58,6 @@ export class SplineCanvas extends Component<Props, State> {
     this.selectedPointIndex = -1;
     this.isMouseDown = false;
     this.numberOfMoves = 0;
-    this.state = { mode: Mode.draw, isActive: false };
   }
 
   componentDidMount(): void {
@@ -74,14 +66,9 @@ export class SplineCanvas extends Component<Props, State> {
     }
   }
 
-  componentDidUpdate(prevProps: Props): void {
+  componentDidUpdate(): void {
     // Redraw if we change pan or zoom
     const spline = this.props.annotationsObject.getSplineForActiveAnnotation();
-
-    // Change mode if we change the spline type prop
-    if (this.props.activeTool !== prevProps.activeTool) {
-      this.updateMode();
-    }
 
     if (spline?.coordinates) {
       this.drawAllSplines();
@@ -206,18 +193,6 @@ export class SplineCanvas extends Component<Props, State> {
       });
   };
 
-  private changeSplineModeToEdit = (): void => {
-    // TODO: add keyboard shortcuts for switching between modes
-    this.setState({ mode: Mode.select }); // Change mode to select mode
-    this.deselectPoint();
-  };
-
-  public changeSplineModeToMagic = (): void => {
-    // TODO: add keyboard shortcuts for switching between modes
-    this.setState({ mode: Mode.magic });
-    // TODO this.calculateGradientImage();
-  };
-
   private deselectPoint = () => {
     this.selectedPointIndex = -1;
     this.drawAllSplines();
@@ -254,9 +229,6 @@ export class SplineCanvas extends Component<Props, State> {
     } else {
       // Delete x,y point at selected index
       this.props.annotationsObject.deleteSplinePoint(this.selectedPointIndex);
-    }
-    if (this.props.annotationsObject.getSplineLength() === 0) {
-      this.setState({ mode: Mode.draw });
     }
 
     this.selectedPointIndex = Math.max(0, this.selectedPointIndex - 1);
@@ -310,6 +282,36 @@ export class SplineCanvas extends Component<Props, State> {
       this.props.canvasPositionAndSize
     );
 
+    if (this.props.mode === Mode.select) {
+      // In select mode a single click allows to select a different spline
+      const selectedSpline = this.props.annotationsObject.clickNearSpline(
+        imageX,
+        imageY,
+        this.props.sliceIndex
+      );
+      const selectedBrushStroke =
+        this.props.annotationsObject.clickNearBrushStroke(
+          imageX,
+          imageY,
+          this.props.sliceIndex
+        );
+
+      if (
+        selectedSpline !== null &&
+        selectedSpline !== this.props.annotationsObject.getActiveAnnotationID()
+      ) {
+        this.props.annotationsObject.setActiveAnnotationID(selectedSpline);
+        this.props.setUIActiveAnnotationID(selectedSpline);
+        this.props.setActiveTool(Tools.spline);
+      } else if (selectedBrushStroke !== null) {
+        this.props.annotationsObject.setActiveAnnotationID(selectedBrushStroke);
+        this.props.setUIActiveAnnotationID(selectedBrushStroke);
+        this.props.setActiveTool(Tools.paintbrush);
+      }
+    }
+
+    if (!this.isActive()) return;
+
     if (this.sliceIndexMatch()) {
       const coordinates = this.props.annotationsObject.getSplineCoordinates();
 
@@ -341,7 +343,7 @@ export class SplineCanvas extends Component<Props, State> {
         }
 
         // If the spline is not closed, append a new point
-      } else if (this.state.mode === Mode.draw && !isClosed) {
+      } else if (this.props.mode === Mode.draw && !isClosed) {
         // Add coordinates to the current spline
         this.props.annotationsObject.addSplinePoint({ x: imageX, y: imageY });
         this.selectedPointIndex =
@@ -349,81 +351,12 @@ export class SplineCanvas extends Component<Props, State> {
       }
     }
 
-    if (this.state.mode === Mode.select) {
-      // In select mode a single click allows to select a different spline
-      const selectedSpline = this.clickNearSpline(imageX, imageY);
-      if (selectedSpline !== null) {
-        this.props.annotationsObject.setActiveAnnotationID(selectedSpline);
-        this.props.setUIActiveAnnotationID(selectedSpline);
-      }
-    }
-
     this.drawAllSplines();
-  };
-
-  clickNearSpline = (imageX: number, imageY: number): number => {
-    // Check if point clicked (in image space) is near an existing spline.
-    // If true, return annotation index, otherwise return null.
-
-    const splines = this.props.annotationsObject.getAllSplines(
-      this.props.sliceIndex
-    );
-    for (let i = 0; i < splines.length; i += 1) {
-      // index here is the index of the annotation this spline is from among all annotations,
-      // not the index within `splines`
-
-      const [spline, index] = splines[i];
-      // here `i` is the index of the spline in `splines`, while `index` is the index of the spline in all annotations
-
-      // For each pair of points, check if point clicked is near the line segment
-      // having for end points two consecutive points in the spline:
-      for (let j = 1; j < spline.coordinates.length; j += 1) {
-        if (
-          this.isClickNearLineSegment(
-            { x: imageX, y: imageY },
-            spline.coordinates[j - 1],
-            spline.coordinates[j]
-          )
-        )
-          return index;
-      }
-    }
-
-    return null;
-  };
-
-  isClickNearLineSegment = (
-    point: XYPoint,
-    point1: XYPoint,
-    point2: XYPoint
-  ): boolean => {
-    // Check if a XYpoint belongs to the line segment with endpoints XYpoint 1 and XYpoint 2.
-    const dx = point.x - point1.x;
-    const dy = point.y - point1.y;
-    const dxLine = point2.x - point1.x;
-    const dyLine = point2.y - point1.y;
-    const distance = 700;
-    // Use the cross-product to check whether the XYpoint lies on the line passing
-    // through XYpoint 1 and XYpoint 2.
-    const crossProduct = dx * dyLine - dy * dxLine;
-    // If the XYpoint is exactly on the line the cross-product is zero. Here we set a threshold
-    // based on ease of use, to accept points that are close enough to the spline.
-    if (Math.abs(crossProduct) > distance) return false;
-
-    // Check if the point is on the segment (i.e., between point 1 and point 2).
-    if (Math.abs(dxLine) >= Math.abs(dyLine)) {
-      return dxLine > 0
-        ? point1.x <= point.x && point.x <= point2.x
-        : point2.x <= point.x && point.x <= point1.x;
-    }
-    return dyLine > 0
-      ? point1.y <= point.y && point.y <= point2.y
-      : point2.y <= point.y && point.y <= point1.y;
   };
 
   onDoubleClick = (x: number, y: number): void => {
     // Add new point on double-click.
-    if (this.state.mode === Mode.draw || !this.sliceIndexMatch()) return;
+    if (this.props.mode === Mode.draw || !this.sliceIndexMatch()) return;
 
     const { x: imageX, y: imageY } = canvasToImage(
       x,
@@ -529,7 +462,7 @@ export class SplineCanvas extends Component<Props, State> {
       this.props.canvasPositionAndSize
     );
 
-    if (this.state.mode === Mode.magic) {
+    if (this.props.activeTool === "magicspline") {
       // add a new point and snap it to the highest gradient point within 25 pixels:
       if (this.gradientImage === undefined) {
         this.gradientImage = calculateSobel(this.props.displayedImage);
@@ -564,7 +497,10 @@ export class SplineCanvas extends Component<Props, State> {
 
     const coordinates = this.props.annotationsObject.getSplineCoordinates();
 
-    if (this.state.mode === Mode.magic && this.numberOfMoves % 5 === 0) {
+    if (
+      this.props.activeTool === "magicspline" &&
+      this.numberOfMoves % 5 === 0
+    ) {
       // add a new point and snap it to the highest gradient point within 25 pixels:
       this.props.annotationsObject.addSplinePoint({
         x: clickPoint.x,
@@ -574,7 +510,7 @@ export class SplineCanvas extends Component<Props, State> {
         this.props.annotationsObject.getSplineLength() - 1,
         25 / this.props.scaleAndPan.scale
       );
-    } else if (this.state.mode !== Mode.magic) {
+    } else if (this.props.activeTool !== "magicspline") {
       // If dragging first point, update also last
       if (this.selectedPointIndex === 0 && this.isClosed(coordinates)) {
         this.props.annotationsObject.updateSplinePoint(
@@ -635,7 +571,7 @@ export class SplineCanvas extends Component<Props, State> {
 
   getCursor = (): Cursor => {
     if (!this.isActive()) return "none";
-    return this.state.mode === Mode.draw ? "crosshair" : "pointer";
+    return this.props.mode === Mode.draw ? "crosshair" : "pointer";
   };
 
   isActive = (): boolean =>
@@ -646,36 +582,8 @@ export class SplineCanvas extends Component<Props, State> {
     this.props.annotationsObject.getSplineForActiveAnnotation().spaceTimeInfo
       .z === this.props.sliceIndex;
 
-  toggleMode = (): void => {
-    if (!this.isActive()) return;
-    if (this.state.mode === Mode.draw) {
-      this.setState({ mode: Mode.select });
-    } else {
-      this.setState({ mode: Mode.draw });
-    }
-  };
-
-  private updateMode(): void {
-    // FIXME this is a bit clumsy
-    // Change mode if we change the spline type prop
-    switch (this.props.activeTool) {
-      case "spline": {
-        this.setState({ mode: Mode.draw, isActive: true });
-        break;
-      }
-      case "magicspline": {
-        this.setState({ mode: Mode.magic, isActive: true });
-        break;
-      }
-      default: {
-        this.setState({ mode: Mode.draw, isActive: false });
-        break;
-      }
-    }
-  }
-
   render = (): ReactNode => (
-    <div style={{ pointerEvents: this.state.isActive ? "auto" : "none" }}>
+    <div style={{ pointerEvents: this.isActive() ? "auto" : "none" }}>
       <BaseCanvas
         onClick={this.onClick}
         onDoubleClick={this.onDoubleClick}
