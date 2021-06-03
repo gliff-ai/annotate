@@ -26,14 +26,15 @@ function log(
 }
 
 export class Annotations {
-  private data: Array<Annotation>;
+  private data: Annotation[];
 
   private activeAnnotationID: number;
 
-  private audit: Array<AuditAction> = [];
+  private audit: AuditAction[];
 
-  constructor() {
-    this.data = [];
+  constructor(data?: Annotation[], audit?: AuditAction[]) {
+    this.data = data || [];
+    this.audit = audit || [];
     this.activeAnnotationID = null;
   }
 
@@ -68,6 +69,10 @@ export class Annotations {
       this.addAnnotation("paintbrush"); // re-create a new empty annotation if we delete the last one (toolbox will be re-assigned by reuseEmptyAnnotation if necessary)
     }
   }
+
+  getData = (): Annotation[] => this.data;
+
+  getAudit = (): AuditAction[] => this.audit;
 
   getLabels = (): string[] => this.data[this.activeAnnotationID].labels;
 
