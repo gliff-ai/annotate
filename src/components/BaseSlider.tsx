@@ -29,50 +29,46 @@ export const BaseSlider: FunctionComponent<Props> = ({
   config,
   onChange,
   slider,
-}: Props): ReactElement => {
-  return (
-    <>
-      <div
-        style={{
-          width: "42px",
-          height: "42px",
-          border: "1px solid #02FFAD",
-          borderRadius: "9px",
-          margin: "auto",
-          textAlign: "center",
-          padding: "10px 0",
-          marginTop: "10px",
-          marginBottom: "20px",
-        }}
-      >
-        {`${value}`}
-      </div>
+}: Props): ReactElement => (
+  <>
+    <div
+      style={{
+        width: "42px",
+        height: "42px",
+        border: "1px solid #02FFAD",
+        borderRadius: "9px",
+        margin: "auto",
+        textAlign: "center",
+        padding: "10px 0",
+        marginTop: "10px",
+        marginBottom: "20px",
+      }}
+    >
+      {`${value}`}
+    </div>
 
-      <div
-        style={{ textAlign: "center", height: "204px", marginBottom: "18px" }}
-      >
-        <div>
-          {slider == "brightness" || slider == "contrast"
-            ? `${config.max}${config.unit}`
-            : null}
-        </div>
-        <Slider
-          color="primary"
-          orientation="vertical"
-          value={value}
-          onChange={onChange(config.name)}
-          aria-labelledby={config.id}
-          step={config.step}
-          min={config.min}
-          max={config.max}
-          getAriaValueText={getAriaValueText}
-        />
-        <div>
-          {slider == "brightness" || slider == "contrast"
-            ? `${config.min}${config.unit}`
-            : null}
-        </div>
+    <div style={{ textAlign: "center", height: "204px", marginBottom: "18px" }}>
+      <div>
+        {slider === "brightness" || slider === "contrast"
+          ? `${config.max}${config.unit}`
+          : null}
       </div>
-    </>
-  );
-};
+      <Slider
+        color="primary"
+        orientation="vertical"
+        value={value}
+        onChange={onChange(config.name)}
+        aria-labelledby={config.id}
+        step={config.step}
+        min={config.min}
+        max={config.max}
+        getAriaValueText={getAriaValueText}
+      />
+      <div>
+        {slider === "brightness" || slider === "contrast"
+          ? `${config.min}${config.unit}`
+          : null}
+      </div>
+    </div>
+  </>
+);

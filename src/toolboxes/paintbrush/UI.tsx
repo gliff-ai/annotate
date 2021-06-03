@@ -10,12 +10,9 @@ import { usePaintbrushStore } from "./Store";
 
 interface Props {
   open: boolean;
-  activeTool: Tool;
-  anchorEl: any;
-  buttonClicked: string;
+  anchorEl: HTMLButtonElement | null;
   onClick: (event: React.MouseEvent) => void;
   onClose: (event: React.MouseEvent) => void;
-  activateTool: (tool: Tool) => void;
 }
 
 const PaintbrushUI = (props: Props): ReactElement => {
@@ -45,7 +42,7 @@ const PaintbrushUI = (props: Props): ReactElement => {
           value={paintbrush.brushRadius}
           config={SLIDER_CONFIG[Sliders.brushRadius]}
           onChange={() => changeBrushRadius}
-          slider={"paintbrush"}
+          slider="paintbrush"
         />
       </div>
     </Popover>

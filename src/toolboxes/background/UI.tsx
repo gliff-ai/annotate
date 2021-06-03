@@ -19,7 +19,7 @@ import { useBackgroundStore } from "./Store";
 
 interface Props {
   open: boolean;
-  anchorEl: any;
+  anchorEl: HTMLElement | null;
   buttonClicked: string;
   onClose: (event: React.MouseEvent) => void;
   channels: boolean[];
@@ -85,7 +85,7 @@ const BackgroundUI = (props: Props): ReactElement => {
               value={background.contrast}
               config={SLIDER_CONFIG[Sliders.contrast]}
               onChange={() => changeContrast}
-              slider={"contrast"}
+              slider="contrast"
             />
           </div>
         )}
@@ -101,7 +101,7 @@ const BackgroundUI = (props: Props): ReactElement => {
               value={background.brightness}
               config={SLIDER_CONFIG[Sliders.brightness]}
               onChange={() => changeBrightness}
-              slider={"brightness"}
+              slider="brightness"
             />
           </div>
         )}

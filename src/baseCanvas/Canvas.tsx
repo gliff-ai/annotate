@@ -76,29 +76,6 @@ export class BaseCanvas extends Component<Props> {
       this.canvasContext.restore();
     }
   };
-  zoomToolTips = [
-    {
-      key: 7,
-      name: "Zoom In",
-      icon: `./src/assets/zoom-in-icon.svg`,
-      shortcut: "Ctrl",
-      shortcutSymbol: "+",
-    },
-    {
-      key: 8,
-      name: "Zoom Out",
-      icon: `./src/assets/zoom-out-icon.svg`,
-      shortcut: "Ctrl",
-      shortcutSymbol: "-",
-    },
-    {
-      key: 9,
-      name: "Fit to Page",
-      icon: `./src/assets/reset-zoom-and-pan-icon.svg`,
-      shortcut: "Ctrl",
-      shortcutSymbol: "[",
-    },
-  ];
 
   componentDidUpdate = (): void => {
     this.applyView();

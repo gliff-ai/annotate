@@ -72,13 +72,11 @@ interface State {
   activeAnnotationID: number;
   viewportPositionAndSize: Required<PositionAndSize>;
   minimapPositionAndSize: Required<PositionAndSize>;
-  expanded: string | boolean;
   callRedraw: number;
   sliceIndex: number;
   channels: boolean[];
-  colour: boolean;
   popover: boolean;
-  anchorEl: any;
+  anchorEl: HTMLButtonElement | null;
   buttonClicked: string;
   toggleMinimap: boolean;
   mode: Mode;
@@ -118,6 +116,100 @@ export class UserInterface extends Component<Props, State> {
 
   private canvasContainer: HTMLDivElement;
 
+  toolTips: ToolTips[] = [
+    {
+      name: "Select",
+      icon: `./src/assets/select-icon.svg`,
+      shortcut: "V",
+    },
+    {
+      name: "Brush",
+      icon: `./src/assets/brush-icon.svg`,
+      shortcut: "B",
+    },
+    {
+      name: "Eraser",
+      icon: `./src/assets/eraser-icon.svg`,
+      shortcut: "E",
+    },
+    {
+      name: "Spline",
+      icon: `./src/assets/splines-icon.svg`,
+      shortcut: "S",
+    },
+    {
+      name: "Magic Spline",
+      icon: `./src/assets/magic-spline-icon.svg`,
+      shortcut: "M",
+    },
+
+    {
+      name: "Contrast",
+      icon: `./src/assets/contrast-icon.svg`,
+      shortcut: `\\`,
+    },
+    {
+      name: "Brightness",
+      icon: `./src/assets/brightness-icon.svg`,
+      shortcut: `/`,
+    },
+    {
+      name: "Channel",
+      icon: `./src/assets/channels-icon.svg`,
+      shortcut: `C`,
+    },
+
+    {
+      name: "Annonation Label",
+      icon: `./src/assets/annotation-label-icon.svg`,
+      shortcut: "L",
+    },
+  ];
+
+  minimapToolTips = [
+    {
+      name: "Minimise Map",
+      icon: `./src/assets/minimise-icon.svg`,
+      shortcut: "Ctrl",
+      shortcutSymbol: "-",
+      styling: { marginRight: "86px", marginLeft: "15px" },
+    },
+
+    {
+      name: "Zoom In",
+      icon: `./src/assets/zoom-in-icon.svg`,
+      shortcut: "Ctrl",
+      shortcutSymbol: "+",
+      styling: { marginRight: "22px" },
+    },
+    {
+      name: "Zoom Out",
+      icon: `./src/assets/zoom-out-icon.svg`,
+      shortcut: "Ctrl",
+      shortcutSymbol: "-",
+      styling: { marginRight: "30px" },
+    },
+    {
+      name: "Fit to Page",
+      icon: `./src/assets/reset-zoom-and-pan-icon.svg`,
+      shortcut: "Ctrl",
+      shortcutSymbol: "[",
+    },
+  ];
+
+  annotationToolTips = [
+    {
+      name: "Add New Annotation",
+      icon: `./src/assets/new-annotation-icon.svg`,
+      shortcutSymbol: "+",
+    },
+    {
+      name: "Clear Annotation",
+      icon: `./src/assets/delete-annotation-icon.svg`,
+      shortcutSymbol: "-",
+    },
+  ];
+
   constructor(props: Props) {
     super(props);
     this.annotationsObject = this.props.annotationsObject || new Annotations();
@@ -132,12 +224,10 @@ export class UserInterface extends Component<Props, State> {
       activeAnnotationID: 0,
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       minimapPositionAndSize: { top: 0, left: 0, width: 200, height: 200 },
-      expanded: "labels-toolbox",
       callRedraw: 0,
       sliceIndex: 0,
       channels: [true],
       displayedImage: this.slicesData[0][0] || null,
-      colour: null,
       popover: null,
       anchorEl: null,
       buttonClicked: null,
@@ -463,104 +553,11 @@ export class UserInterface extends Component<Props, State> {
     }, this.mixChannels);
   };
 
-  //Close popover
+  // Close popover
+
   handleClose = (event: React.MouseEvent) => {
     this.setState({ anchorEl: null, popover: null });
   };
-
-  toolTips: ToolTips[] = [
-    {
-      name: "Select",
-      icon: `./src/assets/select-icon.svg`,
-      shortcut: "V",
-    },
-    {
-      name: "Brush",
-      icon: `./src/assets/brush-icon.svg`,
-      shortcut: "B",
-    },
-    {
-      name: "Eraser",
-      icon: `./src/assets/eraser-icon.svg`,
-      shortcut: "E",
-    },
-    {
-      name: "Spline",
-      icon: `./src/assets/splines-icon.svg`,
-      shortcut: "S",
-    },
-    {
-      name: "Magic Spline",
-      icon: `./src/assets/magic-spline-icon.svg`,
-      shortcut: "M",
-    },
-
-    {
-      name: "Contrast",
-      icon: `./src/assets/contrast-icon.svg`,
-      shortcut: `\\`,
-    },
-    {
-      name: "Brightness",
-      icon: `./src/assets/brightness-icon.svg`,
-      shortcut: `/`,
-    },
-    {
-      name: "Channel",
-      icon: `./src/assets/channels-icon.svg`,
-      shortcut: `C`,
-    },
-
-    {
-      name: "Annonation Label",
-      icon: `./src/assets/annotation-label-icon.svg`,
-      shortcut: "L",
-    },
-  ];
-
-  minimapToolTips = [
-    {
-      name: "Minimise Map",
-      icon: `./src/assets/minimise-icon.svg`,
-      shortcut: "Ctrl",
-      shortcutSymbol: "-",
-      styling: { marginRight: "86px", marginLeft: "15px" },
-    },
-
-    {
-      name: "Zoom In",
-      icon: `./src/assets/zoom-in-icon.svg`,
-      shortcut: "Ctrl",
-      shortcutSymbol: "+",
-      styling: { marginRight: "22px" },
-    },
-    {
-      name: "Zoom Out",
-      icon: `./src/assets/zoom-out-icon.svg`,
-      shortcut: "Ctrl",
-      shortcutSymbol: "-",
-      styling: { marginRight: "30px" },
-    },
-    {
-      name: "Fit to Page",
-      icon: `./src/assets/reset-zoom-and-pan-icon.svg`,
-      shortcut: "Ctrl",
-      shortcutSymbol: "[",
-    },
-  ];
-
-  annotationToolTips = [
-    {
-      name: "Add New Annotation",
-      icon: `./src/assets/new-annotation-icon.svg`,
-      shortcutSymbol: "+",
-    },
-    {
-      name: "Clear Annotation",
-      icon: `./src/assets/delete-annotation-icon.svg`,
-      shortcutSymbol: "-",
-    },
-  ];
 
   handleRequestClose = () => {
     this.setState({
@@ -593,72 +590,68 @@ export class UserInterface extends Component<Props, State> {
       >
         <Grid container direction="row">
           <ButtonGroup size="small" style={{ background: "#fafafa" }}>
-            {this.annotationToolTips.map((toolTip) => {
-              return (
-                <HtmlTooltip
-                  key={toolTip.name}
-                  title={
-                    <Box
-                      display="flex"
-                      alignItems="center"
-                      justifyItems="space-between"
-                    >
-                      <Box mr={3}>
-                        <Typography>{toolTip.name}</Typography>
-                      </Box>
-
-                      <Avatar
-                        style={{
-                          backgroundColor: "#02FFAD",
-                          color: "#2B2F3A",
-                        }}
-                      >
-                        {toolTip.shortcutSymbol}
-                      </Avatar>
-                    </Box>
-                  }
-                  placement="right"
-                >
-                  <IconButton
-                    size="small"
-                    style={{
-                      marginBottom: "5px",
-                      marginTop: "7px",
-                    }}
-                    onClick={(e: React.MouseEvent) =>
-                      this.setState(
-                        {
-                          buttonClicked: toolTip.name,
-                        },
-                        () => {
-                          if (
-                            this.state.buttonClicked === "Add New Annotation"
-                          ) {
-                            this.addAnnotation();
-                          }
-                          if (this.state.buttonClicked === "Clear Annotation") {
-                            this.clearActiveAnnotation();
-                          }
-                        }
-                      )
-                    }
+            {this.annotationToolTips.map((toolTip) => (
+              <HtmlTooltip
+                key={toolTip.name}
+                title={
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyItems="space-between"
                   >
-                    <Avatar sizes="large" variant="circular">
-                      <SVG
-                        src={`${toolTip.icon}`}
-                        width="55%"
-                        height="auto"
-                        fill={
-                          this.state.buttonClicked === toolTip.name
-                            ? "#02FFAD"
-                            : null
-                        }
-                      />
+                    <Box mr={3}>
+                      <Typography>{toolTip.name}</Typography>
+                    </Box>
+
+                    <Avatar
+                      style={{
+                        backgroundColor: "#02FFAD",
+                        color: "#2B2F3A",
+                      }}
+                    >
+                      {toolTip.shortcutSymbol}
                     </Avatar>
-                  </IconButton>
-                </HtmlTooltip>
-              );
-            })}
+                  </Box>
+                }
+                placement="right"
+              >
+                <IconButton
+                  size="small"
+                  style={{
+                    marginBottom: "5px",
+                    marginTop: "7px",
+                  }}
+                  onClick={(e: React.MouseEvent) =>
+                    this.setState(
+                      {
+                        buttonClicked: toolTip.name,
+                      },
+                      () => {
+                        if (this.state.buttonClicked === "Add New Annotation") {
+                          this.addAnnotation();
+                        }
+                        if (this.state.buttonClicked === "Clear Annotation") {
+                          this.clearActiveAnnotation();
+                        }
+                      }
+                    )
+                  }
+                >
+                  <Avatar sizes="large" variant="circular">
+                    <SVG
+                      src={`${toolTip.icon}`}
+                      width="55%"
+                      height="auto"
+                      fill={
+                        this.state.buttonClicked === toolTip.name
+                          ? "#02FFAD"
+                          : null
+                      }
+                    />
+                  </Avatar>
+                </IconButton>
+              </HtmlTooltip>
+            ))}
           </ButtonGroup>
         </Grid>
       </div>
@@ -680,78 +673,76 @@ export class UserInterface extends Component<Props, State> {
               background: "#fafafa",
             }}
           >
-            {this.toolTips.map((toolTip) => {
-              return (
-                <HtmlTooltip
-                  key={toolTip.name}
-                  title={
-                    <Box
-                      display="flex"
-                      alignItems="center"
-                      justifyItems="space-between"
-                    >
-                      <Box mr={3}>
-                        <Typography>{toolTip.name}</Typography>
-                      </Box>
-                      <Avatar
-                        variant="circle"
-                        style={{
-                          backgroundColor: "#02FFAD",
-                          color: "#2B2F3A",
-                        }}
-                      >
-                        {toolTip.shortcut}
-                      </Avatar>
-                    </Box>
-                  }
-                  placement="right"
-                >
-                  <IconButton
-                    size="small"
-                    style={{
-                      marginBottom: "5px",
-                      marginTop: "7px",
-                    }}
-                    onClick={(e: React.MouseEvent) =>
-                      this.setState(
-                        {
-                          popover: true,
-                          buttonClicked: toolTip.name,
-                          anchorEl: e.currentTarget,
-                        },
-                        () => {
-                          if (this.state.buttonClicked === "Eraser") {
-                            this.activateTool("eraser");
-                          }
-                          if (this.state.buttonClicked === "Brush") {
-                            this.activateTool("paintbrush");
-                          }
-                          if (this.state.buttonClicked === "Magic Spline") {
-                            this.activateTool("magicspline");
-                          }
-                          if (this.state.buttonClicked === "Spline") {
-                            this.activateTool("spline");
-                          }
-                        }
-                      )
-                    }
+            {this.toolTips.map((toolTip) => (
+              <HtmlTooltip
+                key={toolTip.name}
+                title={
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyItems="space-between"
                   >
-                    <Avatar sizes="large" variant="circular">
-                      <SVG
-                        src={`${toolTip.icon}`}
-                        width="55%"
-                        height="auto"
-                        fill={
-                          this.state.buttonClicked === toolTip.name
-                            ? "#02FFAD"
-                            : null
-                        }
-                      />
+                    <Box mr={3}>
+                      <Typography>{toolTip.name}</Typography>
+                    </Box>
+                    <Avatar
+                      variant="circle"
+                      style={{
+                        backgroundColor: "#02FFAD",
+                        color: "#2B2F3A",
+                      }}
+                    >
+                      {toolTip.shortcut}
                     </Avatar>
-                  </IconButton>
-                </HtmlTooltip>
-              );
-            })}
+                  </Box>
+                }
+                placement="right"
+              >
+                <IconButton
+                  size="small"
+                  style={{
+                    marginBottom: "5px",
+                    marginTop: "7px",
+                  }}
+                  onClick={(e: React.MouseEvent) =>
+                    this.setState(
+                      {
+                        popover: true,
+                        buttonClicked: toolTip.name,
+                        anchorEl: e.currentTarget as HTMLButtonElement,
+                      },
+                      () => {
+                        if (this.state.buttonClicked === "Eraser") {
+                          this.activateTool("eraser");
+                        }
+                        if (this.state.buttonClicked === "Brush") {
+                          this.activateTool("paintbrush");
+                        }
+                        if (this.state.buttonClicked === "Magic Spline") {
+                          this.activateTool("magicspline");
+                        }
+                        if (this.state.buttonClicked === "Spline") {
+                          this.activateTool("spline");
+                        }
+                      }
+                    )
+                  }
+                >
+                  <Avatar sizes="large" variant="circular">
+                    <SVG
+                      src={`${toolTip.icon}`}
+                      width="55%"
+                      height="auto"
+                      fill={
+                        this.state.buttonClicked === toolTip.name
+                          ? "#02FFAD"
+                          : null
+                      }
+                    />
+                  </Avatar>
+                </IconButton>
+              </HtmlTooltip>
+            ))}
           </ButtonGroup>
         </Grid>
       </div>
@@ -759,21 +750,20 @@ export class UserInterface extends Component<Props, State> {
       <CssBaseline />
       <Container disableGutters>
         <AppBar
-          position={"static"}
+          position="static"
           style={{ backgroundColor: "#fafafa", height: "90px" }}
         >
           <Toolbar>
             <Grid container direction="row">
               <Grid item justify="flex-start" style={{ marginTop: "18px" }}>
-                {
-                  <img
-                    src="
+                <img
+                  src="
                     ./src/assets/gliff-master-black.png
                    "
-                    width="79px"
-                    height="60px"
-                  />
-                }
+                  width="79px"
+                  height="60px"
+                  alt="gliff logo"
+                />
               </Grid>
             </Grid>
             <Grid item justify="flex-end">
@@ -782,7 +772,7 @@ export class UserInterface extends Component<Props, State> {
                 spanElement={
                   /* eslint-disable react/jsx-wrap-multilines */
                   <Button aria-label="upload-picture" component="span">
-                    {<img src="./src/assets/upload-icon.svg" />}
+                    <img src="./src/assets/upload-icon.svg" alt="upload icon" />
                   </Button>
                 }
                 multiple={false}
@@ -970,9 +960,6 @@ export class UserInterface extends Component<Props, State> {
             anchorEl={this.state.anchorEl}
             onClose={this.handleClose}
             onClick={this.handleRequestClose}
-            buttonClicked={this.state.buttonClicked}
-            activeTool={this.state.activeTool}
-            activateTool={this.activateTool}
           />
           <SplineUI
             open={this.state.buttonClicked === "Spline" && this.state.popover}
@@ -1013,82 +1000,80 @@ export class UserInterface extends Component<Props, State> {
               position: "relative",
             }}
           >
-            {this.minimapToolTips.map((minimapToolTip) => {
-              return (
-                <HtmlTooltip
-                  key={minimapToolTip.name}
-                  title={
-                    <Box
-                      display="flex"
-                      alignItems="center"
-                      justifyItems="space-between"
-                    >
-                      <Box mr={3}>
-                        <Typography color="inherit">
-                          {minimapToolTip.name}
-                        </Typography>
-                      </Box>
-                      <Avatar
-                        style={{
-                          backgroundColor: "#02FFAD",
-                          color: "#2B2F3A",
-                        }}
-                      >
-                        {minimapToolTip.shortcut}
-                      </Avatar>
-                      <Avatar
-                        style={{
-                          backgroundColor: "#02FFAD",
-                          color: "#2B2F3A",
-                        }}
-                      >
-                        {minimapToolTip.shortcutSymbol}
-                      </Avatar>
-                    </Box>
-                  }
-                  placement="top"
-                >
-                  <IconButton
-                    size="small"
-                    style={minimapToolTip.styling}
-                    onClick={(e: React.MouseEvent) =>
-                      this.setState(
-                        {
-                          buttonClicked: minimapToolTip.name,
-                        },
-                        () => {
-                          if (minimapToolTip.name === "Zoom In") {
-                            this.incrementScale();
-                          }
-                          if (minimapToolTip.name === "Zoom Out") {
-                            this.decrementScale();
-                          }
-                          if (minimapToolTip.name === "Fit to Page") {
-                            this.resetScaleAndPan();
-                          }
-                          if (minimapToolTip.name === "Minimise Map") {
-                            this.handleDrawerClose();
-                          }
-                        }
-                      )
-                    }
+            {this.minimapToolTips.map((minimapToolTip) => (
+              <HtmlTooltip
+                key={minimapToolTip.name}
+                title={
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyItems="space-between"
                   >
-                    <Avatar sizes="large">
-                      <SVG
-                        src={`${minimapToolTip.icon}`}
-                        width="55%"
-                        height="auto"
-                        fill={
-                          this.state.buttonClicked === minimapToolTip.name
-                            ? "#02FFAD"
-                            : null
-                        }
-                      />
+                    <Box mr={3}>
+                      <Typography color="inherit">
+                        {minimapToolTip.name}
+                      </Typography>
+                    </Box>
+                    <Avatar
+                      style={{
+                        backgroundColor: "#02FFAD",
+                        color: "#2B2F3A",
+                      }}
+                    >
+                      {minimapToolTip.shortcut}
                     </Avatar>
-                  </IconButton>
-                </HtmlTooltip>
-              );
-            })}
+                    <Avatar
+                      style={{
+                        backgroundColor: "#02FFAD",
+                        color: "#2B2F3A",
+                      }}
+                    >
+                      {minimapToolTip.shortcutSymbol}
+                    </Avatar>
+                  </Box>
+                }
+                placement="top"
+              >
+                <IconButton
+                  size="small"
+                  style={minimapToolTip.styling}
+                  onClick={(e: React.MouseEvent) =>
+                    this.setState(
+                      {
+                        buttonClicked: minimapToolTip.name,
+                      },
+                      () => {
+                        if (minimapToolTip.name === "Zoom In") {
+                          this.incrementScale();
+                        }
+                        if (minimapToolTip.name === "Zoom Out") {
+                          this.decrementScale();
+                        }
+                        if (minimapToolTip.name === "Fit to Page") {
+                          this.resetScaleAndPan();
+                        }
+                        if (minimapToolTip.name === "Minimise Map") {
+                          this.handleDrawerClose();
+                        }
+                      }
+                    )
+                  }
+                >
+                  <Avatar sizes="large">
+                    <SVG
+                      src={`${minimapToolTip.icon}`}
+                      width="55%"
+                      height="auto"
+                      fill={
+                        this.state.buttonClicked === minimapToolTip.name
+                          ? "#02FFAD"
+                          : null
+                      }
+                    />
+                  </Avatar>
+                </IconButton>
+              </HtmlTooltip>
+            ))}
             <MinimapCanvas
               displayedImage={this.state.displayedImage}
               scaleAndPan={this.state.scaleAndPan}
