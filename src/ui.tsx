@@ -253,6 +253,28 @@ export class UserInterface extends Component<Props, State> {
     this.setViewportPositionAndSize({ top: 0, left: 0, width, height });
   };
 
+  componentDidUpdate = (prevProps: Props): void => {
+    if (
+      this.props.slicesData &&
+      prevProps.slicesData !== this.props.slicesData
+    ) {
+      this.slicesData = this.props.slicesData;
+      /* eslint-disable react/no-did-update-set-state */
+      this.setState({
+        displayedImage: this.slicesData[0][0],
+        sliceIndex: 0,
+      });
+      this.imageFileInfo = this.props.imageFileInfo;
+    }
+
+    if (
+      this.props.annotationsObject &&
+      prevProps.annotationsObject !== this.props.annotationsObject
+    ) {
+      this.annotationsObject = this.props.annotationsObject;
+    }
+  };
+
   componentWillUnmount(): void {
     for (const event of events) {
       document.removeEventListener(event, this.handleEvent);
