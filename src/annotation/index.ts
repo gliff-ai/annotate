@@ -70,10 +70,6 @@ export class Annotations {
     }
   }
 
-  getData = (): Annotation[] => this.data;
-
-  getAudit = (): AuditAction[] => this.audit;
-
   getLabels = (): string[] => this.data[this.activeAnnotationID].labels;
 
   getActiveAnnotationID = (): number => this.activeAnnotationID;
@@ -215,7 +211,8 @@ export class Annotations {
     });
   }
 
-  getAuditObject = (): Array<AuditAction> => this.audit;
+  getAuditObject = (): Array<AuditAction> =>
+    JSON.parse(JSON.stringify(this.audit)) as AuditAction[];
 
   popAuditObject = (): Array<AuditAction> => {
     // returns the audit array and deletes it from this object, so they can be stored separately without duplicating data
