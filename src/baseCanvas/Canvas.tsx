@@ -1,17 +1,5 @@
 import React, { Component, ReactNode } from "react";
 import { XYPoint, PositionAndSize } from "@/annotation/interfaces";
-import {
-  Avatar,
-  Box,
-  ButtonGroup,
-  Grid,
-  IconButton,
-  Theme,
-  Tooltip,
-  Typography,
-  withStyles,
-} from "@material-ui/core";
-import SVG, { Props as SVGProps } from "react-inlinesvg";
 
 export interface Props {
   name?: string;
@@ -35,15 +23,6 @@ export interface Props {
   setCanvasPositionAndSize?: (canvasPositionAndSize: PositionAndSize) => void;
   displayedImage?: ImageBitmap;
 }
-
-const HtmlTooltip = withStyles((t: Theme) => ({
-  tooltip: {
-    backgroundColor: "#FFFFFF",
-    fontSize: t.typography.pxToRem(12),
-    border: "1px solid #dadde9",
-    color: "#2B2F3A",
-  },
-}))(Tooltip);
 
 export class BaseCanvas extends Component<Props> {
   private name: string;

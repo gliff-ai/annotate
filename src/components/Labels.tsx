@@ -6,21 +6,18 @@ import React, {
 } from "react";
 
 import {
-  Collapse,
   Divider,
   IconButton,
   InputBase,
   List,
   ListItem,
-  ListItemIcon,
   ListItemSecondaryAction,
   ListItemText,
 } from "@material-ui/core";
 
-import SVG, { Props as SVGProps } from "react-inlinesvg";
+import SVG from "react-inlinesvg";
 
 import { Annotations } from "@/annotation";
-import { theme } from "@/theme";
 
 interface Props {
   annotationObject: Annotations;
@@ -44,8 +41,6 @@ export const Labels: FunctionComponent<Props> = ({
   const [menuLabels, setMenuLabels] = useState(
     getMenuLabels(annotationObject.getLabels())
   );
-
-  const [isOpen, setIsOpen] = useState(false);
 
   const [newLabel, setNewLabel] = React.useState("");
 
@@ -71,10 +66,6 @@ export const Labels: FunctionComponent<Props> = ({
     // Remove a label from active annotation object and update some states.
     annotationObject.removeLabel(label);
     updateAllLabels();
-  };
-
-  const handleClick = () => {
-    setIsOpen(!isOpen);
   };
 
   useEffect(() => {

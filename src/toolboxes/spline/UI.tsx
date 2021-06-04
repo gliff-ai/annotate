@@ -1,7 +1,4 @@
-import React, { ChangeEvent, ReactElement } from "react";
-import { Tooltip, IconButton, Typography, Popover } from "@material-ui/core";
-
-import { Timeline, Gesture } from "@material-ui/icons";
+import React, { ReactElement } from "react";
 
 import { Tool } from "@/tools";
 

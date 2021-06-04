@@ -1,8 +1,6 @@
 import React, { ChangeEvent, ReactElement } from "react";
 import { Popover } from "@material-ui/core";
 
-import { Tool } from "@/tools";
-
 import { BaseSlider } from "@/components/BaseSlider";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
 

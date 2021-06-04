@@ -1,4 +1,4 @@
-import React, { Component, ChangeEvent, ReactNode, useRef } from "react";
+import React, { Component, ChangeEvent, ReactNode } from "react";
 import {
   AppBar,
   Container,
@@ -18,12 +18,10 @@ import {
   Popover,
   Card,
   Paper,
-  Drawer,
-  Collapse,
   Slide,
 } from "@material-ui/core";
 
-import SVG, { Props as SVGProps } from "react-inlinesvg";
+import SVG from "react-inlinesvg";
 
 import { ImageFileInfo } from "@gliff-ai/upload/typings";
 import { UploadImage } from "@gliff-ai/upload";
