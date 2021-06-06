@@ -1018,6 +1018,8 @@ export class UserInterface extends Component<Props, State> {
               height: "248px",
               paddingTop: "7px",
               position: "relative",
+              left: "250px",
+              borderRadius: "7px 0 0 0",
             }}
           >
             {this.minimapToolTips.map((minimapToolTip) => (
