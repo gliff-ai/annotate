@@ -77,7 +77,7 @@ interface State {
   viewportPositionAndSize: Required<PositionAndSize>;
   minimapPositionAndSize: Required<PositionAndSize>;
   expanded: string | boolean;
-  callRedraw: number;
+  redraw: number;
   sliceIndex: number;
   channels: boolean[];
   mode: Mode;
@@ -115,10 +115,10 @@ export class UserInterface extends Component<Props, State> {
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       minimapPositionAndSize: { top: 0, left: 0, width: 200, height: 200 },
       expanded: "labels-toolbox",
-      callRedraw: 0,
+      redraw: 0,
       sliceIndex: 0,
       channels: [true],
-      displayedImage: this.slicesData[0][0] || null,
+      displayedImage: this.slicesData ? this.slicesData[0][0] : null,
       activeTool: Tools.paintbrush,
       mode: Mode.draw,
     };
@@ -155,6 +155,11 @@ export class UserInterface extends Component<Props, State> {
       prevProps.annotationsObject !== this.props.annotationsObject
     ) {
       this.annotationsObject = this.props.annotationsObject;
+      // Restore activeAnnotationID
+      this.annotationsObject.setActiveAnnotationID(
+        this.state.activeAnnotationID
+      );
+      this.callRedraw();
     }
   };
 
@@ -171,6 +176,7 @@ export class UserInterface extends Component<Props, State> {
   };
 
   updatePresetLabels = (label: string): void => {
+    if (!this.state.displayedImage) return;
     function onlyUnique(value: string, index: number, self: string[]) {
       return self.indexOf(value) === index;
     }
@@ -249,6 +255,7 @@ export class UserInterface extends Component<Props, State> {
     // adjust pan such that image borders are not inside the canvas
 
     // calculate how much bigger the image is than the canvas, in canvas space:
+    if (!this.state.displayedImage) return;
     const imageScalingFactor = Math.min(
       this.state.viewportPositionAndSize.width /
         this.state.displayedImage.width,
@@ -349,6 +356,7 @@ export class UserInterface extends Component<Props, State> {
     // the result in this.state.displayedImage
 
     // draw the channels onto a new canvas using additive composition:
+    if (!this.slicesData) return;
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
     canvas.width = this.slicesData[this.state.sliceIndex][0].width;
@@ -374,6 +382,7 @@ export class UserInterface extends Component<Props, State> {
   };
 
   addAnnotation = (): void => {
+    if (!this.state.displayedImage) return;
     this.annotationsObject.addAnnotation(this.state.activeTool);
     this.annotationsObject.setSplineSpaceTimeInfo(this.state.sliceIndex);
     this.setState({
@@ -438,8 +447,12 @@ export class UserInterface extends Component<Props, State> {
       // (since it doesn't know which tool is active), so we set the toolbox correctly here:
       this.annotationsObject.setActiveAnnotationToolbox(this.state.activeTool);
     }
+    this.callRedraw();
+  };
+
+  callRedraw = () => {
     this.setState((prevState) => ({
-      callRedraw: prevState.callRedraw + 1,
+      redraw: prevState.redraw + 1,
     }));
   };
 
@@ -503,50 +516,53 @@ export class UserInterface extends Component<Props, State> {
 
         <Grid container spacing={0} justify="center" wrap="nowrap">
           <Grid item style={{ width: "85%", position: "relative" }}>
-            <BackgroundCanvas
-              scaleAndPan={this.state.scaleAndPan}
-              displayedImage={this.state.displayedImage}
-              canvasPositionAndSize={this.state.viewportPositionAndSize}
-              setCanvasPositionAndSize={this.setViewportPositionAndSize}
-            />
+            {this.state.displayedImage && (
+              <>
+                <BackgroundCanvas
+                  scaleAndPan={this.state.scaleAndPan}
+                  displayedImage={this.state.displayedImage}
+                  canvasPositionAndSize={this.state.viewportPositionAndSize}
+                  setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                />
 
-            <SplineCanvas
-              scaleAndPan={this.state.scaleAndPan}
-              activeTool={this.state.activeTool}
-              mode={this.state.mode}
-              annotationsObject={this.annotationsObject}
-              displayedImage={this.state.displayedImage}
-              canvasPositionAndSize={this.state.viewportPositionAndSize}
-              setCanvasPositionAndSize={this.setViewportPositionAndSize}
-              callRedraw={this.state.callRedraw}
-              sliceIndex={this.state.sliceIndex}
-              setUIActiveAnnotationID={(id) => {
-                this.setState({ activeAnnotationID: id });
-              }}
-              setActiveTool={(tool: Tool) => {
-                this.setState({ activeTool: tool });
-              }}
-            />
+                <SplineCanvas
+                  scaleAndPan={this.state.scaleAndPan}
+                  activeTool={this.state.activeTool}
+                  mode={this.state.mode}
+                  annotationsObject={this.annotationsObject}
+                  displayedImage={this.state.displayedImage}
+                  canvasPositionAndSize={this.state.viewportPositionAndSize}
+                  setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                  redraw={this.state.redraw}
+                  sliceIndex={this.state.sliceIndex}
+                  setUIActiveAnnotationID={(id) => {
+                    this.setState({ activeAnnotationID: id });
+                  }}
+                  setActiveTool={(tool: Tool) => {
+                    this.setState({ activeTool: tool });
+                  }}
+                />
 
-            <PaintbrushCanvas
-              scaleAndPan={this.state.scaleAndPan}
-              activeTool={this.state.activeTool}
-              mode={this.state.mode}
-              annotationsObject={this.annotationsObject}
-              displayedImage={this.state.displayedImage}
-              canvasPositionAndSize={this.state.viewportPositionAndSize}
-              setCanvasPositionAndSize={this.setViewportPositionAndSize}
-              callRedraw={this.state.callRedraw}
-              sliceIndex={this.state.sliceIndex}
-              setUIActiveAnnotationID={(id) => {
-                this.setState({ activeAnnotationID: id });
-              }}
-              setActiveTool={(tool: Tool) => {
-                this.setState({ activeTool: tool });
-              }}
-            />
-
-            {this.slicesData.length > 1 && (
+                <PaintbrushCanvas
+                  scaleAndPan={this.state.scaleAndPan}
+                  activeTool={this.state.activeTool}
+                  mode={this.state.mode}
+                  annotationsObject={this.annotationsObject}
+                  displayedImage={this.state.displayedImage}
+                  canvasPositionAndSize={this.state.viewportPositionAndSize}
+                  setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                  redraw={this.state.redraw}
+                  sliceIndex={this.state.sliceIndex}
+                  setUIActiveAnnotationID={(id) => {
+                    this.setState({ activeAnnotationID: id });
+                  }}
+                  setActiveTool={(tool: Tool) => {
+                    this.setState({ activeTool: tool });
+                  }}
+                />
+              </>
+            )}
+            {this.slicesData && this.slicesData.length > 1 && (
               <div
                 style={{
                   position: "absolute",
@@ -572,22 +588,24 @@ export class UserInterface extends Component<Props, State> {
             )}
           </Grid>
           <Grid item style={{ width: 200, position: "relative" }}>
-            <div style={{ height: 200 }}>
-              <BackgroundCanvas
-                scaleAndPan={{ x: 0, y: 0, scale: 1 }}
-                displayedImage={this.state.displayedImage}
-                canvasPositionAndSize={this.state.minimapPositionAndSize}
-                setCanvasPositionAndSize={this.setMinimapPositionAndSize}
-              />
-              <MinimapCanvas
-                displayedImage={this.state.displayedImage}
-                scaleAndPan={this.state.scaleAndPan}
-                setScaleAndPan={this.setScaleAndPan}
-                canvasPositionAndSize={this.state.viewportPositionAndSize}
-                minimapPositionAndSize={this.state.minimapPositionAndSize}
-                setMinimapPositionAndSize={this.setMinimapPositionAndSize}
-              />
-            </div>
+            {this.state.displayedImage && (
+              <div style={{ height: 200 }}>
+                <BackgroundCanvas
+                  scaleAndPan={{ x: 0, y: 0, scale: 1 }}
+                  displayedImage={this.state.displayedImage}
+                  canvasPositionAndSize={this.state.minimapPositionAndSize}
+                  setCanvasPositionAndSize={this.setMinimapPositionAndSize}
+                />
+                <MinimapCanvas
+                  displayedImage={this.state.displayedImage}
+                  scaleAndPan={this.state.scaleAndPan}
+                  setScaleAndPan={this.setScaleAndPan}
+                  canvasPositionAndSize={this.state.viewportPositionAndSize}
+                  minimapPositionAndSize={this.state.minimapPositionAndSize}
+                  setMinimapPositionAndSize={this.setMinimapPositionAndSize}
+                />
+              </div>
+            )}
 
             <Grid container justify="center">
               <ButtonGroup size="small" style={{ margin: "5px" }}>
