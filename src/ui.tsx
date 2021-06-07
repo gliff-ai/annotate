@@ -1085,6 +1085,14 @@ export class UserInterface extends Component<Props, State> {
                 </IconButton>
               </HtmlTooltip>
             ))}
+
+            {/* Background canvas for the minimap */}
+            <BackgroundCanvas
+              scaleAndPan={{ x: 0, y: 0, scale: 1 }}
+              displayedImage={this.state.displayedImage}
+              canvasPositionAndSize={this.state.minimapPositionAndSize}
+              setCanvasPositionAndSize={this.setMinimapPositionAndSize}
+            />
             <MinimapCanvas
               displayedImage={this.state.displayedImage}
               scaleAndPan={this.state.scaleAndPan}
@@ -1145,7 +1153,6 @@ export class UserInterface extends Component<Props, State> {
                 placement="top"
               >
                 <IconButton
-                  color="inherit"
                   onClick={(e: React.MouseEvent) =>
                     this.setState(
                       {
