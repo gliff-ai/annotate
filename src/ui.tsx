@@ -77,7 +77,7 @@ interface State {
   viewportPositionAndSize: Required<PositionAndSize>;
   minimapPositionAndSize: Required<PositionAndSize>;
   expanded: string | boolean;
-  callRedraw: number;
+  redraw: number;
   sliceIndex: number;
   channels: boolean[];
   mode: Mode;
@@ -115,7 +115,7 @@ export class UserInterface extends Component<Props, State> {
       viewportPositionAndSize: { top: 0, left: 0, width: 768, height: 768 },
       minimapPositionAndSize: { top: 0, left: 0, width: 200, height: 200 },
       expanded: "labels-toolbox",
-      callRedraw: 0,
+      redraw: 0,
       sliceIndex: 0,
       channels: [true],
       displayedImage: this.slicesData[0][0] || null,
@@ -155,6 +155,11 @@ export class UserInterface extends Component<Props, State> {
       prevProps.annotationsObject !== this.props.annotationsObject
     ) {
       this.annotationsObject = this.props.annotationsObject;
+      // Restore activeAnnotationID
+      this.annotationsObject.setActiveAnnotationID(
+        this.state.activeAnnotationID
+      );
+      this.callRedraw();
     }
   };
 
@@ -438,8 +443,12 @@ export class UserInterface extends Component<Props, State> {
       // (since it doesn't know which tool is active), so we set the toolbox correctly here:
       this.annotationsObject.setActiveAnnotationToolbox(this.state.activeTool);
     }
+    this.callRedraw();
+  };
+
+  callRedraw = () => {
     this.setState((prevState) => ({
-      callRedraw: prevState.callRedraw + 1,
+      redraw: prevState.redraw + 1,
     }));
   };
 
@@ -518,7 +527,7 @@ export class UserInterface extends Component<Props, State> {
               displayedImage={this.state.displayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
-              callRedraw={this.state.callRedraw}
+              redraw={this.state.redraw}
               sliceIndex={this.state.sliceIndex}
               setUIActiveAnnotationID={(id) => {
                 this.setState({ activeAnnotationID: id });
@@ -536,7 +545,7 @@ export class UserInterface extends Component<Props, State> {
               displayedImage={this.state.displayedImage}
               canvasPositionAndSize={this.state.viewportPositionAndSize}
               setCanvasPositionAndSize={this.setViewportPositionAndSize}
-              callRedraw={this.state.callRedraw}
+              redraw={this.state.redraw}
               sliceIndex={this.state.sliceIndex}
               setUIActiveAnnotationID={(id) => {
                 this.setState({ activeAnnotationID: id });

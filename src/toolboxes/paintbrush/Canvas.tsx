@@ -27,7 +27,7 @@ interface Props extends CanvasProps {
   mode: Mode;
   annotationsObject: Annotations;
   brushRadius: number;
-  callRedraw: number;
+  redraw: number;
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
   setActiveTool: (tool: Tool) => void;
@@ -499,7 +499,7 @@ export const PaintbrushCanvas = (
       scaleAndPan={props.scaleAndPan}
       canvasPositionAndSize={props.canvasPositionAndSize}
       brushRadius={paintbrush.brushRadius}
-      callRedraw={props.callRedraw}
+      redraw={props.redraw}
       sliceIndex={props.sliceIndex}
       setUIActiveAnnotationID={props.setUIActiveAnnotationID}
       setActiveTool={props.setActiveTool}
