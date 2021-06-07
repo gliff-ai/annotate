@@ -168,7 +168,7 @@ export class UserInterface extends Component<Props, State> {
     {
       name: "Minimise Map",
       icon: `./src/assets/minimise-icon.svg`,
-      shortcut: "Ctrl",
+      shortcut: "Alt",
       shortcutSymbol: "-",
       styling: { marginRight: "86px", marginLeft: "15px" },
     },
@@ -1000,17 +1000,6 @@ export class UserInterface extends Component<Props, State> {
           zIndex: 100,
         }}
       >
-        <IconButton
-          color="inherit"
-          onClick={this.handleDrawerOpen}
-          edge="start"
-          size="small"
-        >
-          <Avatar>
-            <SVG src="src/assets/maximise-icon.svg" width="55%" height="auto" />
-          </Avatar>
-        </IconButton>
-
         <Slide in={this.state.toggleMinimap} direction="up" timeout={1000}>
           <Card
             style={{
@@ -1019,7 +1008,7 @@ export class UserInterface extends Component<Props, State> {
               paddingTop: "7px",
               position: "relative",
               left: "250px",
-              borderRadius: "7px 0 0 0",
+              borderRadius: "10px 0 0 0",
             }}
           >
             {this.minimapToolTips.map((minimapToolTip) => (
@@ -1106,6 +1095,80 @@ export class UserInterface extends Component<Props, State> {
             />
           </Card>
         </Slide>
+
+        {this.state.toggleMinimap === false ? (
+          <Slide
+            in={!this.state.toggleMinimap}
+            direction="up"
+            timeout={{ enter: 1000 }}
+          >
+            <Card
+              style={{
+                width: "61px",
+                height: "53px",
+                left: "540px",
+                position: "relative",
+                borderRadius: "10px 0 0 0",
+                textAlign: "center",
+                padding: "7px 0",
+              }}
+            >
+              <HtmlTooltip
+                key="Maximise Map"
+                title={
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyItems="space-between"
+                  >
+                    <Box mr={3}>
+                      <Typography color="inherit">Maximise Map</Typography>
+                    </Box>
+                    <Avatar
+                      style={{
+                        backgroundColor: "#02FFAD",
+                        color: "#2B2F3A",
+                      }}
+                    >
+                      Alt
+                    </Avatar>
+                    <Avatar
+                      style={{
+                        backgroundColor: "#02FFAD",
+                        color: "#2B2F3A",
+                      }}
+                    >
+                      +
+                    </Avatar>
+                  </Box>
+                }
+                placement="top"
+              >
+                <IconButton
+                  color="inherit"
+                  onClick={(e: React.MouseEvent) =>
+                    this.setState(
+                      {
+                        buttonClicked: "Maximise Map",
+                      },
+                      this.handleDrawerOpen
+                    )
+                  }
+                  edge="start"
+                  size="small"
+                >
+                  <Avatar>
+                    <SVG
+                      src="src/assets/maximise-icon.svg"
+                      width="55%"
+                      height="auto"
+                    />
+                  </Avatar>
+                </IconButton>
+              </HtmlTooltip>
+            </Card>
+          </Slide>
+        ) : null}
       </div>
     </ThemeProvider>
   );
