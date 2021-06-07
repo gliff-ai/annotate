@@ -52,6 +52,10 @@ module.exports = {
           from: "examples/zebrafish-heart.jpg",
           to: "zebrafish-heart.jpg",
         },
+        {
+          from: "src/assets",
+          to: "assets",
+        },
       ],
     }),
   ],
