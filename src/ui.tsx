@@ -37,7 +37,6 @@ import { Labels } from "@/components/Labels";
 import { Download } from "@/download/UI";
 import { keydownListener } from "@/keybindings";
 import { Tools, Tool } from "@/tools";
-import { Save } from "@material-ui/icons";
 
 const CONFIG = {
   PAN_AMOUNT: 20,
@@ -797,39 +796,37 @@ export class UserInterface extends Component<Props, State> {
                   alt="gliff logo"
                 />
               </Grid>
+            </Grid>
 
-              <Grid>
-                <UploadImage
-                  setUploadedImage={this.setUploadedImage}
-                  spanElement={
-                    /* eslint-disable react/jsx-wrap-multilines */
-                    <Button aria-label="upload-picture" component="span">
-                      <img
-                        src={require("./assets/upload-icon.svg") as string}
-                        alt="Upload Icon"
-                      />
-                    </Button>
-                  }
-                  multiple={false}
-                />
-              </Grid>
-
-              <Grid>
-                <Download
-                  annotations={this.annotationsObject.getAllAnnotations()}
-                  imageFileInfo={this.imageFileInfo}
-                />
-                {this.props.saveAnnotationsCallback && (
-                  <Button
-                    aria-label="save"
-                    onClick={() =>
-                      this.props.saveAnnotationsCallback(this.annotationsObject)
-                    }
-                  >
-                    <Save />
+            <Grid item justify="flex-end">
+              <UploadImage
+                setUploadedImage={this.setUploadedImage}
+                spanElement={
+                  /* eslint-disable react/jsx-wrap-multilines */
+                  <Button aria-label="upload-picture" component="span">
+                    <img
+                      src={require("./assets/upload-icon.svg") as string}
+                      alt="Upload Icon"
+                    />
                   </Button>
-                )}
-              </Grid>
+                }
+                multiple={false}
+              />
+            </Grid>
+
+            <Grid item justify="flex-end">
+              <Download
+                annotations={this.annotationsObject.getAllAnnotations()}
+                imageFileInfo={this.imageFileInfo}
+              />
+              {this.props.saveAnnotationsCallback && (
+                <Button
+                  aria-label="save"
+                  onClick={() =>
+                    this.props.saveAnnotationsCallback(this.annotationsObject)
+                  }
+                />
+              )}
             </Grid>
           </Toolbar>
         </AppBar>
