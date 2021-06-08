@@ -791,7 +791,7 @@ export class UserInterface extends Component<Props, State> {
             <Grid container direction="row">
               <Grid item justify="flex-start" style={{ marginTop: "18px" }}>
                 <img
-                  src={require(`./assets/gliff-master-black.png`) as string}
+                  src={require(`./assets/gliff-master-black.svg`) as string}
                   width="79px"
                   height="60px"
                   alt="gliff logo"
