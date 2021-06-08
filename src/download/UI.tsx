@@ -51,7 +51,10 @@ export function Download({ annotations, imageFileInfo }: Props): ReactElement {
     <>
       <Tooltip title="Download annotations">
         <Button aria-label="download" onClick={handleOpen}>
-          <img src="./src/assets/save-icon.svg" alt="upload icon" />
+          <img
+            src={require("../assets/save-icon.svg") as string}
+            alt="Save Icon"
+          />
         </Button>
       </Tooltip>
       <Menu
