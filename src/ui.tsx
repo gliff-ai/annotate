@@ -117,7 +117,7 @@ export class UserInterface extends Component<Props, State> {
   toolTips: ToolTips[] = [
     {
       name: "Select",
-      icon: `./src/assets/select-icon.svg`,
+      icon: require(`./assets/select-icon.svg`),
       shortcut: "V",
     },
     {
@@ -794,8 +794,8 @@ export class UserInterface extends Component<Props, State> {
                     /* eslint-disable react/jsx-wrap-multilines */
                     <Button aria-label="upload-picture" component="span">
                       <img
-                        src="./src/assets/upload-icon.svg"
-                        alt="upload icon"
+                        src={require("./assets/upload-icon.svg")}
+                        alt="Upload Icon"
                       />
                     </Button>
                   }

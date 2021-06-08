@@ -46,6 +46,16 @@ module.exports = {
         test: /\.(s*)css$/,
         use: ["style-loader", "css-loader", "sass-loader"],
       },
+      {
+        test: /\.(jpe?g|png|gif|woff|woff2|eot|ttf|svg)(\?[a-z0-9=.]+)?$/,
+        use: {
+          loader: "url-loader",
+          options: {
+            name: "img/[name].[hash:8].[ext]",
+            esModule: false,
+          },
+        },
+      },
     ],
   },
   resolve: {
