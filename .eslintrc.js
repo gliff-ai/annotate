@@ -17,11 +17,14 @@ module.exports = {
     {
       files: ["*.ts", "*.tsx"],
       rules: {
+        "global-require": 0,
+        "@typescript-eslint/no-var-requires": 0,
         "react/destructuring-assignment": "off", // This would be nice, but we call a lot of methods on props we pass down which rules it out
         "import/prefer-default-export": "off", // Most of the internet agrees this should be off
         "no-restricted-syntax": [
           // AirBnb don't allow for...of loops. We do, but still want to restrict the rest. Huge argument here: https://github.com/airbnb/javascript/issues/1271
           "error",
+
           {
             selector: "ForInStatement",
             message:

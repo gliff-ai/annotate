@@ -117,49 +117,49 @@ export class UserInterface extends Component<Props, State> {
   toolTips: ToolTips[] = [
     {
       name: "Select",
-      icon: require(`./assets/select-icon.svg`),
+      icon: require(`./assets/select-icon.svg`) as string,
       shortcut: "V",
     },
     {
       name: "Brush",
-      icon: `./src/assets/brush-icon.svg`,
+      icon: require(`./assets/brush-icon.svg`) as string,
       shortcut: "B",
     },
     {
       name: "Eraser",
-      icon: `./src/assets/eraser-icon.svg`,
+      icon: require(`./assets/eraser-icon.svg`) as string,
       shortcut: "E",
     },
     {
       name: "Spline",
-      icon: `./src/assets/splines-icon.svg`,
+      icon: require(`./assets/splines-icon.svg`) as string,
       shortcut: "S",
     },
     {
       name: "Magic Spline",
-      icon: `./src/assets/magic-spline-icon.svg`,
+      icon: require(`./assets/magic-spline-icon.svg`) as string,
       shortcut: "M",
     },
 
     {
       name: "Contrast",
-      icon: `./src/assets/contrast-icon.svg`,
+      icon: require(`./assets/contrast-icon.svg`) as string,
       shortcut: `\\`,
     },
     {
       name: "Brightness",
-      icon: `./src/assets/brightness-icon.svg`,
+      icon: require(`./assets/brightness-icon.svg`) as string,
       shortcut: `/`,
     },
     {
       name: "Channel",
-      icon: `./src/assets/channels-icon.svg`,
+      icon: require(`./assets/channels-icon.svg`) as string,
       shortcut: `C`,
     },
 
     {
       name: "Annonation Label",
-      icon: `./src/assets/annotation-label-icon.svg`,
+      icon: require(`./assets/annotation-label-icon.svg`) as string,
       shortcut: "L",
     },
   ];
@@ -167,7 +167,7 @@ export class UserInterface extends Component<Props, State> {
   minimapToolTips = [
     {
       name: "Minimise Map",
-      icon: `./src/assets/minimise-icon.svg`,
+      icon: require(`./assets/minimise-icon.svg`) as string,
       shortcut: "Alt",
       shortcutSymbol: "-",
       styling: { marginRight: "86px", marginLeft: "15px" },
@@ -175,21 +175,21 @@ export class UserInterface extends Component<Props, State> {
 
     {
       name: "Zoom In",
-      icon: `./src/assets/zoom-in-icon.svg`,
+      icon: require(`./assets/zoom-in-icon.svg`) as string,
       shortcut: "Ctrl",
       shortcutSymbol: "+",
       styling: { marginRight: "22px" },
     },
     {
       name: "Zoom Out",
-      icon: `./src/assets/zoom-out-icon.svg`,
+      icon: require(`./assets/zoom-out-icon.svg`) as string,
       shortcut: "Ctrl",
       shortcutSymbol: "-",
       styling: { marginRight: "30px" },
     },
     {
       name: "Fit to Page",
-      icon: `./src/assets/reset-zoom-and-pan-icon.svg`,
+      icon: require(`./assets/reset-zoom-and-pan-icon.svg`) as string,
       shortcut: "Ctrl",
       shortcutSymbol: "[",
     },
@@ -198,12 +198,12 @@ export class UserInterface extends Component<Props, State> {
   annotationToolTips = [
     {
       name: "Add New Annotation",
-      icon: `./src/assets/new-annotation-icon.svg`,
+      icon: require(`./assets/new-annotation-icon.svg`) as string,
       shortcutSymbol: "+",
     },
     {
       name: "Clear Annotation",
-      icon: `./src/assets/delete-annotation-icon.svg`,
+      icon: require(`./assets/delete-annotation-icon.svg`) as string,
       shortcutSymbol: "-",
     },
   ];
@@ -778,9 +778,7 @@ export class UserInterface extends Component<Props, State> {
             <Grid container direction="row">
               <Grid item justify="flex-start" style={{ marginTop: "18px" }}>
                 <img
-                  src="
-                    ./src/assets/gliff-master-black.png
-                   "
+                  src={require(`./assets/gliff-master-black.png`) as string}
                   width="79px"
                   height="60px"
                   alt="gliff logo"
@@ -794,7 +792,7 @@ export class UserInterface extends Component<Props, State> {
                     /* eslint-disable react/jsx-wrap-multilines */
                     <Button aria-label="upload-picture" component="span">
                       <img
-                        src={require("./assets/upload-icon.svg")}
+                        src={require("./assets/upload-icon.svg") as string}
                         alt="Upload Icon"
                       />
                     </Button>
@@ -948,7 +946,7 @@ export class UserInterface extends Component<Props, State> {
                   style={{ backgroundColor: "#02FFAD", display: "inline" }}
                 >
                   <SVG
-                    src="./src/assets/pin-icon.svg"
+                    src={require("./assets/pin-icon.svg") as string}
                     width="18px"
                     height="auto"
                   />
@@ -1171,7 +1169,7 @@ export class UserInterface extends Component<Props, State> {
                 >
                   <Avatar>
                     <SVG
-                      src="src/assets/maximise-icon.svg"
+                      src={require("./assets/maximise-icon.svg") as string}
                       width="55%"
                       height="auto"
                     />
