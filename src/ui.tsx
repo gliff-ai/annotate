@@ -768,6 +768,7 @@ export class UserInterface extends Component<Props, State> {
       </div>
 
       <CssBaseline />
+
       <Container disableGutters>
         <AppBar
           position="static"
@@ -785,24 +786,29 @@ export class UserInterface extends Component<Props, State> {
                   alt="gliff logo"
                 />
               </Grid>
-            </Grid>
-            <Grid item justify="flex-end">
-              <UploadImage
-                setUploadedImage={this.setUploadedImage}
-                spanElement={
-                  /* eslint-disable react/jsx-wrap-multilines */
-                  <Button aria-label="upload-picture" component="span">
-                    <img src="./src/assets/upload-icon.svg" alt="upload icon" />
-                  </Button>
-                }
-                multiple={false}
-              />
-              <Download
-                annotations={this.annotationsObject.getAllAnnotations()}
-                imageFileInfo={this.imageFileInfo}
-              />
-              {this.props.saveAnnotationsCallback && (
-                <Tooltip title="Save annotations data">
+
+              <Grid>
+                <UploadImage
+                  setUploadedImage={this.setUploadedImage}
+                  spanElement={
+                    /* eslint-disable react/jsx-wrap-multilines */
+                    <Button aria-label="upload-picture" component="span">
+                      <img
+                        src="./src/assets/upload-icon.svg"
+                        alt="upload icon"
+                      />
+                    </Button>
+                  }
+                  multiple={false}
+                />
+              </Grid>
+
+              <Grid>
+                <Download
+                  annotations={this.annotationsObject.getAllAnnotations()}
+                  imageFileInfo={this.imageFileInfo}
+                />
+                {this.props.saveAnnotationsCallback && (
                   <Button
                     aria-label="save"
                     onClick={() =>
@@ -811,12 +817,11 @@ export class UserInterface extends Component<Props, State> {
                   >
                     <Save />
                   </Button>
-                </Tooltip>
-              )}
+                )}
+              </Grid>
             </Grid>
           </Toolbar>
         </AppBar>
-
         <Grid
           container
           spacing={0}
