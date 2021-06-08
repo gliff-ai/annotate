@@ -20,7 +20,7 @@ interface Props extends BaseProps {
   activeTool: string;
   mode: Mode;
   annotationsObject: Annotations;
-  callRedraw: number;
+  redraw: number;
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
   setActiveTool: (tool: Tool) => void;
