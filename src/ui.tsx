@@ -909,15 +909,19 @@ export class UserInterface extends Component<Props, State> {
                   width: `${this.state.viewportPositionAndSize.width}px`,
                 }}
               >
-                <Slider
-                  value={this.state.sliceIndex}
-                  onChange={this.changeSlice}
-                  aria-labelledby="slice-index-slider"
-                  step={1}
-                  min={0}
-                  max={this.slicesData.length - 1}
-                  valueLabelDisplay="auto"
-                />
+                <div
+                  style={{ width: "70%", margin: "auto", marginTop: "10px" }}
+                >
+                  <Slider
+                    value={this.state.sliceIndex}
+                    onChange={this.changeSlice}
+                    aria-labelledby="slice-index-slider"
+                    step={1}
+                    min={0}
+                    max={this.slicesData.length - 1}
+                    valueLabelDisplay="auto"
+                  />
+                </div>
               </div>
             )}
           </Grid>
