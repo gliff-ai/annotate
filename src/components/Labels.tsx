@@ -94,7 +94,7 @@ export const Labels: FunctionComponent<Props> = ({
             edge="end"
           >
             <SVG
-              src="./src/assets/add-icon.svg"
+              src={require("../assets/add-icon.svg") as string}
               width="12px"
               height="auto"
               fill="#A1A1A1"
@@ -125,7 +125,7 @@ export const Labels: FunctionComponent<Props> = ({
                 onClick={handleRemoveLabel(label)}
               >
                 <SVG
-                  src="./src/assets/backspace-icon.svg"
+                  src={require("../assets/backspace-icon.svg") as string}
                   width="28px"
                   height="auto"
                   fill="#02FFAD"
@@ -147,7 +147,7 @@ export const Labels: FunctionComponent<Props> = ({
                 onClick={handleAddLabel(label)}
               >
                 <SVG
-                  src="./src/assets/add-icon.svg"
+                  src={require("../assets/add-icon.svg") as string}
                   width="12px"
                   height="auto"
                   fill="#000000"

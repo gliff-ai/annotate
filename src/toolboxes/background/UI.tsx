@@ -48,14 +48,14 @@ const BackgroundUI = (props: Props): ReactElement => {
       checked={channel}
       icon={
         <SVG
-          src="./src/assets/not-selected-tickbox-icon.svg"
+          src={require("../../assets/not-selected-tickbox-icon.svg") as string}
           width="18px"
           height="auto"
         />
       }
       checkedIcon={
         <SVG
-          src="./src/assets/selected-tickbox-icon.svg"
+          src={require("../../assets/selected-tickbox-icon.svg") as string}
           width="18px"
           height="auto"
         />
@@ -136,7 +136,7 @@ const BackgroundUI = (props: Props): ReactElement => {
               </Typography>
               <Avatar style={{ backgroundColor: "#02FFAD", display: "inline" }}>
                 <SVG
-                  src="./src/assets/pin-icon.svg"
+                  src={require("../../assets/pin-icon.svg") as string}
                   width="18px"
                   height="auto"
                 />
