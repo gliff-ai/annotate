@@ -13,9 +13,8 @@ import { XYPoint } from "@/annotation/interfaces";
 import { Tool, Tools } from "@/tools";
 import { Mode } from "@/ui";
 import { theme } from "@/theme";
-import { usePaintbrushStore } from "./Store";
-
 import { palette, getRGBAString } from "@/palette";
+import { usePaintbrushStore } from "./Store";
 
 const mainColor = theme.palette.primary.main;
 const secondaryColor = theme.palette.secondary.main;

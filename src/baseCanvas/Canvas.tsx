@@ -167,7 +167,7 @@ export class BaseCanvas extends Component<Props> {
       }}
     >
       <canvas
-        style={{ pointerEvents: "inherit", zIndex: 100 }}
+        style={{ pointerEvents: "inherit" }}
         width="100%"
         height={this.props.canvasPositionAndSize.height}
         onClick={this.onClickHandler}
