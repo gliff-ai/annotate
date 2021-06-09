@@ -783,7 +783,7 @@ export class UserInterface extends Component<Props, State> {
 
       <Container disableGutters>
         <AppBar
-          position="static"
+          position="fixed"
           style={{ backgroundColor: "#fafafa", height: "90px" }}
         >
           <Toolbar>

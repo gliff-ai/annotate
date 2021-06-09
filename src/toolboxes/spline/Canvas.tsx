@@ -1,18 +1,14 @@
 import React, { ReactNode, Component } from "react";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
+import { theme } from "@/theme";
 import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/transforms";
 import { XYPoint } from "@/annotation/interfaces";
 import { Tool, Tools } from "@/tools";
 import { Mode } from "@/ui";
 
-import {
-  main as mainColor,
-  secondary as secondaryColor,
-  getRGBAString,
-  palette,
-} from "@/palette";
+import { getRGBAString, palette } from "@/palette";
 
 import { calculateSobel } from "./sobel";
 
@@ -33,6 +29,9 @@ export const events = [
   "deselectPoint",
   "closeLoop",
 ] as const;
+
+const mainColor = theme.palette.primary.main;
+const secondaryColor = theme.palette.secondary.main;
 
 interface Event extends CustomEvent {
   type: typeof events[number];
@@ -100,12 +99,12 @@ export class SplineCanvas extends Component<Props> {
 
     if (isActive) {
       // Lines
-      context.strokeStyle = getRGBAString(mainColor);
+      context.strokeStyle = mainColor;
     } else {
       context.strokeStyle = color;
     }
     // Squares
-    context.fillStyle = getRGBAString(secondaryColor);
+    context.fillStyle = secondaryColor;
 
     const pointSize = 6;
     let nextPoint;
