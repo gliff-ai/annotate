@@ -7,7 +7,7 @@ import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { usePaintbrushStore } from "./Store";
 
 interface Props {
-  open: boolean;
+  isOpen: boolean;
   anchorEl: HTMLButtonElement | null;
   onClick: (event: React.MouseEvent) => void;
   onClose: (event: React.MouseEvent) => void;
@@ -24,7 +24,7 @@ const PaintbrushUI = (props: Props): ReactElement => {
 
   return (
     <Popover
-      open={props.open}
+      open={props.isOpen}
       anchorEl={props.anchorEl}
       onClose={props.onClose}
       onClick={props.onClick}

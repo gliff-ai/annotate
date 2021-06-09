@@ -73,7 +73,7 @@ interface State {
   sliceIndex: number;
   channels: boolean[];
   popover: boolean;
-  anchorEl: HTMLButtonElement | null;
+  anchorEl: HTMLButtonElement | null; // A HTML element. It's used to set the position of the popover menu https://material-ui.com/api/menu/#props
   buttonClicked: string;
   toggleMinimap: boolean;
   mode: Mode;
@@ -999,13 +999,13 @@ export class UserInterface extends Component<Props, State> {
             toggleChannelAtIndex={this.toggleChannelAtIndex}
           />
           <PaintbrushUI
-            open={this.state.buttonClicked === "Brush" && this.state.popover}
+            isOpen={this.state.buttonClicked === "Brush" && this.state.popover}
             anchorEl={this.state.anchorEl}
             onClose={this.handleClose}
             onClick={this.handleRequestClose}
           />
           <SplineUI
-            open={this.state.buttonClicked === "Spline" && this.state.popover}
+            isOpen={this.state.buttonClicked === "Spline" && this.state.popover}
             anchorEl={this.state.anchorEl}
             onClick={this.handleRequestClose}
             onClose={this.handleClose}

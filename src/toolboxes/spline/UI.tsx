@@ -3,9 +3,9 @@ import React, { ReactElement } from "react";
 import { Tool } from "@/tools";
 
 interface Props {
-  open: boolean;
+  isOpen: boolean;
   activeTool: Tool;
-  anchorEl: any;
+  anchorEl: HTMLButtonElement | null;
   onClose: (event: React.MouseEvent) => void;
   onClick: (event: React.MouseEvent) => void;
   activateTool: (tool: Tool) => void;
