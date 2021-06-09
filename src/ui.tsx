@@ -117,7 +117,7 @@ export class UserInterface extends Component<Props, State> {
     {
       name: "Select",
       icon: require(`./assets/select-icon.svg`) as string,
-      shortcut: "V",
+      shortcut: "A",
     },
     {
       name: "Brush",
@@ -755,6 +755,9 @@ export class UserInterface extends Component<Props, State> {
                         }
                         if (this.state.buttonClicked === "Spline") {
                           this.activateTool("spline");
+                        }
+                        if (this.state.buttonClicked === "Select") {
+                          this.toggleMode();
                         }
                       }
                     )
