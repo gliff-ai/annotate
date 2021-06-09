@@ -22,6 +22,13 @@ const theme: Theme = createMuiTheme({
         color: "#000000",
       },
     },
+    MuiIconButton: {
+      root: {
+        "&:hover": {
+          backgroundColor: "transparent",
+        },
+      },
+    },
 
     MuiSlider: {
       root: {
@@ -59,6 +66,10 @@ const theme: Theme = createMuiTheme({
 
   props: {
     MuiButton: {
+      disableRipple: true,
+    },
+
+    MuiIconButton: {
       disableRipple: true,
     },
 
