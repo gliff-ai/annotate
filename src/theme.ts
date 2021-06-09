@@ -65,10 +65,6 @@ const theme: Theme = createMuiTheme({
   },
 
   props: {
-    MuiButton: {
-      disableRipple: true,
-    },
-
     MuiIconButton: {
       disableRipple: true,
     },
