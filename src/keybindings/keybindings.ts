@@ -5,6 +5,8 @@
 // eg alt+shift+KeyA
 
 export const keybindings = {
+  Equal: "ui.addAnnotation",
+  Minus: "ui.clearActiveAnnotation",
   Backspace: "spline.deleteSelectedPoint",
   Enter: "spline.changeSplineModeToEdit",
   Escape: "spline.deselectPoint",

@@ -57,6 +57,8 @@ export const events = [
   "nextAnnotation",
   "previousAnnotation",
   "toggleMode",
+  "addAnnotation",
+  "clearActiveAnnotation",
 ] as const;
 
 interface State {
@@ -991,6 +993,7 @@ class UserInterface extends Component<Props, State> {
               </div>
             )}
           </Grid>
+
           <Popover
             open={
               this.state.buttonClicked === "Annonation Label" &&
