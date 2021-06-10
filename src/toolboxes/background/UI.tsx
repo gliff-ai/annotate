@@ -9,6 +9,9 @@ import {
   Card,
   Paper,
   Avatar,
+  makeStyles,
+  createStyles,
+  Theme,
 } from "@material-ui/core";
 import SVG from "react-inlinesvg";
 
@@ -26,8 +29,50 @@ interface Props {
   toggleChannelAtIndex: (index: number) => void;
 }
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    checkbox: {
+      marginLeft: "104px",
+    },
+    contrastBaseslider: {
+      width: "63px",
+      height: "335px",
+    },
+    brightnessBaseslider: {
+      width: "63px",
+      height: "335px",
+    },
+    channelCard: {
+      width: "189px",
+      height: "176px",
+    },
+    channelTypography: {
+      display: "inline",
+      fontSize: "21px",
+      marginRight: "54px",
+      marginLeft: "3px",
+    },
+    channelAvatar: {
+      backgroundColor: theme.palette.primary.main,
+      display: "inline",
+    },
+    channelformGroup: {
+      margin: "0",
+      padding: "0",
+      marginLeft: "17px",
+    },
+    channelPaper: {
+      padding: "10px",
+      backgroundColor: theme.palette.primary.main,
+      width: "189px",
+      marginBottom: "15px",
+    },
+  })
+);
+
 const BackgroundUI = (props: Props): ReactElement => {
   const [background, setBackground] = useBackgroundStore();
+  const classes = useStyles();
 
   function changeContrast(e: ChangeEvent, value: number) {
     setBackground({
@@ -45,6 +90,7 @@ const BackgroundUI = (props: Props): ReactElement => {
 
   const controls = props.channels.map((channel, i) => (
     <Checkbox
+      className={classes.checkbox}
       checked={channel}
       icon={
         <SVG
@@ -60,7 +106,6 @@ const BackgroundUI = (props: Props): ReactElement => {
           height="auto"
         />
       }
-      style={{ marginLeft: "104px" }}
       onChange={() => {
         props.toggleChannelAtIndex(i);
       }}
@@ -75,12 +120,7 @@ const BackgroundUI = (props: Props): ReactElement => {
         onClose={props.onClose}
       >
         {props.buttonClicked === "Contrast" && (
-          <div
-            style={{
-              width: "63px",
-              height: "335px",
-            }}
-          >
+          <div className={classes.contrastBaseslider}>
             <BaseSlider
               value={background.contrast}
               config={SLIDER_CONFIG[Sliders.contrast]}
@@ -91,12 +131,7 @@ const BackgroundUI = (props: Props): ReactElement => {
         )}
 
         {props.buttonClicked === "Brightness" && (
-          <div
-            style={{
-              width: "63px",
-              height: "335px",
-            }}
-          >
+          <div className={classes.brightnessBaseslider}>
             <BaseSlider
               value={background.brightness}
               config={SLIDER_CONFIG[Sliders.brightness]}
@@ -107,34 +142,17 @@ const BackgroundUI = (props: Props): ReactElement => {
         )}
 
         {props.buttonClicked === "Channel" && (
-          <Card
-            style={{
-              width: "189px",
-              height: "176px",
-            }}
-          >
+          <Card className={classes.channelCard}>
             <Paper
               elevation={0}
               variant="outlined"
               square
-              style={{
-                padding: "10px",
-                backgroundColor: "#02FFAD",
-                width: "189px",
-                marginBottom: "15px",
-              }}
+              className={classes.channelPaper}
             >
-              <Typography
-                style={{
-                  display: "inline",
-                  fontSize: "21px",
-                  marginRight: "54px",
-                  marginLeft: "3px",
-                }}
-              >
+              <Typography className={classes.channelTypography}>
                 Channels
               </Typography>
-              <Avatar style={{ backgroundColor: "#02FFAD", display: "inline" }}>
+              <Avatar className={classes.channelAvatar}>
                 <SVG
                   src={require("../../assets/pin-icon.svg") as string}
                   width="18px"
@@ -151,7 +169,7 @@ const BackgroundUI = (props: Props): ReactElement => {
                     control={control}
                     label={`C${i + 1}`}
                     labelPlacement="start"
-                    style={{ margin: "0", padding: "0", marginLeft: "17px" }}
+                    className={classes.channelformGroup}
                   />
                 ))}
               </FormGroup>

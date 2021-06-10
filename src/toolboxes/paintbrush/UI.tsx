@@ -1,5 +1,5 @@
 import React, { ChangeEvent, ReactElement } from "react";
-import { Popover } from "@material-ui/core";
+import { createStyles, makeStyles, Popover } from "@material-ui/core";
 
 import { BaseSlider } from "@/components/BaseSlider";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
@@ -13,8 +13,19 @@ interface Props {
   onClose: (event: React.MouseEvent) => void;
 }
 
+const useStyles = makeStyles(() =>
+  createStyles({
+    baseSlider: {
+      width: "63px",
+      height: "297px",
+      textAlign: "center",
+    },
+  })
+);
+
 const PaintbrushUI = (props: Props): ReactElement => {
   const [paintbrush, setPaintbrush] = usePaintbrushStore();
+  const classes = useStyles();
 
   function changeBrushRadius(e: ChangeEvent, value: number) {
     setPaintbrush({
@@ -29,13 +40,7 @@ const PaintbrushUI = (props: Props): ReactElement => {
       onClose={props.onClose}
       onClick={props.onClick}
     >
-      <div
-        style={{
-          width: "63px",
-          height: "297px",
-          textAlign: "center",
-        }}
-      >
+      <div className={classes.baseSlider}>
         <BaseSlider
           value={paintbrush.brushRadius}
           config={SLIDER_CONFIG[Sliders.brushRadius]}

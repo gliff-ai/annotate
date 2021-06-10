@@ -6,6 +6,7 @@ import React, {
 } from "react";
 
 import {
+  createStyles,
   Divider,
   IconButton,
   InputBase,
@@ -13,6 +14,8 @@ import {
   ListItem,
   ListItemSecondaryAction,
   ListItemText,
+  makeStyles,
+  Theme,
 } from "@material-ui/core";
 
 import SVG from "react-inlinesvg";
@@ -26,6 +29,16 @@ interface Props {
   activeAnnotationID: number;
 }
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    listItem: {
+      color: theme.palette.primary.main,
+      fontSize: "50px",
+      marginLeft: "-7px",
+    },
+  })
+);
+
 export const Labels: FunctionComponent<Props> = ({
   annotationObject,
   presetLabels,
@@ -34,6 +47,8 @@ export const Labels: FunctionComponent<Props> = ({
 }: Props): ReactElement => {
   const getMenuLabels = (labels: string[]): string[] =>
     presetLabels.filter((label) => !labels.includes(label));
+
+  const classes = useStyles();
 
   const [assignedLabels, setAssignedLabels] = useState(
     annotationObject.getLabels()
@@ -107,10 +122,7 @@ export const Labels: FunctionComponent<Props> = ({
       <List component="div" disablePadding style={{ width: "100%" }}>
         {assignedLabels.map((label) => (
           <ListItem key={label} dense>
-            <ListItemText
-              primary={label}
-              style={{ color: "#02FFAD", fontSize: "50px", marginLeft: "-7px" }}
-            />
+            <ListItemText primary={label} className={classes.listItem} />
             <ListItemSecondaryAction>
               <IconButton
                 edge="end"
