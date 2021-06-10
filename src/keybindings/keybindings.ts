@@ -10,8 +10,8 @@ export const keybindings = {
   Backspace: "spline.deleteSelectedPoint",
   Enter: "spline.changeSplineModeToEdit",
   Escape: "spline.deselectPoint",
+  KeyA: "ui.toggleMode",
   "ctrl+KeyC": "spline.closeLoop",
-  "ctrl+KeyA": "ui.toggleMode",
   "ctrl+ArrowLeft": "ui.previousAnnotation",
   "ctrl+ArrowRight": "ui.nextAnnotation",
 } as Readonly<{
