@@ -111,6 +111,8 @@ const styles = {
   popoverAvatar: {
     backgroundColor: theme.palette.primary.main,
     color: "#2B2F3A",
+    width: "30px",
+    height: "30px",
   },
   iconbutton: {
     marginBottom: "5px",
@@ -163,10 +165,11 @@ const styles = {
   },
   minimapCard: {
     width: "344px",
-    height: "248px",
+    height: "255px",
     paddingTop: "7px",
     left: "250px",
     borderRadius: "10px 0 0 0",
+    marginTop: "70px",
   },
   mimimapToggle: {
     width: "61px",
@@ -178,6 +181,19 @@ const styles = {
   mimimapToggleAvatar: {
     backgroundColor: theme.palette.primary.main,
     color: "#2B2F3A",
+  },
+  spaceBetweenAvatar: {
+    marginLeft: "3px",
+  },
+  avatarFontSize: {
+    fontSize: "11px",
+    fontWeight: 600,
+  },
+  miniMapToolTipAvatar: {
+    backgroundColor: theme.palette.primary.main,
+    color: "#2B2F3A",
+    width: "40px",
+    height: "40px",
   },
 };
 
@@ -261,30 +277,30 @@ class UserInterface extends Component<Props, State> {
     {
       name: "Minimise Map",
       icon: require(`./assets/minimise-icon.svg`) as string,
-      shortcut: "Alt",
+      shortcut: "ALT",
       shortcutSymbol: "-",
-      styling: { marginRight: "86px", marginLeft: "15px" },
+      styling: { marginRight: "120px", marginLeft: "15px" },
     },
 
     {
       name: "Zoom In",
       icon: require(`./assets/zoom-in-icon.svg`) as string,
-      shortcut: "Ctrl",
+      shortcut: "CTRL",
       shortcutSymbol: "+",
-      styling: { marginRight: "22px" },
+      styling: { marginRight: "10px" },
     },
     {
       name: "Zoom Out",
       icon: require(`./assets/zoom-out-icon.svg`) as string,
-      shortcut: "Ctrl",
+      shortcut: "CTRL",
       shortcutSymbol: "-",
-      styling: { marginRight: "30px" },
+      styling: { marginRight: "10px" },
     },
     {
       name: "Fit to Page",
       icon: require(`./assets/reset-zoom-and-pan-icon.svg`) as string,
-      shortcut: "Ctrl",
-      shortcutSymbol: "[",
+      shortcut: "CTRL",
+      shortcutSymbol: "]",
     },
   ];
 
@@ -750,7 +766,7 @@ class UserInterface extends Component<Props, State> {
                       )
                     }
                   >
-                    <Avatar sizes="large" variant="circular">
+                    <Avatar sizes="large">
                       <SVG
                         src={`${toolTip.icon}`}
                         width="55%"
@@ -776,7 +792,7 @@ class UserInterface extends Component<Props, State> {
           }}
         >
           <Grid container direction="row">
-            <ButtonGroup size="small">
+            <ButtonGroup>
               {this.toolTips.map((toolTip) => (
                 <HtmlTooltip
                   key={toolTip.name}
@@ -1076,22 +1092,22 @@ class UserInterface extends Component<Props, State> {
                           {minimapToolTip.name}
                         </Typography>
                       </Box>
-                      <Avatar
-                        style={{
-                          backgroundColor: theme.palette.primary.main,
-                          color: "#2B2F3A",
-                        }}
-                      >
-                        {minimapToolTip.shortcut}
+                      <Avatar className={this.props.classes.popoverAvatar}>
+                        <Typography
+                          className={this.props.classes.avatarFontSize}
+                        >
+                          {minimapToolTip.shortcut}
+                        </Typography>
                       </Avatar>
-                      <Avatar
-                        style={{
-                          backgroundColor: theme.palette.primary.main,
-                          color: "#2B2F3A",
-                        }}
-                      >
-                        {minimapToolTip.shortcutSymbol}
-                      </Avatar>
+                      <div className={this.props.classes.spaceBetweenAvatar}>
+                        <Avatar className={this.props.classes.popoverAvatar}>
+                          <Typography
+                            className={this.props.classes.avatarFontSize}
+                          >
+                            {minimapToolTip.shortcutSymbol}
+                          </Typography>
+                        </Avatar>
+                      </div>
                     </Box>
                   }
                   placement="top"
@@ -1126,17 +1142,11 @@ class UserInterface extends Component<Props, State> {
                         src={`${minimapToolTip.icon}`}
                         width="55%"
                         height="auto"
-                        fill={
-                          this.state.buttonClicked === minimapToolTip.name
-                            ? theme.palette.primary.main
-                            : null
-                        }
                       />
                     </Avatar>
                   </IconButton>
                 </HtmlTooltip>
               ))}
-
               {/* Background canvas for the minimap */}
               {this.state.displayedImage && (
                 <>
@@ -1180,11 +1190,21 @@ class UserInterface extends Component<Props, State> {
                         <Typography color="inherit">Maximise Map</Typography>
                       </Box>
                       <Avatar className={this.props.classes.popoverAvatar}>
-                        Alt
+                        <Typography
+                          className={this.props.classes.avatarFontSize}
+                        >
+                          ALT
+                        </Typography>
                       </Avatar>
-                      <Avatar className={this.props.classes.popoverAvatar}>
-                        +
-                      </Avatar>
+                      <div className={this.props.classes.spaceBetweenAvatar}>
+                        <Avatar className={this.props.classes.popoverAvatar}>
+                          <Typography
+                            className={this.props.classes.avatarFontSize}
+                          >
+                            +
+                          </Typography>
+                        </Avatar>
+                      </div>
                     </Box>
                   }
                   placement="top"

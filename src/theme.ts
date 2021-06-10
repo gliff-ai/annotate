@@ -22,6 +22,7 @@ const theme: Theme = createMuiTheme({
         color: "#000000",
       },
     },
+
     MuiIconButton: {
       root: {
         "&:hover": {
@@ -52,6 +53,15 @@ const theme: Theme = createMuiTheme({
         borderRadius: "9px",
         padding: "8px",
         background: "#fafafa",
+        width: "63px",
+      },
+    },
+    MuiDivider: {
+      root: {
+        marginTop: "-15px",
+        width: "90%",
+        marginLeft: "12px",
+        marginBottom: "17px",
       },
     },
 

@@ -101,14 +101,7 @@ export const Labels: FunctionComponent<Props> = ({
             />
           </IconButton>
         </ListItem>
-        <Divider
-          style={{
-            marginTop: "-15px",
-            width: "90%",
-            marginLeft: "12px",
-            marginBottom: "17px",
-          }}
-        />
+        <Divider />
       </List>
 
       <List component="div" disablePadding style={{ width: "100%" }}>

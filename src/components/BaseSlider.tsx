@@ -1,5 +1,6 @@
 import React, { ChangeEvent, FunctionComponent, ReactElement } from "react";
-import { Slider } from "@material-ui/core";
+import { createStyles, makeStyles, Slider, Theme } from "@material-ui/core";
+// import { ThemeProvider, theme } from "@/theme";
 
 export interface Config {
   name: string;
@@ -23,6 +24,25 @@ interface Props {
 function getAriaValueText(value: number): string {
   return `${value}`;
 }
+
+// const useStyles = makeStyles((theme: Theme) =>
+//   createStyles({
+//     root: {
+//       display: "flex",
+//       "& > *": {
+//         margin: theme.spacing(1),
+//       },
+//     },
+//     orange: {
+//       color: theme.palette.getContrastText(deepOrange[500]),
+//       backgroundColor: deepOrange[500],
+//     },
+//     purple: {
+//       color: theme.palette.getContrastText(deepPurple[500]),
+//       backgroundColor: deepPurple[500],
+//     },
+//   })
+// );
 
 export const BaseSlider: FunctionComponent<Props> = ({
   value,
@@ -48,7 +68,11 @@ export const BaseSlider: FunctionComponent<Props> = ({
     </div>
 
     <div style={{ textAlign: "center", height: "204px", marginBottom: "18px" }}>
-      <div>
+      <div
+        style={{
+          marginBottom: "17px",
+        }}
+      >
         {slider === "brightness" || slider === "contrast"
           ? `${config.max}${config.unit}`
           : null}
