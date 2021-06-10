@@ -19,6 +19,7 @@ import {
   Card,
   Paper,
   Slide,
+  WithStyles,
 } from "@material-ui/core";
 
 import SVG from "react-inlinesvg";
@@ -79,13 +80,106 @@ interface State {
   mode: Mode;
 }
 
-interface Props {
+interface Props extends WithStyles<typeof styles> {
   slicesData?: Array<Array<ImageBitmap>>;
   imageFileInfo?: ImageFileInfo;
   annotationsObject?: Annotations;
   presetLabels?: string[];
   saveAnnotationsCallback?: (annotationsObject: Annotations) => void;
 }
+
+const styles = {
+  annotationToolbar: {
+    left: "18px",
+    top: "80px",
+    marginTop: "30px",
+    zIndex: 100,
+  },
+
+  mainToolbar: {
+    left: "18px",
+    bottom: "0",
+    marginBottom: "30px",
+    zIndex: 100,
+  },
+
+  mainbox: {
+    display: "flex",
+    alignItems: "center",
+    justifyItems: "space-between",
+  },
+  popoverAvatar: {
+    backgroundColor: theme.palette.primary.main,
+    color: "#2B2F3A",
+  },
+  iconbutton: {
+    marginBottom: "5px",
+    marginTop: "7px",
+  },
+  imageGrid: {
+    justify: "flex-start",
+    marginTop: "20px",
+  },
+  mainGrid: {
+    height: "calc(100% - 64px)",
+  },
+  appbar: {
+    backgroundColor: "#fafafa",
+    height: "90px",
+    paddingTop: "9px",
+  },
+  canvasGrid: {
+    width: "100%",
+    backgroundColor: "#fafafa",
+  },
+  imageSliceSlider: {
+    width: "70%",
+    margin: "auto",
+    marginTop: "10px",
+  },
+  annotationCard: {
+    width: "271px",
+    height: "375px",
+  },
+  annotationPaper: {
+    padding: "10px",
+    backgroundColor: theme.palette.primary.main,
+    width: "271px",
+  },
+  annotationTypography: {
+    display: "inline",
+    fontSize: "21px",
+    marginRight: "125px",
+  },
+  annotationAvatar: {
+    backgroundColor: theme.palette.primary.main,
+    display: "inline",
+  },
+  minimap: {
+    right: "250px",
+    bottom: "0",
+    marginTop: "30px",
+    zIndex: 100,
+  },
+  minimapCard: {
+    width: "344px",
+    height: "248px",
+    paddingTop: "7px",
+    left: "250px",
+    borderRadius: "10px 0 0 0",
+  },
+  mimimapToggle: {
+    width: "61px",
+    height: "53px",
+    left: "540px",
+    borderRadius: "10px 0 0 0",
+    padding: "7px 0",
+  },
+  mimimapToggleAvatar: {
+    backgroundColor: theme.palette.primary.main,
+    color: "#2B2F3A",
+  },
+};
 
 interface ToolTips {
   name: string;
@@ -102,7 +196,7 @@ const HtmlTooltip = withStyles((t: Theme) => ({
   },
 }))(Tooltip);
 
-export class UserInterface extends Component<Props, State> {
+class UserInterface extends Component<Props, State> {
   annotationsObject: Annotations;
 
   private presetLabels: string[];
@@ -609,601 +703,519 @@ export class UserInterface extends Component<Props, State> {
     });
   };
 
-  render = (): ReactNode => (
-    <ThemeProvider theme={theme}>
-      <div
-        style={{
-          position: "fixed",
-          left: "18px",
-          top: "80px",
-          marginTop: "30px",
-          zIndex: 100,
-        }}
-      >
-        <Grid container direction="row">
-          <ButtonGroup size="small" style={{ background: "#fafafa" }}>
-            {this.annotationToolTips.map((toolTip) => (
-              <HtmlTooltip
-                key={toolTip.name}
-                title={
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyItems="space-between"
-                  >
-                    <Box mr={3}>
-                      <Typography>{toolTip.name}</Typography>
-                    </Box>
-
-                    <Avatar
-                      style={{
-                        backgroundColor: "#02FFAD",
-                        color: "#2B2F3A",
-                      }}
-                    >
-                      {toolTip.shortcutSymbol}
-                    </Avatar>
-                  </Box>
-                }
-                placement="right"
-              >
-                <IconButton
-                  size="small"
-                  style={{
-                    marginBottom: "5px",
-                    marginTop: "7px",
-                  }}
-                  onClick={(e: React.MouseEvent) =>
-                    this.setState(
-                      {
-                        buttonClicked: toolTip.name,
-                      },
-                      () => {
-                        if (this.state.buttonClicked === "Add New Annotation") {
-                          this.addAnnotation();
-                        }
-                        if (this.state.buttonClicked === "Clear Annotation") {
-                          this.clearActiveAnnotation();
-                        }
-                      }
-                    )
-                  }
-                >
-                  <Avatar sizes="large" variant="circular">
-                    <SVG
-                      src={`${toolTip.icon}`}
-                      width="55%"
-                      height="auto"
-                      fill={
-                        this.state.buttonClicked === toolTip.name
-                          ? "#02FFAD"
-                          : null
-                      }
-                    />
-                  </Avatar>
-                </IconButton>
-              </HtmlTooltip>
-            ))}
-          </ButtonGroup>
-        </Grid>
-      </div>
-
-      <div
-        style={{
-          position: "fixed",
-          left: "18px",
-          bottom: "0",
-          marginBottom: "30px",
-          zIndex: 100,
-        }}
-      >
-        <Grid container direction="row">
-          <ButtonGroup
-            size="small"
-            style={{
-              margin: "-5px",
-              background: "#fafafa",
-            }}
-          >
-            {this.toolTips.map((toolTip) => (
-              <HtmlTooltip
-                key={toolTip.name}
-                title={
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyItems="space-between"
-                  >
-                    <Box mr={3}>
-                      <Typography>{toolTip.name}</Typography>
-                    </Box>
-                    <Avatar
-                      variant="circle"
-                      style={{
-                        backgroundColor: "#02FFAD",
-                        color: "#2B2F3A",
-                      }}
-                    >
-                      {toolTip.shortcut}
-                    </Avatar>
-                  </Box>
-                }
-                placement="right"
-              >
-                <IconButton
-                  size="small"
-                  style={{
-                    marginBottom: "5px",
-                    marginTop: "7px",
-                  }}
-                  onClick={(e: React.MouseEvent) =>
-                    this.setState(
-                      {
-                        popover: true,
-                        buttonClicked: toolTip.name,
-                        anchorEl: e.currentTarget as HTMLButtonElement,
-                      },
-                      () => {
-                        if (this.state.buttonClicked === "Eraser") {
-                          this.activateTool("eraser");
-                        }
-                        if (this.state.buttonClicked === "Brush") {
-                          this.activateTool("paintbrush");
-                        }
-                        if (this.state.buttonClicked === "Magic Spline") {
-                          this.activateTool("magicspline");
-                        }
-                        if (this.state.buttonClicked === "Spline") {
-                          this.activateTool("spline");
-                        }
-                        if (this.state.buttonClicked === "Select") {
-                          this.toggleMode();
-                        }
-                      }
-                    )
-                  }
-                >
-                  <Avatar sizes="large" variant="circular">
-                    <SVG
-                      src={`${toolTip.icon}`}
-                      width="55%"
-                      height="auto"
-                      fill={
-                        this.state.buttonClicked === toolTip.name
-                          ? "#02FFAD"
-                          : null
-                      }
-                    />
-                  </Avatar>
-                </IconButton>
-              </HtmlTooltip>
-            ))}
-          </ButtonGroup>
-        </Grid>
-      </div>
-
-      <CssBaseline />
-
-      <Container disableGutters>
-        <AppBar
-          position="fixed"
-          style={{ backgroundColor: "#fafafa", height: "90px" }}
+  render = (): ReactNode => {
+    const { classes } = this.props;
+    return (
+      <ThemeProvider theme={theme}>
+        <div
+          className={this.props.classes.annotationToolbar}
+          style={{ position: "fixed" }}
         >
-          <Toolbar>
-            <Grid container direction="row">
-              <Grid item justify="flex-start" style={{ marginTop: "18px" }}>
-                <img
-                  src={require(`./assets/gliff-master-black.svg`) as string}
-                  width="79px"
-                  height="60px"
-                  alt="gliff logo"
-                />
-              </Grid>
-            </Grid>
+          <Grid container direction="row">
+            <ButtonGroup size="small">
+              {this.annotationToolTips.map((toolTip) => (
+                <HtmlTooltip
+                  key={toolTip.name}
+                  title={
+                    <Box className={this.props.classes.mainbox}>
+                      <Box mr={3} ml={2}>
+                        <Typography>{toolTip.name}</Typography>
+                      </Box>
 
-            <Grid item justify="flex-end">
-              <UploadImage
-                setUploadedImage={this.setUploadedImage}
-                spanElement={
-                  /* eslint-disable react/jsx-wrap-multilines */
-                  <Button aria-label="upload-picture" component="span">
-                    <img
-                      src={require("./assets/upload-icon.svg") as string}
-                      alt="Upload Icon"
-                    />
-                  </Button>
-                }
-                multiple={false}
-              />
-            </Grid>
-
-            <Grid item justify="flex-end">
-              <Download
-                annotations={this.annotationsObject.getAllAnnotations()}
-                imageFileInfo={this.imageFileInfo}
-              />
-              {this.props.saveAnnotationsCallback && (
-                <Button
-                  aria-label="save"
-                  onClick={() =>
-                    this.props.saveAnnotationsCallback(this.annotationsObject)
+                      <Avatar className={this.props.classes.popoverAvatar}>
+                        {toolTip.shortcutSymbol}
+                      </Avatar>
+                    </Box>
                   }
-                />
-              )}
-            </Grid>
-          </Toolbar>
-        </AppBar>
-        <Grid
-          container
-          spacing={0}
-          justify="center"
-          wrap="nowrap"
-          style={{ height: "calc(100% - 64px)" }}
-        >
-          <Grid
-            item
-            style={{
-              width: "100%",
-              position: "relative",
-              backgroundColor: "#fafafa",
-            }}
-            ref={(container) => {
-              if (container) {
-                this.canvasContainer = container;
-              }
-            }}
-          >
-            {this.state.displayedImage && (
-              <>
-                <BackgroundCanvas
-                  scaleAndPan={this.state.scaleAndPan}
-                  displayedImage={this.state.displayedImage}
-                  canvasPositionAndSize={this.state.viewportPositionAndSize}
-                  setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                />
-
-                <SplineCanvas
-                  scaleAndPan={this.state.scaleAndPan}
-                  activeTool={this.state.activeTool}
-                  mode={this.state.mode}
-                  annotationsObject={this.annotationsObject}
-                  displayedImage={this.state.displayedImage}
-                  canvasPositionAndSize={this.state.viewportPositionAndSize}
-                  setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                  redraw={this.state.redraw}
-                  sliceIndex={this.state.sliceIndex}
-                  setUIActiveAnnotationID={(id) => {
-                    this.setState({ activeAnnotationID: id });
-                  }}
-                  setActiveTool={(tool: Tool) => {
-                    this.setState({ activeTool: tool });
-                  }}
-                />
-                <PaintbrushCanvas
-                  scaleAndPan={this.state.scaleAndPan}
-                  activeTool={this.state.activeTool}
-                  mode={this.state.mode}
-                  annotationsObject={this.annotationsObject}
-                  displayedImage={this.state.displayedImage}
-                  canvasPositionAndSize={this.state.viewportPositionAndSize}
-                  setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                  redraw={this.state.redraw}
-                  sliceIndex={this.state.sliceIndex}
-                  setUIActiveAnnotationID={(id) => {
-                    this.setState({ activeAnnotationID: id });
-                  }}
-                  setActiveTool={(tool: Tool) => {
-                    this.setState({ activeTool: tool });
-                  }}
-                />
-              </>
-            )}
-
-            {this.slicesData && this.slicesData.length > 1 && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: `${
-                    this.state.viewportPositionAndSize.top +
-                    this.state.viewportPositionAndSize.height +
-                    5
-                  }px`,
-                  left: `${this.state.viewportPositionAndSize.left}px`,
-                  width: `${this.state.viewportPositionAndSize.width}px`,
-                }}
-              >
-                <div
-                  style={{ width: "70%", margin: "auto", marginTop: "10px" }}
+                  placement="right"
                 >
-                  <Slider
-                    value={this.state.sliceIndex}
-                    onChange={this.changeSlice}
-                    aria-labelledby="slice-index-slider"
-                    step={1}
-                    min={0}
-                    max={this.slicesData.length - 1}
-                    valueLabelDisplay="auto"
-                  />
-                </div>
-              </div>
-            )}
+                  <IconButton
+                    size="small"
+                    className={this.props.classes.iconbutton}
+                    onClick={(e: React.MouseEvent) =>
+                      this.setState(
+                        {
+                          buttonClicked: toolTip.name,
+                        },
+                        () => {
+                          if (
+                            this.state.buttonClicked === "Add New Annotation"
+                          ) {
+                            this.addAnnotation();
+                          }
+                          if (this.state.buttonClicked === "Clear Annotation") {
+                            this.clearActiveAnnotation();
+                          }
+                        }
+                      )
+                    }
+                  >
+                    <Avatar sizes="large" variant="circular">
+                      <SVG
+                        src={`${toolTip.icon}`}
+                        width="55%"
+                        height="auto"
+                        fill={
+                          this.state.buttonClicked === toolTip.name
+                            ? theme.palette.primary.main
+                            : null
+                        }
+                      />
+                    </Avatar>
+                  </IconButton>
+                </HtmlTooltip>
+              ))}
+            </ButtonGroup>
           </Grid>
+        </div>
 
-          <Popover
-            open={
-              this.state.buttonClicked === "Annonation Label" &&
-              this.state.popover
-            }
-            anchorEl={this.state.anchorEl}
-            onClose={this.handleClose}
-          >
-            <Card
-              style={{
-                width: "271px",
-                height: "375px",
-              }}
-            >
-              <Paper
-                elevation={0}
-                variant="outlined"
-                square
-                style={{
-                  padding: "10px",
-                  backgroundColor: "#02FFAD",
-                  width: "271px",
-                }}
-              >
-                <Typography
-                  style={{
-                    display: "inline",
-                    fontSize: "21px",
-                    marginRight: "125px",
-                  }}
+        <div
+          className={this.props.classes.mainToolbar}
+          style={{
+            position: "fixed",
+          }}
+        >
+          <Grid container direction="row">
+            <ButtonGroup size="small">
+              {this.toolTips.map((toolTip) => (
+                <HtmlTooltip
+                  key={toolTip.name}
+                  title={
+                    <Box className={this.props.classes.mainbox}>
+                      <Box mr={3} ml={2}>
+                        <Typography>{toolTip.name}</Typography>
+                      </Box>
+                      <Avatar className={this.props.classes.popoverAvatar}>
+                        {toolTip.shortcut}
+                      </Avatar>
+                    </Box>
+                  }
+                  placement="right"
                 >
-                  Annotation
-                </Typography>
-                <Avatar
-                  style={{ backgroundColor: "#02FFAD", display: "inline" }}
-                >
-                  <SVG
-                    src={require("./assets/pin-icon.svg") as string}
-                    width="18px"
-                    height="auto"
-                  />
-                </Avatar>
-              </Paper>
-              <Paper elevation={0} square>
-                <Grid container justify="center">
-                  <Labels
-                    annotationObject={this.annotationsObject}
-                    presetLabels={this.presetLabels}
-                    updatePresetLabels={this.updatePresetLabels}
-                    activeAnnotationID={this.state.activeAnnotationID}
+                  <IconButton
+                    size="small"
+                    className={this.props.classes.iconbutton}
+                    onClick={(e: React.MouseEvent) =>
+                      this.setState(
+                        {
+                          popover: true,
+                          buttonClicked: toolTip.name,
+                          anchorEl: e.currentTarget as HTMLButtonElement,
+                        },
+                        () => {
+                          if (this.state.buttonClicked === "Eraser") {
+                            this.activateTool("eraser");
+                          }
+                          if (this.state.buttonClicked === "Brush") {
+                            this.activateTool("paintbrush");
+                          }
+                          if (this.state.buttonClicked === "Magic Spline") {
+                            this.activateTool("magicspline");
+                          }
+                          if (this.state.buttonClicked === "Spline") {
+                            this.activateTool("spline");
+                          }
+                          if (this.state.buttonClicked === "Select") {
+                            this.toggleMode();
+                          }
+                        }
+                      )
+                    }
+                  >
+                    <Avatar sizes="large" variant="circular">
+                      <SVG
+                        src={`${toolTip.icon}`}
+                        width="55%"
+                        height="auto"
+                        fill={
+                          this.state.buttonClicked === toolTip.name
+                            ? theme.palette.primary.main
+                            : null
+                        }
+                      />
+                    </Avatar>
+                  </IconButton>
+                </HtmlTooltip>
+              ))}
+            </ButtonGroup>
+          </Grid>
+        </div>
+
+        <CssBaseline />
+
+        <Container disableGutters>
+          <AppBar position="fixed" className={this.props.classes.appbar}>
+            <Toolbar>
+              <Grid container direction="row">
+                <Grid item className={this.props.classes.iconbutton}>
+                  <img
+                    src={require(`./assets/gliff-master-black.svg`) as string}
+                    width="79px"
+                    height="60px"
+                    alt="gliff logo"
                   />
                 </Grid>
-              </Paper>
-            </Card>
-          </Popover>
+              </Grid>
 
-          <BackgroundUI
-            open={
-              (this.state.buttonClicked === "Contrast" && this.state.popover) ||
-              (this.state.buttonClicked === "Brightness" &&
-                this.state.popover) ||
-              (this.state.buttonClicked === "Channel" && this.state.popover)
-            }
-            buttonClicked={this.state.buttonClicked}
-            anchorEl={this.state.anchorEl}
-            onClose={this.handleClose}
-            channels={this.state.channels}
-            toggleChannelAtIndex={this.toggleChannelAtIndex}
-          />
-          <PaintbrushUI
-            isOpen={this.state.buttonClicked === "Brush" && this.state.popover}
-            anchorEl={this.state.anchorEl}
-            onClose={this.handleClose}
-            onClick={this.handleRequestClose}
-          />
-          <SplineUI
-            isOpen={this.state.buttonClicked === "Spline" && this.state.popover}
-            anchorEl={this.state.anchorEl}
-            onClick={this.handleRequestClose}
-            onClose={this.handleClose}
-            activeTool={this.state.activeTool}
-            activateTool={this.activateTool}
-          />
-        </Grid>
-      </Container>
-      <div
-        style={{
-          position: "fixed",
-          right: "250px",
-          bottom: "0",
-          marginTop: "30px",
-          zIndex: 100,
-        }}
-      >
-        <Slide in={this.state.toggleMinimap} direction="up" timeout={1000}>
-          <Card
-            style={{
-              width: "344px",
-              height: "248px",
-              paddingTop: "7px",
-              position: "relative",
-              left: "250px",
-              borderRadius: "10px 0 0 0",
-            }}
-          >
-            {this.minimapToolTips.map((minimapToolTip) => (
-              <HtmlTooltip
-                key={minimapToolTip.name}
-                title={
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyItems="space-between"
-                  >
-                    <Box mr={3}>
-                      <Typography color="inherit">
-                        {minimapToolTip.name}
-                      </Typography>
-                    </Box>
-                    <Avatar
-                      style={{
-                        backgroundColor: "#02FFAD",
-                        color: "#2B2F3A",
-                      }}
-                    >
-                      {minimapToolTip.shortcut}
-                    </Avatar>
-                    <Avatar
-                      style={{
-                        backgroundColor: "#02FFAD",
-                        color: "#2B2F3A",
-                      }}
-                    >
-                      {minimapToolTip.shortcutSymbol}
-                    </Avatar>
-                  </Box>
-                }
-                placement="top"
-              >
-                <IconButton
-                  size="small"
-                  style={minimapToolTip.styling}
-                  onClick={(e: React.MouseEvent) =>
-                    this.setState(
-                      {
-                        buttonClicked: minimapToolTip.name,
-                      },
-                      () => {
-                        if (minimapToolTip.name === "Zoom In") {
-                          this.incrementScale();
-                        }
-                        if (minimapToolTip.name === "Zoom Out") {
-                          this.decrementScale();
-                        }
-                        if (minimapToolTip.name === "Fit to Page") {
-                          this.resetScaleAndPan();
-                        }
-                        if (minimapToolTip.name === "Minimise Map") {
-                          this.handleDrawerClose();
-                        }
-                      }
-                    )
+              <Grid item justify="flex-end">
+                <UploadImage
+                  setUploadedImage={this.setUploadedImage}
+                  spanElement={
+                    /* eslint-disable react/jsx-wrap-multilines */
+                    <Button aria-label="upload-picture" component="span">
+                      <img
+                        src={require("./assets/upload-icon.svg") as string}
+                        alt="Upload Icon"
+                      />
+                    </Button>
                   }
-                >
-                  <Avatar sizes="large">
-                    <SVG
-                      src={`${minimapToolTip.icon}`}
-                      width="55%"
-                      height="auto"
-                      fill={
-                        this.state.buttonClicked === minimapToolTip.name
-                          ? "#02FFAD"
-                          : null
-                      }
-                    />
-                  </Avatar>
-                </IconButton>
-              </HtmlTooltip>
-            ))}
-
-            {/* Background canvas for the minimap */}
-            {this.state.displayedImage && (
-              <>
-                <BackgroundCanvas
-                  scaleAndPan={{ x: 0, y: 0, scale: 1 }}
-                  displayedImage={this.state.displayedImage}
-                  canvasPositionAndSize={this.state.minimapPositionAndSize}
-                  setCanvasPositionAndSize={this.setMinimapPositionAndSize}
+                  multiple={false}
                 />
-                <MinimapCanvas
-                  displayedImage={this.state.displayedImage}
-                  scaleAndPan={this.state.scaleAndPan}
-                  setScaleAndPan={this.setScaleAndPan}
-                  canvasPositionAndSize={this.state.viewportPositionAndSize}
-                  minimapPositionAndSize={this.state.minimapPositionAndSize}
-                  setMinimapPositionAndSize={this.setMinimapPositionAndSize}
-                />{" "}
-              </>
-            )}
-          </Card>
-        </Slide>
+              </Grid>
 
-        {this.state.toggleMinimap === false ? (
-          <Slide
-            in={!this.state.toggleMinimap}
-            direction="up"
-            timeout={{ enter: 1000 }}
+              <Grid item justify="flex-end">
+                <Download
+                  annotations={this.annotationsObject.getAllAnnotations()}
+                  imageFileInfo={this.imageFileInfo}
+                />
+                {this.props.saveAnnotationsCallback && (
+                  <Button
+                    aria-label="save"
+                    onClick={() =>
+                      this.props.saveAnnotationsCallback(this.annotationsObject)
+                    }
+                  />
+                )}
+              </Grid>
+            </Toolbar>
+          </AppBar>
+          <Grid
+            container
+            spacing={0}
+            justify="center"
+            wrap="nowrap"
+            className={this.props.classes.mainGrid}
           >
-            <Card
-              style={{
-                width: "61px",
-                height: "53px",
-                left: "540px",
-                position: "relative",
-                borderRadius: "10px 0 0 0",
-                textAlign: "center",
-                padding: "7px 0",
+            <Grid
+              item
+              className={this.props.classes.canvasGrid}
+              style={{ position: "relative" }}
+              ref={(container) => {
+                if (container) {
+                  this.canvasContainer = container;
+                }
               }}
             >
-              <HtmlTooltip
-                key="Maximise Map"
-                title={
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyItems="space-between"
-                  >
-                    <Box mr={3}>
-                      <Typography color="inherit">Maximise Map</Typography>
-                    </Box>
-                    <Avatar
-                      style={{
-                        backgroundColor: "#02FFAD",
-                        color: "#2B2F3A",
-                      }}
-                    >
-                      Alt
-                    </Avatar>
-                    <Avatar
-                      style={{
-                        backgroundColor: "#02FFAD",
-                        color: "#2B2F3A",
-                      }}
-                    >
-                      +
-                    </Avatar>
-                  </Box>
-                }
-                placement="top"
-              >
-                <IconButton
-                  onClick={(e: React.MouseEvent) =>
-                    this.setState(
-                      {
-                        buttonClicked: "Maximise Map",
-                      },
-                      this.handleDrawerOpen
-                    )
-                  }
-                  edge="start"
-                  size="small"
+              {this.state.displayedImage && (
+                <>
+                  <BackgroundCanvas
+                    scaleAndPan={this.state.scaleAndPan}
+                    displayedImage={this.state.displayedImage}
+                    canvasPositionAndSize={this.state.viewportPositionAndSize}
+                    setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                  />
+
+                  <SplineCanvas
+                    scaleAndPan={this.state.scaleAndPan}
+                    activeTool={this.state.activeTool}
+                    mode={this.state.mode}
+                    annotationsObject={this.annotationsObject}
+                    displayedImage={this.state.displayedImage}
+                    canvasPositionAndSize={this.state.viewportPositionAndSize}
+                    setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                    redraw={this.state.redraw}
+                    sliceIndex={this.state.sliceIndex}
+                    setUIActiveAnnotationID={(id) => {
+                      this.setState({ activeAnnotationID: id });
+                    }}
+                    setActiveTool={(tool: Tool) => {
+                      this.setState({ activeTool: tool });
+                    }}
+                  />
+                  <PaintbrushCanvas
+                    scaleAndPan={this.state.scaleAndPan}
+                    activeTool={this.state.activeTool}
+                    mode={this.state.mode}
+                    annotationsObject={this.annotationsObject}
+                    displayedImage={this.state.displayedImage}
+                    canvasPositionAndSize={this.state.viewportPositionAndSize}
+                    setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                    redraw={this.state.redraw}
+                    sliceIndex={this.state.sliceIndex}
+                    setUIActiveAnnotationID={(id) => {
+                      this.setState({ activeAnnotationID: id });
+                    }}
+                    setActiveTool={(tool: Tool) => {
+                      this.setState({ activeTool: tool });
+                    }}
+                  />
+                </>
+              )}
+
+              {this.slicesData && this.slicesData.length > 1 && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: `${
+                      this.state.viewportPositionAndSize.top +
+                      this.state.viewportPositionAndSize.height +
+                      5
+                    }px`,
+                    left: `${this.state.viewportPositionAndSize.left}px`,
+                    width: `${this.state.viewportPositionAndSize.width}px`,
+                  }}
                 >
-                  <Avatar>
+                  <div className={this.props.classes.imageSliceSlider}>
+                    <Slider
+                      value={this.state.sliceIndex}
+                      onChange={this.changeSlice}
+                      aria-labelledby="slice-index-slider"
+                      step={1}
+                      min={0}
+                      max={this.slicesData.length - 1}
+                      valueLabelDisplay="auto"
+                    />
+                  </div>
+                </div>
+              )}
+            </Grid>
+            <Popover
+              open={
+                this.state.buttonClicked === "Annonation Label" &&
+                this.state.popover
+              }
+              anchorEl={this.state.anchorEl}
+              onClose={this.handleClose}
+            >
+              <Card className={this.props.classes.annotationCard}>
+                <Paper
+                  elevation={0}
+                  variant="outlined"
+                  square
+                  className={this.props.classes.annotationPaper}
+                >
+                  <Typography
+                    className={this.props.classes.annotationTypography}
+                  >
+                    Annotation
+                  </Typography>
+                  <Avatar className={this.props.classes.annotationAvatar}>
                     <SVG
-                      src={require("./assets/maximise-icon.svg") as string}
-                      width="55%"
+                      src={require("./assets/pin-icon.svg") as string}
+                      width="18px"
                       height="auto"
                     />
                   </Avatar>
-                </IconButton>
-              </HtmlTooltip>
+                </Paper>
+                <Paper elevation={0} square>
+                  <Grid container justify="center">
+                    <Labels
+                      annotationObject={this.annotationsObject}
+                      presetLabels={this.presetLabels}
+                      updatePresetLabels={this.updatePresetLabels}
+                      activeAnnotationID={this.state.activeAnnotationID}
+                    />
+                  </Grid>
+                </Paper>
+              </Card>
+            </Popover>
+            <BackgroundUI
+              open={
+                (this.state.buttonClicked === "Contrast" &&
+                  this.state.popover) ||
+                (this.state.buttonClicked === "Brightness" &&
+                  this.state.popover) ||
+                (this.state.buttonClicked === "Channel" && this.state.popover)
+              }
+              buttonClicked={this.state.buttonClicked}
+              anchorEl={this.state.anchorEl}
+              onClose={this.handleClose}
+              channels={this.state.channels}
+              toggleChannelAtIndex={this.toggleChannelAtIndex}
+            />
+            <PaintbrushUI
+              isOpen={
+                this.state.buttonClicked === "Brush" && this.state.popover
+              }
+              anchorEl={this.state.anchorEl}
+              onClose={this.handleClose}
+              onClick={this.handleRequestClose}
+            />
+            <SplineUI
+              isOpen={
+                this.state.buttonClicked === "Spline" && this.state.popover
+              }
+              anchorEl={this.state.anchorEl}
+              onClick={this.handleRequestClose}
+              onClose={this.handleClose}
+              activeTool={this.state.activeTool}
+              activateTool={this.activateTool}
+            />
+          </Grid>
+        </Container>
+        <div
+          className={this.props.classes.minimap}
+          style={{
+            position: "fixed",
+          }}
+        >
+          <Slide in={this.state.toggleMinimap} direction="up" timeout={1000}>
+            <Card
+              className={this.props.classes.minimapCard}
+              style={{
+                position: "relative",
+              }}
+            >
+              {this.minimapToolTips.map((minimapToolTip) => (
+                <HtmlTooltip
+                  key={minimapToolTip.name}
+                  title={
+                    <Box className={this.props.classes.mainbox}>
+                      <Box mr={3} ml={2}>
+                        <Typography color="inherit">
+                          {minimapToolTip.name}
+                        </Typography>
+                      </Box>
+                      <Avatar
+                        style={{
+                          backgroundColor: theme.palette.primary.main,
+                          color: "#2B2F3A",
+                        }}
+                      >
+                        {minimapToolTip.shortcut}
+                      </Avatar>
+                      <Avatar
+                        style={{
+                          backgroundColor: theme.palette.primary.main,
+                          color: "#2B2F3A",
+                        }}
+                      >
+                        {minimapToolTip.shortcutSymbol}
+                      </Avatar>
+                    </Box>
+                  }
+                  placement="top"
+                >
+                  <IconButton
+                    size="small"
+                    style={minimapToolTip.styling}
+                    onClick={(e: React.MouseEvent) =>
+                      this.setState(
+                        {
+                          buttonClicked: minimapToolTip.name,
+                        },
+                        () => {
+                          if (minimapToolTip.name === "Zoom In") {
+                            this.incrementScale();
+                          }
+                          if (minimapToolTip.name === "Zoom Out") {
+                            this.decrementScale();
+                          }
+                          if (minimapToolTip.name === "Fit to Page") {
+                            this.resetScaleAndPan();
+                          }
+                          if (minimapToolTip.name === "Minimise Map") {
+                            this.handleDrawerClose();
+                          }
+                        }
+                      )
+                    }
+                  >
+                    <Avatar sizes="large">
+                      <SVG
+                        src={`${minimapToolTip.icon}`}
+                        width="55%"
+                        height="auto"
+                        fill={
+                          this.state.buttonClicked === minimapToolTip.name
+                            ? theme.palette.primary.main
+                            : null
+                        }
+                      />
+                    </Avatar>
+                  </IconButton>
+                </HtmlTooltip>
+              ))}
+
+              {/* Background canvas for the minimap */}
+              {this.state.displayedImage && (
+                <>
+                  <BackgroundCanvas
+                    scaleAndPan={{ x: 0, y: 0, scale: 1 }}
+                    displayedImage={this.state.displayedImage}
+                    canvasPositionAndSize={this.state.minimapPositionAndSize}
+                    setCanvasPositionAndSize={this.setMinimapPositionAndSize}
+                  />
+                  <MinimapCanvas
+                    displayedImage={this.state.displayedImage}
+                    scaleAndPan={this.state.scaleAndPan}
+                    setScaleAndPan={this.setScaleAndPan}
+                    canvasPositionAndSize={this.state.viewportPositionAndSize}
+                    minimapPositionAndSize={this.state.minimapPositionAndSize}
+                    setMinimapPositionAndSize={this.setMinimapPositionAndSize}
+                  />{" "}
+                </>
+              )}
             </Card>
           </Slide>
-        ) : null}
-      </div>
-    </ThemeProvider>
-  );
+
+          {this.state.toggleMinimap === false ? (
+            <Slide
+              in={!this.state.toggleMinimap}
+              direction="up"
+              timeout={{ enter: 1000 }}
+            >
+              <Card
+                className={this.props.classes.mimimapToggle}
+                style={{
+                  position: "relative",
+                  textAlign: "center",
+                }}
+              >
+                <HtmlTooltip
+                  key="Maximise Map"
+                  title={
+                    <Box className={this.props.classes.mainbox}>
+                      <Box mr={3} ml={2}>
+                        <Typography color="inherit">Maximise Map</Typography>
+                      </Box>
+                      <Avatar className={this.props.classes.popoverAvatar}>
+                        Alt
+                      </Avatar>
+                      <Avatar className={this.props.classes.popoverAvatar}>
+                        +
+                      </Avatar>
+                    </Box>
+                  }
+                  placement="top"
+                >
+                  <IconButton
+                    onClick={(e: React.MouseEvent) =>
+                      this.setState(
+                        {
+                          buttonClicked: "Maximise Map",
+                        },
+                        this.handleDrawerOpen
+                      )
+                    }
+                    edge="start"
+                    size="small"
+                  >
+                    <Avatar>
+                      <SVG
+                        src={require("./assets/maximise-icon.svg") as string}
+                        width="55%"
+                        height="auto"
+                      />
+                    </Avatar>
+                  </IconButton>
+                </HtmlTooltip>
+              </Card>
+            </Slide>
+          ) : null}
+        </div>
+      </ThemeProvider>
+    );
+  };
 }
+export default withStyles(styles)(UserInterface);

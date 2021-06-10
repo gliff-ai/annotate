@@ -51,6 +51,7 @@ const theme: Theme = createMuiTheme({
         border: "1px solid #dadde9",
         borderRadius: "9px",
         padding: "8px",
+        background: "#fafafa",
       },
     },
 
