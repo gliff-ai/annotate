@@ -8,7 +8,7 @@ import { usePaintbrushStore } from "./Store";
 
 interface Props {
   isOpen: boolean;
-  anchorEl: HTMLButtonElement | null;
+  anchorElement: HTMLButtonElement | null;
   onClick: (event: React.MouseEvent) => void;
   onClose: (event: React.MouseEvent) => void;
 }
@@ -36,7 +36,7 @@ const PaintbrushUI = (props: Props): ReactElement => {
   return (
     <Popover
       open={props.isOpen}
-      anchorEl={props.anchorEl}
+      anchorEl={props.anchorElement}
       onClose={props.onClose}
       onClick={props.onClick}
     >

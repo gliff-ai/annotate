@@ -74,7 +74,7 @@ interface State {
   sliceIndex: number;
   channels: boolean[];
   popover: boolean;
-  anchorEl: HTMLButtonElement | null; // A HTML element. It's used to set the position of the popover menu https://material-ui.com/api/menu/#props
+  anchorElement: HTMLButtonElement | null; // A HTML element. It's used to set the position of the popover menu https://material-ui.com/api/menu/#props
   buttonClicked: string;
   toggleMinimap: boolean;
   mode: Mode;
@@ -336,7 +336,7 @@ class UserInterface extends Component<Props, State> {
       displayedImage: this.slicesData ? this.slicesData[0][0] : null,
       redraw: 0,
       popover: null,
-      anchorEl: null,
+      anchorElement: null,
       buttonClicked: null,
       toggleMinimap: false,
       activeTool: Tools.paintbrush,
@@ -698,7 +698,7 @@ class UserInterface extends Component<Props, State> {
   // Close popover
 
   handleClose = (event: React.MouseEvent) => {
-    this.setState({ anchorEl: null, popover: null });
+    this.setState({ anchorElement: null, popover: null });
   };
 
   handleRequestClose = () => {
@@ -816,7 +816,7 @@ class UserInterface extends Component<Props, State> {
                         {
                           popover: true,
                           buttonClicked: toolTip.name,
-                          anchorEl: e.currentTarget as HTMLButtonElement,
+                          anchorElement: e.currentTarget as HTMLButtonElement,
                         },
                         () => {
                           if (this.state.buttonClicked === "Eraser") {
@@ -1000,7 +1000,7 @@ class UserInterface extends Component<Props, State> {
                 this.state.buttonClicked === "Annonation Label" &&
                 this.state.popover
               }
-              anchorEl={this.state.anchorEl}
+              anchorEl={this.state.anchorElement}
               onClose={this.handleClose}
             >
               <Card className={this.props.classes.annotationCard}>
@@ -1044,7 +1044,7 @@ class UserInterface extends Component<Props, State> {
                 (this.state.buttonClicked === "Channel" && this.state.popover)
               }
               buttonClicked={this.state.buttonClicked}
-              anchorEl={this.state.anchorEl}
+              anchorElement={this.state.anchorElement}
               onClose={this.handleClose}
               channels={this.state.channels}
               toggleChannelAtIndex={this.toggleChannelAtIndex}
@@ -1053,7 +1053,7 @@ class UserInterface extends Component<Props, State> {
               isOpen={
                 this.state.buttonClicked === "Brush" && this.state.popover
               }
-              anchorEl={this.state.anchorEl}
+              anchorElement={this.state.anchorElement}
               onClose={this.handleClose}
               onClick={this.handleRequestClose}
             />
@@ -1061,7 +1061,7 @@ class UserInterface extends Component<Props, State> {
               isOpen={
                 this.state.buttonClicked === "Spline" && this.state.popover
               }
-              anchorEl={this.state.anchorEl}
+              anchorElement={this.state.anchorElement}
               onClick={this.handleRequestClose}
               onClose={this.handleClose}
               activeTool={this.state.activeTool}

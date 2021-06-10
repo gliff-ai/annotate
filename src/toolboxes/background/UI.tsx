@@ -22,7 +22,7 @@ import { useBackgroundStore } from "./Store";
 
 interface Props {
   open: boolean;
-  anchorEl: HTMLElement | null;
+  anchorElement: HTMLElement | null;
   buttonClicked: string;
   onClose: (event: React.MouseEvent) => void;
   channels: boolean[];
@@ -116,7 +116,7 @@ const BackgroundUI = (props: Props): ReactElement => {
     <>
       <Popover
         open={props.open}
-        anchorEl={props.anchorEl}
+        anchorEl={props.anchorElement}
         onClose={props.onClose}
       >
         {props.buttonClicked === "Contrast" && (
