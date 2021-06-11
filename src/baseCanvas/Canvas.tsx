@@ -23,6 +23,7 @@ export interface Props {
   setCanvasPositionAndSize?: (canvasPositionAndSize: PositionAndSize) => void;
   displayedImage?: ImageBitmap;
 }
+
 export class BaseCanvas extends Component<Props> {
   private name: string;
 
@@ -158,10 +159,11 @@ export class BaseCanvas extends Component<Props> {
         width: "100%",
         height: this.props.canvasPositionAndSize.height,
         cursor: this.props.cursor || "pointer",
-        //   border: "1px solid gray",
-        top: this.props.canvasPositionAndSize.top,
         left: this.props.canvasPositionAndSize.left,
+        bottom: "0px",
         position: "absolute",
+        right: "250px",
+        marginTop: "30px",
       }}
     >
       <canvas

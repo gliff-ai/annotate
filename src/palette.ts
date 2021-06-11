@@ -13,11 +13,8 @@ const palette: Readonly<RGBColor[]> = [
   [170, 68, 153],
 ];
 
-const main: RGBColor = [245, 0, 87]; // Material dark theme secondary
-const secondary: RGBColor = [63, 81, 181]; // Material dark theme primary
-
 function getRGBAString(color: RGBColor, opacity = 1): string {
   return `rgba(${color.join(",")}, ${opacity})`;
 }
 
-export { palette, main, secondary, getRGBAString };
+export { palette, getRGBAString };

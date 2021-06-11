@@ -6,25 +6,21 @@ import React, {
 } from "react";
 
 import {
-  Collapse,
+  createStyles,
+  Divider,
   IconButton,
   InputBase,
   List,
   ListItem,
-  ListItemIcon,
   ListItemSecondaryAction,
   ListItemText,
+  makeStyles,
+  Theme,
 } from "@material-ui/core";
-import {
-  Add,
-  Backspace,
-  ExpandLess,
-  ExpandMore,
-  LibraryAdd,
-} from "@material-ui/icons";
+
+import SVG from "react-inlinesvg";
 
 import { Annotations } from "@/annotation";
-import { theme } from "@/theme";
 
 interface Props {
   annotationObject: Annotations;
@@ -32,6 +28,16 @@ interface Props {
   updatePresetLabels: (label: string) => void;
   activeAnnotationID: number;
 }
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    listItem: {
+      color: theme.palette.primary.main,
+      fontSize: "50px",
+      marginLeft: "-7px",
+    },
+  })
+);
 
 export const Labels: FunctionComponent<Props> = ({
   annotationObject,
@@ -42,14 +48,14 @@ export const Labels: FunctionComponent<Props> = ({
   const getMenuLabels = (labels: string[]): string[] =>
     presetLabels.filter((label) => !labels.includes(label));
 
+  const classes = useStyles();
+
   const [assignedLabels, setAssignedLabels] = useState(
     annotationObject.getLabels()
   );
   const [menuLabels, setMenuLabels] = useState(
     getMenuLabels(annotationObject.getLabels())
   );
-
-  const [isOpen, setIsOpen] = useState(false);
 
   const [newLabel, setNewLabel] = React.useState("");
 
@@ -77,10 +83,6 @@ export const Labels: FunctionComponent<Props> = ({
     updateAllLabels();
   };
 
-  const handleClick = () => {
-    setIsOpen(!isOpen);
-  };
-
   useEffect(() => {
     // Re-render assigned labels at change of active annotation ID.
     updateAllLabels();
@@ -88,73 +90,77 @@ export const Labels: FunctionComponent<Props> = ({
 
   return (
     <>
-      <List component="div" disablePadding>
+      <List component="div" disablePadding style={{ width: "100%" }}>
+        <ListItem>
+          <InputBase
+            placeholder="New label"
+            value={newLabel}
+            onChange={handleNewLabelChange}
+            inputProps={{
+              style: { fontSize: 18, marginRight: 57, marginLeft: -7 },
+            }}
+            startAdornment
+          />
+
+          <IconButton
+            type="submit"
+            aria-label="add-new-label"
+            onClick={handleAddLabel(newLabel)}
+            edge="end"
+          >
+            <SVG
+              src={require("../assets/add-icon.svg") as string}
+              width="12px"
+              height="auto"
+              fill="#A1A1A1"
+            />
+          </IconButton>
+        </ListItem>
+        <Divider />
+      </List>
+
+      <List component="div" disablePadding style={{ width: "100%" }}>
         {assignedLabels.map((label) => (
           <ListItem key={label} dense>
-            <ListItemText primary={label} />
+            <ListItemText primary={label} className={classes.listItem} />
             <ListItemSecondaryAction>
               <IconButton
                 edge="end"
                 aria-label="delete"
                 onClick={handleRemoveLabel(label)}
               >
-                <Backspace />
+                <SVG
+                  src={require("../assets/backspace-icon.svg") as string}
+                  width="28px"
+                  height="auto"
+                  fill="#02FFAD"
+                />
               </IconButton>
             </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
-      <List style={{ width: "100%" }}>
-        <ListItem button onClick={handleClick}>
-          <ListItemIcon>
-            <LibraryAdd />
-            Add Labels
-            {isOpen ? <ExpandLess /> : <ExpandMore />}
-          </ListItemIcon>
-        </ListItem>
 
-        <Collapse
-          in={isOpen}
-          timeout="auto"
-          unmountOnExit
-          style={{
-            backgroundColor: theme.palette.divider,
-          }}
-        >
-          <List component="div" disablePadding>
-            {menuLabels.map((label) => (
-              <ListItem key={label} dense>
-                <ListItemText primary={label} />
-                <ListItemSecondaryAction>
-                  <IconButton
-                    edge="end"
-                    aria-label="add"
-                    onClick={handleAddLabel(label)}
-                  >
-                    <Add />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-            ))}
-            <ListItem dense>
-              <InputBase
-                placeholder="New label"
-                value={newLabel}
-                onChange={handleNewLabelChange}
-                inputProps={{ style: { fontSize: 14 } }}
-              />
-
+      <List component="div" disablePadding style={{ width: "100%" }}>
+        {menuLabels.map((label) => (
+          <ListItem key={label} dense>
+            <ListItemText primary={label} />
+            <ListItemSecondaryAction>
               <IconButton
-                type="submit"
-                aria-label="add-new-label"
-                onClick={handleAddLabel(newLabel)}
                 edge="end"
+                aria-label="add"
+                onClick={handleAddLabel(label)}
               >
-                <Add />
+                <SVG
+                  src={require("../assets/add-icon.svg") as string}
+                  width="12px"
+                  height="auto"
+                  fill="#000000"
+                />
               </IconButton>
-            </ListItem>
-          </List>
-        </Collapse>
+            </ListItemSecondaryAction>
+          </ListItem>
+        ))}
       </List>
     </>
   );

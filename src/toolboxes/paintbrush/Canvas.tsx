@@ -12,15 +12,12 @@ import { canvasToImage, imageToCanvas } from "@/transforms";
 import { XYPoint } from "@/annotation/interfaces";
 import { Tool, Tools } from "@/tools";
 import { Mode } from "@/ui";
-
-import {
-  main as mainColor,
-  secondary as secondaryColor,
-  palette,
-  getRGBAString,
-} from "@/palette";
-
+import { theme } from "@/theme";
+import { palette, getRGBAString } from "@/palette";
 import { usePaintbrushStore } from "./Store";
+
+const mainColor = theme.palette.primary.main;
+const secondaryColor = theme.palette.secondary.main;
 
 interface Props extends CanvasProps {
   activeTool: string;
@@ -165,7 +162,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
       // Create/update brush
       const brush = {
-        color: getRGBAString(mainColor),
+        color: mainColor,
         radius: this.props.brushRadius,
         type: this.props.activeTool === "paintbrush" ? "paint" : "erase",
       } as Brush;
@@ -211,7 +208,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
     // Set annotation colour and transparency
     if (isActive) {
-      context.strokeStyle = getRGBAString(mainColor);
+      context.strokeStyle = mainColor;
       this.annotationOpacity = 1;
     } else {
       context.strokeStyle = brush.color;
@@ -222,7 +219,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     if (brush.type === "erase") {
       // If we are live drawing, use a brush colour
       if (context.canvas.id === "interaction-canvas") {
-        context.strokeStyle = getRGBAString(secondaryColor);
+        context.strokeStyle = secondaryColor;
       } else {
         // If we have saved this line, use a subtraction
         context.globalCompositeOperation = "destination-out";

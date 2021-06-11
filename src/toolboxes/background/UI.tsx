@@ -1,18 +1,19 @@
 import React, { ChangeEvent, ReactElement } from "react";
 import {
-  Grid,
-  Accordion,
-  AccordionSummary,
   Typography,
-  AccordionDetails,
   Checkbox,
   FormControlLabel,
   FormGroup,
-  FormLabel,
   FormControl,
+  Popover,
+  Card,
+  Paper,
+  Avatar,
+  makeStyles,
+  createStyles,
+  Theme,
 } from "@material-ui/core";
-
-import { ExpandMore } from "@material-ui/icons";
+import SVG from "react-inlinesvg";
 
 import { BaseSlider } from "@/components/BaseSlider";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
@@ -20,14 +21,58 @@ import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { useBackgroundStore } from "./Store";
 
 interface Props {
-  expanded: boolean;
-  onChange: (event: ChangeEvent, isExpanded: boolean) => void;
+  open: boolean;
+  anchorElement: HTMLElement | null;
+  buttonClicked: string;
+  onClose: (event: React.MouseEvent) => void;
   channels: boolean[];
   toggleChannelAtIndex: (index: number) => void;
 }
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    checkbox: {
+      marginLeft: "104px",
+    },
+    contrastBaseslider: {
+      width: "63px",
+      height: "335px",
+    },
+    brightnessBaseslider: {
+      width: "63px",
+      height: "335px",
+    },
+    channelCard: {
+      width: "189px",
+      height: "176px",
+    },
+    channelTypography: {
+      display: "inline",
+      fontSize: "21px",
+      marginRight: "54px",
+      marginLeft: "3px",
+    },
+    channelAvatar: {
+      backgroundColor: theme.palette.primary.main,
+      display: "inline",
+    },
+    channelformGroup: {
+      margin: "0",
+      padding: "0",
+      marginLeft: "17px",
+    },
+    channelPaper: {
+      padding: "10px",
+      backgroundColor: theme.palette.primary.main,
+      width: "189px",
+      marginBottom: "15px",
+    },
+  })
+);
+
 const BackgroundUI = (props: Props): ReactElement => {
   const [background, setBackground] = useBackgroundStore();
+  const classes = useStyles();
 
   function changeContrast(e: ChangeEvent, value: number) {
     setBackground({
@@ -45,7 +90,22 @@ const BackgroundUI = (props: Props): ReactElement => {
 
   const controls = props.channels.map((channel, i) => (
     <Checkbox
+      className={classes.checkbox}
       checked={channel}
+      icon={
+        <SVG
+          src={require("../../assets/not-selected-tickbox-icon.svg") as string}
+          width="18px"
+          height="auto"
+        />
+      }
+      checkedIcon={
+        <SVG
+          src={require("../../assets/selected-tickbox-icon.svg") as string}
+          width="18px"
+          height="auto"
+        />
+      }
       onChange={() => {
         props.toggleChannelAtIndex(i);
       }}
@@ -53,26 +113,54 @@ const BackgroundUI = (props: Props): ReactElement => {
   ));
 
   return (
-    <Accordion expanded={props.expanded} onChange={props.onChange}>
-      <AccordionSummary expandIcon={<ExpandMore />} id="background-toolbox">
-        <Typography>Image</Typography>
-      </AccordionSummary>
-      <AccordionDetails>
-        <Grid container spacing={0} justify="center" wrap="nowrap">
-          <Grid item style={{ width: "85%", position: "relative" }}>
+    <>
+      <Popover
+        open={props.open}
+        anchorEl={props.anchorElement}
+        onClose={props.onClose}
+      >
+        {props.buttonClicked === "Contrast" && (
+          <div className={classes.contrastBaseslider}>
             <BaseSlider
               value={background.contrast}
               config={SLIDER_CONFIG[Sliders.contrast]}
               onChange={() => changeContrast}
+              slider="contrast"
             />
+          </div>
+        )}
+
+        {props.buttonClicked === "Brightness" && (
+          <div className={classes.brightnessBaseslider}>
             <BaseSlider
               value={background.brightness}
               config={SLIDER_CONFIG[Sliders.brightness]}
               onChange={() => changeBrightness}
+              slider="brightness"
             />
+          </div>
+        )}
 
+        {props.buttonClicked === "Channel" && (
+          <Card className={classes.channelCard}>
+            <Paper
+              elevation={0}
+              variant="outlined"
+              square
+              className={classes.channelPaper}
+            >
+              <Typography className={classes.channelTypography}>
+                Channels
+              </Typography>
+              <Avatar className={classes.channelAvatar}>
+                <SVG
+                  src={require("../../assets/pin-icon.svg") as string}
+                  width="18px"
+                  height="auto"
+                />
+              </Avatar>
+            </Paper>
             <FormControl component="fieldset">
-              <FormLabel component="legend">Channels</FormLabel>
               <FormGroup aria-label="position" row>
                 {controls.map((control, i) => (
                   <FormControlLabel
@@ -80,16 +168,16 @@ const BackgroundUI = (props: Props): ReactElement => {
                     value="top"
                     control={control}
                     label={`C${i + 1}`}
-                    labelPlacement="top"
-                    style={{ margin: "0", padding: "0" }}
+                    labelPlacement="start"
+                    className={classes.channelformGroup}
                   />
                 ))}
               </FormGroup>
             </FormControl>
-          </Grid>
-        </Grid>
-      </AccordionDetails>
-    </Accordion>
+          </Card>
+        )}
+      </Popover>
+    </>
   );
 };
 

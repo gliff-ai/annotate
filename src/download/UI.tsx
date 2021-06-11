@@ -1,6 +1,5 @@
 import React, { ReactElement, useState, MouseEvent } from "react";
 import { Tooltip, Button, Menu, MenuItem } from "@material-ui/core";
-import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import { ImageFileInfo } from "@gliff-ai/upload";
 import { Annotation } from "@/annotation/interfaces";
 import { downloadPaintbrushAsTiff } from "@/download/DownloadAsTiff";
@@ -51,7 +50,10 @@ export function Download({ annotations, imageFileInfo }: Props): ReactElement {
     <>
       <Tooltip title="Download annotations">
         <Button aria-label="download" onClick={handleOpen}>
-          <CloudDownloadIcon />
+          <img
+            src={require("../assets/save-icon.svg") as string}
+            alt="Save Icon"
+          />
         </Button>
       </Tooltip>
       <Menu

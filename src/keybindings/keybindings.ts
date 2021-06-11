@@ -5,13 +5,20 @@
 // eg alt+shift+KeyA
 
 export const keybindings = {
+  Equal: "ui.addAnnotation",
+  Minus: "ui.clearActiveAnnotation",
   Backspace: "spline.deleteSelectedPoint",
   Enter: "spline.changeSplineModeToEdit",
   Escape: "spline.deselectPoint",
+  KeyA: "ui.toggleMode",
   "ctrl+KeyC": "spline.closeLoop",
-  "ctrl+KeyA": "ui.toggleMode",
   "ctrl+ArrowLeft": "ui.previousAnnotation",
   "ctrl+ArrowRight": "ui.nextAnnotation",
+  "ctrl+Equal": "ui.incrementScale",
+  "ctrl+Minus": "ui.decrementScale",
+  "alt+Equal": "ui.handleDrawerOpen",
+  "alt+Minus": "ui.handleDrawerClose",
+  "ctrl+BracketRight": "ui.resetScaleAndPan",
 } as Readonly<{
   [key: string]: string;
 }>;

@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import { UserInterface } from "@/ui";
+import UserInterface from "@/ui";
 
 import loadImage from "./autoload";
 
