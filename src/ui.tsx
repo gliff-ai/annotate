@@ -59,6 +59,11 @@ export const events = [
   "toggleMode",
   "addAnnotation",
   "clearActiveAnnotation",
+  "incrementScale",
+  "decrementScale",
+  "handleDrawerOpen",
+  "handleDrawerClose",
+  "resetScaleAndPan",
 ] as const;
 
 interface State {
