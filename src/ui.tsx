@@ -202,6 +202,8 @@ const styles = {
     width: "40px",
     height: "40px",
   },
+  svgLarge: { width: "55%", height: "auto" },
+  svgSmall: { width: "18%", height: "auto" },
 };
 
 interface ToolTips {
@@ -772,8 +774,7 @@ class UserInterface extends Component<Props, State> {
                   <Avatar sizes="large">
                     <SVG
                       src={`${toolTip.icon}`}
-                      width="55%"
-                      height="auto"
+                      className={this.props.classes.svgLarge}
                       fill={
                         this.state.buttonClicked === toolTip.name
                           ? theme.palette.primary.main
@@ -844,8 +845,7 @@ class UserInterface extends Component<Props, State> {
                   <Avatar sizes="large" variant="circular">
                     <SVG
                       src={`${toolTip.icon}`}
-                      width="55%"
-                      height="auto"
+                      className={this.props.classes.svgLarge}
                       fill={
                         this.state.buttonClicked === toolTip.name
                           ? theme.palette.primary.main
@@ -876,7 +876,7 @@ class UserInterface extends Component<Props, State> {
               </Grid>
             </Grid>
 
-            <Grid item justify="flex-end">
+            <Grid item>
               <UploadImage
                 setUploadedImage={this.setUploadedImage}
                 spanElement={
@@ -892,7 +892,7 @@ class UserInterface extends Component<Props, State> {
               />
             </Grid>
 
-            <Grid item justify="flex-end">
+            <Grid item>
               <Download
                 annotations={this.annotationsObject.getAllAnnotations()}
                 imageFileInfo={this.imageFileInfo}
@@ -1020,8 +1020,7 @@ class UserInterface extends Component<Props, State> {
                 <Avatar className={this.props.classes.annotationAvatar}>
                   <SVG
                     src={require("./assets/pin-icon.svg") as string}
-                    width="18px"
-                    height="auto"
+                    className={this.props.classes.svgSmall}
                   />
                 </Avatar>
               </Paper>
@@ -1135,8 +1134,7 @@ class UserInterface extends Component<Props, State> {
                   <Avatar sizes="large">
                     <SVG
                       src={`${minimapToolTip.icon}`}
-                      width="55%"
-                      height="auto"
+                      className={this.props.classes.svgLarge}
                     />
                   </Avatar>
                 </IconButton>
@@ -1217,8 +1215,7 @@ class UserInterface extends Component<Props, State> {
                   <Avatar>
                     <SVG
                       src={require("./assets/maximise-icon.svg") as string}
-                      width="55%"
-                      height="auto"
+                      className={this.props.classes.svgLarge}
                     />
                   </Avatar>
                 </IconButton>
