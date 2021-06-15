@@ -2,6 +2,7 @@ interface ToolTips {
   name: string;
   icon: string;
   shortcut: string;
+  tool?: string;
 }
 
 const toolTips: ToolTips[] = [
@@ -14,21 +15,25 @@ const toolTips: ToolTips[] = [
     name: "Brush",
     icon: require(`./assets/brush-icon.svg`) as string,
     shortcut: "B",
+    tool: "paintbrush",
   },
   {
     name: "Eraser",
     icon: require(`./assets/eraser-icon.svg`) as string,
     shortcut: "E",
+    tool: "eraser",
   },
   {
     name: "Spline",
     icon: require(`./assets/splines-icon.svg`) as string,
     shortcut: "S",
+    tool: "spline",
   },
   {
     name: "Magic Spline",
     icon: require(`./assets/magic-spline-icon.svg`) as string,
     shortcut: "M",
+    tool: "magicspline",
   },
 
   {

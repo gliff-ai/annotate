@@ -202,7 +202,7 @@ const styles = {
     height: "40px",
   },
   svgLarge: { width: "55%", height: "auto" },
-  svgSmall: { width: "18%", height: "auto" },
+  svgSmall: { width: "18px", height: "auto" },
 };
 
 const HtmlTooltip = withStyles((t: Theme) => ({
@@ -517,7 +517,7 @@ class UserInterface extends Component<Props, State> {
   };
 
   activateTool = (tool: Tool): void => {
-    this.setState({ activeTool: tool }, () => {
+    this.setState({ activeTool: tool, mode: Mode.draw }, () => {
       this.reuseEmptyAnnotation();
     });
   };
@@ -543,7 +543,13 @@ class UserInterface extends Component<Props, State> {
     if (this.state.mode === Mode.draw) {
       this.setState({ mode: Mode.select, buttonClicked: "Select" });
     } else {
-      this.setState({ mode: Mode.draw, buttonClicked: null });
+      for (const tool of toolTips) {
+        console.log(tool?.tool);
+        if (tool?.tool === this.state.activeTool) {
+          this.setState({ mode: Mode.draw, buttonClicked: tool.name });
+          break;
+        }
+      }
     }
   };
 
@@ -1024,14 +1030,11 @@ class UserInterface extends Component<Props, State> {
                       () => {
                         if (minimapToolTip.name === "Zoom In") {
                           this.incrementScale();
-                        }
-                        if (minimapToolTip.name === "Zoom Out") {
+                        } else if (minimapToolTip.name === "Zoom Out") {
                           this.decrementScale();
-                        }
-                        if (minimapToolTip.name === "Fit to Page") {
+                        } else if (minimapToolTip.name === "Fit to Page") {
                           this.resetScaleAndPan();
-                        }
-                        if (minimapToolTip.name === "Minimise Map") {
+                        } else if (minimapToolTip.name === "Minimise Map") {
                           this.handleDrawerClose();
                         }
                       }
