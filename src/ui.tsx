@@ -24,9 +24,7 @@ import {
 
 import SVG from "react-inlinesvg";
 
-import { ImageFileInfo } from "@gliff-ai/upload/typings";
-import { UploadImage } from "@gliff-ai/upload";
-
+import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { ThemeProvider, theme } from "@/theme";
@@ -484,7 +482,7 @@ class UserInterface extends Component<Props, State> {
     );
 
     // If annotationsObject is not passed down as props, create a new annotationsObject.
-    // Otherwise the annotationsObject will update after the uplaoed image has been stored.
+    // Otherwise the props for annotationsObject will update after the uplaoed image has been stored.
     if (!this.props.annotationsObject) {
       this.annotationsObject = new Annotations();
       this.annotationsObject.addAnnotation(this.state.activeTool);
@@ -543,9 +541,9 @@ class UserInterface extends Component<Props, State> {
 
   toggleMode = (): void => {
     if (this.state.mode === Mode.draw) {
-      this.setState({ mode: Mode.select });
+      this.setState({ mode: Mode.select, buttonClicked: "Select" });
     } else {
-      this.setState({ mode: Mode.draw });
+      this.setState({ mode: Mode.draw, buttonClicked: null });
     }
   };
 
@@ -614,8 +612,6 @@ class UserInterface extends Component<Props, State> {
       return { channels };
     }, this.mixChannels);
   };
-
-  // Close popover
 
   handleClose = (event: React.MouseEvent) => {
     this.setState({ anchorElement: null, popover: null });
