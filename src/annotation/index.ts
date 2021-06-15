@@ -35,7 +35,7 @@ export class Annotations {
   constructor(data?: Annotation[], audit?: AuditAction[]) {
     this.data = data || [];
     this.audit = audit || [];
-    this.activeAnnotationID = null;
+    this.activeAnnotationID = 0;
   }
 
   @log

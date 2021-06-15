@@ -482,6 +482,15 @@ class UserInterface extends Component<Props, State> {
       },
       this.mixChannels
     );
+
+    // If annotationsObject is not passed down as props, create a new annotationsObject.
+    // Otherwise the annotationsObject will update after the uplaoed image has been stored.
+    if (!this.props.annotationsObject) {
+      this.annotationsObject = new Annotations();
+      this.annotationsObject.addAnnotation(this.state.activeTool);
+    }
+
+    // TODO: Add saveImageCallback to store uplaoded image in dominate
   };
 
   mixChannels = (): void => {
