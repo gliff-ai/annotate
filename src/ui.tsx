@@ -435,7 +435,6 @@ class UserInterface extends Component<Props, State> {
     this.multiplyScaleAndPan("x", panMultiplier);
     this.multiplyScaleAndPan("y", panMultiplier);
     this.incrementScaleAndPan("scale", 1);
-    console.log("hellp");
   };
 
   decrementScale = (): void => {
@@ -563,8 +562,10 @@ class UserInterface extends Component<Props, State> {
   reuseEmptyAnnotation = (): void => {
     /* If the active annotation object is empty, change the value of toolbox
     to match the active tool. */
+    const toolbox =
+      this.state.activeTool === "eraser" ? "paintbrush" : this.state.activeTool;
     if (this.annotationsObject.isActiveAnnotationEmpty()) {
-      this.annotationsObject.setActiveAnnotationToolbox(this.state.activeTool);
+      this.annotationsObject.setActiveAnnotationToolbox(toolbox);
       this.annotationsObject.setSplineSpaceTimeInfo(this.state.sliceIndex);
     }
   };
