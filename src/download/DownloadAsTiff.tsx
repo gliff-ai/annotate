@@ -128,20 +128,27 @@ function drawCapsule(
 
     if (brushType === "paint") {
       for (let x = xmin; x < xmax; x += 1) {
-        const index = samplesPerPixel * (imageWidth * y + x);
-        annotationColor.forEach((c, i) => {
-          arr[index + i] = c;
-        });
+        // If point is on the image
+        if (x >= 0 && x <= imageWidth) {
+          const index = samplesPerPixel * (imageWidth * y + x);
+          annotationColor.forEach((c, i) => {
+            arr[index + i] = c;
+          });
+        }
       }
     } else {
       for (let x = xmin; x < xmax; x += 1) {
-        const index = samplesPerPixel * (imageWidth * y + x);
-        if (
-          arr.slice(index, index + 3).toString() === annotationColor.toString()
-        ) {
-          annotationColor.forEach((c, i) => {
-            arr[index + i] = 0;
-          });
+        // If point is on the image
+        if (x >= 0 && x <= imageWidth) {
+          const index = samplesPerPixel * (imageWidth * y + x);
+          if (
+            arr.slice(index, index + 3).toString() ===
+            annotationColor.toString()
+          ) {
+            annotationColor.forEach((c, i) => {
+              arr[index + i] = 0;
+            });
+          }
         }
       }
     }

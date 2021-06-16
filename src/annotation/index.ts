@@ -35,7 +35,7 @@ export class Annotations {
   constructor(data?: Annotation[], audit?: AuditAction[]) {
     this.data = data || [];
     this.audit = audit || [];
-    this.activeAnnotationID = null;
+    this.activeAnnotationID = 0;
   }
 
   @log
@@ -89,8 +89,7 @@ export class Annotations {
     this.data[this.activeAnnotationID].spline.coordinates.length;
 
   isActiveAnnotationEmpty = (): boolean =>
-    // Check whether the active annotation object contains any
-    // paintbrush or spline annotations.
+    // Check whether the active annotation object contains any annotations.
     this.data[this.activeAnnotationID].spline.coordinates.length === 0 &&
     this.data[this.activeAnnotationID].brushStrokes.length === 0;
 

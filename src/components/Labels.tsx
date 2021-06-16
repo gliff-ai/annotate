@@ -36,6 +36,7 @@ const useStyles = makeStyles((theme: Theme) =>
       fontSize: "50px",
       marginLeft: "-7px",
     },
+    list: { width: "100%" },
   })
 );
 
@@ -111,7 +112,7 @@ export const Labels: FunctionComponent<Props> = ({
             <SVG
               src={require("../assets/add-icon.svg") as string}
               width="12px"
-              height="auto"
+              height="100%"
               fill="#A1A1A1"
             />
           </IconButton>
@@ -119,7 +120,7 @@ export const Labels: FunctionComponent<Props> = ({
         <Divider />
       </List>
 
-      <List component="div" disablePadding style={{ width: "100%" }}>
+      <List component="div" disablePadding className={classes.list}>
         {assignedLabels.map((label) => (
           <ListItem key={label} dense>
             <ListItemText primary={label} className={classes.listItem} />
@@ -132,7 +133,7 @@ export const Labels: FunctionComponent<Props> = ({
                 <SVG
                   src={require("../assets/backspace-icon.svg") as string}
                   width="28px"
-                  height="auto"
+                  height="100%"
                   fill="#02FFAD"
                 />
               </IconButton>
@@ -141,7 +142,7 @@ export const Labels: FunctionComponent<Props> = ({
         ))}
       </List>
 
-      <List component="div" disablePadding style={{ width: "100%" }}>
+      <List component="div" disablePadding className={classes.list}>
         {menuLabels.map((label) => (
           <ListItem key={label} dense>
             <ListItemText primary={label} />
@@ -154,7 +155,7 @@ export const Labels: FunctionComponent<Props> = ({
                 <SVG
                   src={require("../assets/add-icon.svg") as string}
                   width="12px"
-                  height="auto"
+                  height="100%"
                   fill="#000000"
                 />
               </IconButton>

@@ -24,9 +24,7 @@ import {
 
 import SVG from "react-inlinesvg";
 
-import { ImageFileInfo } from "@gliff-ai/upload/typings";
-import { UploadImage } from "@gliff-ai/upload";
-
+import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { ThemeProvider, theme } from "@/theme";
@@ -38,6 +36,7 @@ import { Labels } from "@/components/Labels";
 import { Download } from "@/download/UI";
 import { keydownListener } from "@/keybindings";
 import { Tools, Tool } from "@/tools";
+import { toolTips, minimapToolTips, annotationToolTips } from "./tooltips";
 
 const CONFIG = {
   PAN_AMOUNT: 20,
@@ -202,13 +201,9 @@ const styles = {
     width: "40px",
     height: "40px",
   },
+  svgLarge: { width: "55%", height: "auto" },
+  svgSmall: { width: "18px", height: "auto" },
 };
-
-interface ToolTips {
-  name: string;
-  icon: string;
-  shortcut: string;
-}
 
 const HtmlTooltip = withStyles((t: Theme) => ({
   tooltip: {
@@ -229,100 +224,6 @@ class UserInterface extends Component<Props, State> {
   private imageFileInfo: ImageFileInfo | null;
 
   private canvasContainer: HTMLDivElement;
-
-  toolTips: ToolTips[] = [
-    {
-      name: "Select",
-      icon: require(`./assets/select-icon.svg`) as string,
-      shortcut: "A",
-    },
-    {
-      name: "Brush",
-      icon: require(`./assets/brush-icon.svg`) as string,
-      shortcut: "B",
-    },
-    {
-      name: "Eraser",
-      icon: require(`./assets/eraser-icon.svg`) as string,
-      shortcut: "E",
-    },
-    {
-      name: "Spline",
-      icon: require(`./assets/splines-icon.svg`) as string,
-      shortcut: "S",
-    },
-    {
-      name: "Magic Spline",
-      icon: require(`./assets/magic-spline-icon.svg`) as string,
-      shortcut: "M",
-    },
-
-    {
-      name: "Contrast",
-      icon: require(`./assets/contrast-icon.svg`) as string,
-      shortcut: `\\`,
-    },
-    {
-      name: "Brightness",
-      icon: require(`./assets/brightness-icon.svg`) as string,
-      shortcut: `/`,
-    },
-    {
-      name: "Channel",
-      icon: require(`./assets/channels-icon.svg`) as string,
-      shortcut: `C`,
-    },
-
-    {
-      name: "Annonation Label",
-      icon: require(`./assets/annotation-label-icon.svg`) as string,
-      shortcut: "L",
-    },
-  ];
-
-  minimapToolTips = [
-    {
-      name: "Minimise Map",
-      icon: require(`./assets/minimise-icon.svg`) as string,
-      shortcut: "ALT",
-      shortcutSymbol: "-",
-      styling: { marginRight: "120px", marginLeft: "15px" },
-    },
-
-    {
-      name: "Zoom In",
-      icon: require(`./assets/zoom-in-icon.svg`) as string,
-      shortcut: "CTRL",
-      shortcutSymbol: "+",
-      styling: { marginRight: "10px" },
-    },
-    {
-      name: "Zoom Out",
-      icon: require(`./assets/zoom-out-icon.svg`) as string,
-      shortcut: "CTRL",
-      shortcutSymbol: "-",
-      styling: { marginRight: "10px" },
-    },
-    {
-      name: "Fit to Page",
-      icon: require(`./assets/reset-zoom-and-pan-icon.svg`) as string,
-      shortcut: "CTRL",
-      shortcutSymbol: "]",
-    },
-  ];
-
-  annotationToolTips = [
-    {
-      name: "Add New Annotation",
-      icon: require(`./assets/new-annotation-icon.svg`) as string,
-      shortcutSymbol: "+",
-    },
-    {
-      name: "Clear Annotation",
-      icon: require(`./assets/delete-annotation-icon.svg`) as string,
-      shortcutSymbol: "-",
-    },
-  ];
 
   constructor(props: Props) {
     super(props);
@@ -532,7 +433,6 @@ class UserInterface extends Component<Props, State> {
     this.multiplyScaleAndPan("x", panMultiplier);
     this.multiplyScaleAndPan("y", panMultiplier);
     this.incrementScaleAndPan("scale", 1);
-    console.log("hellp");
   };
 
   decrementScale = (): void => {
@@ -580,6 +480,15 @@ class UserInterface extends Component<Props, State> {
       },
       this.mixChannels
     );
+
+    // If annotationsObject is not passed down as props, create a new annotationsObject.
+    // Otherwise the props for annotationsObject will update after the uplaoed image has been stored.
+    if (!this.props.annotationsObject) {
+      this.annotationsObject = new Annotations();
+      this.annotationsObject.addAnnotation(this.state.activeTool);
+    }
+
+    // TODO: Add saveImageCallback to store uplaoded image in dominate
   };
 
   mixChannels = (): void => {
@@ -608,7 +517,7 @@ class UserInterface extends Component<Props, State> {
   };
 
   activateTool = (tool: Tool): void => {
-    this.setState({ activeTool: tool }, () => {
+    this.setState({ activeTool: tool, mode: Mode.draw }, () => {
       this.reuseEmptyAnnotation();
     });
   };
@@ -632,9 +541,15 @@ class UserInterface extends Component<Props, State> {
 
   toggleMode = (): void => {
     if (this.state.mode === Mode.draw) {
-      this.setState({ mode: Mode.select });
+      this.setState({ mode: Mode.select, buttonClicked: "Select" });
     } else {
-      this.setState({ mode: Mode.draw });
+      for (const tool of toolTips) {
+        console.log(tool?.tool);
+        if (tool?.tool === this.state.activeTool) {
+          this.setState({ mode: Mode.draw, buttonClicked: tool.name });
+          break;
+        }
+      }
     }
   };
 
@@ -660,8 +575,10 @@ class UserInterface extends Component<Props, State> {
   reuseEmptyAnnotation = (): void => {
     /* If the active annotation object is empty, change the value of toolbox
     to match the active tool. */
+    const toolbox =
+      this.state.activeTool === "eraser" ? "paintbrush" : this.state.activeTool;
     if (this.annotationsObject.isActiveAnnotationEmpty()) {
-      this.annotationsObject.setActiveAnnotationToolbox(this.state.activeTool);
+      this.annotationsObject.setActiveAnnotationToolbox(toolbox);
       this.annotationsObject.setSplineSpaceTimeInfo(this.state.sliceIndex);
     }
   };
@@ -702,8 +619,6 @@ class UserInterface extends Component<Props, State> {
     }, this.mixChannels);
   };
 
-  // Close popover
-
   handleClose = (event: React.MouseEvent) => {
     this.setState({ anchorElement: null, popover: null });
   };
@@ -734,7 +649,7 @@ class UserInterface extends Component<Props, State> {
       >
         <Grid container direction="row">
           <ButtonGroup size="small">
-            {this.annotationToolTips.map((toolTip) => (
+            {annotationToolTips.map((toolTip) => (
               <HtmlTooltip
                 key={toolTip.name}
                 title={
@@ -772,8 +687,7 @@ class UserInterface extends Component<Props, State> {
                   <Avatar sizes="large">
                     <SVG
                       src={`${toolTip.icon}`}
-                      width="55%"
-                      height="auto"
+                      className={this.props.classes.svgLarge}
                       fill={
                         this.state.buttonClicked === toolTip.name
                           ? theme.palette.primary.main
@@ -796,7 +710,7 @@ class UserInterface extends Component<Props, State> {
       >
         <Grid container direction="row">
           <ButtonGroup>
-            {this.toolTips.map((toolTip) => (
+            {toolTips.map((toolTip) => (
               <HtmlTooltip
                 key={toolTip.name}
                 title={
@@ -844,8 +758,7 @@ class UserInterface extends Component<Props, State> {
                   <Avatar sizes="large" variant="circular">
                     <SVG
                       src={`${toolTip.icon}`}
-                      width="55%"
-                      height="auto"
+                      className={this.props.classes.svgLarge}
                       fill={
                         this.state.buttonClicked === toolTip.name
                           ? theme.palette.primary.main
@@ -876,7 +789,7 @@ class UserInterface extends Component<Props, State> {
               </Grid>
             </Grid>
 
-            <Grid item justify="flex-end">
+            <Grid item>
               <UploadImage
                 setUploadedImage={this.setUploadedImage}
                 spanElement={
@@ -892,7 +805,7 @@ class UserInterface extends Component<Props, State> {
               />
             </Grid>
 
-            <Grid item justify="flex-end">
+            <Grid item>
               <Download
                 annotations={this.annotationsObject.getAllAnnotations()}
                 imageFileInfo={this.imageFileInfo}
@@ -1020,8 +933,7 @@ class UserInterface extends Component<Props, State> {
                 <Avatar className={this.props.classes.annotationAvatar}>
                   <SVG
                     src={require("./assets/pin-icon.svg") as string}
-                    width="18px"
-                    height="auto"
+                    className={this.props.classes.svgSmall}
                   />
                 </Avatar>
               </Paper>
@@ -1079,7 +991,7 @@ class UserInterface extends Component<Props, State> {
               position: "relative",
             }}
           >
-            {this.minimapToolTips.map((minimapToolTip) => (
+            {minimapToolTips.map((minimapToolTip) => (
               <HtmlTooltip
                 key={minimapToolTip.name}
                 title={
@@ -1118,14 +1030,11 @@ class UserInterface extends Component<Props, State> {
                       () => {
                         if (minimapToolTip.name === "Zoom In") {
                           this.incrementScale();
-                        }
-                        if (minimapToolTip.name === "Zoom Out") {
+                        } else if (minimapToolTip.name === "Zoom Out") {
                           this.decrementScale();
-                        }
-                        if (minimapToolTip.name === "Fit to Page") {
+                        } else if (minimapToolTip.name === "Fit to Page") {
                           this.resetScaleAndPan();
-                        }
-                        if (minimapToolTip.name === "Minimise Map") {
+                        } else if (minimapToolTip.name === "Minimise Map") {
                           this.handleDrawerClose();
                         }
                       }
@@ -1135,8 +1044,7 @@ class UserInterface extends Component<Props, State> {
                   <Avatar sizes="large">
                     <SVG
                       src={`${minimapToolTip.icon}`}
-                      width="55%"
-                      height="auto"
+                      className={this.props.classes.svgLarge}
                     />
                   </Avatar>
                 </IconButton>
@@ -1217,8 +1125,7 @@ class UserInterface extends Component<Props, State> {
                   <Avatar>
                     <SVG
                       src={require("./assets/maximise-icon.svg") as string}
-                      width="55%"
-                      height="auto"
+                      className={this.props.classes.svgLarge}
                     />
                   </Avatar>
                 </IconButton>
