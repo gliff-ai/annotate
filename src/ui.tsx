@@ -650,34 +650,34 @@ class UserInterface extends Component<Props, State> {
   };
 
   // Functions of type select<ToolTip.name>, added for use in keybindings
-  selectBrush = () => {
+  selectBrush = (): void => {
     this.setState({ buttonClicked: "Brush" });
     this.activateTool("paintbrush");
   };
 
-  selectEraser = () => {
+  selectEraser = (): void => {
     this.setState({ buttonClicked: "Eraser" });
     this.activateTool("eraser");
   };
 
-  selectSpline = () => {
+  selectSpline = (): void => {
     this.setState({ buttonClicked: "Spline" });
     this.activateTool("spline");
   };
 
-  selectMagicspline = () => {
+  selectMagicspline = (): void => {
     this.setState({ buttonClicked: "Magic Spline" });
     this.activateTool("magicspline");
   };
 
-  selectBrightness = () => this.setState({ buttonClicked: "Brightness" });
+  selectBrightness = (): void => this.setState({ buttonClicked: "Brightness" });
 
-  selectContrast = () => this.setState({ buttonClicked: "Contrast" });
+  selectContrast = (): void => this.setState({ buttonClicked: "Contrast" });
 
-  selectAnnotationLabel = () =>
+  selectAnnotationLabel = (): void =>
     this.setState({ buttonClicked: "Annonation Label" });
 
-  selectChannels = () => this.setState({ buttonClicked: "Channels" });
+  selectChannels = (): void => this.setState({ buttonClicked: "Channels" });
 
   render = (): ReactNode => (
     <ThemeProvider theme={theme}>
