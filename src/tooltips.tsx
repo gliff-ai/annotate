@@ -47,7 +47,7 @@ const toolTips: ToolTips[] = [
     shortcut: `/`,
   },
   {
-    name: "Channel",
+    name: "Channels",
     icon: require(`./assets/channels-icon.svg`) as string,
     shortcut: `C`,
   },

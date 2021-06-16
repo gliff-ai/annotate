@@ -57,6 +57,14 @@ export const events = [
   "previousAnnotation",
   "toggleMode",
   "addAnnotation",
+  "selectBrush",
+  "selectEraser",
+  "selectSpline",
+  "selectMagicspline",
+  "selectBrightness",
+  "selectContrast",
+  "selectChannels",
+  "selectAnnotationLabel",
   "clearActiveAnnotation",
   "incrementScale",
   "decrementScale",
@@ -641,6 +649,36 @@ class UserInterface extends Component<Props, State> {
     });
   };
 
+  // Functions of type select<ToolTip.name>, added for use in keybindings
+  selectBrush = () => {
+    this.setState({ buttonClicked: "Brush" });
+    this.activateTool("paintbrush");
+  };
+
+  selectEraser = () => {
+    this.setState({ buttonClicked: "Eraser" });
+    this.activateTool("eraser");
+  };
+
+  selectSpline = () => {
+    this.setState({ buttonClicked: "Spline" });
+    this.activateTool("spline");
+  };
+
+  selectMagicspline = () => {
+    this.setState({ buttonClicked: "Magic Spline" });
+    this.activateTool("magicspline");
+  };
+
+  selectBrightness = () => this.setState({ buttonClicked: "Brightness" });
+
+  selectContrast = () => this.setState({ buttonClicked: "Contrast" });
+
+  selectAnnotationLabel = () =>
+    this.setState({ buttonClicked: "Annonation Label" });
+
+  selectChannels = () => this.setState({ buttonClicked: "Channels" });
+
   render = (): ReactNode => (
     <ThemeProvider theme={theme}>
       <div
@@ -954,7 +992,7 @@ class UserInterface extends Component<Props, State> {
               (this.state.buttonClicked === "Contrast" && this.state.popover) ||
               (this.state.buttonClicked === "Brightness" &&
                 this.state.popover) ||
-              (this.state.buttonClicked === "Channel" && this.state.popover)
+              (this.state.buttonClicked === "Channels" && this.state.popover)
             }
             buttonClicked={this.state.buttonClicked}
             anchorElement={this.state.anchorElement}
