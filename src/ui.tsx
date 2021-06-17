@@ -1,4 +1,4 @@
-import React, { Component, ChangeEvent, ReactNode } from "react";
+import React, { Component, ChangeEvent, ReactNode, MouseEvent } from "react";
 import {
   AppBar,
   Container,
@@ -36,7 +36,8 @@ import { Labels } from "@/components/Labels";
 import { Download } from "@/download/UI";
 import { keydownListener } from "@/keybindings";
 import { Tools, Tool } from "@/tools";
-import { toolTips, minimapToolTips, annotationToolTips } from "./tooltips";
+import { tooltips } from "@/tooltips";
+import { BaseIconButton } from "@/components/BaseIconButton";
 
 const CONFIG = {
   PAN_AMOUNT: 20,
@@ -551,13 +552,10 @@ class UserInterface extends Component<Props, State> {
     if (this.state.mode === Mode.draw) {
       this.setState({ mode: Mode.select, buttonClicked: "Select" });
     } else {
-      for (const tool of toolTips) {
-        console.log(tool?.tool);
-        if (tool?.tool === this.state.activeTool) {
-          this.setState({ mode: Mode.draw, buttonClicked: tool.name });
-          break;
-        }
-      }
+      this.setState((state) => ({
+        mode: Mode.draw,
+        buttonClicked: tooltips[state.activeTool].name,
+      }));
     }
   };
 
@@ -631,19 +629,19 @@ class UserInterface extends Component<Props, State> {
     this.setState({ anchorElement: null, popover: null });
   };
 
-  handleRequestClose = () => {
+  handleRequestClose = (): void => {
     this.setState({
       popover: false,
     });
   };
 
-  handleDrawerOpen = () => {
+  handleDrawerOpen = (): void => {
     this.setState({
       toggleMinimap: true,
     });
   };
 
-  handleDrawerClose = () => {
+  handleDrawerClose = (): void => {
     this.setState({
       toggleMinimap: false,
     });
@@ -679,6 +677,14 @@ class UserInterface extends Component<Props, State> {
 
   selectChannels = (): void => this.setState({ buttonClicked: "Channels" });
 
+  setButtonClicked = (
+    buttonClicked: string,
+    popover?: boolean,
+    anchorElement?: HTMLButtonElement
+  ) => {
+    this.setState({ buttonClicked, popover, anchorElement });
+  };
+
   render = (): ReactNode => (
     <ThemeProvider theme={theme}>
       <div
@@ -687,55 +693,23 @@ class UserInterface extends Component<Props, State> {
       >
         <Grid container direction="row">
           <ButtonGroup size="small">
-            {annotationToolTips.map((toolTip) => (
-              <HtmlTooltip
-                key={toolTip.name}
-                title={
-                  <Box className={this.props.classes.mainbox}>
-                    <Box mr={3} ml={2}>
-                      <Typography>{toolTip.name}</Typography>
-                    </Box>
+            <BaseIconButton
+              tooltip={tooltips.addNewAnnotation}
+              onClick={(e: MouseEvent) => {
+                this.setButtonClicked(tooltips.addNewAnnotation.name);
+                this.addAnnotation();
+              }}
+              fill={this.state.buttonClicked === tooltips.addNewAnnotation.name}
+            />
 
-                    <Avatar className={this.props.classes.popoverAvatar}>
-                      {toolTip.shortcutSymbol}
-                    </Avatar>
-                  </Box>
-                }
-                placement="right"
-              >
-                <IconButton
-                  size="small"
-                  className={this.props.classes.iconbutton}
-                  onClick={(e: React.MouseEvent) =>
-                    this.setState(
-                      {
-                        buttonClicked: toolTip.name,
-                      },
-                      () => {
-                        if (this.state.buttonClicked === "Add New Annotation") {
-                          this.addAnnotation();
-                        }
-                        if (this.state.buttonClicked === "Clear Annotation") {
-                          this.clearActiveAnnotation();
-                        }
-                      }
-                    )
-                  }
-                >
-                  <Avatar sizes="large">
-                    <SVG
-                      src={`${toolTip.icon}`}
-                      className={this.props.classes.svgLarge}
-                      fill={
-                        this.state.buttonClicked === toolTip.name
-                          ? theme.palette.primary.main
-                          : null
-                      }
-                    />
-                  </Avatar>
-                </IconButton>
-              </HtmlTooltip>
-            ))}
+            <BaseIconButton
+              tooltip={tooltips.clearAnnotation}
+              onClick={(e: MouseEvent) => {
+                this.setButtonClicked(tooltips.clearAnnotation.name);
+                this.clearActiveAnnotation();
+              }}
+              fill={this.state.buttonClicked === tooltips.clearAnnotation.name}
+            />
           </ButtonGroup>
         </Grid>
       </div>
@@ -748,65 +722,110 @@ class UserInterface extends Component<Props, State> {
       >
         <Grid container direction="row">
           <ButtonGroup>
-            {toolTips.map((toolTip) => (
-              <HtmlTooltip
-                key={toolTip.name}
-                title={
-                  <Box className={this.props.classes.mainbox}>
-                    <Box mr={3} ml={2}>
-                      <Typography>{toolTip.name}</Typography>
-                    </Box>
-                    <Avatar className={this.props.classes.popoverAvatar}>
-                      {toolTip.shortcut}
-                    </Avatar>
-                  </Box>
-                }
-                placement="right"
-              >
-                <IconButton
-                  size="small"
-                  className={this.props.classes.iconbutton}
-                  onClick={(e: React.MouseEvent) =>
-                    this.setState(
-                      {
-                        popover: true,
-                        buttonClicked: toolTip.name,
-                        anchorElement: e.currentTarget as HTMLButtonElement,
-                      },
-                      () => {
-                        if (this.state.buttonClicked === "Eraser") {
-                          this.activateTool("eraser");
-                        }
-                        if (this.state.buttonClicked === "Brush") {
-                          this.activateTool("paintbrush");
-                        }
-                        if (this.state.buttonClicked === "Magic Spline") {
-                          this.activateTool("magicspline");
-                        }
-                        if (this.state.buttonClicked === "Spline") {
-                          this.activateTool("spline");
-                        }
-                        if (this.state.buttonClicked === "Select") {
-                          this.toggleMode();
-                        }
-                      }
-                    )
-                  }
-                >
-                  <Avatar sizes="large" variant="circular">
-                    <SVG
-                      src={`${toolTip.icon}`}
-                      className={this.props.classes.svgLarge}
-                      fill={
-                        this.state.buttonClicked === toolTip.name
-                          ? theme.palette.primary.main
-                          : null
-                      }
-                    />
-                  </Avatar>
-                </IconButton>
-              </HtmlTooltip>
-            ))}
+            <BaseIconButton
+              tooltip={tooltips.select}
+              onClick={(e: MouseEvent) => {
+                this.setButtonClicked(
+                  tooltips.select.name,
+                  true,
+                  e.currentTarget as HTMLButtonElement
+                );
+                this.toggleMode();
+              }}
+              fill={this.state.buttonClicked === tooltips.select.name}
+            />
+            <BaseIconButton
+              tooltip={tooltips.brush}
+              onClick={(e: MouseEvent) => {
+                this.setButtonClicked(
+                  tooltips.brush.name,
+                  true,
+                  e.currentTarget as HTMLButtonElement
+                );
+                this.activateTool("paintbrush");
+              }}
+              fill={this.state.buttonClicked === tooltips.brush.name}
+            />
+            <BaseIconButton
+              tooltip={tooltips.eraser}
+              onClick={(e: MouseEvent) => {
+                this.setButtonClicked(
+                  tooltips.eraser.name,
+                  true,
+                  e.currentTarget as HTMLButtonElement
+                );
+                this.activateTool("eraser");
+              }}
+              fill={this.state.buttonClicked === tooltips.eraser.name}
+            />
+            <BaseIconButton
+              tooltip={tooltips.spline}
+              onClick={(e: MouseEvent) => {
+                this.setButtonClicked(
+                  tooltips.spline.name,
+                  true,
+                  e.currentTarget as HTMLButtonElement
+                );
+                this.activateTool("spline");
+              }}
+              fill={this.state.buttonClicked === tooltips.spline.name}
+            />
+            <BaseIconButton
+              tooltip={tooltips.magicspline}
+              onClick={(e: MouseEvent) => {
+                this.setButtonClicked(
+                  tooltips.magicspline.name,
+                  true,
+                  e.currentTarget as HTMLButtonElement
+                );
+                this.activateTool("magicspline");
+              }}
+              fill={this.state.buttonClicked === tooltips.magicspline.name}
+            />
+            <BaseIconButton
+              tooltip={tooltips.brightness}
+              onClick={(e: MouseEvent) => {
+                this.setButtonClicked(
+                  tooltips.brightness.name,
+                  true,
+                  e.currentTarget as HTMLButtonElement
+                );
+              }}
+              fill={this.state.buttonClicked === tooltips.brightness.name}
+            />
+            <BaseIconButton
+              tooltip={tooltips.contrast}
+              onClick={(e: MouseEvent) => {
+                this.setButtonClicked(
+                  tooltips.contrast.name,
+                  true,
+                  e.currentTarget as HTMLButtonElement
+                );
+              }}
+              fill={this.state.buttonClicked === tooltips.contrast.name}
+            />
+            <BaseIconButton
+              tooltip={tooltips.channels}
+              onClick={(e: MouseEvent) => {
+                this.setButtonClicked(
+                  tooltips.channels.name,
+                  true,
+                  e.currentTarget as HTMLButtonElement
+                );
+              }}
+              fill={this.state.buttonClicked === tooltips.channels.name}
+            />
+            <BaseIconButton
+              tooltip={tooltips.labels}
+              onClick={(e: MouseEvent) => {
+                this.setButtonClicked(
+                  tooltips.labels.name,
+                  true,
+                  e.currentTarget as HTMLButtonElement
+                );
+              }}
+              fill={this.state.buttonClicked === tooltips.labels.name}
+            />
           </ButtonGroup>
         </Grid>
       </div>
@@ -1029,65 +1048,42 @@ class UserInterface extends Component<Props, State> {
               position: "relative",
             }}
           >
-            {minimapToolTips.map((minimapToolTip) => (
-              <HtmlTooltip
-                key={minimapToolTip.name}
-                title={
-                  <Box className={this.props.classes.mainbox}>
-                    <Box mr={3} ml={2}>
-                      <Typography color="inherit">
-                        {minimapToolTip.name}
-                      </Typography>
-                    </Box>
-                    <Avatar className={this.props.classes.popoverAvatar}>
-                      <Typography className={this.props.classes.avatarFontSize}>
-                        {minimapToolTip.shortcut}
-                      </Typography>
-                    </Avatar>
-                    <div className={this.props.classes.spaceBetweenAvatar}>
-                      <Avatar className={this.props.classes.popoverAvatar}>
-                        <Typography
-                          className={this.props.classes.avatarFontSize}
-                        >
-                          {minimapToolTip.shortcutSymbol}
-                        </Typography>
-                      </Avatar>
-                    </div>
-                  </Box>
-                }
-                placement="top"
-              >
-                <IconButton
-                  size="small"
-                  style={minimapToolTip.styling}
-                  onClick={(e: React.MouseEvent) =>
-                    this.setState(
-                      {
-                        buttonClicked: minimapToolTip.name,
-                      },
-                      () => {
-                        if (minimapToolTip.name === "Zoom In") {
-                          this.incrementScale();
-                        } else if (minimapToolTip.name === "Zoom Out") {
-                          this.decrementScale();
-                        } else if (minimapToolTip.name === "Fit to Page") {
-                          this.resetScaleAndPan();
-                        } else if (minimapToolTip.name === "Minimise Map") {
-                          this.handleDrawerClose();
-                        }
-                      }
-                    )
-                  }
-                >
-                  <Avatar sizes="large">
-                    <SVG
-                      src={`${minimapToolTip.icon}`}
-                      className={this.props.classes.svgLarge}
-                    />
-                  </Avatar>
-                </IconButton>
-              </HtmlTooltip>
-            ))}
+            <BaseIconButton
+              tooltip={tooltips.minimiseMap}
+              onClick={(e: MouseEvent) => {
+                this.setButtonClicked(tooltips.minimiseMap.name);
+                this.handleDrawerClose();
+              }}
+              fill={this.state.buttonClicked === tooltips.minimiseMap.name}
+              tooltipPlacement="top"
+            />
+            <BaseIconButton
+              tooltip={tooltips.zoomIn}
+              onClick={(e: MouseEvent) => {
+                this.setButtonClicked(tooltips.zoomIn.name);
+                this.incrementScale();
+              }}
+              fill={this.state.buttonClicked === tooltips.zoomIn.name}
+              tooltipPlacement="top"
+            />
+            <BaseIconButton
+              tooltip={tooltips.zoomOut}
+              onClick={(e: MouseEvent) => {
+                this.setButtonClicked(tooltips.zoomOut.name);
+                this.decrementScale();
+              }}
+              fill={this.state.buttonClicked === tooltips.zoomOut.name}
+              tooltipPlacement="top"
+            />
+            <BaseIconButton
+              tooltip={tooltips.fitToPage}
+              onClick={(e: MouseEvent) => {
+                this.setButtonClicked(tooltips.fitToPage.name);
+                this.resetScaleAndPan();
+              }}
+              fill={this.state.buttonClicked === tooltips.fitToPage.name}
+              tooltipPlacement="top"
+            />
             {/* Background canvas for the minimap */}
             {this.state.displayedImage && (
               <>
@@ -1123,51 +1119,19 @@ class UserInterface extends Component<Props, State> {
                 textAlign: "center",
               }}
             >
-              <HtmlTooltip
-                key="Maximise Map"
-                title={
-                  <Box className={this.props.classes.mainbox}>
-                    <Box mr={3} ml={2}>
-                      <Typography color="inherit">Maximise Map</Typography>
-                    </Box>
-                    <Avatar className={this.props.classes.popoverAvatar}>
-                      <Typography className={this.props.classes.avatarFontSize}>
-                        ALT
-                      </Typography>
-                    </Avatar>
-                    <div className={this.props.classes.spaceBetweenAvatar}>
-                      <Avatar className={this.props.classes.popoverAvatar}>
-                        <Typography
-                          className={this.props.classes.avatarFontSize}
-                        >
-                          +
-                        </Typography>
-                      </Avatar>
-                    </div>
-                  </Box>
-                }
-                placement="top"
-              >
-                <IconButton
-                  onClick={(e: React.MouseEvent) =>
-                    this.setState(
-                      {
-                        buttonClicked: "Maximise Map",
-                      },
-                      this.handleDrawerOpen
-                    )
-                  }
-                  edge="start"
-                  size="small"
-                >
-                  <Avatar>
-                    <SVG
-                      src={require("./assets/maximise-icon.svg") as string}
-                      className={this.props.classes.svgLarge}
-                    />
-                  </Avatar>
-                </IconButton>
-              </HtmlTooltip>
+              <BaseIconButton
+                tooltip={tooltips.maximiseMap}
+                onClick={(e: MouseEvent) => {
+                  this.setButtonClicked(
+                    tooltips.maximiseMap.name,
+                    true,
+                    e.currentTarget as HTMLButtonElement
+                  );
+                  this.handleDrawerOpen();
+                }}
+                fill={this.state.buttonClicked === tooltips.maximiseMap.name}
+                tooltipPlacement="top"
+              />
             </Card>
           </Slide>
         ) : null}
