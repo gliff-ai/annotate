@@ -1,2 +1,3 @@
 export { BackgroundCanvas } from "./Canvas";
-export { BackgroundUI } from "./UI";
+export { BackgroundUI } from "./BackgroundUI";
+export { MinimapUI } from "./MinimapUI";
