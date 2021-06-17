@@ -3,7 +3,6 @@ import {
   AppBar,
   Container,
   Toolbar,
-  Tooltip,
   Button,
   ButtonGroup,
   Grid,
@@ -11,14 +10,10 @@ import {
   CssBaseline,
   Slider,
   withStyles,
-  Theme,
   Avatar,
-  Box,
-  IconButton,
   Popover,
   Card,
   Paper,
-  Slide,
   WithStyles,
 } from "@material-ui/core";
 
@@ -28,8 +23,11 @@ import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { ThemeProvider, theme } from "@/theme";
-import { MinimapCanvas } from "@/baseCanvas";
-import { BackgroundCanvas, BackgroundUI } from "@/toolboxes/background";
+import {
+  BackgroundCanvas,
+  BackgroundUI,
+  MinimapUI,
+} from "@/toolboxes/background";
 import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
 import { Labels } from "@/components/Labels";
@@ -69,8 +67,8 @@ export const events = [
   "clearActiveAnnotation",
   "incrementScale",
   "decrementScale",
-  "handleDrawerOpen",
-  "handleDrawerClose",
+  // "handleDrawerOpen",
+  // "handleDrawerClose",
   "resetScaleAndPan",
 ] as const;
 
@@ -91,7 +89,6 @@ interface State {
   popover: boolean;
   anchorElement: HTMLButtonElement | null; // A HTML element. It's used to set the position of the popover menu https://material-ui.com/api/menu/#props
   buttonClicked: string;
-  toggleMinimap: boolean;
   mode: Mode;
 }
 
@@ -159,33 +156,6 @@ const styles = {
     backgroundColor: theme.palette.primary.main,
     display: "inline",
   },
-  minimap: {
-    right: "250px",
-    bottom: "0",
-    marginTop: "30px",
-    zIndex: 100,
-  },
-  minimapCard: {
-    width: "344px",
-    height: "255px",
-    paddingTop: "7px",
-    left: "250px",
-    borderRadius: "10px 0 0 0",
-    marginTop: "70px",
-  },
-  mimimapToggle: {
-    width: "61px",
-    height: "53px",
-    left: "540px",
-    borderRadius: "10px 0 0 0",
-    padding: "7px 0",
-  },
-  miniMapToolTipAvatar: {
-    backgroundColor: theme.palette.primary.main,
-    color: "#2B2F3A",
-    width: "40px",
-    height: "40px",
-  },
   svgSmall: { width: "18px", height: "auto" },
 };
 
@@ -221,7 +191,6 @@ class UserInterface extends Component<Props, State> {
       popover: null,
       anchorElement: null,
       buttonClicked: null,
-      toggleMinimap: false,
       activeTool: Tools.paintbrush,
       mode: Mode.draw,
     };
@@ -601,18 +570,6 @@ class UserInterface extends Component<Props, State> {
     });
   };
 
-  handleDrawerOpen = (): void => {
-    this.setState({
-      toggleMinimap: true,
-    });
-  };
-
-  handleDrawerClose = (): void => {
-    this.setState({
-      toggleMinimap: false,
-    });
-  };
-
   // Functions of type select<ToolTip.name>, added for use in keybindings
   selectBrush = (): void => {
     this.setState({ buttonClicked: "Brush" });
@@ -638,8 +595,8 @@ class UserInterface extends Component<Props, State> {
 
   selectContrast = (): void => this.setState({ buttonClicked: "Contrast" });
 
-  selectAnnotationLabel = (): void =>
-    this.setState({ buttonClicked: "Annotation Label" });
+  selectAnnotationLabel = (e: KeyboardEvent): void =>
+    this.setState({ buttonClicked: "Annotation Label", popover: true });
 
   selectChannels = (): void => this.setState({ buttonClicked: "Channels" });
 
@@ -1001,107 +958,19 @@ class UserInterface extends Component<Props, State> {
           />
         </Grid>
       </Container>
-      <div
-        className={this.props.classes.minimap}
-        style={{
-          position: "fixed",
-        }}
-      >
-        <Slide in={this.state.toggleMinimap} direction="up" timeout={1000}>
-          <Card
-            className={this.props.classes.minimapCard}
-            style={{
-              position: "relative",
-            }}
-          >
-            <BaseIconButton
-              tooltip={tooltips.minimiseMap}
-              onClick={(e: MouseEvent) => {
-                this.setButtonClicked(tooltips.minimiseMap.name);
-                this.handleDrawerClose();
-              }}
-              fill={this.state.buttonClicked === tooltips.minimiseMap.name}
-              tooltipPlacement="top"
-            />
-            <BaseIconButton
-              tooltip={tooltips.zoomIn}
-              onClick={(e: MouseEvent) => {
-                this.setButtonClicked(tooltips.zoomIn.name);
-                this.incrementScale();
-              }}
-              fill={this.state.buttonClicked === tooltips.zoomIn.name}
-              tooltipPlacement="top"
-            />
-            <BaseIconButton
-              tooltip={tooltips.zoomOut}
-              onClick={(e: MouseEvent) => {
-                this.setButtonClicked(tooltips.zoomOut.name);
-                this.decrementScale();
-              }}
-              fill={this.state.buttonClicked === tooltips.zoomOut.name}
-              tooltipPlacement="top"
-            />
-            <BaseIconButton
-              tooltip={tooltips.fitToPage}
-              onClick={(e: MouseEvent) => {
-                this.setButtonClicked(tooltips.fitToPage.name);
-                this.resetScaleAndPan();
-              }}
-              fill={this.state.buttonClicked === tooltips.fitToPage.name}
-              tooltipPlacement="top"
-            />
-            {/* Background canvas for the minimap */}
-            {this.state.displayedImage && (
-              <>
-                <BackgroundCanvas
-                  scaleAndPan={{ x: 0, y: 0, scale: 1 }}
-                  displayedImage={this.state.displayedImage}
-                  canvasPositionAndSize={this.state.minimapPositionAndSize}
-                  setCanvasPositionAndSize={this.setMinimapPositionAndSize}
-                />
-                <MinimapCanvas
-                  displayedImage={this.state.displayedImage}
-                  scaleAndPan={this.state.scaleAndPan}
-                  setScaleAndPan={this.setScaleAndPan}
-                  canvasPositionAndSize={this.state.viewportPositionAndSize}
-                  minimapPositionAndSize={this.state.minimapPositionAndSize}
-                  setMinimapPositionAndSize={this.setMinimapPositionAndSize}
-                />{" "}
-              </>
-            )}
-          </Card>
-        </Slide>
-
-        {this.state.toggleMinimap === false ? (
-          <Slide
-            in={!this.state.toggleMinimap}
-            direction="up"
-            timeout={{ enter: 1000 }}
-          >
-            <Card
-              className={this.props.classes.mimimapToggle}
-              style={{
-                position: "relative",
-                textAlign: "center",
-              }}
-            >
-              <BaseIconButton
-                tooltip={tooltips.maximiseMap}
-                onClick={(e: MouseEvent) => {
-                  this.setButtonClicked(
-                    tooltips.maximiseMap.name,
-                    true,
-                    e.currentTarget as HTMLButtonElement
-                  );
-                  this.handleDrawerOpen();
-                }}
-                fill={this.state.buttonClicked === tooltips.maximiseMap.name}
-                tooltipPlacement="top"
-              />
-            </Card>
-          </Slide>
-        ) : null}
-      </div>
+      <MinimapUI
+        buttonClicked={this.state.buttonClicked}
+        displayedImage={this.state.displayedImage}
+        minimapPositionAndSize={this.state.minimapPositionAndSize}
+        viewportPositionAndSize={this.state.viewportPositionAndSize}
+        scaleAndPan={this.state.scaleAndPan}
+        setButtonClicked={this.setButtonClicked}
+        incrementScale={this.incrementScale}
+        decrementScale={this.decrementScale}
+        setMinimapPositionAndSize={this.setMinimapPositionAndSize}
+        resetScaleAndPan={this.resetScaleAndPan}
+        setScaleAndPan={this.setScaleAndPan}
+      />
     </ThemeProvider>
   );
 }
