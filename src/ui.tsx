@@ -110,24 +110,11 @@ const styles = {
     marginTop: "30px",
     zIndex: 100,
   },
-
   mainToolbar: {
     left: "18px",
     bottom: "0",
     marginBottom: "30px",
     zIndex: 100,
-  },
-
-  mainbox: {
-    display: "flex",
-    alignItems: "center",
-    justifyItems: "space-between",
-  },
-  popoverAvatar: {
-    backgroundColor: theme.palette.primary.main,
-    color: "#2B2F3A",
-    width: "30px",
-    height: "30px",
   },
   iconbutton: {
     marginBottom: "5px",
@@ -193,35 +180,14 @@ const styles = {
     borderRadius: "10px 0 0 0",
     padding: "7px 0",
   },
-  mimimapToggleAvatar: {
-    backgroundColor: theme.palette.primary.main,
-    color: "#2B2F3A",
-  },
-  spaceBetweenAvatar: {
-    marginLeft: "3px",
-  },
-  avatarFontSize: {
-    fontSize: "11px",
-    fontWeight: 600,
-  },
   miniMapToolTipAvatar: {
     backgroundColor: theme.palette.primary.main,
     color: "#2B2F3A",
     width: "40px",
     height: "40px",
   },
-  svgLarge: { width: "55%", height: "auto" },
   svgSmall: { width: "18px", height: "auto" },
 };
-
-const HtmlTooltip = withStyles((t: Theme) => ({
-  tooltip: {
-    backgroundColor: "#FFFFFF",
-    fontSize: t.typography.pxToRem(12),
-    border: "1px solid #dadde9",
-    color: "#2B2F3A",
-  },
-}))(Tooltip);
 
 class UserInterface extends Component<Props, State> {
   annotationsObject: Annotations;
