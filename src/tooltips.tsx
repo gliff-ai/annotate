@@ -53,7 +53,7 @@ const toolTips: ToolTips[] = [
   },
 
   {
-    name: "Annonation Label",
+    name: "Annotation Label",
     icon: require(`./assets/annotation-label-icon.svg`) as string,
     shortcut: "L",
   },

@@ -675,7 +675,7 @@ class UserInterface extends Component<Props, State> {
   selectContrast = (): void => this.setState({ buttonClicked: "Contrast" });
 
   selectAnnotationLabel = (): void =>
-    this.setState({ buttonClicked: "Annonation Label" });
+    this.setState({ buttonClicked: "Annotation Label" });
 
   selectChannels = (): void => this.setState({ buttonClicked: "Channels" });
 
@@ -952,7 +952,7 @@ class UserInterface extends Component<Props, State> {
 
           <Popover
             open={
-              this.state.buttonClicked === "Annonation Label" &&
+              this.state.buttonClicked === "Annotation Label" &&
               this.state.popover
             }
             anchorEl={this.state.anchorElement}
