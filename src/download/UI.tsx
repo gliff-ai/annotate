@@ -1,9 +1,29 @@
 import React, { ReactElement, useState, MouseEvent } from "react";
-import { Tooltip, Button, Menu, MenuItem } from "@material-ui/core";
+import { Tooltip, Button, Menu, MenuItem, makeStyles } from "@material-ui/core";
 import { ImageFileInfo } from "@gliff-ai/upload";
 import { Annotation } from "@/annotation/interfaces";
 import { downloadPaintbrushAsTiff } from "@/download/DownloadAsTiff";
 import { downloadAnnotationsAsJson } from "@/download/DownloadAsJson";
+
+const useStyles = makeStyles({
+  menu: {
+    borderRadius: "9px",
+    opacity: 1,
+  },
+  menuItem: {
+    opacity: "1",
+    fontSize: "17px",
+    letterSpacing: "0px",
+    color: "#2B2F3A",
+    "&:hover": {
+      background: "#02FFAD 0% 0% no-repeat padding-box",
+    },
+  },
+  paper: {
+    marginTop: "90px",
+    marginLeft: "-20px",
+  },
+});
 
 interface Props {
   annotations: Annotation[];
@@ -11,6 +31,7 @@ interface Props {
 }
 
 export function Download({ annotations, imageFileInfo }: Props): ReactElement {
+  const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleOpen = (event: MouseEvent<HTMLButtonElement>) => {
@@ -58,18 +79,21 @@ export function Download({ annotations, imageFileInfo }: Props): ReactElement {
       </Tooltip>
       <Menu
         id="download-menu"
+        className={classes.menu}
         anchorEl={anchorEl}
         keepMounted
         open={Boolean(anchorEl)}
         onClick={handleClose}
         getContentAnchorEl={null}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
+        PopoverClasses={{ paper: classes.paper }}
       >
         {menuItems.map((item) => (
-          <MenuItem key={item.key} onClick={item.onClick} dense>
+          <MenuItem
+            key={item.key}
+            className={classes.menuItem}
+            onClick={item.onClick}
+            dense
+          >
             {item.text}
           </MenuItem>
         ))}
