@@ -24,8 +24,8 @@ export const keybindings = {
   "ctrl+ArrowRight": "ui.nextAnnotation",
   "ctrl+Equal": "ui.incrementScale",
   "ctrl+Minus": "ui.decrementScale",
-  "alt+Equal": "ui.handleDrawerOpen",
-  "alt+Minus": "ui.handleDrawerClose",
+  "alt+Equal": "minimap.handleDrawerOpen",
+  "alt+Minus": "minimap.handleDrawerClose",
   "ctrl+BracketRight": "ui.resetScaleAndPan",
 } as Readonly<{
   [key: string]: string;
