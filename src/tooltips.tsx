@@ -58,7 +58,7 @@ const tooltips: ToolTips = {
     icon: require(`./assets/select-icon.svg`) as string,
     shortcut: "A",
   },
-  brush: {
+  paintbrush: {
     name: "Brush",
     icon: require(`./assets/brush-icon.svg`) as string,
     shortcut: "B",

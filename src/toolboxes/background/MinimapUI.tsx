@@ -93,7 +93,7 @@ const MinimapUI = (props: Props): ReactElement => {
         >
           <BaseIconButton
             tooltip={tooltips.minimiseMap}
-            onClick={(e: MouseEvent) => {
+            onClick={() => {
               props.setButtonClicked(tooltips.minimiseMap.name);
               handleDrawerClose();
             }}
@@ -102,7 +102,7 @@ const MinimapUI = (props: Props): ReactElement => {
           />
           <BaseIconButton
             tooltip={tooltips.zoomIn}
-            onClick={(e: MouseEvent) => {
+            onClick={() => {
               props.setButtonClicked(tooltips.zoomIn.name);
               props.incrementScale();
             }}
@@ -111,7 +111,7 @@ const MinimapUI = (props: Props): ReactElement => {
           />
           <BaseIconButton
             tooltip={tooltips.zoomOut}
-            onClick={(e: MouseEvent) => {
+            onClick={() => {
               props.setButtonClicked(tooltips.zoomOut.name);
               props.decrementScale();
             }}
@@ -120,7 +120,7 @@ const MinimapUI = (props: Props): ReactElement => {
           />
           <BaseIconButton
             tooltip={tooltips.fitToPage}
-            onClick={(e: MouseEvent) => {
+            onClick={() => {
               props.setButtonClicked(tooltips.fitToPage.name);
               props.resetScaleAndPan();
             }}

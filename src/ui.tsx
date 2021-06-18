@@ -560,8 +560,15 @@ class UserInterface extends Component<Props, State> {
     }, this.mixChannels);
   };
 
-  handleClose = (event: React.MouseEvent) => {
+  handleClose = (event: React.MouseEvent): void => {
     this.setState({ anchorElement: null, popover: null });
+  };
+
+  handleOpen = (event: React.MouseEvent) => {
+    this.setState({
+      anchorElement: event.currentTarget as HTMLButtonElement,
+      popover: true,
+    });
   };
 
   handleRequestClose = (): void => {
@@ -600,13 +607,8 @@ class UserInterface extends Component<Props, State> {
 
   selectChannels = (): void => this.setState({ buttonClicked: "Channels" });
 
-  setButtonClicked = (
-    buttonClicked: string,
-    popover?: boolean,
-    anchorElement?: HTMLButtonElement
-  ) => {
-    this.setState({ buttonClicked, popover, anchorElement });
-  };
+  setButtonClicked = (buttonClicked: string) =>
+    this.setState({ buttonClicked });
 
   render = (): ReactNode => (
     <ThemeProvider theme={theme}>
@@ -618,7 +620,7 @@ class UserInterface extends Component<Props, State> {
           <ButtonGroup size="small">
             <BaseIconButton
               tooltip={tooltips.addNewAnnotation}
-              onClick={(e: MouseEvent) => {
+              onClick={() => {
                 this.setButtonClicked(tooltips.addNewAnnotation.name);
                 this.addAnnotation();
               }}
@@ -627,7 +629,7 @@ class UserInterface extends Component<Props, State> {
 
             <BaseIconButton
               tooltip={tooltips.clearAnnotation}
-              onClick={(e: MouseEvent) => {
+              onClick={() => {
                 this.setButtonClicked(tooltips.clearAnnotation.name);
                 this.clearActiveAnnotation();
               }}
@@ -647,105 +649,74 @@ class UserInterface extends Component<Props, State> {
           <ButtonGroup>
             <BaseIconButton
               tooltip={tooltips.select}
-              onClick={(e: MouseEvent) => {
-                this.setButtonClicked(
-                  tooltips.select.name,
-                  true,
-                  e.currentTarget as HTMLButtonElement
-                );
+              onClick={() => {
+                this.setButtonClicked(tooltips.select.name);
                 this.toggleMode();
               }}
               fill={this.state.buttonClicked === tooltips.select.name}
             />
             <BaseIconButton
-              tooltip={tooltips.brush}
-              onClick={(e: MouseEvent) => {
-                this.setButtonClicked(
-                  tooltips.brush.name,
-                  true,
-                  e.currentTarget as HTMLButtonElement
-                );
+              tooltip={tooltips.paintbrush}
+              onClick={(e) => {
+                this.handleOpen(e);
+                this.setButtonClicked(tooltips.paintbrush.name);
                 this.activateTool("paintbrush");
               }}
-              fill={this.state.buttonClicked === tooltips.brush.name}
+              fill={this.state.buttonClicked === tooltips.paintbrush.name}
             />
             <BaseIconButton
               tooltip={tooltips.eraser}
-              onClick={(e: MouseEvent) => {
-                this.setButtonClicked(
-                  tooltips.eraser.name,
-                  true,
-                  e.currentTarget as HTMLButtonElement
-                );
+              onClick={() => {
+                this.setButtonClicked(tooltips.eraser.name);
                 this.activateTool("eraser");
               }}
               fill={this.state.buttonClicked === tooltips.eraser.name}
             />
             <BaseIconButton
               tooltip={tooltips.spline}
-              onClick={(e: MouseEvent) => {
-                this.setButtonClicked(
-                  tooltips.spline.name,
-                  true,
-                  e.currentTarget as HTMLButtonElement
-                );
+              onClick={() => {
+                this.setButtonClicked(tooltips.spline.name);
                 this.activateTool("spline");
               }}
               fill={this.state.buttonClicked === tooltips.spline.name}
             />
             <BaseIconButton
               tooltip={tooltips.magicspline}
-              onClick={(e: MouseEvent) => {
-                this.setButtonClicked(
-                  tooltips.magicspline.name,
-                  true,
-                  e.currentTarget as HTMLButtonElement
-                );
+              onClick={() => {
+                this.setButtonClicked(tooltips.magicspline.name);
                 this.activateTool("magicspline");
               }}
               fill={this.state.buttonClicked === tooltips.magicspline.name}
             />
             <BaseIconButton
               tooltip={tooltips.brightness}
-              onClick={(e: MouseEvent) => {
-                this.setButtonClicked(
-                  tooltips.brightness.name,
-                  true,
-                  e.currentTarget as HTMLButtonElement
-                );
+              onClick={(e) => {
+                this.handleOpen(e);
+                this.setButtonClicked(tooltips.brightness.name);
               }}
               fill={this.state.buttonClicked === tooltips.brightness.name}
             />
             <BaseIconButton
               tooltip={tooltips.contrast}
-              onClick={(e: MouseEvent) => {
-                this.setButtonClicked(
-                  tooltips.contrast.name,
-                  true,
-                  e.currentTarget as HTMLButtonElement
-                );
+              onClick={(e) => {
+                this.handleOpen(e);
+                this.setButtonClicked(tooltips.contrast.name);
               }}
               fill={this.state.buttonClicked === tooltips.contrast.name}
             />
             <BaseIconButton
               tooltip={tooltips.channels}
               onClick={(e: MouseEvent) => {
-                this.setButtonClicked(
-                  tooltips.channels.name,
-                  true,
-                  e.currentTarget as HTMLButtonElement
-                );
+                this.handleOpen(e);
+                this.setButtonClicked(tooltips.channels.name);
               }}
               fill={this.state.buttonClicked === tooltips.channels.name}
             />
             <BaseIconButton
               tooltip={tooltips.labels}
               onClick={(e: MouseEvent) => {
-                this.setButtonClicked(
-                  tooltips.labels.name,
-                  true,
-                  e.currentTarget as HTMLButtonElement
-                );
+                this.handleOpen(e);
+                this.setButtonClicked(tooltips.labels.name);
               }}
               fill={this.state.buttonClicked === tooltips.labels.name}
             />
