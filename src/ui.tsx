@@ -1,4 +1,4 @@
-import React, { Component, ChangeEvent, ReactNode, MouseEvent } from "react";
+import React, { Component, ChangeEvent, ReactNode } from "react";
 import {
   AppBar,
   Container,
@@ -27,8 +27,12 @@ import MinimapUI, {
   BackgroundCanvas,
   BackgroundUI,
 } from "@/toolboxes/background";
-import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
-import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
+import { SplineCanvas, SplineUI, SplineToolbar } from "@/toolboxes/spline";
+import {
+  PaintbrushCanvas,
+  PaintbrushUI,
+  PaintbrushToolbar,
+} from "@/toolboxes/paintbrush";
 import { Labels } from "@/components/Labels";
 import { Download } from "@/download/UI";
 import { keydownListener } from "@/keybindings";
@@ -54,10 +58,6 @@ export const events = [
   "previousAnnotation",
   "toggleMode",
   "addAnnotation",
-  "selectBrush",
-  "selectEraser",
-  "selectSpline",
-  "selectMagicspline",
   "selectBrightness",
   "selectContrast",
   "selectChannels",
@@ -586,27 +586,6 @@ class UserInterface extends Component<Props, State> {
 
   // Functions of type select<ToolTip.name>, added for use in keybindings and OnClick events
   // TODO: find a way to pass parameters in keybindings and get rid of code duplication
-  selectBrush = (): void => {
-    this.handleOpen()(this.refBtnsPopovers[tooltips.paintbrush.name]);
-    this.setButtonClicked(tooltips.paintbrush.name);
-    this.activateTool("paintbrush");
-  };
-
-  selectEraser = (): void => {
-    this.setButtonClicked(tooltips.eraser.name);
-    this.activateTool("eraser");
-  };
-
-  selectSpline = (): void => {
-    this.setButtonClicked(tooltips.spline.name);
-    this.activateTool("spline");
-  };
-
-  selectMagicspline = (): void => {
-    this.setButtonClicked(tooltips.magicspline.name);
-    this.activateTool("magicspline");
-  };
-
   selectContrast = (): void => {
     this.handleOpen()(this.refBtnsPopovers[tooltips.contrast.name]);
     this.setButtonClicked(tooltips.contrast.name);
@@ -675,28 +654,16 @@ class UserInterface extends Component<Props, State> {
               }}
               fill={this.state.buttonClicked === tooltips.select.name}
             />
-            <BaseIconButton
-              tooltip={tooltips.paintbrush}
-              onClick={this.selectBrush}
-              fill={this.state.buttonClicked === tooltips.paintbrush.name}
-              setRefCallback={(ref) => {
-                this.refBtnsPopovers[tooltips.paintbrush.name] = ref;
-              }}
+            <PaintbrushToolbar
+              buttonClicked={this.state.buttonClicked}
+              setButtonClicked={this.setButtonClicked}
+              activateTool={this.activateTool}
+              handleOpen={this.handleOpen}
             />
-            <BaseIconButton
-              tooltip={tooltips.eraser}
-              onClick={this.selectEraser}
-              fill={this.state.buttonClicked === tooltips.eraser.name}
-            />
-            <BaseIconButton
-              tooltip={tooltips.spline}
-              onClick={this.selectSpline}
-              fill={this.state.buttonClicked === tooltips.spline.name}
-            />
-            <BaseIconButton
-              tooltip={tooltips.magicspline}
-              onClick={this.selectMagicspline}
-              fill={this.state.buttonClicked === tooltips.magicspline.name}
+            <SplineToolbar
+              buttonClicked={this.state.buttonClicked}
+              setButtonClicked={this.setButtonClicked}
+              activateTool={this.activateTool}
             />
             <BaseIconButton
               tooltip={tooltips.brightness}
