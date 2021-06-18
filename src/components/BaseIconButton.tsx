@@ -51,6 +51,7 @@ interface Props {
   buttonSize?: "small" | "medium";
   buttonEdge?: "start" | "end";
   tooltipPlacement?: TooltipProps["placement"];
+  setRefCallback?: (ref: HTMLButtonElement) => void;
 }
 
 export const BaseIconButton = (props: Props): ReactElement => {
@@ -91,6 +92,10 @@ export const BaseIconButton = (props: Props): ReactElement => {
       placement={props.tooltipPlacement}
     >
       <IconButton
+        ref={(ref) => {
+          if (!ref || !props.setRefCallback) return;
+          props.setRefCallback(ref);
+        }}
         className={
           props.tooltip?.styling
             ? `${classes.extraButtonStyling} ${classes.iconButton}`
@@ -118,4 +123,5 @@ BaseIconButton.defaultProps = {
   buttonSize: "small",
   buttonEdge: "start",
   tooltipPlacement: "right",
+  setRefCallback: null,
 };

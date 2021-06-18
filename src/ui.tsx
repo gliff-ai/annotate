@@ -23,10 +23,9 @@ import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { ThemeProvider, theme } from "@/theme";
-import {
+import MinimapUI, {
   BackgroundCanvas,
   BackgroundUI,
-  MinimapUI,
 } from "@/toolboxes/background";
 import { SplineCanvas, SplineUI } from "@/toolboxes/spline";
 import { PaintbrushCanvas, PaintbrushUI } from "@/toolboxes/paintbrush";
@@ -45,7 +44,6 @@ export enum Mode {
   draw,
   select,
 }
-
 interface Event extends CustomEvent {
   type: typeof events[number];
 }
@@ -67,8 +65,6 @@ export const events = [
   "clearActiveAnnotation",
   "incrementScale",
   "decrementScale",
-  // "handleDrawerOpen",
-  // "handleDrawerClose",
   "resetScaleAndPan",
 ] as const;
 
@@ -170,6 +166,8 @@ class UserInterface extends Component<Props, State> {
 
   private canvasContainer: HTMLDivElement;
 
+  private refBtnsPopovers: { [buttonName: string]: HTMLButtonElement };
+
   constructor(props: Props) {
     super(props);
     this.annotationsObject = this.props.annotationsObject || new Annotations();
@@ -188,7 +186,7 @@ class UserInterface extends Component<Props, State> {
       channels: [true],
       displayedImage: this.slicesData ? this.slicesData[0][0] : null,
       redraw: 0,
-      popover: null,
+      popover: false,
       anchorElement: null,
       buttonClicked: null,
       activeTool: Tools.paintbrush,
@@ -198,6 +196,7 @@ class UserInterface extends Component<Props, State> {
     this.annotationsObject.addAnnotation(this.state.activeTool);
     this.presetLabels = this.props.presetLabels || [];
     this.imageFileInfo = this.props.imageFileInfo || null;
+    this.refBtnsPopovers = {};
   }
 
   componentDidMount = (): void => {
@@ -560,16 +559,24 @@ class UserInterface extends Component<Props, State> {
     }, this.mixChannels);
   };
 
-  handleClose = (event: React.MouseEvent): void => {
-    this.setState({ anchorElement: null, popover: null });
-  };
-
-  handleOpen = (event: React.MouseEvent) => {
+  handleClose = (): void =>
     this.setState({
-      anchorElement: event.currentTarget as HTMLButtonElement,
-      popover: true,
+      anchorElement: null,
+      popover: false,
     });
-  };
+
+  handleOpen =
+    (event?: React.MouseEvent) =>
+    (anchorElement?: HTMLButtonElement): void => {
+      if (anchorElement) {
+        this.setState({ anchorElement, popover: true });
+      } else if (event) {
+        this.setState({
+          anchorElement: event.currentTarget as HTMLButtonElement,
+          popover: true,
+        });
+      }
+    };
 
   handleRequestClose = (): void => {
     this.setState({
@@ -577,37 +584,50 @@ class UserInterface extends Component<Props, State> {
     });
   };
 
-  // Functions of type select<ToolTip.name>, added for use in keybindings
+  // Functions of type select<ToolTip.name>, added for use in keybindings and OnClick events
+  // TODO: find a way to pass parameters in keybindings and get rid of code duplication
   selectBrush = (): void => {
-    this.setState({ buttonClicked: "Brush" });
+    this.handleOpen()(this.refBtnsPopovers[tooltips.paintbrush.name]);
+    this.setButtonClicked(tooltips.paintbrush.name);
     this.activateTool("paintbrush");
   };
 
   selectEraser = (): void => {
-    this.setState({ buttonClicked: "Eraser" });
+    this.setButtonClicked(tooltips.eraser.name);
     this.activateTool("eraser");
   };
 
   selectSpline = (): void => {
-    this.setState({ buttonClicked: "Spline" });
+    this.setButtonClicked(tooltips.spline.name);
     this.activateTool("spline");
   };
 
   selectMagicspline = (): void => {
-    this.setState({ buttonClicked: "Magic Spline" });
+    this.setButtonClicked(tooltips.magicspline.name);
     this.activateTool("magicspline");
   };
 
-  selectBrightness = (): void => this.setState({ buttonClicked: "Brightness" });
+  selectContrast = (): void => {
+    this.handleOpen()(this.refBtnsPopovers[tooltips.contrast.name]);
+    this.setButtonClicked(tooltips.contrast.name);
+  };
 
-  selectContrast = (): void => this.setState({ buttonClicked: "Contrast" });
+  selectBrightness = (): void => {
+    this.handleOpen()(this.refBtnsPopovers[tooltips.brightness.name]);
+    this.setButtonClicked(tooltips.brightness.name);
+  };
 
-  selectAnnotationLabel = (e: KeyboardEvent): void =>
-    this.setState({ buttonClicked: "Annotation Label", popover: true });
+  selectChannels = (): void => {
+    this.handleOpen()(this.refBtnsPopovers[tooltips.channels.name]);
+    this.setButtonClicked(tooltips.channels.name);
+  };
 
-  selectChannels = (): void => this.setState({ buttonClicked: "Channels" });
+  selectAnnotationLabel = (): void => {
+    this.handleOpen()(this.refBtnsPopovers[tooltips.labels.name]);
+    this.setButtonClicked(tooltips.labels.name);
+  };
 
-  setButtonClicked = (buttonClicked: string) =>
+  setButtonClicked = (buttonClicked: string): void =>
     this.setState({ buttonClicked });
 
   render = (): ReactNode => (
@@ -657,68 +677,58 @@ class UserInterface extends Component<Props, State> {
             />
             <BaseIconButton
               tooltip={tooltips.paintbrush}
-              onClick={(e) => {
-                this.handleOpen(e);
-                this.setButtonClicked(tooltips.paintbrush.name);
-                this.activateTool("paintbrush");
-              }}
+              onClick={this.selectBrush}
               fill={this.state.buttonClicked === tooltips.paintbrush.name}
+              setRefCallback={(ref) => {
+                this.refBtnsPopovers[tooltips.paintbrush.name] = ref;
+              }}
             />
             <BaseIconButton
               tooltip={tooltips.eraser}
-              onClick={() => {
-                this.setButtonClicked(tooltips.eraser.name);
-                this.activateTool("eraser");
-              }}
+              onClick={this.selectEraser}
               fill={this.state.buttonClicked === tooltips.eraser.name}
             />
             <BaseIconButton
               tooltip={tooltips.spline}
-              onClick={() => {
-                this.setButtonClicked(tooltips.spline.name);
-                this.activateTool("spline");
-              }}
+              onClick={this.selectSpline}
               fill={this.state.buttonClicked === tooltips.spline.name}
             />
             <BaseIconButton
               tooltip={tooltips.magicspline}
-              onClick={() => {
-                this.setButtonClicked(tooltips.magicspline.name);
-                this.activateTool("magicspline");
-              }}
+              onClick={this.selectMagicspline}
               fill={this.state.buttonClicked === tooltips.magicspline.name}
             />
             <BaseIconButton
               tooltip={tooltips.brightness}
-              onClick={(e) => {
-                this.handleOpen(e);
-                this.setButtonClicked(tooltips.brightness.name);
-              }}
+              onClick={this.selectBrightness}
               fill={this.state.buttonClicked === tooltips.brightness.name}
+              setRefCallback={(ref) => {
+                this.refBtnsPopovers[tooltips.brightness.name] = ref;
+              }}
             />
             <BaseIconButton
               tooltip={tooltips.contrast}
-              onClick={(e) => {
-                this.handleOpen(e);
-                this.setButtonClicked(tooltips.contrast.name);
-              }}
+              onClick={this.selectContrast}
               fill={this.state.buttonClicked === tooltips.contrast.name}
+              setRefCallback={(ref) => {
+                this.refBtnsPopovers[tooltips.contrast.name] = ref;
+              }}
             />
             <BaseIconButton
               tooltip={tooltips.channels}
-              onClick={(e: MouseEvent) => {
-                this.handleOpen(e);
-                this.setButtonClicked(tooltips.channels.name);
-              }}
+              onClick={this.selectChannels}
               fill={this.state.buttonClicked === tooltips.channels.name}
+              setRefCallback={(ref) => {
+                this.refBtnsPopovers[tooltips.channels.name] = ref;
+              }}
             />
             <BaseIconButton
               tooltip={tooltips.labels}
-              onClick={(e: MouseEvent) => {
-                this.handleOpen(e);
-                this.setButtonClicked(tooltips.labels.name);
-              }}
+              onClick={this.selectAnnotationLabel}
               fill={this.state.buttonClicked === tooltips.labels.name}
+              setRefCallback={(ref) => {
+                this.refBtnsPopovers[tooltips.labels.name] = ref;
+              }}
             />
           </ButtonGroup>
         </Grid>
@@ -902,10 +912,10 @@ class UserInterface extends Component<Props, State> {
           </Popover>
           <BackgroundUI
             open={
-              (this.state.buttonClicked === "Contrast" && this.state.popover) ||
-              (this.state.buttonClicked === "Brightness" &&
-                this.state.popover) ||
-              (this.state.buttonClicked === "Channels" && this.state.popover)
+              (this.state.buttonClicked === "Contrast" ||
+                this.state.buttonClicked === "Brightness" ||
+                this.state.buttonClicked === "Channels") &&
+              this.state.popover
             }
             buttonClicked={this.state.buttonClicked}
             anchorElement={this.state.anchorElement}
