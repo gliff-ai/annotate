@@ -48,6 +48,7 @@ module.exports = {
             ignorePropertyModificationsFor: ["descriptor", "context"], // Decorators
           },
         ],
+        "react/static-property-placement": [2, "static public field"],
       },
     },
     {
