@@ -45,7 +45,7 @@ const PaintbrushUI = (props: Props): ReactElement => {
           value={paintbrush.brushRadius}
           config={SLIDER_CONFIG[Sliders.brushRadius]}
           onChange={() => changeBrushRadius}
-          slider="paintbrush"
+          showEndValues={false}
         />
       </div>
     </Popover>
