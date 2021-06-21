@@ -722,7 +722,7 @@ class UserInterface extends Component<Props, State> {
 
       <CssBaseline />
 
-      <Container disableGutters>
+      <Container disableGutters maxWidth={false}>
         <AppBar position="fixed" className={this.props.classes.appbar}>
           <Toolbar>
             <Grid container direction="row">
