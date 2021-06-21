@@ -98,6 +98,6 @@ const tooltips: ToolTips = {
     icon: require(`./assets/annotation-label-icon.svg`) as string,
     shortcut: "L",
   },
-};
+} as const;
 
 export { ToolTip, ToolTips, tooltips };
