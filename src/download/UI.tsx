@@ -1,5 +1,12 @@
 import React, { ReactElement, useState, MouseEvent } from "react";
-import { Tooltip, Button, Menu, MenuItem, makeStyles } from "@material-ui/core";
+import {
+  Tooltip,
+  Button,
+  Menu,
+  MenuItem,
+  makeStyles,
+  Theme,
+} from "@material-ui/core";
 import { ImageFileInfo } from "@gliff-ai/upload";
 import { Annotation } from "@/annotation/interfaces";
 import { downloadPaintbrushAsTiff } from "@/download/DownloadAsTiff";
@@ -10,11 +17,14 @@ const useStyles = makeStyles({
     borderRadius: "9px",
     opacity: 1,
   },
-  menuItem: {
-    opacity: "1",
+  text: {
     fontSize: "17px",
     letterSpacing: "0px",
     color: "#2B2F3A",
+    fontWeight: 400,
+  },
+  menuItem: {
+    opacity: "1",
     "&:hover": {
       background: "#02FFAD 0% 0% no-repeat padding-box",
     },
@@ -22,6 +32,13 @@ const useStyles = makeStyles({
   paper: {
     marginTop: "90px",
     marginLeft: "-20px",
+  },
+  tooltip: {
+    backgroundColor: "#FFFFFF",
+    border: "1px solid #dadde9",
+    opacity: "1",
+    marginTop: "30px",
+    marginLeft: "0px",
   },
 });
 
@@ -69,7 +86,10 @@ export function Download({ annotations, imageFileInfo }: Props): ReactElement {
 
   return (
     <>
-      <Tooltip title="Download annotations">
+      <Tooltip
+        title="Download annotations"
+        classes={{ tooltip: `${classes.tooltip} ${classes.text}` }}
+      >
         <Button aria-label="download" onClick={handleOpen}>
           <img
             src={require("../assets/save-icon.svg") as string}
@@ -90,7 +110,7 @@ export function Download({ annotations, imageFileInfo }: Props): ReactElement {
         {menuItems.map((item) => (
           <MenuItem
             key={item.key}
-            className={classes.menuItem}
+            className={`${classes.menuItem} ${classes.text}`}
             onClick={item.onClick}
             dense
           >

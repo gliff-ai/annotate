@@ -15,6 +15,7 @@ import {
   Card,
   Paper,
   WithStyles,
+  Tooltip,
 } from "@material-ui/core";
 
 import SVG from "react-inlinesvg";
@@ -88,14 +89,6 @@ interface State {
   mode: Mode;
 }
 
-interface Props extends WithStyles<typeof styles> {
-  slicesData?: Array<Array<ImageBitmap>>;
-  imageFileInfo?: ImageFileInfo;
-  annotationsObject?: Annotations;
-  presetLabels?: string[];
-  saveAnnotationsCallback?: (annotationsObject: Annotations) => void;
-}
-
 const styles = {
   annotationToolbar: {
     left: "18px",
@@ -152,9 +145,29 @@ const styles = {
     backgroundColor: theme.palette.primary.main,
     display: "inline",
   },
+  tooltip: {
+    backgroundColor: "#FFFFFF",
+    border: "1px solid #dadde9",
+    opacity: "1",
+    marginTop: "30px",
+    marginLeft: "0px",
+  },
+  tooltipText: {
+    fontSize: "17px",
+    letterSpacing: 0,
+    color: "#2B2F3A",
+    fontWeight: 400,
+  },
   svgSmall: { width: "18px", height: "auto" },
 };
 
+interface Props extends WithStyles<typeof styles> {
+  slicesData?: Array<Array<ImageBitmap>>;
+  imageFileInfo?: ImageFileInfo;
+  annotationsObject?: Annotations;
+  presetLabels?: string[];
+  saveAnnotationsCallback?: (annotationsObject: Annotations) => void;
+}
 class UserInterface extends Component<Props, State> {
   annotationsObject: Annotations;
 
@@ -722,12 +735,19 @@ class UserInterface extends Component<Props, State> {
                 setUploadedImage={this.setUploadedImage}
                 spanElement={
                   /* eslint-disable react/jsx-wrap-multilines */
-                  <Button aria-label="upload-picture" component="span">
-                    <img
-                      src={require("./assets/upload-icon.svg") as string}
-                      alt="Upload Icon"
-                    />
-                  </Button>
+                  <Tooltip
+                    title="Upload images"
+                    classes={{
+                      tooltip: `${this.props.classes.tooltip} ${this.props.classes.tooltipText}`,
+                    }}
+                  >
+                    <Button aria-label="upload-picture" component="span">
+                      <img
+                        src={require("./assets/upload-icon.svg") as string}
+                        alt="Upload Icon"
+                      />
+                    </Button>
+                  </Tooltip>
                 }
                 multiple={false}
               />
