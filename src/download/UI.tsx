@@ -1,12 +1,5 @@
 import React, { ReactElement, useState, MouseEvent } from "react";
-import {
-  Tooltip,
-  Button,
-  Menu,
-  MenuItem,
-  makeStyles,
-  Theme,
-} from "@material-ui/core";
+import { Tooltip, Button, Menu, MenuItem, makeStyles } from "@material-ui/core";
 import { ImageFileInfo } from "@gliff-ai/upload";
 import { Annotation } from "@/annotation/interfaces";
 import { downloadPaintbrushAsTiff } from "@/download/DownloadAsTiff";
