@@ -46,7 +46,7 @@ const tooltips: ToolTips = {
   addNewAnnotation: {
     name: "Add New Annotation",
     icon: require(`./assets/new-annotation-icon.svg`) as string,
-    shortcut: "+",
+    shortcut: "=",
   },
   clearAnnotation: {
     name: "Clear Annotation",
