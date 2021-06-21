@@ -495,14 +495,18 @@ class UserInterface extends Component<Props, State> {
     this.cycleActiveAnnotation(false);
   };
 
+  setButtonClickedToActiveTool = () => {
+    this.setState((state) => ({
+      buttonClicked: tooltips[state.activeTool].name,
+    }));
+  };
+
   toggleMode = (): void => {
     if (this.state.mode === Mode.draw) {
       this.setState({ mode: Mode.select, buttonClicked: "Select" });
     } else {
-      this.setState((state) => ({
-        mode: Mode.draw,
-        buttonClicked: tooltips[state.activeTool].name,
-      }));
+      this.setState({ mode: Mode.draw });
+      this.setButtonClickedToActiveTool();
     }
   };
 
@@ -632,19 +636,21 @@ class UserInterface extends Component<Props, State> {
           <ButtonGroup size="small">
             <BaseIconButton
               tooltip={tooltips.addNewAnnotation}
-              onClick={() => {
+              onMouseDown={() => {
                 this.setButtonClicked(tooltips.addNewAnnotation.name);
                 this.addAnnotation();
               }}
+              onMouseUp={this.setButtonClickedToActiveTool}
               fill={this.state.buttonClicked === tooltips.addNewAnnotation.name}
             />
 
             <BaseIconButton
               tooltip={tooltips.clearAnnotation}
-              onClick={() => {
+              onMouseDown={() => {
                 this.setButtonClicked(tooltips.clearAnnotation.name);
                 this.clearActiveAnnotation();
               }}
+              onMouseUp={this.setButtonClickedToActiveTool}
               fill={this.state.buttonClicked === tooltips.clearAnnotation.name}
             />
           </ButtonGroup>
