@@ -55,6 +55,7 @@ export class BackgroundCanvasClass extends Component<Props> {
       scaleAndPan={this.props.scaleAndPan}
       zoomExtents={{ min: 0.3, max: 3 }}
       canvasPositionAndSize={this.props.canvasPositionAndSize}
+      setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
     />
   );
 }
@@ -71,6 +72,7 @@ export const BackgroundCanvas = (
       scaleAndPan={props.scaleAndPan}
       canvasPositionAndSize={props.canvasPositionAndSize}
       displayedImage={props.displayedImage}
+      setCanvasPositionAndSize={props.setCanvasPositionAndSize}
     />
   );
 };

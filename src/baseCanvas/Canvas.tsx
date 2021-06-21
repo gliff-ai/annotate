@@ -157,19 +157,16 @@ export class BaseCanvas extends Component<Props> {
         display: "block",
         touchAction: "none",
         width: "100%",
-        height: this.props.canvasPositionAndSize.height,
+        height: "100%",
         cursor: this.props.cursor || "pointer",
         left: this.props.canvasPositionAndSize.left,
         bottom: "0px",
         position: "absolute",
-        right: "250px",
         marginTop: "30px",
       }}
     >
       <canvas
         style={{ pointerEvents: "inherit" }}
-        width="100%"
-        height={this.props.canvasPositionAndSize.height}
         onClick={this.onClickHandler}
         onMouseDown={this.onMouseDownHandler}
         onMouseMove={this.onMouseMoveHandler}

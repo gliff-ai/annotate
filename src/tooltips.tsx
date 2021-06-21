@@ -15,7 +15,7 @@ const tooltips: ToolTips = {
     icon: require(`./assets/minimise-icon.svg`) as string,
     shortcut: "ALT",
     shortcutSymbol: "-",
-    styling: { marginRight: "120px", marginLeft: "15px" },
+    styling: { marginRight: "132px" },
   },
   maximiseMap: {
     name: "Maximise Map",
