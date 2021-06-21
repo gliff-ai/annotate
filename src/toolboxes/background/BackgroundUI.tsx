@@ -141,7 +141,7 @@ const BackgroundUI = (props: Props): ReactElement => {
           </div>
         )}
 
-        {props.buttonClicked === "Channel" && (
+        {props.buttonClicked === "Channels" && (
           <Card className={classes.channelCard}>
             <Paper
               elevation={0}
