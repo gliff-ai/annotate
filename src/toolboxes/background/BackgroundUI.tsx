@@ -34,11 +34,11 @@ const useStyles = makeStyles((theme: Theme) =>
     checkbox: {
       marginLeft: "104px",
     },
-    contrastBaseslider: {
+    contrastSlider: {
       width: "63px",
       height: "335px",
     },
-    brightnessBaseslider: {
+    brightnessSlider: {
       width: "63px",
       height: "335px",
     },
@@ -120,23 +120,21 @@ const BackgroundUI = (props: Props): ReactElement => {
         onClose={props.onClose}
       >
         {props.buttonClicked === "Contrast" && (
-          <div className={classes.contrastBaseslider}>
+          <div className={classes.contrastSlider}>
             <BaseSlider
               value={background.contrast}
               config={SLIDER_CONFIG[Sliders.contrast]}
               onChange={() => changeContrast}
-              slider="contrast"
             />
           </div>
         )}
 
         {props.buttonClicked === "Brightness" && (
-          <div className={classes.brightnessBaseslider}>
+          <div className={classes.brightnessSlider}>
             <BaseSlider
               value={background.brightness}
               config={SLIDER_CONFIG[Sliders.brightness]}
               onChange={() => changeBrightness}
-              slider="brightness"
             />
           </div>
         )}

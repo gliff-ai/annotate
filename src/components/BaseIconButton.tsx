@@ -1,4 +1,4 @@
-import React, { MouseEvent, KeyboardEvent, ReactElement } from "react";
+import React, { MouseEvent, ReactElement } from "react";
 import {
   IconButton,
   Avatar,
@@ -45,8 +45,9 @@ const useStyles = (props: Props) =>
 
 interface Props {
   tooltip: ToolTip;
-  onClick: (event: MouseEvent) => void;
-  onKeyDown?: (event: KeyboardEvent) => void;
+  onClick?: (event: MouseEvent) => void;
+  onMouseDown?: (event: MouseEvent) => void;
+  onMouseUp?: (event: MouseEvent) => void;
   fill: boolean;
   buttonSize?: "small" | "medium";
   buttonEdge?: "start" | "end";
@@ -101,7 +102,8 @@ export const BaseIconButton = (props: Props): ReactElement => {
             ? `${classes.extraButtonStyling} ${classes.iconButton}`
             : classes.iconButton
         }
-        onKeyDown={props.onKeyDown}
+        onMouseUp={props.onMouseUp}
+        onMouseDown={props.onMouseDown}
         onClick={props.onClick}
         size={props.buttonSize}
         edge={props.buttonEdge}
@@ -119,9 +121,11 @@ export const BaseIconButton = (props: Props): ReactElement => {
 };
 
 BaseIconButton.defaultProps = {
-  onKeyDown: null,
   buttonSize: "small",
   buttonEdge: "start",
   tooltipPlacement: "right",
   setRefCallback: null,
+  onMouseUp: null,
+  onMouseDown: null,
+  onClick: null,
 };

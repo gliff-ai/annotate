@@ -17,12 +17,26 @@ const theme: Theme = createMuiTheme({
   },
 
   overrides: {
+    MuiCssBaseline: {
+      "@global": {
+        html: {
+          height: "100%",
+        },
+        body: {
+          height: "100%",
+        },
+        "#react-container": {
+          overflow: "hidden",
+          height: "100%",
+        },
+      },
+    },
+
     MuiButton: {
       root: {
         color: "#000000",
       },
     },
-
     MuiIconButton: {
       root: {
         "&:hover": {
@@ -30,7 +44,6 @@ const theme: Theme = createMuiTheme({
         },
       },
     },
-
     MuiSlider: {
       root: {
         color: "#000000",
@@ -40,7 +53,6 @@ const theme: Theme = createMuiTheme({
         height: "auto",
       },
     },
-
     MuiPopover: {
       root: {
         marginLeft: "20px",
@@ -64,13 +76,18 @@ const theme: Theme = createMuiTheme({
         marginBottom: "17px",
       },
     },
-
     MuiAvatar: {
       colorDefault: {
         backgroundColor: "#fff",
         "&:hover": {
           backgroundColor: "#02FFAD",
         },
+      },
+    },
+    MuiContainer: {
+      root: {
+        height: "100%",
+        width: "100%",
       },
     },
   },

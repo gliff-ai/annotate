@@ -1,5 +1,5 @@
 import React, { ChangeEvent, FunctionComponent, ReactElement } from "react";
-import { createStyles, makeStyles, Slider } from "@material-ui/core";
+import { makeStyles, Slider } from "@material-ui/core";
 
 export interface Config {
   name: string;
@@ -17,15 +17,16 @@ interface Props {
   value: number;
   config: Config;
   onChange: (arg0: string) => (arg1: ChangeEvent, arg2: number) => void;
-  slider: string;
+  sliderHeight?: string;
+  showEndValues?: boolean;
 }
 
 function getAriaValueText(value: number): string {
   return `${value}`;
 }
 
-const useStyles = makeStyles(() =>
-  createStyles({
+const useStyles = (sliderHeight?: string) =>
+  makeStyles({
     value: {
       width: "42px",
       height: "42px",
@@ -39,32 +40,29 @@ const useStyles = makeStyles(() =>
     },
     slider: {
       textAlign: "center",
-      height: "204px",
+      height: sliderHeight || "204px",
       marginBottom: "18px",
     },
     maxSliderValue: {
       marginBottom: "18px",
     },
-  })
-);
+  });
 
 export const BaseSlider: FunctionComponent<Props> = ({
   value,
   config,
   onChange,
-  slider,
+  sliderHeight,
+  showEndValues,
 }: Props): ReactElement => {
-  const classes = useStyles();
+  const classes = useStyles(sliderHeight)();
 
   return (
     <>
       <div className={classes.value}>{`${value}`}</div>
-
       <div className={classes.slider}>
         <div className={classes.maxSliderValue}>
-          {slider === "brightness" || slider === "contrast"
-            ? `${config.max}${config.unit}`
-            : null}
+          {showEndValues ? `${config.max}${config.unit}` : null}
         </div>
         <Slider
           color="primary"
@@ -77,12 +75,13 @@ export const BaseSlider: FunctionComponent<Props> = ({
           max={config.max}
           getAriaValueText={getAriaValueText}
         />
-        <div>
-          {slider === "brightness" || slider === "contrast"
-            ? `${config.min}${config.unit}`
-            : null}
-        </div>
+        <div>{showEndValues ? `${config.min}${config.unit}` : null}</div>
       </div>
     </>
   );
+};
+
+BaseSlider.defaultProps = {
+  sliderHeight: null,
+  showEndValues: true,
 };

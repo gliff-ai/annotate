@@ -18,9 +18,13 @@ const styles = {
     width: "344px",
     height: "255px",
     paddingTop: "7px",
+    padding: "10px",
     left: "250px",
     borderRadius: "10px 0 0 0",
-    marginTop: "70px",
+  },
+  canvasCard: {
+    width: "100%",
+    height: "200px",
   },
   mimimapToggle: {
     width: "61px",
@@ -114,9 +118,7 @@ class MinimapUI extends Component<Props, State> {
       <Slide in={this.state.isOpen} direction="up" timeout={1000}>
         <Card
           className={this.props.classes.minimapCard}
-          style={{
-            position: "relative",
-          }}
+          style={{ position: "relative" }}
         >
           <BaseIconButton
             tooltip={tooltips.minimiseMap}
@@ -156,7 +158,10 @@ class MinimapUI extends Component<Props, State> {
           />
           {/* Background canvas for the minimap */}
           {this.props.displayedImage && (
-            <>
+            <div
+              className={this.props.classes.canvasCard}
+              style={{ position: "relative" }}
+            >
               <BackgroundCanvas
                 scaleAndPan={{ x: 0, y: 0, scale: 1 }}
                 displayedImage={this.props.displayedImage}
@@ -170,8 +175,8 @@ class MinimapUI extends Component<Props, State> {
                 canvasPositionAndSize={this.props.viewportPositionAndSize}
                 minimapPositionAndSize={this.props.minimapPositionAndSize}
                 setMinimapPositionAndSize={this.props.setMinimapPositionAndSize}
-              />{" "}
-            </>
+              />
+            </div>
           )}
         </Card>
       </Slide>

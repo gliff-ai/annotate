@@ -8,7 +8,6 @@ import {
   Grid,
   Typography,
   CssBaseline,
-  Slider,
   withStyles,
   Avatar,
   Popover,
@@ -40,6 +39,7 @@ import { keydownListener } from "@/keybindings";
 import { Tools, Tool } from "@/tools";
 import { tooltips } from "@/tooltips";
 import { BaseIconButton } from "@/components/BaseIconButton";
+import { BaseSlider, Config } from "@/components/BaseSlider";
 
 const CONFIG = {
   PAN_AMOUNT: 20,
@@ -129,10 +129,9 @@ const styles = {
     width: "100%",
     backgroundColor: "#fafafa",
   },
-  imageSliceSlider: {
-    width: "70%",
-    margin: "auto",
-    marginTop: "10px",
+  slicesSlider: {
+    width: "63px",
+    height: "450px",
   },
   annotationCard: {
     width: "271px",
@@ -507,14 +506,18 @@ class UserInterface extends Component<Props, State> {
     this.cycleActiveAnnotation(false);
   };
 
+  setButtonClickedToActiveTool = () => {
+    this.setState((state) => ({
+      buttonClicked: tooltips[state.activeTool].name,
+    }));
+  };
+
   toggleMode = (): void => {
     if (this.state.mode === Mode.draw) {
       this.setState({ mode: Mode.select, buttonClicked: "Select" });
     } else {
-      this.setState((state) => ({
-        mode: Mode.draw,
-        buttonClicked: tooltips[state.activeTool].name,
-      }));
+      this.setState({ mode: Mode.draw });
+      this.setButtonClickedToActiveTool();
     }
   };
 
@@ -707,10 +710,11 @@ class UserInterface extends Component<Props, State> {
             <ButtonGroup size="small">
               <BaseIconButton
                 tooltip={tooltips.addNewAnnotation}
-                onClick={() => {
+                onMouseDown={() => {
                   this.setButtonClicked(tooltips.addNewAnnotation.name);
                   this.addAnnotation();
                 }}
+                onMouseUp={this.setButtonClickedToActiveTool}
                 fill={
                   this.state.buttonClicked === tooltips.addNewAnnotation.name
                 }
@@ -718,10 +722,11 @@ class UserInterface extends Component<Props, State> {
 
               <BaseIconButton
                 tooltip={tooltips.clearAnnotation}
-                onClick={() => {
+                onMouseDown={() => {
                   this.setButtonClicked(tooltips.clearAnnotation.name);
                   this.clearActiveAnnotation();
                 }}
+                onMouseUp={this.setButtonClickedToActiveTool}
                 fill={
                   this.state.buttonClicked === tooltips.clearAnnotation.name
                 }
@@ -795,7 +800,7 @@ class UserInterface extends Component<Props, State> {
 
         <CssBaseline />
 
-        <Container disableGutters>
+        <Container disableGutters maxWidth={false}>
           {appBar}
           <Grid
             container
@@ -861,30 +866,32 @@ class UserInterface extends Component<Props, State> {
               )}
 
               {this.slicesData && this.slicesData.length > 1 && (
-                <div
+                <Paper
+                  elevation={3}
+                  className={classes.slicesSlider}
                   style={{
                     position: "absolute",
-                    top: `${
-                      this.state.viewportPositionAndSize.top +
-                      this.state.viewportPositionAndSize.height +
-                      5
-                    }px`,
-                    left: `${this.state.viewportPositionAndSize.left}px`,
-                    width: `${this.state.viewportPositionAndSize.width}px`,
+                    top: "110px",
+                    right: "30px",
                   }}
                 >
-                  <div className={classes.imageSliceSlider}>
-                    <Slider
-                      value={this.state.sliceIndex}
-                      onChange={this.changeSlice}
-                      aria-labelledby="slice-index-slider"
-                      step={1}
-                      min={0}
-                      max={this.slicesData.length - 1}
-                      valueLabelDisplay="auto"
-                    />
-                  </div>
-                </div>
+                  <BaseSlider
+                    value={this.state.sliceIndex}
+                    config={
+                      {
+                        name: "slices",
+                        id: "slices-slider",
+                        initial: 1,
+                        step: 1,
+                        min: 0,
+                        max: this.slicesData.length - 1,
+                        unit: "",
+                      } as Config
+                    }
+                    onChange={() => this.changeSlice}
+                    sliderHeight="300px"
+                  />
+                </Paper>
               )}
             </Grid>
 
