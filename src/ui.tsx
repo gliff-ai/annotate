@@ -157,8 +157,6 @@ const styles = {
     opacity: "1",
     marginTop: "30px",
     marginLeft: "0px",
-  },
-  tooltipText: {
     fontSize: "17px",
     letterSpacing: 0,
     color: "#2B2F3A",
@@ -646,12 +644,19 @@ class UserInterface extends Component<Props, State> {
           <UploadImage
             setUploadedImage={this.setUploadedImage}
             spanElement={
-              <Button aria-label="upload-picture" component="span">
-                <img
-                  src={require("./assets/upload-icon.svg") as string}
-                  alt="Upload Icon"
-                />
-              </Button>
+              <Tooltip
+                title="Upload images"
+                classes={{
+                  tooltip: classes.tooltip,
+                }}
+              >
+                <Button aria-label="upload-picture" component="span">
+                  <img
+                    src={require("./assets/upload-icon.svg") as string}
+                    alt="Upload Icon"
+                  />
+                </Button>
+              </Tooltip>
             }
             multiple={false}
           />
@@ -662,11 +667,22 @@ class UserInterface extends Component<Props, State> {
             annotations={this.annotationsObject.getAllAnnotations()}
             imageFileInfo={this.imageFileInfo}
           />
+        </Grid>
+        <Grid item>
           {saveAnnotationsCallback && (
-            <Button
-              aria-label="save"
-              onClick={() => saveAnnotationsCallback(this.annotationsObject)}
-            />
+            <Tooltip
+              title="Save annotations"
+              classes={{
+                tooltip: classes.tooltip,
+              }}
+            >
+              <Button
+                aria-label="save-annotations"
+                onClick={() => saveAnnotationsCallback(this.annotationsObject)}
+              >
+                Save
+              </Button>
+            </Tooltip>
           )}
         </Grid>
       </>
