@@ -676,6 +676,7 @@ class UserInterface extends Component<Props, State> {
                 tooltip: classes.tooltip,
               }}
             >
+              {/* TODO: Add save annotations icon! */}
               <Button
                 aria-label="save-annotations"
                 onClick={() => saveAnnotationsCallback(this.annotationsObject)}
