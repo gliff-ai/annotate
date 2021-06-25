@@ -3,7 +3,6 @@ import {
   AppBar,
   Container,
   Toolbar,
-  Button,
   ButtonGroup,
   Grid,
   Typography,
@@ -14,7 +13,6 @@ import {
   Card,
   Paper,
   WithStyles,
-  Tooltip,
 } from "@material-ui/core";
 
 import SVG from "react-inlinesvg";
@@ -40,6 +38,7 @@ import { Tools, Tool } from "@/tools";
 import { tooltips } from "@/tooltips";
 import { BaseIconButton } from "@/components/BaseIconButton";
 import { BaseSlider, Config } from "@/components/BaseSlider";
+import { BaseButton } from "@/components/BaseButton";
 
 const CONFIG = {
   PAN_AMOUNT: 20,
@@ -67,6 +66,7 @@ export const events = [
   "incrementScale",
   "decrementScale",
   "resetScaleAndPan",
+  "saveAnnotations",
 ] as const;
 
 interface State {
@@ -157,8 +157,6 @@ const styles = {
     opacity: "1",
     marginTop: "30px",
     marginLeft: "0px",
-  },
-  tooltipText: {
     fontSize: "17px",
     letterSpacing: 0,
     color: "#2B2F3A",
@@ -637,6 +635,11 @@ class UserInterface extends Component<Props, State> {
   setButtonClicked = (buttonClicked: string): void =>
     this.setState({ buttonClicked });
 
+  saveAnnotations = (): void => {
+    if (!this.props.saveAnnotationsCallback) return;
+    this.props.saveAnnotationsCallback(this.annotationsObject);
+  };
+
   render = (): ReactNode => {
     const { classes, showAppBar, saveAnnotationsCallback } = this.props;
 
@@ -646,12 +649,14 @@ class UserInterface extends Component<Props, State> {
           <UploadImage
             setUploadedImage={this.setUploadedImage}
             spanElement={
-              <Button aria-label="upload-picture" component="span">
-                <img
-                  src={require("./assets/upload-icon.svg") as string}
-                  alt="Upload Icon"
-                />
-              </Button>
+              <BaseButton
+                tooltip={tooltips.upload}
+                fill={false}
+                hasAvatar={false}
+                tooltipPlacement="bottom"
+                tooltipStyling={{ marginTop: "30px", marginLeft: "0px" }}
+                svgStyling={{ width: "45px", height: "auto" }}
+              />
             }
             multiple={false}
           />
@@ -662,10 +667,17 @@ class UserInterface extends Component<Props, State> {
             annotations={this.annotationsObject.getAllAnnotations()}
             imageFileInfo={this.imageFileInfo}
           />
+        </Grid>
+        <Grid item>
           {saveAnnotationsCallback && (
-            <Button
-              aria-label="save"
-              onClick={() => saveAnnotationsCallback(this.annotationsObject)}
+            <BaseButton
+              tooltip={tooltips.save}
+              onClick={this.saveAnnotations}
+              fill={false}
+              hasAvatar={false}
+              tooltipPlacement="bottom"
+              tooltipStyling={{ marginTop: "30px", marginLeft: "0px" }}
+              svgStyling={{ width: "45px", height: "auto" }}
             />
           )}
         </Grid>
