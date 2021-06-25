@@ -1,11 +1,8 @@
-import { CSSProperties } from "react";
-
 interface ToolTip {
   name: string;
   icon: string;
   shortcut?: string;
   shortcutSymbol?: string;
-  styling?: CSSProperties;
 }
 type ToolTips = { [name: string]: ToolTip };
 
@@ -15,7 +12,6 @@ const tooltips: ToolTips = {
     icon: require(`./assets/minimise-icon.svg`) as string,
     shortcut: "ALT",
     shortcutSymbol: "-",
-    styling: { marginRight: "132px" },
   },
   maximiseMap: {
     name: "Maximise Map",
@@ -28,14 +24,12 @@ const tooltips: ToolTips = {
     icon: require(`./assets/zoom-in-icon.svg`) as string,
     shortcut: "CTRL",
     shortcutSymbol: "+",
-    styling: { marginRight: "10px" },
   },
   zoomOut: {
     name: "Zoom Out",
     icon: require(`./assets/zoom-out-icon.svg`) as string,
     shortcut: "CTRL",
     shortcutSymbol: "-",
-    styling: { marginRight: "10px" },
   },
   fitToPage: {
     name: "Fit to Page",
@@ -97,6 +91,22 @@ const tooltips: ToolTips = {
     name: "Annotation Label",
     icon: require(`./assets/annotation-label-icon.svg`) as string,
     shortcut: "L",
+  },
+  download: {
+    name: "Download annotations",
+    icon: require("./assets/download-icon.svg") as string,
+    shortcut: "D",
+  },
+  upload: {
+    name: "Upload images",
+    icon: require(`./assets/upload-icon.svg`) as string,
+    shortcut: "U",
+  },
+  save: {
+    name: "Save annotations",
+    icon: require(`./assets/upload-icon.svg`) as string, // TODO: replace with correct icon
+    shortcut: "CTRL",
+    shortcutSymbol: "S",
   },
 } as const;
 

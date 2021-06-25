@@ -1,10 +1,10 @@
 import React, { MouseEvent, ReactElement, CSSProperties } from "react";
 import {
-  IconButton,
   Avatar,
   makeStyles,
   Tooltip,
   TooltipProps,
+  Button,
 } from "@material-ui/core";
 import SVG from "react-inlinesvg";
 import { theme } from "@/theme";
@@ -18,16 +18,14 @@ interface Props {
   onMouseUp?: (event: MouseEvent) => void;
   fill: boolean;
   buttonSize?: "small" | "medium";
-  buttonEdge?: "start" | "end";
   tooltipPlacement?: TooltipProps["placement"];
-  setRefCallback?: (ref: HTMLButtonElement) => void;
   svgStyling?: CSSProperties;
   tooltipStyling?: CSSProperties;
   buttonStyling?: CSSProperties;
   hasAvatar?: boolean;
 }
 
-export const BaseIconButton = (props: Props): ReactElement => {
+export const BaseButton = (props: Props): ReactElement => {
   const classes = makeStyles({
     iconButton: {
       marginBottom: "5px",
@@ -61,29 +59,23 @@ export const BaseIconButton = (props: Props): ReactElement => {
       title={<BaseTooltipTitle tooltip={props.tooltip} />}
       placement={props.tooltipPlacement}
     >
-      <IconButton
-        ref={(ref) => {
-          if (!ref || !props.setRefCallback) return;
-          props.setRefCallback(ref);
-        }}
+      <Button
+        component="span"
         className={classes.iconButton}
         onMouseUp={props.onMouseUp}
         onMouseDown={props.onMouseDown}
         onClick={props.onClick}
         size={props.buttonSize}
-        edge={props.buttonEdge}
       >
         {props.hasAvatar ? <Avatar>{svgIcon}</Avatar> : <>{svgIcon}</>}
-      </IconButton>
+      </Button>
     </Tooltip>
   );
 };
 
-BaseIconButton.defaultProps = {
+BaseButton.defaultProps = {
   buttonSize: "small",
-  buttonEdge: "start",
   tooltipPlacement: "right",
-  setRefCallback: null,
   onMouseUp: null,
   onMouseDown: null,
   onClick: null,
