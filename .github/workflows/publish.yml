@@ -1,0 +1,37 @@
+name: Publish Tag
+on: push
+
+jobs:
+  Publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event_name == 'push' && github.ref == 'refs/heads/automated_versions'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 15
+    - name: Setup dependencies
+      run: npm i --omit=peer
+    - id: bump
+      uses: zwaldowski/match-label-action@v1
+      with:
+        allowed: major,minor,patch
+    - uses: zwaldowski/semver-release-action@v1
+      with:
+        bump: ${{ steps.bump.outputs.match }}
+        dry_run: true
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Update package.json
+      run: npm version ${{ steps.next_version.outputs.version }}
+    - id: git_commit
+      run: |
+        git add .
+        git commit -m "Bump version"
+        git push
+        echo ::set-output name=sha::$(git rev-parse HEAD)
+    - uses: zwaldowski/semver-release-action@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        sha: ${{ steps.git_commit.outputs.sha }}
