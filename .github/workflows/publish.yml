@@ -1,8 +1,5 @@
 name: Publish Tag
 on:
-  push:
-    branches:
-      - automated_versions
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
