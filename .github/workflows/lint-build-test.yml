@@ -76,7 +76,7 @@ jobs:
       run: |
         git config user.name github-actions
         git config user.email github-actions@github.com
-        npm version git-tag-version
+        npm version from-git
         cat package.json
         git add .
         git commit -m "version: bump (ci skip)"
