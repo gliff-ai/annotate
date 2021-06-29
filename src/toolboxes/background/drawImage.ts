@@ -35,12 +35,29 @@ export function drawImageOnCanvas(
     x: number;
     y: number;
     scale: number;
-  }
+  },
+  edgeColour?: string,
+  lineWidth?: number
 ): void {
   const { offsetX, offsetY, newWidth, newHeight } =
     getNewImageSizeAndDisplacement(ctx, img, scaleAndPan);
 
   ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
+
+  // Draw edge around the image
+  if (edgeColour) {
+    const lw = lineWidth || 2;
+    ctx.beginPath();
+    /* eslint-disable no-param-reassign */
+    ctx.strokeStyle = edgeColour;
+    ctx.lineWidth = lw;
+    ctx.strokeRect(
+      offsetX - lw,
+      offsetY - lw,
+      newWidth + lw * 2,
+      newHeight + lw * 2
+    );
+  }
 }
 
 export function getImageDataFromCanvas(
