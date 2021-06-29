@@ -909,8 +909,8 @@ class UserInterface extends Component<Props, State> {
 
             <Popover
               open={
-                this.state.buttonClicked === "Annotation Label" &&
-                this.state.popover
+                Boolean(this.state.anchorElement) &&
+                this.state.buttonClicked === "Annotation Label"
               }
               anchorEl={this.state.anchorElement}
               onClose={this.handleClose}
@@ -945,17 +945,12 @@ class UserInterface extends Component<Props, State> {
               </Card>
             </Popover>
             <BackgroundUI
-              open={
-                (this.state.buttonClicked === "Contrast" ||
-                  this.state.buttonClicked === "Brightness" ||
-                  this.state.buttonClicked === "Channels") &&
-                this.state.popover
-              }
               buttonClicked={this.state.buttonClicked}
               anchorElement={this.state.anchorElement}
               onClose={this.handleClose}
               channels={this.state.channels}
               toggleChannelAtIndex={this.toggleChannelAtIndex}
+              displayedImage={this.state.displayedImage}
             />
             <PaintbrushUI
               isOpen={
