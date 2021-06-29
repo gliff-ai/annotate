@@ -87,7 +87,7 @@ interface State {
   anchorElement: HTMLButtonElement | null; // A HTML element. It's used to set the position of the popover menu https://material-ui.com/api/menu/#props
   buttonClicked: string;
   mode: Mode;
-  canvasContainerColour: string;
+  canvasContainerColour: number[];
 }
 
 const styles = {
@@ -213,7 +213,7 @@ class UserInterface extends Component<Props, State> {
       buttonClicked: null,
       activeTool: Tools.paintbrush,
       mode: Mode.draw,
-      canvasContainerColour: "#fafafa",
+      canvasContainerColour: [255, 255, 255, 1],
     };
 
     this.annotationsObject.addAnnotation(this.state.activeTool);
@@ -271,6 +271,11 @@ class UserInterface extends Component<Props, State> {
     if (event.detail === "ui") {
       this[event.type]?.call(this);
     }
+  };
+
+  getRGBAforCanvasContainerColour = (): string => {
+    const [r, g, b, a] = [...this.state.canvasContainerColour];
+    return `rgba(${r},${g},${b},${a})`;
   };
 
   updatePresetLabels = (label: string): void => {
@@ -816,7 +821,9 @@ class UserInterface extends Component<Props, State> {
         <Container
           disableGutters
           maxWidth={false}
-          style={{ backgroundColor: `${this.state.canvasContainerColour}` }}
+          style={{
+            backgroundColor: this.getRGBAforCanvasContainerColour(),
+          }}
         >
           {appBar}
           <Grid
@@ -997,6 +1004,7 @@ class UserInterface extends Component<Props, State> {
           setMinimapPositionAndSize={this.setMinimapPositionAndSize}
           resetScaleAndPan={this.resetScaleAndPan}
           setScaleAndPan={this.setScaleAndPan}
+          canvasContainerColour={this.state.canvasContainerColour}
         />
       </ThemeProvider>
     );

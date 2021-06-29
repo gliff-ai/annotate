@@ -8,7 +8,7 @@ import { useBackgroundStore } from "./Store";
 interface Props extends BaseProps {
   contrast: number;
   brightness: number;
-  setCanvasContainerColourCallback?: (colour: string) => void;
+  setCanvasContainerColourCallback?: (colour: number[]) => void;
 }
 interface State {
   edgeColour: string | null;
@@ -56,6 +56,16 @@ export class BackgroundCanvasClass extends Component<Props, State> {
     }
   };
 
+  setEdgeColour = (containerColour: number[]): void => {
+    // Get the inverse colour to the container colour and average it to grey (so R=B=G).
+    const edgeColour =
+      255 - (containerColour[0] + containerColour[1] + containerColour[2]) / 3;
+    // Set edge colour
+    this.setState({
+      edgeColour: `rgba(${edgeColour},${edgeColour},${edgeColour},0.75)`,
+    });
+  };
+
   setCanvasContainerColour = (): void => {
     // Set background colour of canvas area sorrounding the background image.
     if (
@@ -71,30 +81,25 @@ export class BackgroundCanvasClass extends Component<Props, State> {
       this.props.scaleAndPan
     );
 
-    const color = [];
+    const colour = [];
     const samp = 4;
     // For each RGB value
-    for (let i = 0; i < samp; i += 1) {
+    for (let i = 0; i < 3; i += 1) {
       // Calculate the mean of the values at the four corners of the image.
-      color[i] =
+      colour[i] =
         (data[0 + i] +
           data[(width - 1) * samp + i] +
           data[width * (height - 1) * samp + i] +
           data[data.length - samp + i]) /
         4;
     }
+    colour[3] = 1;
 
     // Set canvas container colour
-    this.props.setCanvasContainerColourCallback(
-      `rgba(${color[0]},${color[1]},${color[2]},1)`
-    );
+    this.props.setCanvasContainerColourCallback(colour);
 
-    // Get the inverse colour to the background and average it to grey (so R=B=G)
-    const edgeColour = 255 - (color[0] + color[1] + color[2]) / 3;
     // Set edge colour
-    this.setState({
-      edgeColour: `rgba(${edgeColour},${edgeColour},${edgeColour},0.75)`,
-    });
+    this.setEdgeColour(colour);
   };
 
   updateBrightnessOrContrast = (): void => {
