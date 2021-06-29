@@ -100,7 +100,6 @@ export const Labels: FunctionComponent<Props> = ({
             inputProps={{
               style: { fontSize: 18, marginRight: 57, marginLeft: -7 },
             }}
-            startAdornment
           />
 
           <IconButton
