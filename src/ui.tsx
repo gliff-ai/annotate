@@ -119,7 +119,7 @@ const styles = {
     marginTop: "20px",
   },
   mainGrid: {
-    height: "calc(100% - 64px)",
+    height: "100%",
   },
   appbar: {
     backgroundColor: "#fafafa",
