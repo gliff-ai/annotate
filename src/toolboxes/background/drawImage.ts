@@ -46,7 +46,7 @@ export function drawImageOnCanvas(
 
   // Draw edge around the image
   if (edgeColour) {
-    const lw = lineWidth || 2;
+    const lw = lineWidth || 1;
     ctx.beginPath();
     /* eslint-disable no-param-reassign */
     ctx.strokeStyle = edgeColour;
