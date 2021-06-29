@@ -1,11 +1,14 @@
-import React, { ReactElement, useState, MouseEvent } from "react";
-import { Tooltip, Button, Menu, MenuItem, makeStyles } from "@material-ui/core";
+import React, { ReactElement, MouseEvent, Component } from "react";
+import { Menu, MenuItem, withStyles, WithStyles } from "@material-ui/core";
 import { ImageFileInfo } from "@gliff-ai/upload";
 import { Annotation } from "@/annotation/interfaces";
+import { keydownListener } from "@/keybindings";
 import { downloadPaintbrushAsTiff } from "@/download/DownloadAsTiff";
 import { downloadAnnotationsAsJson } from "@/download/DownloadAsJson";
+import { tooltips } from "@/tooltips";
+import { BaseIconButton } from "@/components/BaseIconButton";
 
-const useStyles = makeStyles({
+const styles = {
   menu: {
     borderRadius: "9px",
     opacity: 1,
@@ -18,6 +21,9 @@ const useStyles = makeStyles({
   },
   menuItem: {
     opacity: "1",
+    "&:focus": {
+      background: "#02FFAD 0% 0% no-repeat padding-box",
+    },
     "&:hover": {
       background: "#02FFAD 0% 0% no-repeat padding-box",
     },
@@ -33,84 +39,160 @@ const useStyles = makeStyles({
     marginTop: "30px",
     marginLeft: "0px",
   },
-});
+};
 
-interface Props {
+const events = ["openDownloadDropdown"] as const;
+
+interface Event extends CustomEvent {
+  type: typeof events[number];
+}
+interface Props extends WithStyles<typeof styles> {
   annotations: Annotation[];
   imageFileInfo: ImageFileInfo;
 }
 
-export function Download({ annotations, imageFileInfo }: Props): ReactElement {
-  const classes = useStyles();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  const handleOpen = (event: MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const toolboxes: string[] = [];
-  annotations.forEach((a) => {
-    if (!toolboxes.includes(a.toolbox)) {
-      toolboxes.push(a.toolbox);
-    }
-  });
-
-  const menuItems: Array<{ key: string; text: string; onClick: () => void }> =
-    [];
-  toolboxes.forEach((toolbox) => {
-    if (toolbox === "paintbrush") {
-      menuItems.push({
-        key: "paintbrush-tiff",
-        text: "Export paintbrush as Tiff",
-        onClick: () => downloadPaintbrushAsTiff(annotations, imageFileInfo),
-      });
-    }
-    menuItems.push({
-      key: `${toolbox}-json`,
-      text: `Export ${toolbox} as JSON`,
-      onClick: () =>
-        downloadAnnotationsAsJson(annotations, toolbox, imageFileInfo.fileName),
-    });
-  });
-
-  return (
-    <>
-      <Tooltip
-        title="Download annotations"
-        classes={{ tooltip: `${classes.tooltip} ${classes.text}` }}
-      >
-        <Button aria-label="download" onClick={handleOpen}>
-          <img
-            src={require("../assets/save-icon.svg") as string}
-            alt="Save Icon"
-          />
-        </Button>
-      </Tooltip>
-      <Menu
-        id="download-menu"
-        className={classes.menu}
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClick={handleClose}
-        getContentAnchorEl={null}
-        PopoverClasses={{ paper: classes.paper }}
-      >
-        {menuItems.map((item) => (
-          <MenuItem
-            key={item.key}
-            className={`${classes.menuItem} ${classes.text}`}
-            onClick={item.onClick}
-            dense
-          >
-            {item.text}
-          </MenuItem>
-        ))}
-      </Menu>
-    </>
-  );
+type ItemMenu = {
+  key: string;
+  text: string;
+  onClick: () => void;
+};
+interface State {
+  anchorEl: HTMLButtonElement | null;
+  menuItems: ItemMenu[];
 }
+class Download extends Component<Props, State> {
+  refDownloadPopover: HTMLButtonElement | null;
+
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      anchorEl: null,
+      menuItems: [],
+    };
+    this.refDownloadPopover = null;
+  }
+
+  componentDidMount = () => {
+    this.prepareMenuItems();
+
+    document.addEventListener("keydown", keydownListener);
+
+    for (const event of events) {
+      document.addEventListener(event, this.handleEvent);
+    }
+  };
+
+  componentWillUnmount(): void {
+    for (const event of events) {
+      document.removeEventListener(event, this.handleEvent);
+    }
+  }
+
+  componentDidUpdate = (prevProps: Props): void => {
+    if (
+      JSON.stringify(prevProps.annotations) !==
+      JSON.stringify(this.props.annotations)
+    ) {
+      this.prepareMenuItems();
+    }
+  };
+
+  handleEvent = (event: Event): void => {
+    console.log("callevent");
+    if (event.detail === "download") {
+      this[event.type]?.call(this);
+    }
+  };
+
+  openDownloadDropdown = (): void => {
+    this.setState({ anchorEl: this.refDownloadPopover });
+  };
+
+  handleOpen = (event: MouseEvent<HTMLButtonElement>) => {
+    this.setState({ anchorEl: event.currentTarget });
+  };
+
+  handleClose = () => {
+    this.setState({ anchorEl: null });
+  };
+
+  prepareMenuItems = () => {
+    const toolboxes: string[] = [];
+    const newMenuItems: ItemMenu[] = [];
+
+    this.props.annotations.forEach((a) => {
+      if (!toolboxes.includes(a.toolbox)) {
+        toolboxes.push(a.toolbox);
+      }
+    });
+
+    toolboxes.forEach((toolbox) => {
+      if (toolbox === "paintbrush") {
+        newMenuItems.push({
+          key: "paintbrush-tiff",
+          text: "Export paintbrush as Tiff",
+          onClick: () =>
+            downloadPaintbrushAsTiff(
+              this.props.annotations,
+              this.props.imageFileInfo
+            ),
+        });
+      }
+      newMenuItems.push({
+        key: `${toolbox}-json`,
+        text: `Export ${toolbox} as JSON`,
+        onClick: () =>
+          downloadAnnotationsAsJson(
+            this.props.annotations,
+            toolbox,
+            this.props.imageFileInfo.fileName
+          ),
+      });
+    });
+    this.setState({ menuItems: newMenuItems });
+  };
+
+  render = (): ReactElement => {
+    const { classes } = this.props;
+    return (
+      <>
+        <BaseIconButton
+          tooltip={tooltips.download}
+          onClick={this.handleOpen}
+          fill={false}
+          hasAvatar={false}
+          tooltipPlacement="bottom"
+          tooltipStyling={{ marginTop: "30px", marginLeft: "0px" }}
+          svgStyling={{ width: "45px", height: "auto" }}
+          setRefCallback={(ref) => {
+            this.refDownloadPopover = ref;
+          }}
+        />
+        <Menu
+          id="download-menu"
+          className={classes.menu}
+          anchorEl={this.state.anchorEl}
+          keepMounted
+          open={Boolean(this.state.anchorEl)}
+          onClick={this.handleClose}
+          getContentAnchorEl={null}
+          PopoverClasses={{ paper: classes.paper }}
+        >
+          {this.state.menuItems.map((item) => (
+            <MenuItem
+              key={item.key}
+              className={`${classes.menuItem} ${classes.text}`}
+              onClick={item.onClick}
+              dense
+            >
+              {item.text}
+            </MenuItem>
+          ))}
+        </Menu>
+      </>
+    );
+  };
+}
+
+const DownloadUI = withStyles(styles)(Download);
+export { DownloadUI as Download };

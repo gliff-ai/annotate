@@ -128,6 +128,7 @@ class MinimapUI extends Component<Props, State> {
             }}
             fill={this.props.buttonClicked === tooltips.minimiseMap.name}
             tooltipPlacement="top"
+            buttonStyling={{ marginRight: "132px" }}
           />
           <BaseIconButton
             tooltip={tooltips.zoomIn}
@@ -137,6 +138,7 @@ class MinimapUI extends Component<Props, State> {
             }}
             fill={this.props.buttonClicked === tooltips.zoomIn.name}
             tooltipPlacement="top"
+            buttonStyling={{ marginRight: "10px" }}
           />
           <BaseIconButton
             tooltip={tooltips.zoomOut}
@@ -146,6 +148,7 @@ class MinimapUI extends Component<Props, State> {
             }}
             fill={this.props.buttonClicked === tooltips.zoomOut.name}
             tooltipPlacement="top"
+            buttonStyling={{ marginRight: "10px" }}
           />
           <BaseIconButton
             tooltip={tooltips.fitToPage}
