@@ -1,5 +1,4 @@
 export interface BrushStroke {
-  // Todo move this into Paintbrush Toolbox
   coordinates: XYPoint[];
   spaceTimeInfo: ZTPoint;
   brush: {
@@ -19,9 +18,6 @@ export interface Annotation {
   brushStrokes: BrushStroke[];
   parameters: Record<string, unknown>;
 }
-
-// export interface AnnotationParameters {}
-
 export interface XYPoint {
   x: number;
   y: number;
