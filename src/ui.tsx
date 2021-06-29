@@ -14,7 +14,6 @@ import {
   Card,
   Paper,
   WithStyles,
-  Tooltip,
 } from "@material-ui/core";
 
 import SVG from "react-inlinesvg";
@@ -87,6 +86,7 @@ interface State {
   anchorElement: HTMLButtonElement | null; // A HTML element. It's used to set the position of the popover menu https://material-ui.com/api/menu/#props
   buttonClicked: string;
   mode: Mode;
+  canvasContainerColour: string;
 }
 
 const styles = {
@@ -127,7 +127,6 @@ const styles = {
   },
   canvasGrid: {
     width: "100%",
-    backgroundColor: "#fafafa",
   },
   slicesSlider: {
     width: "63px",
@@ -215,6 +214,7 @@ class UserInterface extends Component<Props, State> {
       buttonClicked: null,
       activeTool: Tools.paintbrush,
       mode: Mode.draw,
+      canvasContainerColour: "#fafafa",
     };
 
     this.annotationsObject.addAnnotation(this.state.activeTool);
@@ -800,7 +800,11 @@ class UserInterface extends Component<Props, State> {
 
         <CssBaseline />
 
-        <Container disableGutters maxWidth={false}>
+        <Container
+          disableGutters
+          maxWidth={false}
+          style={{ backgroundColor: `${this.state.canvasContainerColour}` }}
+        >
           {appBar}
           <Grid
             container
@@ -826,6 +830,9 @@ class UserInterface extends Component<Props, State> {
                     displayedImage={this.state.displayedImage}
                     canvasPositionAndSize={this.state.viewportPositionAndSize}
                     setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                    setCanvasContainerColourCallback={(canvasContainerColour) =>
+                      this.setState({ canvasContainerColour })
+                    }
                   />
 
                   <SplineCanvas

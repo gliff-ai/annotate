@@ -1,13 +1,14 @@
 import React, { Component, ReactNode, ReactElement } from "react";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
-import drawImageOnCanvas from "./drawImage";
+import { drawImageOnCanvas, getImageDataFromCanvas } from "./drawImage";
 
 import { useBackgroundStore } from "./Store";
 
 interface Props extends BaseProps {
   contrast: number;
   brightness: number;
+  setCanvasContainerColourCallback?: (colour: string) => void;
 }
 
 export class BackgroundCanvasClass extends Component<Props> {
@@ -26,6 +27,9 @@ export class BackgroundCanvasClass extends Component<Props> {
       this.updateBrightnessOrContrast();
     }
     this.drawImage();
+    if (prevProps.displayedImage !== this.props.displayedImage) {
+      this.setCanvasContainerColour();
+    }
   }
 
   private drawImage = () => {
@@ -39,6 +43,41 @@ export class BackgroundCanvasClass extends Component<Props> {
         this.props.scaleAndPan
       );
     }
+  };
+
+  setCanvasContainerColour = (): void => {
+    // Set background colour of canvas area sorrounding the background image.
+    if (
+      !this.props.displayedImage ||
+      !this.props.setCanvasContainerColourCallback
+    )
+      return;
+
+    const alpha = 0.8;
+    const color = [];
+
+    // Get the data for the background image
+    const { width, height, data } = getImageDataFromCanvas(
+      this.baseCanvas.canvasContext,
+      this.props.displayedImage,
+      this.props.scaleAndPan
+    );
+
+    const samp = 4;
+    // For each RGB value
+    for (let i = 0; i < samp; i += 1) {
+      // Calculate the mean of the values at the four corners of the image.
+      color[i] =
+        (data[0 + i] +
+          data[(width - 1) * samp + i] +
+          data[width * (height - 1) * samp + i] +
+          data[data.length - samp + i]) /
+        4;
+    }
+
+    this.props.setCanvasContainerColourCallback(
+      `rgba(${color[0]},${color[1]},${color[2]},${alpha})`
+    );
   };
 
   updateBrightnessOrContrast = (): void => {
@@ -73,6 +112,7 @@ export const BackgroundCanvas = (
       canvasPositionAndSize={props.canvasPositionAndSize}
       displayedImage={props.displayedImage}
       setCanvasPositionAndSize={props.setCanvasPositionAndSize}
+      setCanvasContainerColourCallback={props.setCanvasContainerColourCallback}
     />
   );
 };
