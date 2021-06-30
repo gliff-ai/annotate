@@ -73,6 +73,7 @@ interface Props extends WithStyles<typeof styles> {
     x?: number;
     y?: number;
   }) => void;
+  canvasContainerColour: number[];
 }
 
 interface State {
@@ -178,6 +179,7 @@ class MinimapUI extends Component<Props, State> {
                 canvasPositionAndSize={this.props.viewportPositionAndSize}
                 minimapPositionAndSize={this.props.minimapPositionAndSize}
                 setMinimapPositionAndSize={this.props.setMinimapPositionAndSize}
+                canvasContainerColour={this.props.canvasContainerColour}
               />
             </div>
           )}
