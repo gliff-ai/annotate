@@ -1,5 +1,11 @@
-// import { AnnotationParameters } from "../../annotation";
-//
-// export interface SplineParameters extends AnnotationParameters {
-//   function: "linear";
-// }
+import { XYPoint, ZTPoint } from "@/annotation/interfaces";
+
+export interface BrushStroke {
+  coordinates: XYPoint[];
+  spaceTimeInfo: ZTPoint;
+  brush: {
+    radius: number;
+    type: "paint" | "erase";
+    color: string; // rgb(a) string
+  };
+}

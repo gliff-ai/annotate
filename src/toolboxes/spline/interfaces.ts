@@ -1,5 +1,6 @@
-// import { AnnotationParameters } from "../../annotation";
-//
-// export interface SplineParameters extends AnnotationParameters {
-//   function: "linear";
-// }
+import { XYPoint, ZTPoint } from "@/annotation/interfaces";
+
+export interface Spline {
+  coordinates: XYPoint[];
+  spaceTimeInfo: ZTPoint;
+}

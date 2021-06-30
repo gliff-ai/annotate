@@ -1,16 +1,6 @@
-export interface BrushStroke {
-  coordinates: XYPoint[];
-  spaceTimeInfo: ZTPoint;
-  brush: {
-    radius: number;
-    type: "paint" | "erase";
-    color: string; // rgb(a) string
-  };
-}
-export interface Spline {
-  coordinates: XYPoint[];
-  spaceTimeInfo: ZTPoint;
-}
+import { BrushStroke } from "@/toolboxes/paintbrush";
+import { Spline } from "@/toolboxes/spline";
+
 export interface Annotation {
   labels: string[];
   toolbox: string;
