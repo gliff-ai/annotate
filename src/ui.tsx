@@ -574,12 +574,6 @@ class UserInterface extends Component<Props, State> {
       }
     };
 
-  // handleRequestClose = (): void => {
-  //   this.setState({
-  //     popover: false,
-  //   });
-  // };
-
   // Functions of type select<ToolTip.name>, added for use in keybindings and OnClick events
   // TODO: find a way to pass parameters in keybindings and get rid of code duplication
   selectContrast = (): void => {
