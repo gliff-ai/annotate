@@ -94,18 +94,24 @@ class Minimap extends Component<Props, State> {
     }
   };
 
+  componentWillUnmount(): void {
+    for (const event of events) {
+      document.removeEventListener(event, this.handleEvent);
+    }
+  }
+
+  handleEvent = (event: Event): void => {
+    if (event.detail === "minimap") {
+      this[event.type]?.call(this);
+    }
+  };
+
   handleDrawerClose = () => {
     this.setState({ isOpen: false });
   };
 
   handleDrawerOpen = () => {
     this.setState({ isOpen: true });
-  };
-
-  handleEvent = (event: Event): void => {
-    if (event.detail === "minimap") {
-      this[event.type]?.call(this);
-    }
   };
 
   render = (): ReactElement => (
