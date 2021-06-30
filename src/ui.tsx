@@ -21,9 +21,10 @@ import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { ThemeProvider, theme } from "@/theme";
-import MinimapUI, {
+import {
   BackgroundCanvas,
   BackgroundUI,
+  MinimapUI,
 } from "@/toolboxes/background";
 import { SplineCanvas, SplineUI, SplineToolbar } from "@/toolboxes/spline";
 import {

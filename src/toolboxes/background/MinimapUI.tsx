@@ -79,7 +79,7 @@ interface State {
   isOpen: boolean;
 }
 
-class MinimapUI extends Component<Props, State> {
+class Minimap extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
@@ -213,4 +213,4 @@ class MinimapUI extends Component<Props, State> {
   );
 }
 
-export default withStyles(styles)(MinimapUI);
+export const MinimapUI = withStyles(styles)(Minimap);
