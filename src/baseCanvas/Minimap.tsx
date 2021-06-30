@@ -13,6 +13,7 @@ export interface Props extends BaseProps {
     y?: number;
   }) => void;
   setMinimapPositionAndSize?: (minimapPositionAndSize: PositionAndSize) => void;
+  canvasContainerColour: number[];
 }
 
 export class MinimapCanvas extends React.Component<Props> {
@@ -30,7 +31,17 @@ export class MinimapCanvas extends React.Component<Props> {
     this.applyView();
   };
 
+  private getEdgeColour = (): string => {
+    const [r, g, b] = [...this.props.canvasContainerColour];
+    const edgeColour = 255 - (r + g + b) / 3;
+    return `rgba(${edgeColour},${edgeColour},${edgeColour},1)`;
+  };
+
   private applyView = (): void => {
+    const lineWidth = 2;
+    const edgeColour = this.getEdgeColour();
+    console.log(edgeColour);
+
     this.boundingRect = getMinimapViewFinder(
       this.props.displayedImage.width,
       this.props.displayedImage.height,
@@ -40,13 +51,13 @@ export class MinimapCanvas extends React.Component<Props> {
     );
     this.baseCanvas.clearWindow();
     this.baseCanvas.canvasContext.beginPath();
-    this.baseCanvas.canvasContext.strokeStyle = "#FFFFFF";
-    this.baseCanvas.canvasContext.lineWidth = 2;
+    this.baseCanvas.canvasContext.strokeStyle = edgeColour;
+    this.baseCanvas.canvasContext.lineWidth = lineWidth;
     this.baseCanvas.canvasContext.strokeRect(
-      this.boundingRect.left + 1,
-      this.boundingRect.top + 1,
-      this.boundingRect.width - 2,
-      this.boundingRect.height - 2
+      this.boundingRect.left + lineWidth / 2,
+      this.boundingRect.top + lineWidth / 2,
+      this.boundingRect.width - lineWidth,
+      this.boundingRect.height - lineWidth
     );
   };
 
