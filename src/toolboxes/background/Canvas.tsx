@@ -57,12 +57,11 @@ export class BackgroundCanvasClass extends Component<Props, State> {
   };
 
   setEdgeColour = (containerColour: number[]): void => {
-    // Get the inverse colour to the container colour and average it to grey (so R=B=G).
-    const edgeColour =
-      255 - (containerColour[0] + containerColour[1] + containerColour[2]) / 3;
+    const [r, g, b] = containerColour;
+    const colour = 255 - (r + g + b) / 3; // Get the inverse colour to the container colour and average it to grey (so R=B=G).
     // Set edge colour
     this.setState({
-      edgeColour: `rgba(${edgeColour},${edgeColour},${edgeColour},0.75)`,
+      edgeColour: `rgba(${colour},${colour},${colour},0.75)`,
     });
   };
 
