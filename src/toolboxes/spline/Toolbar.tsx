@@ -21,6 +21,12 @@ class Toolbar extends Component<Props> {
     }
   };
 
+  componentWillUnmount(): void {
+    for (const event of events) {
+      document.removeEventListener(event, this.handleEvent);
+    }
+  }
+
   handleEvent = (event: Event): void => {
     if (event.detail === "spline") {
       this[event.type]?.call(this);
