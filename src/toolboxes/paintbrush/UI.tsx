@@ -1,15 +1,12 @@
 import React, { ChangeEvent, ReactElement } from "react";
 import { createStyles, makeStyles, Popover } from "@material-ui/core";
-
 import { BaseSlider } from "@/components/BaseSlider";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
-
 import { usePaintbrushStore } from "./Store";
 
 interface Props {
   isOpen: boolean;
   anchorElement: HTMLButtonElement | null;
-  onClick: (event: React.MouseEvent) => void;
   onClose: (event: React.MouseEvent) => void;
 }
 
@@ -38,7 +35,6 @@ const PaintbrushUI = (props: Props): ReactElement => {
       open={props.isOpen}
       anchorEl={props.anchorElement}
       onClose={props.onClose}
-      onClick={props.onClick}
     >
       <div className={classes.baseSlider}>
         <BaseSlider

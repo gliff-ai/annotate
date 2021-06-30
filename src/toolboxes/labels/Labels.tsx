@@ -23,8 +23,8 @@ import SVG from "react-inlinesvg";
 
 import { Annotations } from "@/annotation";
 
-interface Props {
-  annotationObject: Annotations;
+export interface Props {
+  annotationsObject: Annotations;
   presetLabels: string[];
   updatePresetLabels: (label: string) => void;
   activeAnnotationID: number;
@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export const Labels: FunctionComponent<Props> = ({
-  annotationObject,
+  annotationsObject,
   presetLabels,
   updatePresetLabels,
   activeAnnotationID,
@@ -51,7 +51,7 @@ export const Labels: FunctionComponent<Props> = ({
   const classes = useStyles();
 
   const [assignedLabels, setAssignedLabels] = useState(
-    annotationObject.getLabels()
+    annotationsObject.getLabels()
   );
 
   function getMenuLabels(labels: string[]): string[] {
@@ -60,7 +60,7 @@ export const Labels: FunctionComponent<Props> = ({
   }
 
   const [menuLabels, setMenuLabels] = useState(
-    getMenuLabels(annotationObject.getLabels())
+    getMenuLabels(annotationsObject.getLabels())
   );
   const [newLabel, setNewLabel] = useState("");
 
@@ -72,14 +72,14 @@ export const Labels: FunctionComponent<Props> = ({
   }
 
   const updateAllLabels = (): void => {
-    const labels = annotationObject.getLabels();
+    const labels = annotationsObject.getLabels();
     setAssignedLabels(labels);
     setMenuLabels(getMenuLabels(labels));
   };
 
   const handleAddLabel = (label: string) => (): void => {
     // Add a label to active annotation object and update some states.
-    annotationObject.addLabel(label);
+    annotationsObject.addLabel(label);
     updatePresetLabels(label);
     updateAllLabels();
     setNewLabel("");
@@ -87,7 +87,7 @@ export const Labels: FunctionComponent<Props> = ({
 
   const handleRemoveLabel = (label: string) => (): void => {
     // Remove a label from active annotation object and update some states.
-    annotationObject.removeLabel(label);
+    annotationsObject.removeLabel(label);
     updateAllLabels();
   };
 
@@ -114,7 +114,7 @@ export const Labels: FunctionComponent<Props> = ({
             edge="end"
           >
             <SVG
-              src={require("../assets/add-icon.svg") as string}
+              src={require("../../assets/add-icon.svg") as string}
               width="12px"
               height="100%"
               fill="#A1A1A1"
@@ -135,7 +135,7 @@ export const Labels: FunctionComponent<Props> = ({
                 onClick={handleRemoveLabel(label)}
               >
                 <SVG
-                  src={require("../assets/backspace-icon.svg") as string}
+                  src={require("../../assets/backspace-icon.svg") as string}
                   width="28px"
                   height="100%"
                   fill="#02FFAD"
@@ -157,7 +157,7 @@ export const Labels: FunctionComponent<Props> = ({
                 onClick={handleAddLabel(label)}
               >
                 <SVG
-                  src={require("../assets/add-icon.svg") as string}
+                  src={require("../../assets/add-icon.svg") as string}
                   width="12px"
                   height="100%"
                   fill="#000000"

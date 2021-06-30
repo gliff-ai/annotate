@@ -5,17 +5,11 @@ import {
   Toolbar,
   ButtonGroup,
   Grid,
-  Typography,
   CssBaseline,
   withStyles,
-  Avatar,
-  Popover,
-  Card,
   Paper,
   WithStyles,
 } from "@material-ui/core";
-
-import SVG from "react-inlinesvg";
 
 import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
 import { Annotations } from "@/annotation";
@@ -32,7 +26,7 @@ import {
   PaintbrushUI,
   PaintbrushToolbar,
 } from "@/toolboxes/paintbrush";
-import { Labels } from "@/components/Labels";
+import { LabelsPopover } from "@/toolboxes/labels";
 import { Download } from "@/download/UI";
 import { keydownListener } from "@/keybindings";
 import { Tools, Tool } from "@/tools";
@@ -84,7 +78,6 @@ interface State {
   redraw: number;
   sliceIndex: number;
   channels: boolean[];
-  popover: boolean;
   anchorElement: HTMLButtonElement | null; // A HTML element. It's used to set the position of the popover menu https://material-ui.com/api/menu/#props
   buttonClicked: string;
   mode: Mode;
@@ -134,24 +127,6 @@ const styles = {
     width: "63px",
     height: "450px",
   },
-  annotationCard: {
-    width: "271px",
-    height: "375px",
-  },
-  annotationPaper: {
-    padding: "10px",
-    backgroundColor: theme.palette.primary.main,
-    width: "271px",
-  },
-  annotationTypography: {
-    display: "inline",
-    fontSize: "21px",
-    marginRight: "125px",
-  },
-  annotationAvatar: {
-    backgroundColor: theme.palette.primary.main,
-    display: "inline",
-  },
   tooltip: {
     backgroundColor: "#FFFFFF",
     border: "1px solid #dadde9",
@@ -163,7 +138,6 @@ const styles = {
     color: "#2B2F3A",
     fontWeight: 400,
   },
-  svgSmall: { width: "18px", height: "auto" },
 };
 
 interface Props extends WithStyles<typeof styles> {
@@ -209,7 +183,6 @@ class UserInterface extends Component<Props, State> {
       channels: [true],
       displayedImage: this.slicesData ? this.slicesData[0][0] : null,
       redraw: 0,
-      popover: false,
       anchorElement: null,
       buttonClicked: null,
       activeTool: Tools.paintbrush,
@@ -573,15 +546,10 @@ class UserInterface extends Component<Props, State> {
   };
 
   changeSlice = (e: ChangeEvent, value: number): void => {
-    this.setState(
-      {
-        sliceIndex: value,
-      },
-      () => {
-        this.reuseEmptyAnnotation();
-        this.mixChannels();
-      }
-    );
+    this.setState({ sliceIndex: value }, () => {
+      this.reuseEmptyAnnotation();
+      this.mixChannels();
+    });
   };
 
   toggleChannelAtIndex = (index: number): void => {
@@ -592,30 +560,25 @@ class UserInterface extends Component<Props, State> {
     }, this.mixChannels);
   };
 
-  handleClose = (): void =>
-    this.setState({
-      anchorElement: null,
-      popover: false,
-    });
+  handleClose = (): void => this.setState({ anchorElement: null });
 
   handleOpen =
     (event?: React.MouseEvent) =>
     (anchorElement?: HTMLButtonElement): void => {
       if (anchorElement) {
-        this.setState({ anchorElement, popover: true });
+        this.setState({ anchorElement });
       } else if (event) {
         this.setState({
           anchorElement: event.currentTarget as HTMLButtonElement,
-          popover: true,
         });
       }
     };
 
-  handleRequestClose = (): void => {
-    this.setState({
-      popover: false,
-    });
-  };
+  // handleRequestClose = (): void => {
+  //   this.setState({
+  //     popover: false,
+  //   });
+  // };
 
   // Functions of type select<ToolTip.name>, added for use in keybindings and OnClick events
   // TODO: find a way to pass parameters in keybindings and get rid of code duplication
@@ -852,7 +815,6 @@ class UserInterface extends Component<Props, State> {
                       this.setState({ canvasContainerColour })
                     }
                   />
-
                   <SplineCanvas
                     scaleAndPan={this.state.scaleAndPan}
                     activeTool={this.state.activeTool}
@@ -919,44 +881,18 @@ class UserInterface extends Component<Props, State> {
                 </Paper>
               )}
             </Grid>
-
-            <Popover
-              open={
-                Boolean(this.state.anchorElement) &&
-                this.state.buttonClicked === "Annotation Label"
+            <LabelsPopover
+              isOpen={
+                this.state.buttonClicked === "Annotation Label" &&
+                Boolean(this.state.anchorElement)
               }
-              anchorEl={this.state.anchorElement}
+              anchorElement={this.state.anchorElement}
               onClose={this.handleClose}
-            >
-              <Card className={classes.annotationCard}>
-                <Paper
-                  elevation={0}
-                  variant="outlined"
-                  square
-                  className={classes.annotationPaper}
-                >
-                  <Typography className={classes.annotationTypography}>
-                    Annotation
-                  </Typography>
-                  <Avatar className={classes.annotationAvatar}>
-                    <SVG
-                      src={require("./assets/pin-icon.svg") as string}
-                      className={classes.svgSmall}
-                    />
-                  </Avatar>
-                </Paper>
-                <Paper elevation={0} square>
-                  <Grid container justify="center">
-                    <Labels
-                      annotationObject={this.annotationsObject}
-                      presetLabels={this.presetLabels}
-                      updatePresetLabels={this.updatePresetLabels}
-                      activeAnnotationID={this.state.activeAnnotationID}
-                    />
-                  </Grid>
-                </Paper>
-              </Card>
-            </Popover>
+              annotationsObject={this.annotationsObject}
+              presetLabels={this.presetLabels}
+              updatePresetLabels={this.updatePresetLabels}
+              activeAnnotationID={this.state.activeAnnotationID}
+            />
             <BackgroundUI
               buttonClicked={this.state.buttonClicked}
               anchorElement={this.state.anchorElement}
@@ -967,13 +903,13 @@ class UserInterface extends Component<Props, State> {
             />
             <PaintbrushUI
               isOpen={
-                this.state.buttonClicked === "Brush" && this.state.popover
+                this.state.buttonClicked === "Brush" &&
+                Boolean(this.state.anchorElement)
               }
               anchorElement={this.state.anchorElement}
               onClose={this.handleClose}
-              onClick={this.handleRequestClose}
             />
-            <SplineUI
+            {/* <SplineUI
               isOpen={
                 this.state.buttonClicked === "Spline" && this.state.popover
               }
@@ -982,7 +918,7 @@ class UserInterface extends Component<Props, State> {
               onClose={this.handleClose}
               activeTool={this.state.activeTool}
               activateTool={this.activateTool}
-            />
+            /> */}
           </Grid>
         </Container>
         <MinimapUI
