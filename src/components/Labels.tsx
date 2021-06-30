@@ -1,5 +1,6 @@
 import React, {
   FunctionComponent,
+  ChangeEvent,
   ReactElement,
   useState,
   useEffect,
@@ -37,6 +38,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginLeft: "-7px",
     },
     list: { width: "100%" },
+    inputBaseProps: { fontSize: 18, marginRight: 57, marginLeft: -7 },
   })
 );
 
@@ -46,23 +48,28 @@ export const Labels: FunctionComponent<Props> = ({
   updatePresetLabels,
   activeAnnotationID,
 }: Props): ReactElement => {
-  const getMenuLabels = (labels: string[]): string[] =>
-    presetLabels.filter((label) => !labels.includes(label));
-
   const classes = useStyles();
 
   const [assignedLabels, setAssignedLabels] = useState(
     annotationObject.getLabels()
   );
+
+  function getMenuLabels(labels: string[]): string[] {
+    // Get array with labels that are yet to be assigned.
+    return presetLabels.filter((label) => !labels.includes(label));
+  }
+
   const [menuLabels, setMenuLabels] = useState(
     getMenuLabels(annotationObject.getLabels())
   );
+  const [newLabel, setNewLabel] = useState("");
 
-  const [newLabel, setNewLabel] = React.useState("");
+  function handleNewLabelChange(event: ChangeEvent<HTMLInputElement>): void {
+    // Handle the input of a new label.
+    const { value } = event.target; // TODO: add input validation
 
-  const handleNewLabelChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setNewLabel(event.target.value);
-  };
+    setNewLabel(value);
+  }
 
   const updateAllLabels = (): void => {
     const labels = annotationObject.getLabels();
@@ -91,15 +98,13 @@ export const Labels: FunctionComponent<Props> = ({
 
   return (
     <>
-      <List component="div" disablePadding style={{ width: "100%" }}>
+      <List component="div" disablePadding className={classes.list}>
         <ListItem>
           <InputBase
             placeholder="New label"
             value={newLabel}
             onChange={handleNewLabelChange}
-            inputProps={{
-              style: { fontSize: 18, marginRight: 57, marginLeft: -7 },
-            }}
+            inputProps={{ styles: `${classes.inputBaseProps}` }}
           />
 
           <IconButton
