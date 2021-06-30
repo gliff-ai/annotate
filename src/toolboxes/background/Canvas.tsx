@@ -1,17 +1,27 @@
 import React, { Component, ReactNode, ReactElement } from "react";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
-import drawImageOnCanvas from "./drawImage";
+import { drawImageOnCanvas, getImageDataFromCanvas } from "./drawImage";
 
 import { useBackgroundStore } from "./Store";
 
 interface Props extends BaseProps {
   contrast: number;
   brightness: number;
+  setCanvasContainerColourCallback?: (colour: number[]) => void;
 }
-
-export class BackgroundCanvasClass extends Component<Props> {
+interface State {
+  edgeColour: string | null;
+}
+export class BackgroundCanvasClass extends Component<Props, State> {
   private baseCanvas: BaseCanvas;
+
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      edgeColour: null,
+    };
+  }
 
   componentDidMount = (): void => {
     this.drawImage();
@@ -26,6 +36,10 @@ export class BackgroundCanvasClass extends Component<Props> {
       this.updateBrightnessOrContrast();
     }
     this.drawImage();
+
+    if (prevProps.displayedImage !== this.props.displayedImage) {
+      this.setCanvasContainerColour();
+    }
   }
 
   private drawImage = () => {
@@ -36,9 +50,56 @@ export class BackgroundCanvasClass extends Component<Props> {
       drawImageOnCanvas(
         this.baseCanvas.canvasContext,
         this.props.displayedImage,
-        this.props.scaleAndPan
+        this.props.scaleAndPan,
+        this.state.edgeColour
       );
     }
+  };
+
+  setEdgeColour = (containerColour: number[]): void => {
+    // Get the inverse colour to the container colour and average it to grey (so R=B=G).
+    const edgeColour =
+      255 - (containerColour[0] + containerColour[1] + containerColour[2]) / 3;
+    // Set edge colour
+    this.setState({
+      edgeColour: `rgba(${edgeColour},${edgeColour},${edgeColour},0.75)`,
+    });
+  };
+
+  setCanvasContainerColour = (): void => {
+    // Set background colour of canvas area sorrounding the background image.
+    if (
+      !this.props.displayedImage ||
+      !this.props.setCanvasContainerColourCallback
+    )
+      return;
+
+    // Get the data for the background image
+    const { width, height, data } = getImageDataFromCanvas(
+      this.baseCanvas.canvasContext,
+      this.props.displayedImage,
+      this.props.scaleAndPan
+    );
+
+    const colour = [];
+    const samp = 4;
+    // For each RGB value
+    for (let i = 0; i < 3; i += 1) {
+      // Calculate the mean of the values at the four corners of the image.
+      colour[i] =
+        (data[0 + i] +
+          data[(width - 1) * samp + i] +
+          data[width * (height - 1) * samp + i] +
+          data[data.length - samp + i]) /
+        4;
+    }
+    colour[3] = 1;
+
+    // Set canvas container colour
+    this.props.setCanvasContainerColourCallback(colour);
+
+    // Set edge colour
+    this.setEdgeColour(colour);
   };
 
   updateBrightnessOrContrast = (): void => {
@@ -73,6 +134,7 @@ export const BackgroundCanvas = (
       canvasPositionAndSize={props.canvasPositionAndSize}
       displayedImage={props.displayedImage}
       setCanvasPositionAndSize={props.setCanvasPositionAndSize}
+      setCanvasContainerColourCallback={props.setCanvasContainerColourCallback}
     />
   );
 };

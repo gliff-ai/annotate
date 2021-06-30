@@ -10,9 +10,6 @@ export interface Config {
   max: number;
   unit: string;
 }
-
-type Marks = Array<{ value: number; label: string }>;
-
 interface Props {
   value: number;
   config: Config;

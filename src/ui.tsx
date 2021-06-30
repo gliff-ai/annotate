@@ -87,6 +87,7 @@ interface State {
   anchorElement: HTMLButtonElement | null; // A HTML element. It's used to set the position of the popover menu https://material-ui.com/api/menu/#props
   buttonClicked: string;
   mode: Mode;
+  canvasContainerColour: number[];
 }
 
 const styles = {
@@ -118,7 +119,7 @@ const styles = {
     marginTop: "20px",
   },
   mainGrid: {
-    height: "calc(100% - 64px)",
+    height: "100%",
   },
   appbar: {
     backgroundColor: "#fafafa",
@@ -127,7 +128,6 @@ const styles = {
   },
   canvasGrid: {
     width: "100%",
-    backgroundColor: "#fafafa",
   },
   slicesSlider: {
     width: "63px",
@@ -213,6 +213,7 @@ class UserInterface extends Component<Props, State> {
       buttonClicked: null,
       activeTool: Tools.paintbrush,
       mode: Mode.draw,
+      canvasContainerColour: [255, 255, 255, 1],
     };
 
     this.annotationsObject.addAnnotation(this.state.activeTool);
@@ -270,6 +271,11 @@ class UserInterface extends Component<Props, State> {
     if (event.detail === "ui") {
       this[event.type]?.call(this);
     }
+  };
+
+  getRGBAforCanvasContainerColour = (): string => {
+    const [r, g, b, a] = [...this.state.canvasContainerColour];
+    return `rgba(${r},${g},${b},${a})`;
   };
 
   updatePresetLabels = (label: string): void => {
@@ -812,7 +818,13 @@ class UserInterface extends Component<Props, State> {
 
         <CssBaseline />
 
-        <Container disableGutters maxWidth={false}>
+        <Container
+          disableGutters
+          maxWidth={false}
+          style={{
+            backgroundColor: this.getRGBAforCanvasContainerColour(),
+          }}
+        >
           {appBar}
           <Grid
             container
@@ -838,6 +850,9 @@ class UserInterface extends Component<Props, State> {
                     displayedImage={this.state.displayedImage}
                     canvasPositionAndSize={this.state.viewportPositionAndSize}
                     setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                    setCanvasContainerColourCallback={(canvasContainerColour) =>
+                      this.setState({ canvasContainerColour })
+                    }
                   />
 
                   <SplineCanvas
@@ -989,6 +1004,7 @@ class UserInterface extends Component<Props, State> {
           setMinimapPositionAndSize={this.setMinimapPositionAndSize}
           resetScaleAndPan={this.resetScaleAndPan}
           setScaleAndPan={this.setScaleAndPan}
+          canvasContainerColour={this.state.canvasContainerColour}
         />
       </ThemeProvider>
     );
