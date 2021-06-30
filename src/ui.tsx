@@ -669,19 +669,6 @@ class UserInterface extends Component<Props, State> {
             imageFileInfo={this.imageFileInfo}
           />
         </Grid>
-        <Grid item>
-          {saveAnnotationsCallback && (
-            <BaseButton
-              tooltip={tooltips.save}
-              onClick={this.saveAnnotations}
-              fill={false}
-              hasAvatar={false}
-              tooltipPlacement="bottom"
-              tooltipStyling={{ marginTop: "30px", marginLeft: "0px" }}
-              svgStyling={{ width: "45px", height: "auto" }}
-            />
-          )}
-        </Grid>
       </>
     );
 
@@ -732,7 +719,6 @@ class UserInterface extends Component<Props, State> {
                   this.state.buttonClicked === tooltips.addNewAnnotation.name
                 }
               />
-
               <BaseIconButton
                 tooltip={tooltips.clearAnnotation}
                 onMouseDown={() => {
@@ -744,6 +730,17 @@ class UserInterface extends Component<Props, State> {
                   this.state.buttonClicked === tooltips.clearAnnotation.name
                 }
               />
+              {saveAnnotationsCallback && (
+                <BaseIconButton
+                  tooltip={tooltips.save}
+                  onMouseDown={() => {
+                    this.setButtonClicked(tooltips.save.name);
+                    this.saveAnnotations();
+                  }}
+                  onMouseUp={this.setButtonClickedToActiveTool}
+                  fill={this.state.buttonClicked === tooltips.save.name}
+                />
+              )}
             </ButtonGroup>
           </Grid>
         </div>
