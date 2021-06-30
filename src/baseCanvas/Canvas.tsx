@@ -25,8 +25,6 @@ export interface Props {
 }
 
 export class BaseCanvas extends Component<Props> {
-  private name: string;
-
   private canvas: HTMLCanvasElement;
 
   private canvasContainer: HTMLDivElement;
@@ -35,14 +33,8 @@ export class BaseCanvas extends Component<Props> {
 
   private canvasObserver: ResizeObserver;
 
-  constructor(props: Props) {
-    super(props);
-    this.name = props.name;
-  }
-
   public clearWindow = (): void => {
     this.canvasContext.save();
-    // this.canvasContext.setTransform(1, 0, 0, 1, 0, 0); // identity matrix
 
     try {
       this.canvasContext.clearRect(
@@ -172,8 +164,8 @@ export class BaseCanvas extends Component<Props> {
         onMouseMove={this.onMouseMoveHandler}
         onMouseUp={this.onMouseUpHandler}
         onDoubleClick={this.onDoubleClickHandler}
-        key={this.name}
-        id={`${this.name}-canvas`}
+        key={this.props.name}
+        id={`${this.props.name}-canvas`}
         ref={(canvas) => {
           if (canvas) {
             // Keep this as it is initially null

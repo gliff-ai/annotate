@@ -48,7 +48,7 @@ const useStyles = (sliderHeight?: string) =>
     },
   });
 
-export const BaseSlider: FunctionComponent<Props> = ({
+export const BaseSlider = ({
   value,
   config,
   onChange,
