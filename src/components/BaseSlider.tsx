@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FunctionComponent, ReactElement } from "react";
+import React, { ChangeEvent, ReactElement } from "react";
 import { makeStyles, Slider } from "@material-ui/core";
 
 export interface Config {
