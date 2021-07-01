@@ -488,8 +488,10 @@ class UserInterface extends Component<Props, State> {
     this.cycleActiveAnnotation(false);
   };
 
-  setButtonClickedToActiveTool = () => {
+  selectDrawMode = (): void => {
+    // Select draw mode and re-activate last used paint tool
     this.setState((state) => ({
+      mode: Mode.draw,
       buttonClicked: tooltips[state.activeTool].name,
     }));
   };
@@ -501,8 +503,7 @@ class UserInterface extends Component<Props, State> {
     if (this.state.mode === Mode.draw) {
       this.setState({ mode: Mode.select, buttonClicked: tooltips.select.name });
     } else {
-      this.setState({ mode: Mode.draw });
-      this.setButtonClickedToActiveTool();
+      this.selectDrawMode();
     }
   };
 
@@ -699,7 +700,7 @@ class UserInterface extends Component<Props, State> {
                 this.setButtonClicked(tooltips.addNewAnnotation.name);
                 this.addAnnotation();
               }}
-              onMouseUp={this.setButtonClickedToActiveTool}
+              onMouseUp={this.selectDrawMode}
               fill={this.state.buttonClicked === tooltips.addNewAnnotation.name}
             />
             <BaseIconButton
@@ -708,7 +709,7 @@ class UserInterface extends Component<Props, State> {
                 this.setButtonClicked(tooltips.clearAnnotation.name);
                 this.clearActiveAnnotation();
               }}
-              onMouseUp={this.setButtonClickedToActiveTool}
+              onMouseUp={this.selectDrawMode}
               fill={this.state.buttonClicked === tooltips.clearAnnotation.name}
             />
             {saveAnnotationsCallback && (
@@ -718,7 +719,7 @@ class UserInterface extends Component<Props, State> {
                   this.setButtonClicked(tooltips.save.name);
                   this.saveAnnotations();
                 }}
-                onMouseUp={this.setButtonClickedToActiveTool}
+                onMouseUp={this.selectDrawMode}
                 fill={this.state.buttonClicked === tooltips.save.name}
               />
             )}
