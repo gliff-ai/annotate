@@ -44,7 +44,6 @@ export const BaseIconButton = (props: Props): ReactElement => {
     svg: {
       width: "55%",
       height: "auto",
-      "&:hover": { fill: "#000000" },
       ...props.svgStyling,
     },
   })(props);

@@ -58,7 +58,6 @@ const theme: Theme = createMuiTheme({
         marginLeft: "20px",
       },
     },
-
     MuiButtonGroup: {
       root: {
         border: "1px solid #dadde9",
@@ -82,6 +81,9 @@ const theme: Theme = createMuiTheme({
         "&:hover": {
           backgroundColor: "#02FFAD",
         },
+        "&:hover svg": {
+          fill: "#000000",
+        },
       },
     },
     MuiContainer: {
@@ -91,7 +93,6 @@ const theme: Theme = createMuiTheme({
       },
     },
   },
-
   props: {
     MuiIconButton: {
       disableRipple: true,
