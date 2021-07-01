@@ -12,6 +12,7 @@ interface Props {
   buttonClicked: string;
   setButtonClicked: (buttonName: string) => void;
   activateTool: (activeTool: string) => void;
+  isTyping: () => boolean;
 }
 
 class Toolbar extends Component<Props> {
@@ -34,11 +35,13 @@ class Toolbar extends Component<Props> {
   };
 
   selectSpline = (): void => {
+    if (this.props.isTyping()) return;
     this.props.setButtonClicked(tooltips.spline.name);
     this.props.activateTool("spline");
   };
 
   selectMagicspline = (): void => {
+    if (this.props.isTyping()) return;
     this.props.setButtonClicked(tooltips.magicspline.name);
     this.props.activateTool("magicspline");
   };

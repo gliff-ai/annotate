@@ -49,6 +49,7 @@ interface Event extends CustomEvent {
 interface Props extends WithStyles<typeof styles> {
   annotations: Annotation[];
   imageFileInfo: ImageFileInfo;
+  isTyping: () => boolean;
 }
 
 type ItemMenu = {
@@ -104,6 +105,7 @@ class DownloadUI extends Component<Props, State> {
   };
 
   openDownloadDropdown = (): void => {
+    if (this.props.isTyping()) return;
     this.setState({ anchorEl: this.refDownloadPopover });
   };
 

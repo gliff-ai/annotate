@@ -9,6 +9,7 @@ interface Props {
   handleOpen: (
     event?: React.MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
+  isTyping: () => boolean;
 }
 
 const events = ["selectBrush", "selectEraser"] as const;
@@ -44,12 +45,14 @@ class Toolbar extends Component<Props> {
   };
 
   selectBrush = (): void => {
+    if (this.props.isTyping()) return;
     this.props.handleOpen()(this.refBrushPopover);
     this.props.setButtonClicked(tooltips.paintbrush.name);
     this.props.activateTool("paintbrush");
   };
 
   selectEraser = (): void => {
+    if (this.props.isTyping()) return;
     this.props.setButtonClicked(tooltips.eraser.name);
     this.props.activateTool("eraser");
   };

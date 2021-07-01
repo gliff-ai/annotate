@@ -491,8 +491,11 @@ class UserInterface extends Component<Props, State> {
   };
 
   toggleMode = (): void => {
+    // Toggle between draw and select mode.
+    if (this.isTyping()) return;
+
     if (this.state.mode === Mode.draw) {
-      this.setState({ mode: Mode.select, buttonClicked: "Select" });
+      this.setState({ mode: Mode.select, buttonClicked: tooltips.select.name });
     } else {
       this.setState({ mode: Mode.draw });
       this.setButtonClickedToActiveTool();
@@ -574,19 +577,25 @@ class UserInterface extends Component<Props, State> {
       }
     };
 
+  setButtonClicked = (buttonClicked: string): void =>
+    this.setState({ buttonClicked });
+
   // Functions of type select<ToolTip.name>, added for use in keybindings and OnClick events
   // TODO: find a way to pass parameters in keybindings and get rid of code duplication
   selectContrast = (): void => {
+    if (this.isTyping()) return;
     this.handleOpen()(this.refBtnsPopovers[tooltips.contrast.name]);
     this.setButtonClicked(tooltips.contrast.name);
   };
 
   selectBrightness = (): void => {
+    if (this.isTyping()) return;
     this.handleOpen()(this.refBtnsPopovers[tooltips.brightness.name]);
     this.setButtonClicked(tooltips.brightness.name);
   };
 
   selectChannels = (): void => {
+    if (this.isTyping()) return;
     this.handleOpen()(this.refBtnsPopovers[tooltips.channels.name]);
     this.setButtonClicked(tooltips.channels.name);
   };
@@ -596,13 +605,15 @@ class UserInterface extends Component<Props, State> {
     this.setButtonClicked(tooltips.labels.name);
   };
 
-  setButtonClicked = (buttonClicked: string): void =>
-    this.setState({ buttonClicked });
-
   saveAnnotations = (): void => {
     if (!this.props.saveAnnotationsCallback) return;
     this.props.saveAnnotationsCallback(this.annotationsObject);
   };
+
+  isTyping = () =>
+    // Added to prevent single-key shortcuts that are also valid text input
+    // to get triggered during text input.
+    this.refBtnsPopovers[tooltips.labels.name] === this.state.anchorElement;
 
   render = (): ReactNode => {
     const { classes, showAppBar, saveAnnotationsCallback } = this.props;
@@ -630,6 +641,7 @@ class UserInterface extends Component<Props, State> {
           <Download
             annotations={this.annotationsObject.getAllAnnotations()}
             imageFileInfo={this.imageFileInfo}
+            isTyping={this.isTyping}
           />
         </Grid>
       </>
@@ -718,10 +730,7 @@ class UserInterface extends Component<Props, State> {
             <ButtonGroup>
               <BaseIconButton
                 tooltip={tooltips.select}
-                onClick={() => {
-                  this.setButtonClicked(tooltips.select.name);
-                  this.toggleMode();
-                }}
+                onClick={this.toggleMode}
                 fill={this.state.buttonClicked === tooltips.select.name}
               />
               <PaintbrushToolbar
@@ -729,11 +738,13 @@ class UserInterface extends Component<Props, State> {
                 setButtonClicked={this.setButtonClicked}
                 activateTool={this.activateTool}
                 handleOpen={this.handleOpen}
+                isTyping={this.isTyping}
               />
               <SplineToolbar
                 buttonClicked={this.state.buttonClicked}
                 setButtonClicked={this.setButtonClicked}
                 activateTool={this.activateTool}
+                isTyping={this.isTyping}
               />
               <BaseIconButton
                 tooltip={tooltips.brightness}
