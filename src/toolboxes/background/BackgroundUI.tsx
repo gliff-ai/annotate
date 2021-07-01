@@ -1,4 +1,4 @@
-import React, { ChangeEvent, ReactElement } from "react";
+import React, { ChangeEvent, ReactElement, useEffect, useState } from "react";
 import {
   Typography,
   Checkbox,
@@ -21,12 +21,12 @@ import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { useBackgroundStore } from "./Store";
 
 interface Props {
-  open: boolean;
   anchorElement: HTMLElement | null;
   buttonClicked: string;
   onClose: (event: React.MouseEvent) => void;
   channels: boolean[];
   toggleChannelAtIndex: (index: number) => void;
+  displayedImage: ImageBitmap;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -72,6 +72,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const BackgroundUI = (props: Props): ReactElement => {
   const [background, setBackground] = useBackgroundStore();
+  const [channelControls, setChannelControls] = useState<JSX.Element[]>([]);
   const classes = useStyles();
 
   function changeContrast(e: ChangeEvent, value: number) {
@@ -88,34 +89,47 @@ const BackgroundUI = (props: Props): ReactElement => {
     });
   }
 
-  const controls = props.channels.map((channel, i) => (
-    <Checkbox
-      className={classes.checkbox}
-      checked={channel}
-      icon={
-        <SVG
-          src={require("../../assets/not-selected-tickbox-icon.svg") as string}
-          width="18px"
-          height="auto"
-        />
-      }
-      checkedIcon={
-        <SVG
-          src={require("../../assets/selected-tickbox-icon.svg") as string}
-          width="18px"
-          height="auto"
-        />
-      }
-      onChange={() => {
-        props.toggleChannelAtIndex(i);
-      }}
-    />
-  ));
+  const isOpen = () =>
+    (props.buttonClicked === "Channels" ||
+      props.buttonClicked === "Brightness" ||
+      props.buttonClicked === "Contrast") &&
+    Boolean(props.anchorElement);
 
-  return (
+  useEffect(() => {
+    // Update channel controls when a new image is uploaded.
+    const untickedIcon = (
+      <SVG
+        src={require("../../assets/not-selected-tickbox-icon.svg") as string}
+        width="18px"
+        height="auto"
+      />
+    );
+    const tickedIcon = (
+      <SVG
+        src={require("../../assets/selected-tickbox-icon.svg") as string}
+        width="18px"
+        height="auto"
+      />
+    );
+    setChannelControls(
+      props.channels.map((channel, i) => (
+        <Checkbox
+          className={classes.checkbox}
+          checked={channel}
+          icon={untickedIcon}
+          checkedIcon={tickedIcon}
+          onChange={() => {
+            props.toggleChannelAtIndex(i);
+          }}
+        />
+      ))
+    );
+  }, [props.displayedImage]);
+
+  return props.displayedImage ? (
     <>
       <Popover
-        open={props.open}
+        open={isOpen()}
         anchorEl={props.anchorElement}
         onClose={props.onClose}
       >
@@ -160,7 +174,7 @@ const BackgroundUI = (props: Props): ReactElement => {
             </Paper>
             <FormControl component="fieldset">
               <FormGroup aria-label="position" row>
-                {controls.map((control, i) => (
+                {channelControls.map((control, i) => (
                   <FormControlLabel
                     key={`C${i + 1}`}
                     value="top"
@@ -176,7 +190,7 @@ const BackgroundUI = (props: Props): ReactElement => {
         )}
       </Popover>
     </>
-  );
+  ) : null;
 };
 
 export { BackgroundUI };

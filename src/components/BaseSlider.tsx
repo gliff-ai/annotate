@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FunctionComponent, ReactElement } from "react";
+import React, { ChangeEvent, ReactElement } from "react";
 import { makeStyles, Slider } from "@material-ui/core";
 
 export interface Config {
@@ -45,7 +45,7 @@ const useStyles = (sliderHeight?: string) =>
     },
   });
 
-export const BaseSlider: FunctionComponent<Props> = ({
+export const BaseSlider = ({
   value,
   config,
   onChange,

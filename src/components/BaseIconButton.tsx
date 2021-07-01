@@ -41,13 +41,17 @@ export const BaseIconButton = (props: Props): ReactElement => {
       color: "#2B2F3A",
       ...props.tooltipStyling,
     },
-    svgLarge: { width: "55%", height: "auto", ...props.svgStyling },
+    svg: {
+      width: "55%",
+      height: "auto",
+      ...props.svgStyling,
+    },
   })(props);
 
   const svgIcon = (
     <SVG
       src={props.tooltip.icon}
-      className={classes.svgLarge}
+      className={classes.svg}
       fill={props.fill ? theme.palette.primary.main : null}
     />
   );

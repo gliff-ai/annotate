@@ -100,7 +100,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
 
   private interactionCanvas: BaseCanvas;
 
-  private backgroundCanvas: BaseCanvas;
+  private backgroundCanvas: BaseCanvas | null;
 
   private isPressing: boolean;
 
@@ -117,6 +117,7 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     this.isDrawing = false;
     this.points = [];
     this.annotationOpacity = 1;
+    this.backgroundCanvas = null;
 
     this.state = {
       hideBackCanvas: false,
@@ -256,8 +257,9 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     context.stroke();
   };
 
-  drawAllStrokes = (context = this.backgroundCanvas.canvasContext): void => {
+  drawAllStrokes = (context = this.backgroundCanvas?.canvasContext): void => {
     // Draw strokes on active layer whiles showing existing paintbrush layers
+    if (!context) return;
 
     // Get active annotation ID
     const activeAnnotationID =
@@ -426,60 +428,63 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     }
   };
 
-  render = (): ReactNode => (
-    <>
-      {/* this div is basically a fake cursor */}
-      <FauxCursor
-        activeTool={this.props.activeTool}
-        brushRadius={this.getCanvasBrushRadius(this.props.brushRadius)}
-        canvasTopAndLeft={{
-          top:
-            this.backgroundCanvas?.canvasContext?.canvas?.getBoundingClientRect()
-              .top || 0,
-          left:
-            this.backgroundCanvas?.canvasContext?.canvas?.getBoundingClientRect()
-              .left || 0,
-        }}
-      />
-      {/* We have two canvases in order to be able to erase stuff. */}
-      <div
-        style={{
-          pointerEvents:
-            this.props.activeTool === "paintbrush" ||
-            this.props.activeTool === "eraser"
-              ? "auto"
-              : "none",
-        }}
-      >
-        <div style={{ opacity: this.state.hideBackCanvas ? "none" : "block" }}>
+  render = (): ReactNode =>
+    this.props.displayedImage ? (
+      <>
+        {/* this div is basically a fake cursor */}
+        <FauxCursor
+          activeTool={this.props.activeTool}
+          brushRadius={this.getCanvasBrushRadius(this.props.brushRadius)}
+          canvasTopAndLeft={{
+            top:
+              this.backgroundCanvas?.canvasContext?.canvas?.getBoundingClientRect()
+                .top || 0,
+            left:
+              this.backgroundCanvas?.canvasContext?.canvas?.getBoundingClientRect()
+                .left || 0,
+          }}
+        />
+        {/* We have two canvases in order to be able to erase stuff. */}
+        <div
+          style={{
+            pointerEvents:
+              this.props.activeTool === "paintbrush" ||
+              this.props.activeTool === "eraser"
+                ? "auto"
+                : "none",
+          }}
+        >
+          <div
+            style={{ opacity: this.state.hideBackCanvas ? "none" : "block" }}
+          >
+            <BaseCanvas
+              cursor="none"
+              ref={(backgroundCanvas) => {
+                this.backgroundCanvas = backgroundCanvas;
+              }}
+              name="background"
+              scaleAndPan={this.props.scaleAndPan}
+              canvasPositionAndSize={this.props.canvasPositionAndSize}
+              setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
+            />
+          </div>
+
           <BaseCanvas
-            cursor="none"
-            ref={(backgroundCanvas) => {
-              this.backgroundCanvas = backgroundCanvas;
+            onMouseDown={this.onMouseDown}
+            onMouseMove={this.onMouseMove}
+            onMouseUp={this.onMouseUp}
+            cursor={this.getCursor()}
+            ref={(interactionCanvas) => {
+              this.interactionCanvas = interactionCanvas;
             }}
-            name="background"
+            name="interaction"
             scaleAndPan={this.props.scaleAndPan}
             canvasPositionAndSize={this.props.canvasPositionAndSize}
             setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
           />
         </div>
-
-        <BaseCanvas
-          onMouseDown={this.onMouseDown}
-          onMouseMove={this.onMouseMove}
-          onMouseUp={this.onMouseUp}
-          cursor={this.getCursor()}
-          ref={(interactionCanvas) => {
-            this.interactionCanvas = interactionCanvas;
-          }}
-          name="interaction"
-          scaleAndPan={this.props.scaleAndPan}
-          canvasPositionAndSize={this.props.canvasPositionAndSize}
-          setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
-        />
-      </div>
-    </>
-  );
+      </>
+    ) : null;
 }
 
 export const PaintbrushCanvas = (

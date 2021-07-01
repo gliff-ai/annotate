@@ -80,7 +80,7 @@ interface State {
   isOpen: boolean;
 }
 
-class MinimapUI extends Component<Props, State> {
+class Minimap extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
@@ -95,18 +95,24 @@ class MinimapUI extends Component<Props, State> {
     }
   };
 
+  componentWillUnmount(): void {
+    for (const event of events) {
+      document.removeEventListener(event, this.handleEvent);
+    }
+  }
+
+  handleEvent = (event: Event): void => {
+    if (event.detail === "minimap") {
+      this[event.type]?.call(this);
+    }
+  };
+
   handleDrawerClose = () => {
     this.setState({ isOpen: false });
   };
 
   handleDrawerOpen = () => {
     this.setState({ isOpen: true });
-  };
-
-  handleEvent = (event: Event): void => {
-    if (event.detail === "minimap") {
-      this[event.type]?.call(this);
-    }
   };
 
   render = (): ReactElement => (
@@ -215,4 +221,4 @@ class MinimapUI extends Component<Props, State> {
   );
 }
 
-export default withStyles(styles)(MinimapUI);
+export const MinimapUI = withStyles(styles)(Minimap);

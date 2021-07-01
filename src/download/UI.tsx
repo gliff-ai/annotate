@@ -60,7 +60,7 @@ interface State {
   anchorEl: HTMLButtonElement | null;
   menuItems: ItemMenu[];
 }
-class Download extends Component<Props, State> {
+class DownloadUI extends Component<Props, State> {
   refDownloadPopover: HTMLButtonElement | null;
 
   constructor(props: Props) {
@@ -98,7 +98,6 @@ class Download extends Component<Props, State> {
   };
 
   handleEvent = (event: Event): void => {
-    console.log("callevent");
     if (event.detail === "download") {
       this[event.type]?.call(this);
     }
@@ -194,5 +193,4 @@ class Download extends Component<Props, State> {
   };
 }
 
-const DownloadUI = withStyles(styles)(Download);
-export { DownloadUI as Download };
+export const Download = withStyles(styles)(DownloadUI);

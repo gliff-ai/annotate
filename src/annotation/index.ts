@@ -1,10 +1,6 @@
-import {
-  Annotation,
-  XYPoint,
-  BrushStroke,
-  Spline,
-  AuditAction,
-} from "./interfaces";
+import { BrushStroke } from "@/toolboxes/paintbrush";
+import { Spline } from "@/toolboxes/spline";
+import { Annotation, XYPoint, AuditAction } from "./interfaces";
 
 interface Descriptor extends Omit<PropertyDescriptor, "value"> {
   // Ideally this would be the methods of Annotations

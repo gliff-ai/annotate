@@ -104,7 +104,7 @@ const tooltips: ToolTips = {
   },
   save: {
     name: "Save annotations",
-    icon: require(`./assets/upload-icon.svg`) as string, // TODO: replace with correct icon
+    icon: require(`./assets/save-icon.svg`) as string,
     shortcut: "CTRL",
     shortcutSymbol: "S",
   },
