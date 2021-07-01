@@ -85,16 +85,20 @@ interface State {
 }
 
 const styles = {
-  annotationToolbar: {
+  selectionContainer: {
     left: "18px",
-    top: "80px",
-    marginTop: "30px",
+    marginTop: "18px",
+    top: "90px",
+    width: "auto",
     zIndex: 100,
   },
-  mainToolbar: {
+  displayContainer: {
+    marginTop: "18px",
+  },
+  bottomToolbars: {
+    bottom: "18px",
     left: "18px",
-    bottom: "0",
-    marginBottom: "30px",
+    width: "auto",
     zIndex: 100,
   },
   uploadToolbar: {
@@ -677,62 +681,66 @@ class UserInterface extends Component<Props, State> {
 
     return (
       <ThemeProvider theme={theme}>
-        <div
-          className={classes.annotationToolbar}
+        <Grid
+          container
+          direction="row"
+          className={classes.selectionContainer}
+          style={{ position: "fixed" }}
+        >
+          <ButtonGroup size="small" id="selection-toolbar">
+            <BaseIconButton
+              tooltip={tooltips.select}
+              onClick={this.toggleMode}
+              fill={this.state.buttonClicked === tooltips.select.name}
+            />
+            <BaseIconButton
+              tooltip={tooltips.addNewAnnotation}
+              onMouseDown={() => {
+                this.setButtonClicked(tooltips.addNewAnnotation.name);
+                this.addAnnotation();
+              }}
+              onMouseUp={this.setButtonClickedToActiveTool}
+              fill={this.state.buttonClicked === tooltips.addNewAnnotation.name}
+            />
+            <BaseIconButton
+              tooltip={tooltips.clearAnnotation}
+              onMouseDown={() => {
+                this.setButtonClicked(tooltips.clearAnnotation.name);
+                this.clearActiveAnnotation();
+              }}
+              onMouseUp={this.setButtonClickedToActiveTool}
+              fill={this.state.buttonClicked === tooltips.clearAnnotation.name}
+            />
+            {saveAnnotationsCallback && (
+              <BaseIconButton
+                tooltip={tooltips.save}
+                onMouseDown={() => {
+                  this.setButtonClicked(tooltips.save.name);
+                  this.saveAnnotations();
+                }}
+                onMouseUp={this.setButtonClickedToActiveTool}
+                fill={this.state.buttonClicked === tooltips.save.name}
+              />
+            )}
+            <BaseIconButton
+              tooltip={tooltips.labels}
+              onClick={this.selectAnnotationLabel}
+              fill={this.state.buttonClicked === tooltips.labels.name}
+              setRefCallback={(ref) => {
+                this.refBtnsPopovers[tooltips.labels.name] = ref;
+              }}
+            />
+          </ButtonGroup>
+        </Grid>
+
+        <Grid
+          container
+          direction="row"
+          className={classes.bottomToolbars}
           style={{ position: "fixed" }}
         >
           <Grid container direction="row">
-            <ButtonGroup size="small">
-              <BaseIconButton
-                tooltip={tooltips.addNewAnnotation}
-                onMouseDown={() => {
-                  this.setButtonClicked(tooltips.addNewAnnotation.name);
-                  this.addAnnotation();
-                }}
-                onMouseUp={this.setButtonClickedToActiveTool}
-                fill={
-                  this.state.buttonClicked === tooltips.addNewAnnotation.name
-                }
-              />
-              <BaseIconButton
-                tooltip={tooltips.clearAnnotation}
-                onMouseDown={() => {
-                  this.setButtonClicked(tooltips.clearAnnotation.name);
-                  this.clearActiveAnnotation();
-                }}
-                onMouseUp={this.setButtonClickedToActiveTool}
-                fill={
-                  this.state.buttonClicked === tooltips.clearAnnotation.name
-                }
-              />
-              {saveAnnotationsCallback && (
-                <BaseIconButton
-                  tooltip={tooltips.save}
-                  onMouseDown={() => {
-                    this.setButtonClicked(tooltips.save.name);
-                    this.saveAnnotations();
-                  }}
-                  onMouseUp={this.setButtonClickedToActiveTool}
-                  fill={this.state.buttonClicked === tooltips.save.name}
-                />
-              )}
-            </ButtonGroup>
-          </Grid>
-        </div>
-
-        <div
-          className={classes.mainToolbar}
-          style={{
-            position: "fixed",
-          }}
-        >
-          <Grid container direction="row">
-            <ButtonGroup>
-              <BaseIconButton
-                tooltip={tooltips.select}
-                onClick={this.toggleMode}
-                fill={this.state.buttonClicked === tooltips.select.name}
-              />
+            <ButtonGroup id="paint-toolbar">
               <PaintbrushToolbar
                 buttonClicked={this.state.buttonClicked}
                 setButtonClicked={this.setButtonClicked}
@@ -746,6 +754,11 @@ class UserInterface extends Component<Props, State> {
                 activateTool={this.activateTool}
                 isTyping={this.isTyping}
               />
+            </ButtonGroup>
+          </Grid>
+
+          <Grid container direction="row" className={classes.displayContainer}>
+            <ButtonGroup id="display-toolbar">
               <BaseIconButton
                 tooltip={tooltips.brightness}
                 onClick={this.selectBrightness}
@@ -770,17 +783,9 @@ class UserInterface extends Component<Props, State> {
                   this.refBtnsPopovers[tooltips.channels.name] = ref;
                 }}
               />
-              <BaseIconButton
-                tooltip={tooltips.labels}
-                onClick={this.selectAnnotationLabel}
-                fill={this.state.buttonClicked === tooltips.labels.name}
-                setRefCallback={(ref) => {
-                  this.refBtnsPopovers[tooltips.labels.name] = ref;
-                }}
-              />
             </ButtonGroup>
           </Grid>
-        </div>
+        </Grid>
 
         <CssBaseline />
 
