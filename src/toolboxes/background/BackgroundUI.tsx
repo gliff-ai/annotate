@@ -126,7 +126,7 @@ const BackgroundUI = (props: Props): ReactElement => {
     );
   }, [props.displayedImage]);
 
-  return (
+  return props.displayedImage ? (
     <>
       <Popover
         open={isOpen()}
@@ -190,7 +190,7 @@ const BackgroundUI = (props: Props): ReactElement => {
         )}
       </Popover>
     </>
-  );
+  ) : null;
 };
 
 export { BackgroundUI };

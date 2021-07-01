@@ -798,55 +798,50 @@ class UserInterface extends Component<Props, State> {
                 }
               }}
             >
-              {this.state.displayedImage && (
-                <>
-                  <BackgroundCanvas
-                    scaleAndPan={this.state.scaleAndPan}
-                    displayedImage={this.state.displayedImage}
-                    canvasPositionAndSize={this.state.viewportPositionAndSize}
-                    setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                    setCanvasContainerColourCallback={(canvasContainerColour) =>
-                      this.setState({ canvasContainerColour })
-                    }
-                  />
-                  <SplineCanvas
-                    scaleAndPan={this.state.scaleAndPan}
-                    activeTool={this.state.activeTool}
-                    mode={this.state.mode}
-                    annotationsObject={this.annotationsObject}
-                    displayedImage={this.state.displayedImage}
-                    canvasPositionAndSize={this.state.viewportPositionAndSize}
-                    setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                    redraw={this.state.redraw}
-                    sliceIndex={this.state.sliceIndex}
-                    setUIActiveAnnotationID={(id) => {
-                      this.setState({ activeAnnotationID: id });
-                    }}
-                    setActiveTool={(tool: Tool) => {
-                      this.setState({ activeTool: tool });
-                    }}
-                  />
-                  <PaintbrushCanvas
-                    scaleAndPan={this.state.scaleAndPan}
-                    activeTool={this.state.activeTool}
-                    mode={this.state.mode}
-                    annotationsObject={this.annotationsObject}
-                    displayedImage={this.state.displayedImage}
-                    canvasPositionAndSize={this.state.viewportPositionAndSize}
-                    setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                    redraw={this.state.redraw}
-                    sliceIndex={this.state.sliceIndex}
-                    setUIActiveAnnotationID={(id) => {
-                      this.setState({ activeAnnotationID: id });
-                    }}
-                    setActiveTool={(tool: Tool) => {
-                      this.setState({ activeTool: tool });
-                    }}
-                  />
-                </>
-              )}
-
-              {this.slicesData && this.slicesData.length > 1 && (
+              <BackgroundCanvas
+                scaleAndPan={this.state.scaleAndPan}
+                displayedImage={this.state.displayedImage}
+                canvasPositionAndSize={this.state.viewportPositionAndSize}
+                setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                setCanvasContainerColourCallback={(canvasContainerColour) =>
+                  this.setState({ canvasContainerColour })
+                }
+              />
+              <SplineCanvas
+                scaleAndPan={this.state.scaleAndPan}
+                activeTool={this.state.activeTool}
+                mode={this.state.mode}
+                annotationsObject={this.annotationsObject}
+                displayedImage={this.state.displayedImage}
+                canvasPositionAndSize={this.state.viewportPositionAndSize}
+                setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                redraw={this.state.redraw}
+                sliceIndex={this.state.sliceIndex}
+                setUIActiveAnnotationID={(id) => {
+                  this.setState({ activeAnnotationID: id });
+                }}
+                setActiveTool={(tool: Tool) => {
+                  this.setState({ activeTool: tool });
+                }}
+              />
+              <PaintbrushCanvas
+                scaleAndPan={this.state.scaleAndPan}
+                activeTool={this.state.activeTool}
+                mode={this.state.mode}
+                annotationsObject={this.annotationsObject}
+                displayedImage={this.state.displayedImage}
+                canvasPositionAndSize={this.state.viewportPositionAndSize}
+                setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                redraw={this.state.redraw}
+                sliceIndex={this.state.sliceIndex}
+                setUIActiveAnnotationID={(id) => {
+                  this.setState({ activeAnnotationID: id });
+                }}
+                setActiveTool={(tool: Tool) => {
+                  this.setState({ activeTool: tool });
+                }}
+              />
+              {this.slicesData?.length > 1 && (
                 <Paper
                   elevation={3}
                   className={classes.slicesSlider}

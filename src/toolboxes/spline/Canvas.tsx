@@ -173,6 +173,7 @@ export class SplineCanvas extends Component<Props> {
 
   drawAllSplines = (): void => {
     // Draw all the splines
+    if (!this.baseCanvas) return;
 
     // Clear all the splines:
     const { canvasContext: context } = this.baseCanvas;
@@ -581,23 +582,24 @@ export class SplineCanvas extends Component<Props> {
     this.props.annotationsObject.getSplineForActiveAnnotation().spaceTimeInfo
       .z === this.props.sliceIndex;
 
-  render = (): ReactNode => (
-    <div style={{ pointerEvents: this.isActive() ? "auto" : "none" }}>
-      <BaseCanvas
-        onClick={this.onClick}
-        onDoubleClick={this.onDoubleClick}
-        onMouseDown={this.onMouseDown}
-        onMouseMove={this.onMouseMove}
-        onMouseUp={this.onMouseUp}
-        cursor={this.getCursor()}
-        ref={(baseCanvas) => {
-          this.baseCanvas = baseCanvas;
-        }}
-        name="spline"
-        scaleAndPan={this.props.scaleAndPan}
-        canvasPositionAndSize={this.props.canvasPositionAndSize}
-        setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
-      />
-    </div>
-  );
+  render = (): ReactNode =>
+    this.props?.displayedImage ? (
+      <div style={{ pointerEvents: this.isActive() ? "auto" : "none" }}>
+        <BaseCanvas
+          onClick={this.onClick}
+          onDoubleClick={this.onDoubleClick}
+          onMouseDown={this.onMouseDown}
+          onMouseMove={this.onMouseMove}
+          onMouseUp={this.onMouseUp}
+          cursor={this.getCursor()}
+          ref={(baseCanvas) => {
+            this.baseCanvas = baseCanvas;
+          }}
+          name="spline"
+          scaleAndPan={this.props.scaleAndPan}
+          canvasPositionAndSize={this.props.canvasPositionAndSize}
+          setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
+        />
+      </div>
+    ) : null;
 }
