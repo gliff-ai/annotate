@@ -4,10 +4,6 @@ const path = require("path");
 
 const port = process.env.PORT || 3000;
 
-function resolve(dir) {
-  return path.join(__dirname, "..", dir);
-}
-
 module.exports = {
   entry: "./examples/src/index.tsx",
   mode: "development",
