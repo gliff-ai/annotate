@@ -20,7 +20,7 @@ import {
   BackgroundUI,
   MinimapUI,
 } from "@/toolboxes/background";
-import { SplineCanvas, SplineUI, SplineToolbar } from "@/toolboxes/spline";
+import { SplineCanvas, SplineToolbar } from "@/toolboxes/spline";
 import {
   PaintbrushCanvas,
   PaintbrushUI,
@@ -34,6 +34,8 @@ import { tooltips } from "@/components/tooltips";
 import { BaseIconButton } from "@/components/BaseIconButton";
 import { BaseSlider, Config } from "@/components/BaseSlider";
 import { BaseButton } from "@/components/BaseButton";
+
+const logger = console;
 
 const CONFIG = {
   PAN_AMOUNT: 20,
@@ -152,6 +154,7 @@ interface Props extends WithStyles<typeof styles> {
   saveAnnotationsCallback?: (annotationsObject: Annotations) => void;
   showAppBar: boolean;
 }
+
 class UserInterface extends Component<Props, State> {
   static defaultProps = {
     showAppBar: true,
@@ -462,7 +465,7 @@ class UserInterface extends Component<Props, State> {
 
     createImageBitmap(canvas)
       .then((displayedImage) => this.setState({ displayedImage }))
-      .catch((e) => console.log(e));
+      .catch((e) => logger.error(e));
   };
 
   activateTool = (tool: Tool): void => {

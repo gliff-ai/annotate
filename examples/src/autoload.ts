@@ -5,6 +5,8 @@ type UploadData = {
   imageFileInfo: ImageFileInfo;
 };
 
+const logger = console;
+
 const loadImage = (filename: string): Promise<UploadData> =>
   new Promise((resolve: (data: UploadData) => void) => {
     const image = new Image();
@@ -25,7 +27,7 @@ const loadImage = (filename: string): Promise<UploadData> =>
           resolve({ slicesData, imageFileInfo });
         })
         .catch((e) => {
-          console.log(e);
+          logger.error(e);
         });
     };
     image.src = filename;
