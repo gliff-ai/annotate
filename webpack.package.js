@@ -1,0 +1,57 @@
+const path = require("path");
+
+module.exports = {
+  entry: {
+    main: "./src/index.tsx",
+  },
+  devtool: "source-map",
+  output: {
+    filename: "main.js",
+    path: path.resolve(__dirname, "dist"),
+    libraryTarget: "commonjs",
+  },
+  externals: {
+    // Don't bundle react or react-dom
+    react: {
+      commonjs: "react",
+      commonjs2: "react",
+      amd: "React",
+      root: "React",
+    },
+    "react-dom": {
+      commonjs: "react-dom",
+      commonjs2: "react-dom",
+      amd: "ReactDOM",
+      root: "ReactDOM",
+    },
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: "ts-loader",
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.(s*)css$/,
+        use: ["style-loader", "css-loader", "sass-loader"],
+      },
+      {
+        test: /\.(jpe?g|png|gif|woff|woff2|eot|ttf|svg)(\?[a-z0-9=.]+)?$/,
+        use: {
+          loader: "url-loader",
+          options: {
+            name: "img/[name].[hash:8].[ext]",
+            esModule: false,
+          },
+        },
+      },
+    ],
+  },
+  resolve: {
+    extensions: [".tsx", ".ts", ".js"],
+    alias: {
+      "@": path.resolve(__dirname, "src"),
+    },
+  },
+};

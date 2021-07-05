@@ -1,46 +1,23 @@
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 const path = require("path");
 
+const port = process.env.PORT || 3000;
+
+function resolve(dir) {
+  return path.join(__dirname, "..", dir);
+}
+
 module.exports = {
-  entry: {
-    main: "./src/index.tsx",
-  },
-  output: {
-    filename: "main.js",
-    path: path.resolve(__dirname, "dist"),
-    libraryTarget: "commonjs",
-  },
-  externals: {
-    // Don't bundle react or react-dom
-    react: {
-      commonjs: "react",
-      commonjs2: "react",
-      amd: "React",
-      root: "React",
-    },
-    "react-dom": {
-      commonjs: "react-dom",
-      commonjs2: "react-dom",
-      amd: "ReactDOM",
-      root: "ReactDOM",
-    },
-  },
+  entry: "./examples/src/index.tsx",
+  mode: "development",
+  devtool: "eval-source-map",
   module: {
     rules: [
       {
         test: /\.tsx?$/,
         use: "ts-loader",
         exclude: /node_modules/,
-      },
-      {
-        test: /\.m?js$/,
-        exclude: /(node_modules|bower_components)/,
-        use: {
-          loader: "babel-loader",
-          options: {
-            presets: ["@babel/preset-env", "@babel/react"],
-            plugins: ["@babel/proposal-class-properties"],
-          },
-        },
       },
       {
         test: /\.(s*)css$/,
@@ -63,5 +40,28 @@ module.exports = {
     alias: {
       "@": path.resolve(__dirname, "src"),
     },
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: "examples/index.html",
+    }),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: "examples/zebrafish-heart.jpg",
+          to: "zebrafish-heart.jpg",
+        },
+        {
+          from: "src/assets",
+          to: "assets",
+        },
+      ],
+    }),
+  ],
+  devServer: {
+    host: "localhost",
+    port,
+    historyApiFallback: true,
+    open: true,
   },
 };
