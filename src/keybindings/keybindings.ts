@@ -24,11 +24,11 @@ export const keybindings = {
   "ctrl+KeyC": "spline.closeLoop",
   "ctrl+ArrowLeft": "ui.previousAnnotation",
   "ctrl+ArrowRight": "ui.nextAnnotation",
-  "ctrl+Equal": "ui.incrementScale",
-  "ctrl+Minus": "ui.decrementScale",
   "alt+Equal": "minimap.handleDrawerOpen",
   "alt+Minus": "minimap.handleDrawerClose",
-  "ctrl+BracketRight": "ui.resetScaleAndPan",
+  "alt+Digit1": "ui.incrementScale",
+  "alt+Digit2": "ui.decrementScale",
+  "alt+Digit3": "ui.resetScaleAndPan",
 } as Readonly<{
   [key: string]: string;
 }>;

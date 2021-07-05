@@ -15,7 +15,6 @@ const theme: Theme = createMuiTheme({
   shape: {
     borderRadius: 6,
   },
-
   overrides: {
     MuiCssBaseline: {
       "@global": {
@@ -31,7 +30,6 @@ const theme: Theme = createMuiTheme({
         },
       },
     },
-
     MuiButton: {
       root: {
         color: "#000000",

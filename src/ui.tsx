@@ -85,16 +85,20 @@ interface State {
 }
 
 const styles = {
-  annotationToolbar: {
+  selectionContainer: {
     left: "18px",
-    top: "80px",
-    marginTop: "30px",
+    marginTop: "18px",
+    top: "90px",
+    width: "auto",
     zIndex: 100,
   },
-  mainToolbar: {
+  displayContainer: {
+    marginTop: "18px",
+  },
+  bottomToolbars: {
+    bottom: "18px",
     left: "18px",
-    bottom: "0",
-    marginBottom: "30px",
+    width: "auto",
     zIndex: 100,
   },
   uploadToolbar: {
@@ -484,18 +488,22 @@ class UserInterface extends Component<Props, State> {
     this.cycleActiveAnnotation(false);
   };
 
-  setButtonClickedToActiveTool = () => {
+  selectDrawMode = (): void => {
+    // Select draw mode and re-activate last used paint tool
     this.setState((state) => ({
+      mode: Mode.draw,
       buttonClicked: tooltips[state.activeTool].name,
     }));
   };
 
   toggleMode = (): void => {
+    // Toggle between draw and select mode.
+    if (this.isTyping()) return;
+
     if (this.state.mode === Mode.draw) {
-      this.setState({ mode: Mode.select, buttonClicked: "Select" });
+      this.setState({ mode: Mode.select, buttonClicked: tooltips.select.name });
     } else {
-      this.setState({ mode: Mode.draw });
-      this.setButtonClickedToActiveTool();
+      this.selectDrawMode();
     }
   };
 
@@ -574,19 +582,25 @@ class UserInterface extends Component<Props, State> {
       }
     };
 
+  setButtonClicked = (buttonClicked: string): void =>
+    this.setState({ buttonClicked });
+
   // Functions of type select<ToolTip.name>, added for use in keybindings and OnClick events
   // TODO: find a way to pass parameters in keybindings and get rid of code duplication
   selectContrast = (): void => {
+    if (this.isTyping()) return;
     this.handleOpen()(this.refBtnsPopovers[tooltips.contrast.name]);
     this.setButtonClicked(tooltips.contrast.name);
   };
 
   selectBrightness = (): void => {
+    if (this.isTyping()) return;
     this.handleOpen()(this.refBtnsPopovers[tooltips.brightness.name]);
     this.setButtonClicked(tooltips.brightness.name);
   };
 
   selectChannels = (): void => {
+    if (this.isTyping()) return;
     this.handleOpen()(this.refBtnsPopovers[tooltips.channels.name]);
     this.setButtonClicked(tooltips.channels.name);
   };
@@ -596,13 +610,15 @@ class UserInterface extends Component<Props, State> {
     this.setButtonClicked(tooltips.labels.name);
   };
 
-  setButtonClicked = (buttonClicked: string): void =>
-    this.setState({ buttonClicked });
-
   saveAnnotations = (): void => {
     if (!this.props.saveAnnotationsCallback) return;
     this.props.saveAnnotationsCallback(this.annotationsObject);
   };
+
+  isTyping = () =>
+    // Added to prevent single-key shortcuts that are also valid text input
+    // to get triggered during text input.
+    this.refBtnsPopovers[tooltips.labels.name] === this.state.anchorElement;
 
   render = (): ReactNode => {
     const { classes, showAppBar, saveAnnotationsCallback } = this.props;
@@ -630,6 +646,7 @@ class UserInterface extends Component<Props, State> {
           <Download
             annotations={this.annotationsObject.getAllAnnotations()}
             imageFileInfo={this.imageFileInfo}
+            isTyping={this.isTyping}
           />
         </Grid>
       </>
@@ -665,76 +682,84 @@ class UserInterface extends Component<Props, State> {
 
     return (
       <ThemeProvider theme={theme}>
-        <div
-          className={classes.annotationToolbar}
+        <Grid
+          container
+          direction="row"
+          className={classes.selectionContainer}
+          style={{ position: "fixed" }}
+        >
+          <ButtonGroup size="small" id="selection-toolbar">
+            <BaseIconButton
+              tooltip={tooltips.select}
+              onClick={this.toggleMode}
+              fill={this.state.buttonClicked === tooltips.select.name}
+            />
+            <BaseIconButton
+              tooltip={tooltips.addNewAnnotation}
+              onMouseDown={() => {
+                this.setButtonClicked(tooltips.addNewAnnotation.name);
+                this.addAnnotation();
+              }}
+              onMouseUp={this.selectDrawMode}
+              fill={this.state.buttonClicked === tooltips.addNewAnnotation.name}
+            />
+            <BaseIconButton
+              tooltip={tooltips.clearAnnotation}
+              onMouseDown={() => {
+                this.setButtonClicked(tooltips.clearAnnotation.name);
+                this.clearActiveAnnotation();
+              }}
+              onMouseUp={this.selectDrawMode}
+              fill={this.state.buttonClicked === tooltips.clearAnnotation.name}
+            />
+            {saveAnnotationsCallback && (
+              <BaseIconButton
+                tooltip={tooltips.save}
+                onMouseDown={() => {
+                  this.setButtonClicked(tooltips.save.name);
+                  this.saveAnnotations();
+                }}
+                onMouseUp={this.selectDrawMode}
+                fill={this.state.buttonClicked === tooltips.save.name}
+              />
+            )}
+            <BaseIconButton
+              tooltip={tooltips.labels}
+              onClick={this.selectAnnotationLabel}
+              fill={this.state.buttonClicked === tooltips.labels.name}
+              setRefCallback={(ref) => {
+                this.refBtnsPopovers[tooltips.labels.name] = ref;
+              }}
+            />
+          </ButtonGroup>
+        </Grid>
+
+        <Grid
+          container
+          direction="row"
+          className={classes.bottomToolbars}
           style={{ position: "fixed" }}
         >
           <Grid container direction="row">
-            <ButtonGroup size="small">
-              <BaseIconButton
-                tooltip={tooltips.addNewAnnotation}
-                onMouseDown={() => {
-                  this.setButtonClicked(tooltips.addNewAnnotation.name);
-                  this.addAnnotation();
-                }}
-                onMouseUp={this.setButtonClickedToActiveTool}
-                fill={
-                  this.state.buttonClicked === tooltips.addNewAnnotation.name
-                }
-              />
-              <BaseIconButton
-                tooltip={tooltips.clearAnnotation}
-                onMouseDown={() => {
-                  this.setButtonClicked(tooltips.clearAnnotation.name);
-                  this.clearActiveAnnotation();
-                }}
-                onMouseUp={this.setButtonClickedToActiveTool}
-                fill={
-                  this.state.buttonClicked === tooltips.clearAnnotation.name
-                }
-              />
-              {saveAnnotationsCallback && (
-                <BaseIconButton
-                  tooltip={tooltips.save}
-                  onMouseDown={() => {
-                    this.setButtonClicked(tooltips.save.name);
-                    this.saveAnnotations();
-                  }}
-                  onMouseUp={this.setButtonClickedToActiveTool}
-                  fill={this.state.buttonClicked === tooltips.save.name}
-                />
-              )}
-            </ButtonGroup>
-          </Grid>
-        </div>
-
-        <div
-          className={classes.mainToolbar}
-          style={{
-            position: "fixed",
-          }}
-        >
-          <Grid container direction="row">
-            <ButtonGroup>
-              <BaseIconButton
-                tooltip={tooltips.select}
-                onClick={() => {
-                  this.setButtonClicked(tooltips.select.name);
-                  this.toggleMode();
-                }}
-                fill={this.state.buttonClicked === tooltips.select.name}
-              />
+            <ButtonGroup id="paint-toolbar">
               <PaintbrushToolbar
                 buttonClicked={this.state.buttonClicked}
                 setButtonClicked={this.setButtonClicked}
                 activateTool={this.activateTool}
                 handleOpen={this.handleOpen}
+                isTyping={this.isTyping}
               />
               <SplineToolbar
                 buttonClicked={this.state.buttonClicked}
                 setButtonClicked={this.setButtonClicked}
                 activateTool={this.activateTool}
+                isTyping={this.isTyping}
               />
+            </ButtonGroup>
+          </Grid>
+
+          <Grid container direction="row" className={classes.displayContainer}>
+            <ButtonGroup id="display-toolbar">
               <BaseIconButton
                 tooltip={tooltips.brightness}
                 onClick={this.selectBrightness}
@@ -759,17 +784,9 @@ class UserInterface extends Component<Props, State> {
                   this.refBtnsPopovers[tooltips.channels.name] = ref;
                 }}
               />
-              <BaseIconButton
-                tooltip={tooltips.labels}
-                onClick={this.selectAnnotationLabel}
-                fill={this.state.buttonClicked === tooltips.labels.name}
-                setRefCallback={(ref) => {
-                  this.refBtnsPopovers[tooltips.labels.name] = ref;
-                }}
-              />
             </ButtonGroup>
           </Grid>
-        </div>
+        </Grid>
 
         <CssBaseline />
 
