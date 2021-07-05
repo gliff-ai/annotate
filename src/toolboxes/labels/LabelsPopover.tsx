@@ -1,5 +1,4 @@
-import { ReactElement } from "react";
-import * as React from "react";
+import { ReactElement, MouseEvent } from "react";
 import {
   Grid,
   Typography,
@@ -38,7 +37,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props extends LabelsProps {
   isOpen: boolean;
   anchorElement: HTMLButtonElement | null;
-  onClose: (event: React.MouseEvent) => void;
+  onClose: (event: MouseEvent) => void;
 }
 
 export const LabelsPopover = (props: Props): ReactElement => {

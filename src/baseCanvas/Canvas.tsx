@@ -1,5 +1,4 @@
-import { Component, ReactNode } from "react";
-import * as React from "react";
+import { Component, ReactNode, MouseEvent } from "react";
 import { XYPoint, PositionAndSize } from "@/annotation/interfaces";
 
 export interface Props {
@@ -83,7 +82,7 @@ export class BaseCanvas extends Component<Props> {
     this.canvasObserver.unobserve(this.canvasContainer);
   };
 
-  windowToCanvas = (e: React.MouseEvent): XYPoint => {
+  windowToCanvas = (e: MouseEvent): XYPoint => {
     // returns the mouse coordinates from e, transformed from window to canvas space
     const x = e.clientX - this.canvas.getBoundingClientRect().left;
     const y = e.clientY - this.canvas.getBoundingClientRect().top;
@@ -91,7 +90,7 @@ export class BaseCanvas extends Component<Props> {
     return { x, y };
   };
 
-  onDoubleClickHandler = (e: React.MouseEvent): void => {
+  onDoubleClickHandler = (e: MouseEvent): void => {
     const { x, y } = this.windowToCanvas(e);
 
     if (this.props.onDoubleClick) {
@@ -99,7 +98,7 @@ export class BaseCanvas extends Component<Props> {
     }
   };
 
-  onClickHandler = (e: React.MouseEvent): void => {
+  onClickHandler = (e: MouseEvent): void => {
     const { x, y } = this.windowToCanvas(e);
 
     if (this.props.onClick) {
@@ -107,7 +106,7 @@ export class BaseCanvas extends Component<Props> {
     }
   };
 
-  onMouseDownHandler = (e: React.MouseEvent): void => {
+  onMouseDownHandler = (e: MouseEvent): void => {
     const { x, y } = this.windowToCanvas(e);
 
     if (this.props.onMouseDown) {
@@ -115,7 +114,7 @@ export class BaseCanvas extends Component<Props> {
     }
   };
 
-  onMouseMoveHandler = (e: React.MouseEvent): void => {
+  onMouseMoveHandler = (e: MouseEvent): void => {
     const { x, y } = this.windowToCanvas(e);
 
     if (this.props.onMouseMove) {
@@ -123,7 +122,7 @@ export class BaseCanvas extends Component<Props> {
     }
   };
 
-  onMouseUpHandler = (e: React.MouseEvent): void => {
+  onMouseUpHandler = (e: MouseEvent): void => {
     const { x, y } = this.windowToCanvas(e);
 
     if (this.props.onMouseUp) {
@@ -131,7 +130,7 @@ export class BaseCanvas extends Component<Props> {
     }
   };
 
-  onContextMenuHandler = (e: React.MouseEvent): void => {
+  onContextMenuHandler = (e: MouseEvent): void => {
     const { x, y } = this.windowToCanvas(e);
 
     // x and y are now in canvas space

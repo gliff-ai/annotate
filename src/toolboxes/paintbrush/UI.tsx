@@ -1,5 +1,4 @@
-import { ChangeEvent, ReactElement } from "react";
-import * as React from "react";
+import { ChangeEvent, ReactElement, MouseEvent } from "react";
 import { createStyles, makeStyles, Popover } from "@material-ui/core";
 import { BaseSlider } from "@/components/BaseSlider";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
@@ -8,7 +7,7 @@ import { usePaintbrushStore } from "./Store";
 interface Props {
   isOpen: boolean;
   anchorElement: HTMLButtonElement | null;
-  onClose: (event: React.MouseEvent) => void;
+  onClose: (event: MouseEvent) => void;
 }
 
 const useStyles = makeStyles(() =>
