@@ -1,4 +1,4 @@
-import React, { ReactNode, Component } from "react";
+import { ReactNode, Component } from "react";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
 import { theme } from "@/components/theme";

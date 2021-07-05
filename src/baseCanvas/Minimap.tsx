@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import { Component, ReactNode } from "react";
 import { getMinimapViewFinder, minimapToCanvas } from "@/components/transforms";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { Props as BaseProps, BaseCanvas } from "./Canvas";
@@ -16,7 +16,7 @@ export interface Props extends BaseProps {
   canvasContainerColour: number[];
 }
 
-export class MinimapCanvas extends React.Component<Props> {
+export class MinimapCanvas extends Component<Props> {
   public baseCanvas: BaseCanvas;
 
   private boundingRect: PositionAndSize;

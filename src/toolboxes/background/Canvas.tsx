@@ -1,4 +1,4 @@
-import React, { Component, ReactNode, ReactElement } from "react";
+import { Component, ReactNode, ReactElement } from "react";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
 import { drawImageOnCanvas, getImageDataFromCanvas } from "./drawImage";

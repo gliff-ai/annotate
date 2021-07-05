@@ -1,4 +1,4 @@
-import React, { Component, ReactElement, MouseEvent } from "react";
+import { Component, ReactElement, MouseEvent } from "react";
 import { Slide, Card, WithStyles, withStyles } from "@material-ui/core";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { BaseIconButton } from "@/components/BaseIconButton";

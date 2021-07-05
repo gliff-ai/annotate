@@ -1,4 +1,5 @@
-import React, { ChangeEvent, ReactElement, useEffect, useState } from "react";
+import { ChangeEvent, ReactElement, useEffect, useState } from "react";
+import * as React from "react";
 import {
   Typography,
   Checkbox,

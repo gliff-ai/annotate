@@ -1,10 +1,5 @@
-import React, {
-  ReactNode,
-  Component,
-  ReactElement,
-  useState,
-  useEffect,
-} from "react";
+import { ReactNode, Component, ReactElement, useState, useEffect } from "react";
+import * as React from "react";
 
 import { BaseCanvas, CanvasProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";

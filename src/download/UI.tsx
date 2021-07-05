@@ -1,4 +1,4 @@
-import React, { ReactElement, MouseEvent, Component } from "react";
+import { ReactElement, MouseEvent, Component } from "react";
 import { Menu, MenuItem, withStyles, WithStyles } from "@material-ui/core";
 import { ImageFileInfo } from "@gliff-ai/upload";
 import { Annotation } from "@/annotation/interfaces";

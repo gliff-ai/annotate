@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import { ReactElement } from "react";
 import { Avatar, makeStyles, Box, Typography } from "@material-ui/core";
 import { theme } from "@/components/theme";
 import { ToolTip } from "@/components/tooltips";
