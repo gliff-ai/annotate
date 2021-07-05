@@ -1,6 +1,6 @@
 import React, { Component, ReactElement } from "react";
 import { BaseIconButton } from "@/components/BaseIconButton";
-import { tooltips } from "@/tooltips";
+import { tooltips } from "@/components/tooltips";
 
 const events = ["selectSpline", "selectMagicspline"] as const;
 

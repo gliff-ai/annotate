@@ -5,7 +5,7 @@ import { Annotation } from "@/annotation/interfaces";
 import { keydownListener } from "@/keybindings";
 import { downloadPaintbrushAsTiff } from "@/download/DownloadAsTiff";
 import { downloadAnnotationsAsJson } from "@/download/DownloadAsJson";
-import { tooltips } from "@/tooltips";
+import { tooltips } from "@/components/tooltips";
 import { BaseIconButton } from "@/components/BaseIconButton";
 
 const styles = {

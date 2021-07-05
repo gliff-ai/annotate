@@ -1,4 +1,4 @@
-import React, { Component, ChangeEvent, ReactNode } from "react";
+import { Component, ChangeEvent, ReactNode } from "react";
 import {
   AppBar,
   Container,
@@ -14,7 +14,7 @@ import {
 import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
-import { ThemeProvider, theme } from "@/theme";
+import { ThemeProvider, theme } from "@/components/theme";
 import {
   BackgroundCanvas,
   BackgroundUI,
@@ -29,8 +29,8 @@ import {
 import { LabelsPopover } from "@/toolboxes/labels";
 import { Download } from "@/download/UI";
 import { keydownListener } from "@/keybindings";
-import { Tools, Tool } from "@/tools";
-import { tooltips } from "@/tooltips";
+import { Tools, Tool } from "@/components/tools";
+import { tooltips } from "@/components/tooltips";
 import { BaseIconButton } from "@/components/BaseIconButton";
 import { BaseSlider, Config } from "@/components/BaseSlider";
 import { BaseButton } from "@/components/BaseButton";

@@ -1,6 +1,6 @@
 import React, { ReactElement } from "react";
 
-import { Tool } from "@/tools";
+import { Tool } from "@/components/tools";
 
 interface Props {
   isOpen: boolean;

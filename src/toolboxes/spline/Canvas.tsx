@@ -1,14 +1,14 @@
 import React, { ReactNode, Component } from "react";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
-import { theme } from "@/theme";
+import { theme } from "@/components/theme";
 import { Annotations } from "@/annotation";
-import { canvasToImage, imageToCanvas } from "@/transforms";
+import { canvasToImage, imageToCanvas } from "@/components/transforms";
 import { XYPoint } from "@/annotation/interfaces";
-import { Tool, Tools } from "@/tools";
+import { Tool, Tools } from "@/components/tools";
 import { Mode } from "@/ui";
 
-import { getRGBAString, palette } from "@/palette";
+import { getRGBAString, palette } from "@/components/palette";
 
 import { calculateSobel } from "./sobel";
 

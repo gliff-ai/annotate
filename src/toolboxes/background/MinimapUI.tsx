@@ -4,8 +4,8 @@ import { PositionAndSize } from "@/annotation/interfaces";
 import { BaseIconButton } from "@/components/BaseIconButton";
 import { MinimapCanvas } from "@/baseCanvas";
 import { BackgroundCanvas } from "@/toolboxes/background";
-import { theme } from "@/theme";
-import { tooltips } from "@/tooltips";
+import { theme } from "@/components/theme";
+import { tooltips } from "@/components/tooltips";
 
 const styles = {
   minimap: {

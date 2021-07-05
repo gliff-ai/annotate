@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { getMinimapViewFinder, minimapToCanvas } from "@/transforms";
+import { getMinimapViewFinder, minimapToCanvas } from "@/components/transforms";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { Props as BaseProps, BaseCanvas } from "./Canvas";
 

@@ -8,12 +8,12 @@ import React, {
 
 import { BaseCanvas, CanvasProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";
-import { canvasToImage, imageToCanvas } from "@/transforms";
+import { canvasToImage, imageToCanvas } from "@/components/transforms";
 import { XYPoint } from "@/annotation/interfaces";
-import { Tool, Tools } from "@/tools";
+import { Tool, Tools } from "@/components/tools";
 import { Mode } from "@/ui";
-import { theme } from "@/theme";
-import { palette, getRGBAString } from "@/palette";
+import { theme } from "@/components/theme";
+import { palette, getRGBAString } from "@/components/palette";
 import { usePaintbrushStore } from "./Store";
 
 const mainColor = theme.palette.primary.main;
