@@ -1,13 +1,14 @@
-import React, { Component, ReactElement } from "react";
+import { Component, ReactElement, MouseEvent } from "react";
+
 import { BaseIconButton } from "@/components/BaseIconButton";
-import { tooltips } from "@/tooltips";
+import { tooltips } from "@/components/tooltips";
 
 interface Props {
   buttonClicked: string;
   setButtonClicked: (buttonName: string) => void;
   activateTool: (activeTool: string) => void;
   handleOpen: (
-    event?: React.MouseEvent
+    event?: MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
   isTyping: () => boolean;
 }

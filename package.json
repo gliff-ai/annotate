@@ -10,12 +10,12 @@
     "dist/*"
   ],
   "scripts": {
-    "build": "webpack --progress --config webpack.config.js",
+    "build": "webpack --progress --config webpack.build.js",
     "lint": "npm run lint:ts",
     "lint:ts": "npx eslint \"**/*.ts*\"",
-    "serve": "webpack serve --config webpack.config.js",
+    "serve": "webpack serve --config webpack.build.js",
     "test": "jest --coverage",
-    "prepare": "rm -r dist/; webpack --progress --config webpack.build.js"
+    "prepare": "rm -r dist/; webpack --progress --config webpack.package.js"
   },
   "license": "AGPL-3.0-only",
   "devDependencies": {

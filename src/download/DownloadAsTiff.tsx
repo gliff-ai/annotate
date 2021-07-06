@@ -2,7 +2,7 @@
 import * as UTIF from "utif";
 import { ImageFileInfo } from "@gliff-ai/upload";
 import { Annotation, XYPoint } from "@/annotation/interfaces";
-import { palette } from "@/palette";
+import { palette } from "@/components/palette";
 
 function drawCapsule(
   point0: XYPoint,

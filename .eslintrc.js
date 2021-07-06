@@ -19,6 +19,9 @@ module.exports = {
       rules: {
         "global-require": 0,
         "@typescript-eslint/no-var-requires": 0,
+        "no-void": ["error", { allowAsStatement: true }],
+        "react/react-in-jsx-scope": "off", // This isn't true as of React 17
+        "react/jsx-indent": "off", // this just argues with prettier, and we validate against prettier anyway
         "react/destructuring-assignment": "off", // This would be nice, but we call a lot of methods on props we pass down which rules it out
         "import/prefer-default-export": "off", // Most of the internet agrees this should be off
         "no-restricted-syntax": [

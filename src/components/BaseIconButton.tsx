@@ -1,4 +1,4 @@
-import React, { MouseEvent, ReactElement, CSSProperties } from "react";
+import { MouseEvent, ReactElement, CSSProperties } from "react";
 import {
   IconButton,
   Avatar,
@@ -7,8 +7,8 @@ import {
   TooltipProps,
 } from "@material-ui/core";
 import SVG from "react-inlinesvg";
-import { theme } from "@/theme";
-import { ToolTip } from "@/tooltips";
+import { theme } from "@/components/theme";
+import { ToolTip } from "@/components/tooltips";
 import { BaseTooltipTitle } from "@/components/BaseTooltipTitle";
 
 interface Props {

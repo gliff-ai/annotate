@@ -1,4 +1,11 @@
-import React, { ChangeEvent, ReactElement, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  ReactElement,
+  useEffect,
+  useState,
+  MouseEvent,
+} from "react";
+
 import {
   Typography,
   Checkbox,
@@ -23,7 +30,7 @@ import { useBackgroundStore } from "./Store";
 interface Props {
   anchorElement: HTMLElement | null;
   buttonClicked: string;
-  onClose: (event: React.MouseEvent) => void;
+  onClose: (event: MouseEvent) => void;
   channels: boolean[];
   toggleChannelAtIndex: (index: number) => void;
   displayedImage: ImageBitmap;
