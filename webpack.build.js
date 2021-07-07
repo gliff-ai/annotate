@@ -21,15 +21,7 @@ module.exports = {
         use: {
           loader: "babel-loader",
           options: {
-            presets: [
-              "@babel/preset-env",
-              [
-                "@babel/preset-react",
-                {
-                  runtime: "automatic", // defaults to classic
-                },
-              ],
-            ],
+            presets: ["@babel/preset-env", "@babel/react"],
             plugins: ["@babel/proposal-class-properties"],
           },
         },
