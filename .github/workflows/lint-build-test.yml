@@ -15,9 +15,9 @@ jobs:
       - name: Setup dependencies
         run: npm i -g eslint prettier && npm i
       - name: Lint
-        run: npm run lint
+        run: npm run lint:ts
       - name: Prettier
-        run: npx prettier -c **/*.tsx
+        run: npm run prettier
   Build:
     runs-on: ubuntu-latest
     timeout-minutes: 2
