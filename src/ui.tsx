@@ -88,7 +88,7 @@ interface State {
 
 const styles = {
   mainContainer: {
-    position: "relative" as "relative",
+    position: "relative" as const,
     height: "100%",
     width: "100%",
   },

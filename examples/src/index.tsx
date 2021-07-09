@@ -7,11 +7,7 @@ import loadImage from "./autoload";
 loadImage("zebrafish-heart.jpg").then(
   ({ slicesData, imageFileInfo }) => {
     ReactDOM.render(
-      <UserInterface
-        slicesData={slicesData}
-        imageFileInfo={imageFileInfo}
-        showAppBar={false}
-      />,
+      <UserInterface slicesData={slicesData} imageFileInfo={imageFileInfo} />,
       document.getElementById("react-container")
     );
   },
