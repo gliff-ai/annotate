@@ -34,6 +34,7 @@ import { tooltips } from "@/components/tooltips";
 import { BaseIconButton } from "@/components/BaseIconButton";
 import { BaseSlider, Config } from "@/components/BaseSlider";
 import { BaseButton } from "@/components/BaseButton";
+import { pageLoading } from "@/decorators";
 
 const logger = console;
 
@@ -158,6 +159,7 @@ interface Props extends WithStyles<typeof styles> {
   presetLabels?: string[];
   saveAnnotationsCallback?: (annotationsObject: Annotations) => void;
   showAppBar: boolean;
+  setIsLoading?: (isLoading: boolean) => void;
 }
 
 class UserInterface extends Component<Props, State> {
@@ -208,7 +210,8 @@ class UserInterface extends Component<Props, State> {
     this.refBtnsPopovers = {};
   }
 
-  componentDidMount = (): void => {
+  @pageLoading
+  componentDidMount(): void {
     document.addEventListener("keydown", keydownListener);
 
     for (const event of events) {
@@ -218,7 +221,7 @@ class UserInterface extends Component<Props, State> {
 
     const { clientHeight: height, clientWidth: width } = this.canvasContainer;
     this.setViewportPositionAndSize({ top: 0, left: 0, width, height });
-  };
+  }
 
   componentDidUpdate = (prevProps: Props): void => {
     if (
@@ -555,7 +558,7 @@ class UserInterface extends Component<Props, State> {
     this.callRedraw();
   };
 
-  callRedraw = () => {
+  callRedraw = (): void => {
     this.setState((prevState) => ({
       redraw: prevState.redraw + 1,
     }));
@@ -623,7 +626,7 @@ class UserInterface extends Component<Props, State> {
     this.props.saveAnnotationsCallback(this.annotationsObject);
   };
 
-  isTyping = () =>
+  isTyping = (): boolean =>
     // Added to prevent single-key shortcuts that are also valid text input
     // to get triggered during text input.
     this.refBtnsPopovers[tooltips.labels.name] === this.state.anchorElement;
@@ -964,4 +967,6 @@ class UserInterface extends Component<Props, State> {
     );
   };
 }
+
+export { UserInterface as UI };
 export default withStyles(styles)(UserInterface);
