@@ -17,20 +17,16 @@ import { PositionAndSize } from "@/annotation/interfaces";
 import { ThemeProvider, theme } from "@/components/theme";
 import {
   BackgroundCanvas,
-  BackgroundUI,
-  MinimapUI,
+  BackgroundToolbar,
+  Minimap,
 } from "@/toolboxes/background";
-import {
-  SplineCanvas,
-  Submenu as SplineSubmenu,
-  SplineToolbar,
-} from "@/toolboxes/spline";
+import { SplineCanvas, SplineSubmenu, SplineToolbar } from "@/toolboxes/spline";
 import {
   PaintbrushCanvas,
-  Submenu as PaintbrushSubmenu,
+  PaintbrushSubmenu,
   PaintbrushToolbar,
 } from "@/toolboxes/paintbrush";
-import { LabelsPopover } from "@/toolboxes/labels";
+import { LabelsSubmenu } from "@/toolboxes/labels";
 import { Download } from "@/download/UI";
 import { keydownListener } from "@/keybindings";
 import { Tools, Tool } from "@/components/tools";
@@ -913,7 +909,7 @@ class UserInterface extends Component<Props, State> {
                   </Paper>
                 )}
               </Grid>
-              <LabelsPopover
+              <LabelsSubmenu
                 isOpen={
                   this.state.buttonClicked === "Annotation Label" &&
                   Boolean(this.state.anchorElement)
@@ -925,7 +921,7 @@ class UserInterface extends Component<Props, State> {
                 updatePresetLabels={this.updatePresetLabels}
                 activeAnnotationID={this.state.activeAnnotationID}
               />
-              <BackgroundUI
+              <BackgroundToolbar
                 buttonClicked={this.state.buttonClicked}
                 anchorElement={this.state.anchorElement}
                 onClose={this.handleClose}
@@ -951,7 +947,7 @@ class UserInterface extends Component<Props, State> {
               />
             </Grid>
           </Container>
-          <MinimapUI
+          <Minimap
             buttonClicked={this.state.buttonClicked}
             displayedImage={this.state.displayedImage}
             minimapPositionAndSize={this.state.minimapPositionAndSize}

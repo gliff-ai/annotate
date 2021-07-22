@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const BackgroundUI = (props: Props): ReactElement => {
+const Toolbar = (props: Props): ReactElement => {
   const [background, setBackground] = useBackgroundStore();
   const [channelControls, setChannelControls] = useState<JSX.Element[]>([]);
   const classes = useStyles();
@@ -200,4 +200,4 @@ const BackgroundUI = (props: Props): ReactElement => {
   ) : null;
 };
 
-export { BackgroundUI };
+export { Toolbar };

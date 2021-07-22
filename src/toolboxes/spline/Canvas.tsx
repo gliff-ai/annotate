@@ -41,7 +41,7 @@ interface Event extends CustomEvent {
 
 type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 
-export class SplineCanvasClass extends Component<Props> {
+class CanvasClass extends Component<Props> {
   readonly name = "spline";
 
   private baseCanvas: BaseCanvas;
@@ -640,7 +640,7 @@ export class SplineCanvasClass extends Component<Props> {
     ) : null;
 }
 
-export const SplineCanvas = (props: Props): ReactElement => {
+export const Canvas = (props: Props): ReactElement => {
   // we will overwrite props.activeTool, which will be spline
   // with spline.splineType, which will be spline/lasso/magic/rect
   const [spline] = useSplineStore();
@@ -650,7 +650,7 @@ export const SplineCanvas = (props: Props): ReactElement => {
   }
 
   return (
-    <SplineCanvasClass
+    <CanvasClass
       activeTool={activeTool}
       mode={props.mode}
       annotationsObject={props.annotationsObject}

@@ -96,7 +96,7 @@ const FauxCursor: FC<CursorProps> = ({
   );
 };
 
-export class PaintbrushCanvasClass extends Component<Props, State> {
+export class CanvasClass extends Component<Props, State> {
   readonly name = "paintbrush";
 
   private interactionCanvas: BaseCanvas;
@@ -488,13 +488,11 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     ) : null;
 }
 
-export const PaintbrushCanvas = (
-  props: Omit<Props, "brushRadius">
-): ReactElement => {
+export const Canvas = (props: Omit<Props, "brushRadius">): ReactElement => {
   const [paintbrush] = usePaintbrushStore();
 
   return (
-    <PaintbrushCanvasClass
+    <CanvasClass
       activeTool={props.activeTool}
       mode={props.mode}
       annotationsObject={props.annotationsObject}

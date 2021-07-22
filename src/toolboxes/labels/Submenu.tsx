@@ -40,7 +40,7 @@ interface Props extends LabelsProps {
   onClose: (event: MouseEvent) => void;
 }
 
-export const LabelsPopover = (props: Props): ReactElement => {
+export const Submenu = (props: Props): ReactElement => {
   const classes = useStyles();
 
   return (
