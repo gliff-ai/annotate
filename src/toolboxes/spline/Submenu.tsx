@@ -26,9 +26,10 @@ const Submenu = (props: Props): ReactElement => {
   }
 
   function closeSpline() {
-    document.dispatchEvent(new CustomEvent("closeSpline", { detail: "spline" }));
+    document.dispatchEvent(
+      new CustomEvent("closeSpline", { detail: "spline" })
+    );
   }
-
 
   return (
     <Popover
@@ -36,27 +37,27 @@ const Submenu = (props: Props): ReactElement => {
       anchorEl={props.anchorElement}
       onClose={props.onClose}
     >
-        <ButtonGroup size="small" id="spline-toolbar">
-      <BaseIconButton
-        tooltip={tooltips.spline}
-        onClick={selectSpline}
-        fill={spline.splineType === tooltips.spline.name}
-      />
-      <BaseIconButton
-        tooltip={tooltips.lassospline}
-        onClick={selectLassoSpline}
-        fill={spline.splineType === tooltips.lassospline.name}
-      />
-      {/* <BaseIconButton
+      <ButtonGroup size="small" id="spline-toolbar">
+        <BaseIconButton
+          tooltip={tooltips.spline}
+          onClick={selectSpline}
+          fill={spline.splineType === tooltips.spline.name}
+        />
+        <BaseIconButton
+          tooltip={tooltips.lassospline}
+          onClick={selectLassoSpline}
+          fill={spline.splineType === tooltips.lassospline.name}
+        />
+        {/* <BaseIconButton
         tooltip={tooltips.magicspline}
         onClick={selectMagicSpline}
         fill={spline.splineType === tooltips.magicspline.name}
       /> */}
-      <BaseIconButton
-        tooltip={tooltips.closespline}
-        onClick={closeSpline}
-        fill={false}
-      />
+        <BaseIconButton
+          tooltip={tooltips.closespline}
+          onClick={closeSpline}
+          fill={false}
+        />
       </ButtonGroup>
     </Popover>
   );
