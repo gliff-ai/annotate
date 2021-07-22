@@ -12,6 +12,20 @@ import { Mode } from "@/ui";
 import { getRGBAString, palette } from "@/components/palette";
 import { BoundingBoxCoordinates } from "./interfaces";
 
+enum Corners {
+  "topLeft",
+  "topRight",
+  "bottomRight",
+  "bottomLeft",
+}
+
+type SelectedCorners =
+  | "none"
+  | "topLeft"
+  | "topRight"
+  | "bottomRight"
+  | "bottomLeft";
+
 interface Props extends BaseProps {
   activeTool: string;
   mode: Mode;
@@ -40,7 +54,7 @@ export class CanvasClass extends Component<Props> {
 
   private baseCanvas: BaseCanvas;
 
-  private selectedCorner: "none" | "topLeft" | "bottomRight";
+  private selectedCorner: SelectedCorners;
 
   private isMouseDown: boolean;
 
@@ -91,44 +105,64 @@ export class CanvasClass extends Component<Props> {
 
     // if active use a thicker line
     const lineWidth = isActive ? 2 : 1;
+    context.lineWidth = lineWidth;
     if (isActive) {
       // if active highlight with mainColor
       context.strokeStyle = mainColor;
     } else {
       context.strokeStyle = color;
     }
+    context.fillStyle = secondaryColor;
+    const pointSize = 6;
 
-    let { topLeft, bottomRight } = boundingBoxCoordinates;
+    // get the four corners
+    const { topLeft, bottomRight } = boundingBoxCoordinates;
+    const topRight: XYPoint = { x: topLeft?.x, y: bottomRight?.y };
+    const bottomLeft: XYPoint = { x: bottomRight?.x, y: topLeft?.y };
+    const corners: XYPoint[] = [topLeft, topRight, bottomRight, bottomLeft];
 
-    // convert tp canvas coordinate space
-    topLeft = imageToCanvas(
-      topLeft.x,
-      topLeft.y,
-      this.props.displayedImage.width,
-      this.props.displayedImage.height,
-      this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
-    );
-    bottomRight = imageToCanvas(
-      bottomRight.x,
-      bottomRight.y,
-      this.props.displayedImage.width,
-      this.props.displayedImage.height,
-      this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
-    );
+    // convert to canvas coordinate space
+    for (let i = 0; i < 4; i += 1) {
+      corners[i] = imageToCanvas(
+        corners[i].x,
+        corners[i].y,
+        this.props.displayedImage.width,
+        this.props.displayedImage.height,
+        this.props.scaleAndPan,
+        this.props.canvasPositionAndSize
+      );
+    }
 
-    // draw rect and stroke
-    context.lineWidth = lineWidth;
+    // draw bounding box
     context.beginPath();
-    //   context.moveTo(topLeft.x, topLeft.y);
     context.rect(
-      topLeft.x,
-      topLeft.y,
-      bottomRight.x - topLeft.x,
-      bottomRight.y - topLeft.y
-    ); // draw rectangle
+      corners[0].x,
+      corners[0].y,
+      corners[2].x - corners[0].x,
+      corners[2].y - corners[0].y
+    );
     context.stroke();
+
+    // draw the corners
+    context.beginPath();
+    for (let i = 0; i < 4; i += 1) {
+      if (this.selectedCorner === Corners[i] && isActive) {
+        context.fillRect(
+          corners[i].x - pointSize / 2,
+          corners[i].y - pointSize / 2,
+          pointSize,
+          pointSize
+        ); // draw a filled square to mark the point as selected
+      } else {
+        context.rect(
+          corners[i].x - pointSize / 2,
+          corners[i].y - pointSize / 2,
+          pointSize,
+          pointSize
+        ); // draw a square to mark the point
+        context.stroke();
+      }
+    }
   };
 
   drawAllBoundingBoxes = (): void => {
@@ -164,7 +198,16 @@ export class CanvasClass extends Component<Props> {
     const boundingBoxCoordinates =
       this.props.annotationsObject.getBoundingBoxCoordinates();
 
-    boundingBoxCoordinates[this.selectedCorner] = { x: null, y: null };
+    switch (this.selectedCorner) {
+      case "topLeft":
+        boundingBoxCoordinates.topLeft = { x: null, y: null };
+        break;
+      case "bottomRight":
+        boundingBoxCoordinates.bottomRight = { x: null, y: null };
+        break;
+      default:
+        break;
+    }
 
     this.props.annotationsObject.updateBoundingBoxCoordinates(
       boundingBoxCoordinates
@@ -177,7 +220,7 @@ export class CanvasClass extends Component<Props> {
   clickNearCorner = (
     clickPoint: XYPoint,
     boundingBoxCoordinates: BoundingBoxCoordinates
-  ): number => {
+  ): SelectedCorners => {
     // iterates through the corners of boundingBox, returns the index of the first point within distance 25 of clickPoint
     // clickPoint and boundingBoxCoordinates are both expected to be in image space
     // returns -1 if no point was within distance 25
@@ -194,7 +237,20 @@ export class CanvasClass extends Component<Props> {
       topLeft,
     ];
 
-    return this.clickNearPoint(clickPoint, corners);
+    switch (this.clickNearPoint(clickPoint, corners)) {
+      case 0:
+        return "topLeft";
+      case 1:
+        return "topRight";
+      case 2:
+        return "bottomRight";
+      case 3:
+        return "bottomLeft";
+      case 4:
+        return "topLeft";
+      default:
+        return "none";
+    }
   };
 
   clickNearPoint = (clickPoint: XYPoint, cornersVector: XYPoint[]): number => {
@@ -273,7 +329,6 @@ export class CanvasClass extends Component<Props> {
     );
 
     if (this.props.mode === Mode.select) {
-      console.log("select mode");
       // In select mode a single click allows to select a different spline annotation
       const selectedSpline = this.props.annotationsObject.clickNearSpline(
         imageX,
@@ -302,9 +357,7 @@ export class CanvasClass extends Component<Props> {
     }
 
     // if no bounding box tool is turned on then do nothing
-    console.log(this.isActive());
     if (!this.isActive()) return;
-    console.log(this.isActive());
 
     if (this.sliceIndexMatch()) {
       // if our current spline annotation object is for the visible slice
@@ -315,23 +368,11 @@ export class CanvasClass extends Component<Props> {
       // check if the current bounding box is a complete one
       const isComplete = this.isComplete(boundingBoxCoordinates);
 
-      // check if we clicked within the nudge radius of an existing point
-      const nudgePointIdx = this.clickNearCorner(
-        { x: imageX, y: imageY },
-        boundingBoxCoordinates
-      );
-
-      if (nudgePointIdx !== -1) {
-        // If the mouse click was near an existing point, nudge that point
-        // TODO we want to deal with this so we can nudge the 'bottom left corner'
-        // which actually doesnt exist but is a powerful feature to add
-        console.log("nudging bounding boxes is not yet implemented");
-      } else if (this.props.mode === Mode.draw && !isComplete) {
+      if (this.props.mode === Mode.draw && !isComplete) {
         // else, i.e. not near an existing point
         // if the rectangle is not complete and we are in Mode.draw then
         // add a corner to the current bounding box
         // if a rectangular spline, we only want to add a TL and BR point
-        console.log("no corners");
         const { topLeft, bottomRight } = boundingBoxCoordinates;
         if (
           (topLeft?.x === null || topLeft?.y === null) &&
@@ -352,7 +393,6 @@ export class CanvasClass extends Component<Props> {
         ) {
           // one point defined as topLeft
           // but check which should actually be TL and which should be BR
-          console.log("tl corner exists");
           boundingBoxCoordinates = this.orderCoordinates(
             boundingBoxCoordinates.topLeft,
             {
@@ -370,7 +410,6 @@ export class CanvasClass extends Component<Props> {
         ) {
           // unusually we have one point defined as bottomRight
           // but check which should actually be TL and which should be BR
-          console.log("br corner exists");
           boundingBoxCoordinates = this.orderCoordinates(
             boundingBoxCoordinates.bottomRight,
             {
@@ -412,13 +451,12 @@ export class CanvasClass extends Component<Props> {
     );
 
     const nearPoint = this.clickNearCorner(clickPoint, boundingBoxCoordinates);
-    if (nearPoint !== -1) {
+
+    if (nearPoint !== "none") {
       // If the mouse click was near an existing point, drag that point
       // TODO we want to deal with this so we can drag the 'bottom left corner'
       // which actually doesnt exist but is a powerful feature to add
-      console.log("dragging bounding boxes is not yet implemented");
-      // question: how to deal with highlighting the 'virtual corners'
-      // e.g. this.selectedCorner = "bottomLeft"
+      this.selectedCorner = nearPoint;
       this.isMouseDown = true;
     }
 
@@ -438,7 +476,7 @@ export class CanvasClass extends Component<Props> {
       this.props.canvasPositionAndSize
     );
 
-    const boundingBoxCoordinates =
+    let boundingBoxCoordinates =
       this.props.annotationsObject.getBoundingBoxCoordinates();
 
     if (
@@ -446,11 +484,58 @@ export class CanvasClass extends Component<Props> {
       this.isComplete(boundingBoxCoordinates)
     ) {
       // If the mouse drag was near an existing point, drag that point
-      // TODO we want to deal with this so we can drag the 'bottom left corner'
-      // which actually doesnt exist but is a powerful feature to add
-      console.log("dragging bounding boxes is not yet implemented");
-      // question: how to deal with highlighting the 'virtual corners'
-      // e.g. this.selectedCorner = "bottomLeft"
+      switch (this.selectedCorner) {
+        case "topLeft":
+          boundingBoxCoordinates = this.orderCoordinates(
+            {
+              x: boundingBoxCoordinates.bottomRight.x,
+              y: boundingBoxCoordinates.bottomRight.y,
+            },
+            { x: clickPoint.x, y: clickPoint.y } // prevents us overwriting the original click point
+          );
+          this.props.annotationsObject.updateBoundingBoxCoordinates(
+            boundingBoxCoordinates
+          );
+          break;
+        case "topRight":
+          boundingBoxCoordinates = this.orderCoordinates(
+            {
+              x: boundingBoxCoordinates.bottomRight.x,
+              y: boundingBoxCoordinates.topLeft.y,
+            },
+            { x: clickPoint.x, y: clickPoint.y } // prevents us overwriting the original click point
+          );
+          this.props.annotationsObject.updateBoundingBoxCoordinates(
+            boundingBoxCoordinates
+          );
+          break;
+        case "bottomRight":
+          boundingBoxCoordinates = this.orderCoordinates(
+            {
+              x: boundingBoxCoordinates.topLeft.x,
+              y: boundingBoxCoordinates.topLeft.y,
+            },
+            { x: clickPoint.x, y: clickPoint.y } // prevents us overwriting the original click point
+          );
+          this.props.annotationsObject.updateBoundingBoxCoordinates(
+            boundingBoxCoordinates
+          );
+          break;
+        case "bottomLeft":
+          boundingBoxCoordinates = this.orderCoordinates(
+            {
+              x: boundingBoxCoordinates.topLeft.x,
+              y: boundingBoxCoordinates.bottomRight.y,
+            },
+            { x: clickPoint.x, y: clickPoint.y } // prevents us overwriting the original click point
+          );
+          this.props.annotationsObject.updateBoundingBoxCoordinates(
+            boundingBoxCoordinates
+          );
+          break;
+        default:
+          break;
+      }
     }
 
     // Redraw all the splines
