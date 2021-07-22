@@ -99,8 +99,7 @@ export class Annotations {
 
     this.data.forEach((annotation, i) => {
       if (
-        (annotation.toolbox === "spline" ||
-          annotation.toolbox === "magicspline") &&
+        annotation.toolbox === "spline" &&
         annotation.spline.spaceTimeInfo.z === z
       ) {
         splines.push([annotation.spline, i]);
@@ -154,11 +153,7 @@ export class Annotations {
 
   @log
   addSplinePoint(point: XYPoint): void {
-    if (
-      ["spline", "magicspline"].includes(
-        this.data[this.activeAnnotationID].toolbox
-      )
-    ) {
+    if (this.data[this.activeAnnotationID].toolbox === "spline") {
       this.data[this.activeAnnotationID].spline.coordinates.push(point);
     }
   }
@@ -287,7 +282,7 @@ export class Annotations {
       // here `i` is the index of the spline in `splines`, while `index` is the index of the spline in all annotations
 
       // For each pair of points, check if point clicked is near the line segment
-      // having for end points two consecutive points in the spline:
+      // having for end points two consecutive points in the spline
       for (let j = 1; j < spline.coordinates.length; j += 1) {
         if (
           this.isClickNearLineSegment(

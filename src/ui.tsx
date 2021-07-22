@@ -22,6 +22,7 @@ import {
 } from "@/toolboxes/background";
 import {
   SplineCanvas,
+  Submenu as SplineSubmenu,
   SplineToolbar,
 } from "@/toolboxes/spline";
 import {
@@ -773,6 +774,7 @@ class UserInterface extends Component<Props, State> {
                   buttonClicked={this.state.buttonClicked}
                   setButtonClicked={this.setButtonClicked}
                   activateTool={this.activateTool}
+                  handleOpen={this.handleOpen}
                   isTyping={this.isTyping}
                 />
               </ButtonGroup>
@@ -939,16 +941,14 @@ class UserInterface extends Component<Props, State> {
                 anchorElement={this.state.anchorElement}
                 onClose={this.handleClose}
               />
-              {/* <SplineUI
-              isOpen={
-                this.state.buttonClicked === "Spline" && this.state.popover
-              }
-              anchorElement={this.state.anchorElement}
-              onClick={this.handleRequestClose}
-              onClose={this.handleClose}
-              activeTool={this.state.activeTool}
-              activateTool={this.activateTool}
-            /> */}
+              <SplineSubmenu
+                isOpen={
+                  this.state.buttonClicked === "Spline" &&
+                  Boolean(this.state.anchorElement)
+                }
+                anchorElement={this.state.anchorElement}
+                onClose={this.handleClose}
+              />
             </Grid>
           </Container>
           <MinimapUI
