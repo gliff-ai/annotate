@@ -82,6 +82,11 @@ const tooltips: ToolTips = {
     icon: require(`@/assets/magic-spline-icon.svg`) as string,
     shortcut: "L",
   },
+  boundingBox: {
+    name: "Rectangular Bounding Box",
+    icon: require(`@/assets/magic-spline-icon.svg`) as string,
+    shortcut: "R",
+  },
   contrast: {
     name: "Contrast",
     icon: require(`@/assets/contrast-icon.svg`) as string,

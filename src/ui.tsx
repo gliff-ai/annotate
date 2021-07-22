@@ -21,6 +21,7 @@ import {
   Minimap,
 } from "@/toolboxes/background";
 import { SplineCanvas, SplineSubmenu, SplineToolbar } from "@/toolboxes/spline";
+import { BoundingBoxCanvas, BoundingBoxToolbar } from "@/toolboxes/boundingBox";
 import {
   PaintbrushCanvas,
   PaintbrushSubmenu,
@@ -773,6 +774,12 @@ class UserInterface extends Component<Props, State> {
                   handleOpen={this.handleOpen}
                   isTyping={this.isTyping}
                 />
+                <BoundingBoxToolbar
+                  buttonClicked={this.state.buttonClicked}
+                  setButtonClicked={this.setButtonClicked}
+                  activateTool={this.activateTool}
+                  isTyping={this.isTyping}
+                />
               </ButtonGroup>
             </Grid>
 
@@ -847,6 +854,23 @@ class UserInterface extends Component<Props, State> {
                   }
                 />
                 <SplineCanvas
+                  scaleAndPan={this.state.scaleAndPan}
+                  activeTool={this.state.activeTool}
+                  mode={this.state.mode}
+                  annotationsObject={this.annotationsObject}
+                  displayedImage={this.state.displayedImage}
+                  canvasPositionAndSize={this.state.viewportPositionAndSize}
+                  setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                  redraw={this.state.redraw}
+                  sliceIndex={this.state.sliceIndex}
+                  setUIActiveAnnotationID={(id) => {
+                    this.setState({ activeAnnotationID: id });
+                  }}
+                  setActiveTool={(tool: Tool) => {
+                    this.setState({ activeTool: tool });
+                  }}
+                />
+                <BoundingBoxCanvas
                   scaleAndPan={this.state.scaleAndPan}
                   activeTool={this.state.activeTool}
                   mode={this.state.mode}
