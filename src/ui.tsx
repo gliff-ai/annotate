@@ -20,10 +20,13 @@ import {
   BackgroundUI,
   MinimapUI,
 } from "@/toolboxes/background";
-import { SplineCanvas, SplineToolbar } from "@/toolboxes/spline";
+import {
+  SplineCanvas,
+  SplineToolbar,
+} from "@/toolboxes/spline";
 import {
   PaintbrushCanvas,
-  PaintbrushUI,
+  Submenu as PaintbrushSubmenu,
   PaintbrushToolbar,
 } from "@/toolboxes/paintbrush";
 import { LabelsPopover } from "@/toolboxes/labels";
@@ -928,7 +931,7 @@ class UserInterface extends Component<Props, State> {
                 toggleChannelAtIndex={this.toggleChannelAtIndex}
                 displayedImage={this.state.displayedImage}
               />
-              <PaintbrushUI
+              <PaintbrushSubmenu
                 isOpen={
                   this.state.buttonClicked === "Brush" &&
                   Boolean(this.state.anchorElement)

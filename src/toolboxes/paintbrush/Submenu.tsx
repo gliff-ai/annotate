@@ -20,7 +20,7 @@ const useStyles = makeStyles(() =>
   })
 );
 
-const PaintbrushUI = (props: Props): ReactElement => {
+const Submenu = (props: Props): ReactElement => {
   const [paintbrush, setPaintbrush] = usePaintbrushStore();
   const classes = useStyles();
 
@@ -48,4 +48,4 @@ const PaintbrushUI = (props: Props): ReactElement => {
   );
 };
 
-export { PaintbrushUI };
+export { Submenu };
