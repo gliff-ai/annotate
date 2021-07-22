@@ -20,10 +20,14 @@ import {
   BackgroundUI,
   MinimapUI,
 } from "@/toolboxes/background";
-import { SplineCanvas, SplineToolbar } from "@/toolboxes/spline";
+import {
+  SplineCanvas,
+  Submenu as SplineSubmenu,
+  SplineToolbar,
+} from "@/toolboxes/spline";
 import {
   PaintbrushCanvas,
-  PaintbrushUI,
+  Submenu as PaintbrushSubmenu,
   PaintbrushToolbar,
 } from "@/toolboxes/paintbrush";
 import { LabelsPopover } from "@/toolboxes/labels";
@@ -770,6 +774,7 @@ class UserInterface extends Component<Props, State> {
                   buttonClicked={this.state.buttonClicked}
                   setButtonClicked={this.setButtonClicked}
                   activateTool={this.activateTool}
+                  handleOpen={this.handleOpen}
                   isTyping={this.isTyping}
                 />
               </ButtonGroup>
@@ -928,7 +933,7 @@ class UserInterface extends Component<Props, State> {
                 toggleChannelAtIndex={this.toggleChannelAtIndex}
                 displayedImage={this.state.displayedImage}
               />
-              <PaintbrushUI
+              <PaintbrushSubmenu
                 isOpen={
                   this.state.buttonClicked === "Brush" &&
                   Boolean(this.state.anchorElement)
@@ -936,16 +941,14 @@ class UserInterface extends Component<Props, State> {
                 anchorElement={this.state.anchorElement}
                 onClose={this.handleClose}
               />
-              {/* <SplineUI
-              isOpen={
-                this.state.buttonClicked === "Spline" && this.state.popover
-              }
-              anchorElement={this.state.anchorElement}
-              onClick={this.handleRequestClose}
-              onClose={this.handleClose}
-              activeTool={this.state.activeTool}
-              activateTool={this.activateTool}
-            /> */}
+              <SplineSubmenu
+                isOpen={
+                  this.state.buttonClicked === "Spline" &&
+                  Boolean(this.state.anchorElement)
+                }
+                anchorElement={this.state.anchorElement}
+                onClose={this.handleClose}
+              />
             </Grid>
           </Container>
           <MinimapUI

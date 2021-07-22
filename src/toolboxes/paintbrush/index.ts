@@ -1,4 +1,4 @@
 export { PaintbrushCanvas } from "./Canvas";
-export { PaintbrushUI } from "./UI";
+export { Submenu } from "./Submenu";
 export { Toolbar as PaintbrushToolbar } from "./Toolbar";
 export { BrushStroke } from "./interfaces";

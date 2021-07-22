@@ -67,10 +67,20 @@ const tooltips: ToolTips = {
     icon: require(`@/assets/splines-icon.svg`) as string,
     shortcut: "S",
   },
+  lassospline: {
+    name: "Lasso Spline",
+    icon: require(`@/assets/magic-spline-icon.svg`) as string,
+    shortcut: "O",
+  },
   magicspline: {
     name: "Magic Spline",
     icon: require(`@/assets/magic-spline-icon.svg`) as string,
     shortcut: "M",
+  },
+  closespline: {
+    name: "Close Active Spline",
+    icon: require(`@/assets/magic-spline-icon.svg`) as string,
+    shortcut: "L",
   },
   contrast: {
     name: "Contrast",
@@ -80,17 +90,18 @@ const tooltips: ToolTips = {
   brightness: {
     name: "Brightness",
     icon: require(`@/assets/brightness-icon.svg`) as string,
-    shortcut: `/`,
+    shortcut: "/",
   },
   channels: {
     name: "Channels",
     icon: require(`@/assets/channels-icon.svg`) as string,
-    shortcut: `C`,
+    shortcut: "C",
   },
   labels: {
     name: "Annotation Label",
     icon: require(`@/assets/annotation-label-icon.svg`) as string,
-    shortcut: "L",
+    shortcut: "CTRL",
+    shortcutSymbol: "L",
   },
   download: {
     name: "Download annotations",

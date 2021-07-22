@@ -21,7 +21,7 @@ export const keybindings = {
   Enter: "spline.changeSplineModeToEdit",
   Escape: "spline.deselectPoint",
   "ctrl+KeyS": "ui.saveAnnotations",
-  "ctrl+KeyC": "spline.closeLoop",
+  "ctrl+KeyC": "spline.closeSpline",
   "ctrl+ArrowLeft": "ui.previousAnnotation",
   "ctrl+ArrowRight": "ui.nextAnnotation",
   "alt+Equal": "minimap.handleDrawerOpen",

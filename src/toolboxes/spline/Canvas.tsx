@@ -1,4 +1,4 @@
-import { ReactNode, Component } from "react";
+import { ReactNode, Component, ReactElement } from "react";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
 import { theme } from "@/components/theme";
@@ -6,11 +6,13 @@ import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/components/transforms";
 import { XYPoint } from "@/annotation/interfaces";
 import { Tool, Tools } from "@/components/tools";
+import { tooltips } from "@/components/tooltips";
 import { Mode } from "@/ui";
 
 import { getRGBAString, palette } from "@/components/palette";
 
 import { calculateSobel } from "./sobel";
+import { useSplineStore } from "./Store";
 
 interface Props extends BaseProps {
   activeTool: string;
@@ -27,7 +29,7 @@ interface Props extends BaseProps {
 export const events = [
   "deleteSelectedPoint",
   "deselectPoint",
-  "closeLoop",
+  "closeSpline",
 ] as const;
 
 const mainColor = theme.palette.primary.main;
@@ -39,7 +41,7 @@ interface Event extends CustomEvent {
 
 type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 
-export class SplineCanvas extends Component<Props> {
+export class SplineCanvasClass extends Component<Props> {
   readonly name = "spline";
 
   private baseCanvas: BaseCanvas;
@@ -271,8 +273,12 @@ export class SplineCanvas extends Component<Props> {
     return -1;
   };
 
-  // X and Y are in CanvasSpace
   onClick = (x: number, y: number): void => {
+    // handle click to select an annotation (Mode.select)
+    // or add new point to a normal spline (Mode.draw and this.props.activeTool === tooltips.spline.name)
+    // or add TL or BR point to a rectangle spline (Mode.draw and this.props.activeTool === tooltips.rectspline.name)
+
+    // X and Y are in CanvasSpace, convert to ImageSpace
     const { x: imageX, y: imageY } = canvasToImage(
       x,
       y,
@@ -283,7 +289,7 @@ export class SplineCanvas extends Component<Props> {
     );
 
     if (this.props.mode === Mode.select) {
-      // In select mode a single click allows to select a different spline
+      // In select mode a single click allows to select a different spline annotation
       const selectedSpline = this.props.annotationsObject.clickNearSpline(
         imageX,
         imageY,
@@ -310,16 +316,20 @@ export class SplineCanvas extends Component<Props> {
       }
     }
 
+    // if no spline tool is turned on then do nothing
     if (!this.isActive()) return;
 
     if (this.sliceIndexMatch()) {
+      // if our current spline annotation object is for the visible slice
+      // get the current spline coordinates
       const coordinates = this.props.annotationsObject.getSplineCoordinates();
 
-      // check if we clicked within the nudge radius of an existing point:
+      // check if we clicked within the nudge radius of an existing point
       const nudgePointIdx = this.clickNearPoint(
         { x: imageX, y: imageY },
         coordinates
       );
+      // check if the current spline is a closed one
       const isClosed = this.isClosed(coordinates);
 
       if (nudgePointIdx !== -1) {
@@ -341,13 +351,16 @@ export class SplineCanvas extends Component<Props> {
             coordinates.length - 1
           );
         }
-
-        // If the spline is not closed, append a new point
       } else if (this.props.mode === Mode.draw && !isClosed) {
-        // Add coordinates to the current spline
-        this.props.annotationsObject.addSplinePoint({ x: imageX, y: imageY });
-        this.selectedPointIndex =
-          this.props.annotationsObject.getSplineLength() - 1;
+        // else, i.e. not near an existing point
+        // if the spline is not closed and we are in Mode.draw then
+        // add coordinates to the current spline
+        if (this.props.activeTool === tooltips.spline.name) {
+          // if a normal spline, just add points as needed
+          this.props.annotationsObject.addSplinePoint({ x: imageX, y: imageY });
+          this.selectedPointIndex =
+            this.props.annotationsObject.getSplineLength() - 1;
+        }
       }
     }
 
@@ -370,8 +383,10 @@ export class SplineCanvas extends Component<Props> {
     this.drawAllSplines();
   };
 
-  closeLoop = (): void => {
+  closeSpline = (): void => {
     // Append the first spline point to the end, making a closed polygon
+
+    // check the current annotation is on the current slice
     if (!this.sliceIndexMatch()) return;
 
     const coordinates = this.props.annotationsObject.getSplineCoordinates();
@@ -383,6 +398,7 @@ export class SplineCanvas extends Component<Props> {
       return; // don't duplicate the first point again if the loop is already closed
     }
 
+    // add an endpoint that is the same as the startpoint
     this.props.annotationsObject.addSplinePoint(coordinates[0]);
 
     this.drawAllSplines();
@@ -462,22 +478,29 @@ export class SplineCanvas extends Component<Props> {
       this.props.canvasPositionAndSize
     );
 
-    if (this.props.activeTool === "magicspline") {
-      // add a new point and snap it to the highest gradient point within 25 pixels:
+    if (this.props.activeTool === tooltips.magicspline.name) {
+      // magic spline, add a new point and snap it to the highest gradient point within 25 pixels:
       if (this.gradientImage === undefined) {
         this.gradientImage = calculateSobel(this.props.displayedImage);
       }
       this.props.annotationsObject.addSplinePoint(clickPoint);
       this.snapToGradient(this.props.annotationsObject.getSplineLength() - 1);
       this.isMouseDown = true;
-      this.drawAllSplines();
+    } else if (this.props.activeTool === tooltips.lassospline.name) {
+      // lasso spline, add a new point but no snapping
+      this.props.annotationsObject.addSplinePoint(clickPoint);
+      this.selectedPointIndex =
+        this.props.annotationsObject.getSplineLength() - 1;
+      this.isMouseDown = true;
     } else {
+      // normal spline, try and drag and drop existing nodes
       const nearPoint = this.clickNearPoint(clickPoint, coordinates);
       if (nearPoint !== -1) {
         this.selectedPointIndex = nearPoint;
         this.isMouseDown = true;
       }
     }
+    this.drawAllSplines();
   };
 
   onMouseMove = (x: number, y: number): void => {
@@ -498,10 +521,11 @@ export class SplineCanvas extends Component<Props> {
     const coordinates = this.props.annotationsObject.getSplineCoordinates();
 
     if (
-      this.props.activeTool === "magicspline" &&
+      this.props.activeTool === tooltips.magicspline.name &&
       this.numberOfMoves % 5 === 0
     ) {
-      // add a new point and snap it to the highest gradient point within 25 pixels:
+      // magic spline, every 5 moves add a new point
+      // and snap it to the highest gradient point within 25 pixels:
       this.props.annotationsObject.addSplinePoint({
         x: clickPoint.x,
         y: clickPoint.y,
@@ -510,8 +534,19 @@ export class SplineCanvas extends Component<Props> {
         this.props.annotationsObject.getSplineLength() - 1,
         25 / this.props.scaleAndPan.scale
       );
-    } else if (this.props.activeTool !== "magicspline") {
-      // If dragging first point, update also last
+    } else if (
+      this.props.activeTool === tooltips.lassospline.name &&
+      this.numberOfMoves % 5 === 0
+    ) {
+      // lasso spline, every 5 moves add a new point
+      this.props.annotationsObject.addSplinePoint({
+        x: clickPoint.x,
+        y: clickPoint.y,
+      });
+      this.selectedPointIndex =
+        this.props.annotationsObject.getSplineLength() - 1;
+    } else {
+      // normal spline, if dragging first point, update closed last
       if (this.selectedPointIndex === 0 && this.isClosed(coordinates)) {
         this.props.annotationsObject.updateSplinePoint(
           clickPoint.x,
@@ -575,8 +610,9 @@ export class SplineCanvas extends Component<Props> {
   };
 
   isActive = (): boolean =>
-    this.props.activeTool === "spline" ||
-    this.props.activeTool === "magicspline";
+    this.props.activeTool === tooltips.spline.name ||
+    this.props.activeTool === tooltips.lassospline.name ||
+    this.props.activeTool === tooltips.magicspline.name;
 
   sliceIndexMatch = (): boolean =>
     this.props.annotationsObject.getSplineForActiveAnnotation().spaceTimeInfo
@@ -603,3 +639,28 @@ export class SplineCanvas extends Component<Props> {
       </div>
     ) : null;
 }
+
+export const SplineCanvas = (props: Props): ReactElement => {
+  // we will overwrite props.activeTool, which will be spline
+  // with spline.splineType, which will be spline/lasso/magic/rect
+  const [spline] = useSplineStore();
+  let { activeTool } = props;
+  if (activeTool === "spline") {
+    activeTool = spline.splineType;
+  }
+
+  return (
+    <SplineCanvasClass
+      activeTool={activeTool}
+      mode={props.mode}
+      annotationsObject={props.annotationsObject}
+      displayedImage={props.displayedImage}
+      scaleAndPan={props.scaleAndPan}
+      canvasPositionAndSize={props.canvasPositionAndSize}
+      redraw={props.redraw}
+      sliceIndex={props.sliceIndex}
+      setUIActiveAnnotationID={props.setUIActiveAnnotationID}
+      setActiveTool={props.setActiveTool}
+    />
+  );
+};

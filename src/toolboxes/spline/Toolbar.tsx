@@ -1,8 +1,8 @@
-import { Component, ReactElement } from "react";
+import { Component, ReactElement, MouseEvent } from "react";
 import { BaseIconButton } from "@/components/BaseIconButton";
 import { tooltips } from "@/components/tooltips";
 
-const events = ["selectSpline", "selectMagicspline"] as const;
+const events = ["selectSpline"] as const;
 
 interface Event extends CustomEvent {
   type: typeof events[number];
@@ -12,10 +12,20 @@ interface Props {
   buttonClicked: string;
   setButtonClicked: (buttonName: string) => void;
   activateTool: (activeTool: string) => void;
+  handleOpen: (
+    event?: MouseEvent
+  ) => (anchorElement?: HTMLButtonElement) => void;
   isTyping: () => boolean;
 }
 
 class Toolbar extends Component<Props> {
+  private refSplinePopover: HTMLButtonElement;
+
+  constructor(props: Props) {
+    super(props);
+    this.refSplinePopover = null;
+  }
+
   componentDidMount = (): void => {
     for (const event of events) {
       document.addEventListener(event, this.handleEvent);
@@ -36,14 +46,9 @@ class Toolbar extends Component<Props> {
 
   selectSpline = (): void => {
     if (this.props.isTyping()) return;
+    this.props.handleOpen()(this.refSplinePopover);
     this.props.setButtonClicked(tooltips.spline.name);
     this.props.activateTool("spline");
-  };
-
-  selectMagicspline = (): void => {
-    if (this.props.isTyping()) return;
-    this.props.setButtonClicked(tooltips.magicspline.name);
-    this.props.activateTool("magicspline");
   };
 
   render = (): ReactElement => (
@@ -52,12 +57,10 @@ class Toolbar extends Component<Props> {
         tooltip={tooltips.spline}
         onClick={this.selectSpline}
         fill={this.props.buttonClicked === tooltips.spline.name}
+        setRefCallback={(ref) => {
+          this.refSplinePopover = ref;
+        }}
       />
-      {/* <BaseIconButton
-        tooltip={tooltips.magicspline}
-        onClick={this.selectMagicspline}
-        fill={this.props.buttonClicked === tooltips.magicspline.name}
-      /> */}
     </>
   );
 }
