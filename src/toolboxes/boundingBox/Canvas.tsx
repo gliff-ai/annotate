@@ -38,7 +38,7 @@ interface Props extends BaseProps {
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
 // We should maybe namespace them so we don't get conflicting methods across toolboxes.
-export const events = ["deleteSelectedPoint", "deselectPoint"] as const;
+export const events = ["deleteSelectedCorner", "deselectCorner"] as const;
 
 const mainColor = theme.palette.primary.main;
 const secondaryColor = theme.palette.secondary.main;
@@ -214,12 +214,12 @@ export class CanvasClass extends Component<Props> {
       });
   };
 
-  private deselectPoint = () => {
+  private deselectCorner = () => {
     this.selectedCorner = "none";
     this.drawAllBoundingBoxes();
   };
 
-  deleteSelectedPoint = (): void => {
+  deleteSelectedCorner = (): void => {
     if (this.selectedCorner === "none" || !this.sliceIndexMatch()) return;
 
     const boundingBoxCoordinates =
@@ -357,6 +357,13 @@ export class CanvasClass extends Component<Props> {
 
     if (this.props.mode === Mode.select) {
       // In select mode a single click allows to select a different spline annotation
+      // DEVNOTE this is currently duplicated in each toolbox!
+      const selectedBoundingBox =
+        this.props.annotationsObject.clickNearBoundingBox(
+          imageX,
+          imageY,
+          this.props.sliceIndex
+        );
       const selectedSpline = this.props.annotationsObject.clickNearSpline(
         imageX,
         imageY,
@@ -370,9 +377,14 @@ export class CanvasClass extends Component<Props> {
         );
 
       if (
-        selectedSpline !== null &&
-        selectedSpline !== this.props.annotationsObject.getActiveAnnotationID()
+        selectedBoundingBox !== null &&
+        selectedBoundingBox !==
+          this.props.annotationsObject.getActiveAnnotationID()
       ) {
+        this.props.annotationsObject.setActiveAnnotationID(selectedBoundingBox);
+        this.props.setUIActiveAnnotationID(selectedBoundingBox);
+        this.props.setActiveTool(Tools.boundingBox);
+      } else if (selectedSpline !== null) {
         this.props.annotationsObject.setActiveAnnotationID(selectedSpline);
         this.props.setUIActiveAnnotationID(selectedSpline);
         this.props.setActiveTool(Tools.spline);

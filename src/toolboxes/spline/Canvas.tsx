@@ -290,6 +290,13 @@ class CanvasClass extends Component<Props> {
 
     if (this.props.mode === Mode.select) {
       // In select mode a single click allows to select a different spline annotation
+      // DEVNOTE this is currently duplicated in each toolbox!
+      const selectedBoundingBox =
+        this.props.annotationsObject.clickNearBoundingBox(
+          imageX,
+          imageY,
+          this.props.sliceIndex
+        );
       const selectedSpline = this.props.annotationsObject.clickNearSpline(
         imageX,
         imageY,
@@ -302,13 +309,18 @@ class CanvasClass extends Component<Props> {
           this.props.sliceIndex
         );
 
-      if (
-        selectedSpline !== null &&
-        selectedSpline !== this.props.annotationsObject.getActiveAnnotationID()
-      ) {
+      if (selectedSpline !== null) {
         this.props.annotationsObject.setActiveAnnotationID(selectedSpline);
         this.props.setUIActiveAnnotationID(selectedSpline);
         this.props.setActiveTool(Tools.spline);
+      } else if (
+        selectedBoundingBox !== null &&
+        selectedBoundingBox !==
+          this.props.annotationsObject.getActiveAnnotationID()
+      ) {
+        this.props.annotationsObject.setActiveAnnotationID(selectedBoundingBox);
+        this.props.setUIActiveAnnotationID(selectedBoundingBox);
+        this.props.setActiveTool(Tools.boundingBox);
       } else if (selectedBrushStroke !== null) {
         this.props.annotationsObject.setActiveAnnotationID(selectedBrushStroke);
         this.props.setUIActiveAnnotationID(selectedBrushStroke);
