@@ -97,9 +97,6 @@ export class CanvasClass extends Component<Props> {
     isActive = false,
     color: string
   ): void => {
-    // ignore unfinished boxes
-    if (!this.isComplete(boundingBoxCoordinates)) return;
-
     // get canvas context for drawing
     const { canvasContext: context } = this.baseCanvas;
 
@@ -114,6 +111,36 @@ export class CanvasClass extends Component<Props> {
     }
     context.fillStyle = secondaryColor;
     const pointSize = 6;
+
+    if (!this.isComplete(boundingBoxCoordinates)) {
+      const { topLeft, bottomRight } = boundingBoxCoordinates;
+      let x: number;
+      let y: number;
+      // for unfinished boxes just draw a TL or BR corner
+      if (topLeft?.x !== null && topLeft?.y !== null) {
+        // we have just one point in the top left so draw it
+        ({ x, y } = topLeft);
+      } else if (bottomRight?.x !== null && bottomRight?.y !== null) {
+        // we have just one point in the bottom right so draw it
+        ({ x, y } = bottomRight);
+      }
+      ({ x, y } = imageToCanvas(
+        x,
+        y,
+        this.props.displayedImage.width,
+        this.props.displayedImage.height,
+        this.props.scaleAndPan,
+        this.props.canvasPositionAndSize
+      ));
+      context.beginPath();
+      context.fillRect(
+        x - pointSize / 2,
+        y - pointSize / 2,
+        pointSize,
+        pointSize
+      ); // draw a filled square to mark the point as selected
+      return;
+    }
 
     // get the four corners
     const { topLeft, bottomRight } = boundingBoxCoordinates;
@@ -422,12 +449,11 @@ export class CanvasClass extends Component<Props> {
           );
           this.selectedCorner = "topLeft";
         } else if (isComplete) {
-          console.log(
-            "Not adding your point because this rectangle is complete."
-          );
+          // Not adding your point because this rectangle is complete.
+          return;
         } else {
-          // otherwise spit an error
-          console.log("Not really sure why but I can't add to this rectangle.");
+          // Not really sure why but I can't add to this rectangle.
+          return;
         }
       }
     }

@@ -1,4 +1,3 @@
-import { tooltips } from "@/components/tooltips";
 import { BoundingBox, BoundingBoxCoordinates } from "@/toolboxes/boundingBox";
 import { BrushStroke } from "@/toolboxes/paintbrush";
 import { Spline } from "@/toolboxes/spline";
