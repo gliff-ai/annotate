@@ -6,7 +6,8 @@ import {
   useEffect,
   FC,
 } from "react";
-
+import simplify from "simplify-js";
+import { slpfLines } from "@gliff-ai/slpf";
 import { BaseCanvas, CanvasProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/components/transforms";
@@ -16,6 +17,7 @@ import { Mode } from "@/ui";
 import { theme } from "@/components/theme";
 import { palette, getRGBAString } from "@/components/palette";
 import { usePaintbrushStore } from "./Store";
+import { BrushStroke } from "./interfaces";
 
 const mainColor = theme.palette.primary.main;
 const secondaryColor = theme.palette.secondary.main;
@@ -43,7 +45,7 @@ interface State {
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
 // We should maybe namespace them so we don't get conflicting methods across toolboxes.
-export const events = ["saveLine"] as const;
+export const events = ["saveLine", "fillBrush"] as const;
 
 interface Event extends CustomEvent {
   type: typeof events[number];
@@ -334,6 +336,46 @@ export class CanvasClass extends Component<Props, State> {
     this.drawAllStrokes();
     const context = this.interactionCanvas.canvasContext;
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+  };
+
+  fillBrush = (): void => {
+    // Treat the current paintbrush item as a closed polygon and fill
+    // Simplifying the line for computational efficiency
+    const strokeCoordinates =
+      this.props.annotationsObject.getBrushStrokeCoordinates();
+
+    // simplify
+    // TODO pick tolerance more cleverly
+    const simplifiedCoordinates = simplify(strokeCoordinates, 10, true);
+
+    const linesToFill: XYPoint[][] = slpfLines(simplifiedCoordinates);
+
+    let color = this.props.annotationsObject.getActiveAnnotationColor();
+    // Do we already have a colour for this layer?
+    color =
+      color ||
+      getRGBAString(
+        palette[
+          this.props.annotationsObject.getActiveAnnotationID() % palette.length
+        ]
+      );
+
+    for (let i = 0; i < linesToFill.length; i += 1) {
+      const coordinates = linesToFill[i];
+      const brushStroke: BrushStroke = {
+        coordinates,
+        spaceTimeInfo: { z: this.props.sliceIndex, t: 0 },
+        brush: {
+          color,
+          radius: 1,
+          type: "paint",
+        },
+      };
+
+      this.props.annotationsObject.addBrushStroke(brushStroke);
+    }
+
+    this.drawAllStrokes();
   };
 
   /* *** Mouse events *** */
