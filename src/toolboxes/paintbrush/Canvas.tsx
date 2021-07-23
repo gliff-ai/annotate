@@ -200,13 +200,6 @@ export class CanvasClass extends Component<Props, State> {
       return { x, y };
     });
 
-    function midPointBetween(p1: XYPoint, p2: XYPoint) {
-      return {
-        x: p1.x + (p2.x - p1.x) / 2,
-        y: p1.y + (p2.y - p1.y) / 2,
-      };
-    }
-
     context.lineJoin = "round";
     context.lineCap = "round";
 
@@ -237,26 +230,17 @@ export class CanvasClass extends Component<Props, State> {
 
     context.lineWidth = this.getCanvasBrushRadius(brush.radius);
 
-    let p1 = points[0];
-    let p2 = points[1];
+    const firstPoint = points[0];
 
-    context.moveTo(p2.x, p2.y);
     context.beginPath();
+    context.moveTo(firstPoint.x, firstPoint.y);
 
-    for (let i = 1, len = points.length; i < len; i += 1) {
-      // we pick the point between pi+1 & pi+2 as the
-      // end point and p1 as our control point
-      const midPoint = midPointBetween(p1, p2);
-
-      context.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
-      p1 = points[i];
-      p2 = points[i + 1];
+    for (let i = 1; i < points.length; i += 1) {
+      // we just use linear connections for now
+      const nextPoint = points[i];
+      context.lineTo(nextPoint.x, nextPoint.y);
     }
 
-    // Draw last line as a straight line while
-    // we wait for the next point to be able to calculate
-    // the bezier control point
-    context.lineTo(p1.x, p1.y);
     context.stroke();
   };
 
