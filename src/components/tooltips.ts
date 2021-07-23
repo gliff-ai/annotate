@@ -62,6 +62,11 @@ const tooltips: ToolTips = {
     icon: require(`@/assets/eraser-icon.svg`) as string,
     shortcut: "E",
   },
+  fillbrush: {
+    name: "Fill Active Brushstroke",
+    icon: require(`@/assets/magic-spline-icon.svg`) as string,
+    shortcut: "F",
+  },
   spline: {
     name: "Spline",
     icon: require(`@/assets/splines-icon.svg`) as string,
