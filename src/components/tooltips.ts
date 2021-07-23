@@ -87,6 +87,11 @@ const tooltips: ToolTips = {
     icon: require(`@/assets/magic-spline-icon.svg`) as string,
     shortcut: "L",
   },
+  fillspline: {
+    name: "Fill Active Spline & Convert to Paintbrush",
+    icon: require(`@/assets/magic-spline-icon.svg`) as string,
+    shortcut: "F",
+  },
   boundingBox: {
     name: "Rectangular Bounding Box",
     icon: require(`@/assets/bounding-box-icon.svg`) as string,
