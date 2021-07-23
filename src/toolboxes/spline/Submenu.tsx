@@ -31,8 +31,10 @@ const Submenu = (props: Props): ReactElement => {
     );
   }
 
-  function fillSpline() {
-    document.dispatchEvent(new CustomEvent("fillSpline", { detail: "spline" }));
+  function convertSpline() {
+    document.dispatchEvent(
+      new CustomEvent("convertSpline", { detail: "spline" })
+    );
   }
 
   return (
@@ -63,8 +65,8 @@ const Submenu = (props: Props): ReactElement => {
           fill={false}
         />
         <BaseIconButton
-          tooltip={tooltips.fillspline}
-          onClick={fillSpline}
+          tooltip={tooltips.convertspline}
+          onClick={convertSpline}
           fill={false}
         />
       </ButtonGroup>

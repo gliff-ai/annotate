@@ -417,6 +417,24 @@ class CanvasClass extends Component<Props> {
     this.drawAllSplines();
   };
 
+  convertSpline = (): void => {
+    // Create a new paintbrush annotation that is equivalent to closing and filling the current spline shape
+
+    // check the current annotation is on the current slice
+    if (!this.sliceIndexMatch()) return;
+
+    // convert to paintbrush annotation with diameter=1 pixel
+    // TODO determine radius more cleverly
+    this.props.annotationsObject.convertSplineToPaintbrush(2);
+
+    // set the active tool to be the paintbrush
+    document.dispatchEvent(
+      new CustomEvent("selectBrush", { detail: "paintbrush" })
+    );
+
+    this.drawAllSplines();
+  };
+
   fillSpline = (): void => {
     // Create a new paintbrush annotation that is equivalent to closing and filling the current spline shape
 
