@@ -364,7 +364,6 @@ export class Annotations {
     return r < distanceThreshold;
   };
 
-
   getSplineSpaceTimeInfo = (): ZTPoint =>
     this.data[this.activeAnnotationID].spline?.spaceTimeInfo;
 
@@ -477,4 +476,11 @@ export class Annotations {
   clearBrushStrokes(): void {
     this.data[this.activeAnnotationID].brushStrokes = [];
   }
+
+  getBrushStrokeCoordinates = (index = 0): Array<XYPoint> =>
+    JSON.parse(
+      JSON.stringify(
+        this.data[this.activeAnnotationID].brushStrokes[index]?.coordinates
+      )
+    ) as Array<XYPoint>;
 }
