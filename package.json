@@ -67,10 +67,12 @@
     "react-dom": "^17.0.1"
   },
   "dependencies": {
+    "@gliff-ai/slpf": "^1.1.0",
     "@gliff-ai/upload": "^0.1.4",
     "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",
     "react-inlinesvg": "^2.3.0",
+    "simplify-js": "^1.2.4",
     "utif": "^3.1.0"
   }
 }
