@@ -30,6 +30,7 @@ export const events = [
   "deleteSelectedPoint",
   "deselectPoint",
   "closeSpline",
+  "fillSpline",
 ] as const;
 
 const mainColor = theme.palette.primary.main;
@@ -412,6 +413,29 @@ class CanvasClass extends Component<Props> {
 
     // add an endpoint that is the same as the startpoint
     this.props.annotationsObject.addSplinePoint(coordinates[0]);
+
+    this.drawAllSplines();
+  };
+
+  fillSpline = (): void => {
+    // Create a new paintbrush annotation that is equivalent to closing and filling the current spline shape
+
+    // check the current annotation is on the current slice
+    if (!this.sliceIndexMatch()) return;
+
+    // convert to paintbrush annotation with diameter=1 pixel
+    // TODO determine radius more cleverly
+    this.props.annotationsObject.convertSplineToPaintbrush(2);
+
+    // call the fill paintbrush function
+    document.dispatchEvent(
+      new CustomEvent("fillBrush", { detail: "paintbrush" })
+    );
+
+    // set the active tool to be the paintbrush
+    document.dispatchEvent(
+      new CustomEvent("selectBrush", { detail: "paintbrush" })
+    );
 
     this.drawAllSplines();
   };
