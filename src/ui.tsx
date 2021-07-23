@@ -122,7 +122,7 @@ const styles = {
     marginTop: "7px",
   },
   imageGrid: {
-    justify: "flex-start",
+    justifyContent: "flex-start",
     marginTop: "20px",
   },
   mainGrid: {
@@ -830,7 +830,7 @@ class UserInterface extends Component<Props, State> {
             <Grid
               container
               spacing={0}
-              justify="center"
+              justifyContent="center"
               wrap="nowrap"
               className={classes.mainGrid}
             >
