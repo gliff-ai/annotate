@@ -41,7 +41,7 @@ interface Event extends CustomEvent {
 
 type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 
-export class SplineCanvasClass extends Component<Props> {
+class CanvasClass extends Component<Props> {
   readonly name = "spline";
 
   private baseCanvas: BaseCanvas;
@@ -290,6 +290,13 @@ export class SplineCanvasClass extends Component<Props> {
 
     if (this.props.mode === Mode.select) {
       // In select mode a single click allows to select a different spline annotation
+      // DEVNOTE this is currently duplicated in each toolbox!
+      const selectedBoundingBox =
+        this.props.annotationsObject.clickNearBoundingBox(
+          imageX,
+          imageY,
+          this.props.sliceIndex
+        );
       const selectedSpline = this.props.annotationsObject.clickNearSpline(
         imageX,
         imageY,
@@ -302,13 +309,18 @@ export class SplineCanvasClass extends Component<Props> {
           this.props.sliceIndex
         );
 
-      if (
-        selectedSpline !== null &&
-        selectedSpline !== this.props.annotationsObject.getActiveAnnotationID()
-      ) {
+      if (selectedSpline !== null) {
         this.props.annotationsObject.setActiveAnnotationID(selectedSpline);
         this.props.setUIActiveAnnotationID(selectedSpline);
         this.props.setActiveTool(Tools.spline);
+      } else if (
+        selectedBoundingBox !== null &&
+        selectedBoundingBox !==
+          this.props.annotationsObject.getActiveAnnotationID()
+      ) {
+        this.props.annotationsObject.setActiveAnnotationID(selectedBoundingBox);
+        this.props.setUIActiveAnnotationID(selectedBoundingBox);
+        this.props.setActiveTool(Tools.boundingBox);
       } else if (selectedBrushStroke !== null) {
         this.props.annotationsObject.setActiveAnnotationID(selectedBrushStroke);
         this.props.setUIActiveAnnotationID(selectedBrushStroke);
@@ -640,7 +652,7 @@ export class SplineCanvasClass extends Component<Props> {
     ) : null;
 }
 
-export const SplineCanvas = (props: Props): ReactElement => {
+export const Canvas = (props: Props): ReactElement => {
   // we will overwrite props.activeTool, which will be spline
   // with spline.splineType, which will be spline/lasso/magic/rect
   const [spline] = useSplineStore();
@@ -650,7 +662,7 @@ export const SplineCanvas = (props: Props): ReactElement => {
   }
 
   return (
-    <SplineCanvasClass
+    <CanvasClass
       activeTool={activeTool}
       mode={props.mode}
       annotationsObject={props.annotationsObject}
