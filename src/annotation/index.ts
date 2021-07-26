@@ -330,8 +330,8 @@ export class Annotations {
     };
     if (addToUndoRedo) {
       this.updateUndoRedoActions("updateSplinePoint", [
-        (newX = point.x),
-        (newY = point.y),
+        point.x,
+        point.y,
         index,
       ]);
     }
@@ -501,7 +501,10 @@ export class Annotations {
 
   canRedo = (): boolean => this.redoData.length > 0;
 
-  canUndoRedo = () => ({ undo: this.canUndo(), redo: this.canRedo() });
+  canUndoRedo = (): CanUndoRedo => ({
+    undo: this.canUndo(),
+    redo: this.canRedo(),
+  });
 
   private initUndoRedo = () => {
     this.undoData = [];
@@ -511,7 +514,7 @@ export class Annotations {
   private updateUndoRedoActions = (method: string, args: unknown): void => {
     this.undoData.push({
       undoAction: {
-        method: method,
+        method,
         args: JSON.stringify(args),
       },
       redoAction: this.audit[this.audit.length - 1],
@@ -523,6 +526,7 @@ export class Annotations {
     addToUndoRedo = true
   ): void => {
     const method = this[action.method as keyof Annotations];
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment */
     method.apply(this, [...JSON.parse(action.args), addToUndoRedo]);
   };
 
