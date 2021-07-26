@@ -96,7 +96,7 @@ const FauxCursor: FC<CursorProps> = ({
   );
 };
 
-export class PaintbrushCanvasClass extends Component<Props, State> {
+export class CanvasClass extends Component<Props, State> {
   readonly name = "paintbrush";
 
   private interactionCanvas: BaseCanvas;
@@ -354,7 +354,8 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
       // Ensure the initial down position gets added to our line
       this.handlePointerMove(canvasX, canvasY);
     } else if (this.props.mode === Mode.select) {
-      // In select mode a single click allows to select a different paintbrush or spline annotation
+      // In select mode a single click allows to select a different spline annotation
+      // DEVNOTE this is currently duplicated in each toolbox!
       const { x: imageX, y: imageY } = canvasToImage(
         canvasX,
         canvasY,
@@ -363,8 +364,8 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
         this.props.scaleAndPan,
         this.props.canvasPositionAndSize
       );
-      const selectedBrushStroke =
-        this.props.annotationsObject.clickNearBrushStroke(
+      const selectedBoundingBox =
+        this.props.annotationsObject.clickNearBoundingBox(
           imageX,
           imageY,
           this.props.sliceIndex
@@ -374,19 +375,29 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
         imageY,
         this.props.sliceIndex
       );
-      if (
-        selectedBrushStroke !== null &&
-        selectedBrushStroke !==
-          this.props.annotationsObject.getActiveAnnotationID()
-      ) {
+      const selectedBrushStroke =
+        this.props.annotationsObject.clickNearBrushStroke(
+          imageX,
+          imageY,
+          this.props.sliceIndex
+        );
+
+      if (selectedBrushStroke !== null) {
         this.props.annotationsObject.setActiveAnnotationID(selectedBrushStroke);
         this.props.setUIActiveAnnotationID(selectedBrushStroke);
         this.props.setActiveTool(Tools.paintbrush);
-        this.drawAllStrokes();
       } else if (selectedSpline !== null) {
         this.props.annotationsObject.setActiveAnnotationID(selectedSpline);
         this.props.setUIActiveAnnotationID(selectedSpline);
         this.props.setActiveTool(Tools.spline);
+      } else if (
+        selectedBoundingBox !== null &&
+        selectedBoundingBox !==
+          this.props.annotationsObject.getActiveAnnotationID()
+      ) {
+        this.props.annotationsObject.setActiveAnnotationID(selectedBoundingBox);
+        this.props.setUIActiveAnnotationID(selectedBoundingBox);
+        this.props.setActiveTool(Tools.boundingBox);
       }
     }
   };
@@ -488,13 +499,11 @@ export class PaintbrushCanvasClass extends Component<Props, State> {
     ) : null;
 }
 
-export const PaintbrushCanvas = (
-  props: Omit<Props, "brushRadius">
-): ReactElement => {
+export const Canvas = (props: Omit<Props, "brushRadius">): ReactElement => {
   const [paintbrush] = usePaintbrushStore();
 
   return (
-    <PaintbrushCanvasClass
+    <CanvasClass
       activeTool={props.activeTool}
       mode={props.mode}
       annotationsObject={props.annotationsObject}

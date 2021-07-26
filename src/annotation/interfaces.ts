@@ -1,3 +1,4 @@
+import { BoundingBox } from "@/toolboxes/boundingBox";
 import { BrushStroke } from "@/toolboxes/paintbrush";
 import { Spline } from "@/toolboxes/spline";
 
@@ -6,6 +7,7 @@ export interface Annotation {
   toolbox: string;
   spline: Spline;
   brushStrokes: BrushStroke[];
+  boundingBox: BoundingBox;
   parameters: Record<string, unknown>;
 }
 export interface XYPoint {

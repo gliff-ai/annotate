@@ -1,1 +1,1 @@
-export { LabelsPopover } from "./LabelsPopover";
+export { Submenu as LabelsSubmenu } from "./Submenu";

@@ -1,3 +1,4 @@
+import { BoundingBox, BoundingBoxCoordinates } from "@/toolboxes/boundingBox";
 import { BrushStroke } from "@/toolboxes/paintbrush";
 import { Spline } from "@/toolboxes/spline";
 import { Annotation, XYPoint, AuditAction } from "./interfaces";
@@ -42,6 +43,13 @@ export class Annotations {
       coordinates: [],
       spaceTimeInfo: { z: 0, t: 0 },
     },
+    boundingBox: BoundingBox = {
+      coordinates: {
+        topLeft: { x: null, y: null },
+        bottomRight: { x: null, y: null },
+      },
+      spaceTimeInfo: { z: 0, t: 0 },
+    },
     brushStrokes: BrushStroke[] = [],
     parameters: Annotation["parameters"] = {}
   ): void {
@@ -50,6 +58,7 @@ export class Annotations {
         labels,
         toolbox,
         spline,
+        boundingBox,
         brushStrokes,
         parameters,
       }) - 1;
@@ -66,13 +75,176 @@ export class Annotations {
     }
   }
 
-  getLabels = (): string[] => this.data[this.activeAnnotationID].labels;
-
   getActiveAnnotationID = (): number => this.activeAnnotationID;
 
   getActiveAnnotationColor = (): string =>
     this.data[this.activeAnnotationID].brushStrokes[0]?.brush.color;
 
+  isActiveAnnotationEmpty = (): boolean =>
+    // Check whether the active annotation object contains any annotations.
+    this.data[this.activeAnnotationID].spline.coordinates.length === 0 &&
+    this.data[this.activeAnnotationID].brushStrokes.length === 0;
+
+  getAllAnnotations = (): Annotation[] =>
+    JSON.parse(JSON.stringify(this.data)) as Annotation[]; // deep copy to ensure no modification without audit logging
+
+  length = (): number => this.data.length;
+
+  @log
+  setActiveAnnotationID(id: number): void {
+    this.activeAnnotationID = id;
+  }
+
+  @log
+  setActiveAnnotationToolbox(newToolbox: string): void {
+    this.data[this.activeAnnotationID].toolbox = newToolbox;
+  }
+
+  // LABELS
+  @log
+  addLabel(newLabel: string): void {
+    if (!this.data[this.activeAnnotationID].labels.includes(newLabel)) {
+      this.data[this.activeAnnotationID].labels.push(newLabel);
+    }
+  }
+
+  @log
+  removeLabel(existingLabel: string): void {
+    this.data[this.activeAnnotationID].labels = this.data[
+      this.activeAnnotationID
+    ].labels.filter((label) => label !== existingLabel);
+  }
+
+  getLabels = (): string[] => this.data[this.activeAnnotationID].labels;
+
+  // BOUNDING BOXES
+  getBoundingBoxForActiveAnnotation = (): BoundingBox =>
+    this.data[this.activeAnnotationID].boundingBox;
+
+  getBoundingBoxCoordinates = (): BoundingBoxCoordinates => {
+    const tl = JSON.parse(
+      JSON.stringify(
+        this.data[this.activeAnnotationID].boundingBox.coordinates.topLeft
+      )
+    ) as XYPoint;
+    const br = JSON.parse(
+      JSON.stringify(
+        this.data[this.activeAnnotationID].boundingBox.coordinates.bottomRight
+      )
+    ) as XYPoint;
+    return { topLeft: tl, bottomRight: br };
+  };
+
+  getAllBoundingBoxes = (z: number): Array<[BoundingBox, number]> => {
+    // returns an array of [BoundingBox, index] pairs
+    // for all BoundingBox at the given z-index.
+    // index needed for identifying the active spline
+    const boundingBoxes: Array<[BoundingBox, number]> = [];
+
+    this.data.forEach((annotation, i) => {
+      if (
+        annotation.toolbox === "boundingBox" &&
+        annotation.spline.spaceTimeInfo.z === z
+      ) {
+        boundingBoxes.push([annotation.boundingBox, i]);
+      }
+    });
+
+    return boundingBoxes;
+  };
+
+  @log
+  clearBoundingBoxCoordinates(): void {
+    this.data[this.activeAnnotationID].boundingBox.coordinates = {
+      topLeft: null,
+      bottomRight: null,
+    };
+  }
+
+  @log
+  updateBoundingBoxCoordinates(coordinates: BoundingBoxCoordinates): void {
+    if (this.data[this.activeAnnotationID].toolbox === "boundingBox") {
+      this.data[this.activeAnnotationID].boundingBox.coordinates = coordinates;
+    }
+  }
+
+  @log
+  setBoundingBoxTimeInfo(z?: number, t?: number): void {
+    // Set space and time data for bounding box of active annotation.
+    if (z === undefined && t === undefined) return;
+    const { z: prevZ, t: prevT } =
+      this.data[this.activeAnnotationID].boundingBox.spaceTimeInfo;
+    this.data[this.activeAnnotationID].boundingBox.spaceTimeInfo = {
+      z: z || prevZ,
+      t: t || prevT,
+    };
+  }
+
+  clickNearBoundingBox = (
+    imageX: number,
+    imageY: number,
+    sliceIndex: number
+  ): number => {
+    // Check if point clicked (in image space) is near an existing boundingBox.
+    // If true, return annotation index, otherwise return null.
+
+    const boundingBoxes = this.getAllBoundingBoxes(sliceIndex);
+    for (let i = 0; i < boundingBoxes.length; i += 1) {
+      // index here is the index of the annotation this spline is from among all annotations,
+      // not the index within each `boundingBox`
+
+      const [boundingBox, index] = boundingBoxes[i];
+      // here `i` is the index of the boundingBox in `boundingBoxes`, while `index` is the index of the boundingBox in all annotations
+
+      // For each boundingBox, check if point clicked is near rectangle edges
+      if (
+        this.isClickNearBoundingBoxEdge(
+          { x: imageX, y: imageY },
+          boundingBox.coordinates
+        )
+      ) {
+        return index;
+      }
+    }
+
+    return null;
+  };
+
+  isClickNearBoundingBoxEdge = (
+    p: XYPoint, // test point
+    { topLeft, bottomRight }: BoundingBoxCoordinates, // TL, BR of rect
+    distanceThreshold = 12
+  ): boolean => {
+    // get the four corners (plus an extra corner to close the loop)
+    // and use isClickNearLineSegment for ease
+    const topRight: XYPoint = { x: topLeft.x, y: bottomRight.y };
+    const bottomLeft: XYPoint = { x: bottomRight.x, y: topLeft.y };
+    const corners: XYPoint[] = [
+      topLeft,
+      topRight,
+      bottomRight,
+      bottomLeft,
+      topLeft,
+    ];
+
+    // For each pair of corners, check if point clicked is near the line segment
+    // having for end points two consecutive points in the spline
+    for (let j = 1; j < corners.length; j += 1) {
+      const result = this.isClickNearLineSegment(
+        p,
+        corners[j - 1],
+        corners[j],
+        distanceThreshold
+      );
+      if (result) {
+        return result;
+      }
+    }
+
+    return false;
+  };
+
+  // SPLINES
   getSplineForActiveAnnotation = (): Spline =>
     this.data[this.activeAnnotationID].spline;
 
@@ -83,14 +255,6 @@ export class Annotations {
 
   getSplineLength = (): number =>
     this.data[this.activeAnnotationID].spline.coordinates.length;
-
-  isActiveAnnotationEmpty = (): boolean =>
-    // Check whether the active annotation object contains any annotations.
-    this.data[this.activeAnnotationID].spline.coordinates.length === 0 &&
-    this.data[this.activeAnnotationID].brushStrokes.length === 0;
-
-  getAllAnnotations = (): Annotation[] =>
-    JSON.parse(JSON.stringify(this.data)) as Annotation[]; // deep copy to ensure no modification without audit logging
 
   getAllSplines = (z: number): Array<[Spline, number]> => {
     // returns an array of [spline, index] pairs for all splines at the given z-index.
@@ -108,43 +272,6 @@ export class Annotations {
 
     return splines;
   };
-
-  length = (): number => this.data.length;
-
-  @log
-  addLabel(newLabel: string): void {
-    if (!this.data[this.activeAnnotationID].labels.includes(newLabel)) {
-      this.data[this.activeAnnotationID].labels.push(newLabel);
-    }
-  }
-
-  @log
-  removeLabel(existingLabel: string): void {
-    this.data[this.activeAnnotationID].labels = this.data[
-      this.activeAnnotationID
-    ].labels.filter((label) => label !== existingLabel);
-  }
-
-  @log
-  setActiveAnnotationID(id: number): void {
-    this.activeAnnotationID = id;
-  }
-
-  @log
-  addBrushStroke(newBrushStroke: BrushStroke): void {
-    if (
-      ["paintbrush", "eraser"].includes(
-        this.data[this.activeAnnotationID].toolbox
-      )
-    ) {
-      this.data[this.activeAnnotationID].brushStrokes.push(newBrushStroke);
-    }
-  }
-
-  @log
-  clearBrushStrokes(): void {
-    this.data[this.activeAnnotationID].brushStrokes = [];
-  }
 
   @log
   clearSplineCoordinates(): void {
@@ -177,11 +304,6 @@ export class Annotations {
   }
 
   @log
-  setActiveAnnotationToolbox(newToolbox: string): void {
-    this.data[this.activeAnnotationID].toolbox = newToolbox;
-  }
-
-  @log
   setSplineSpaceTimeInfo(z?: number, t?: number): void {
     // Set space and time data for spline of active annotation.
     if (z === undefined && t === undefined) return;
@@ -193,6 +315,56 @@ export class Annotations {
     };
   }
 
+  clickNearSpline = (
+    imageX: number,
+    imageY: number,
+    sliceIndex: number
+  ): number => {
+    // Check if point clicked (in image space) is near an existing spline.
+    // If true, return annotation index, otherwise return null.
+
+    const splines = this.getAllSplines(sliceIndex);
+    for (let i = 0; i < splines.length; i += 1) {
+      // index here is the index of the annotation this spline is from among all annotations,
+      // not the index within `splines`
+
+      const [spline, index] = splines[i];
+      // here `i` is the index of the spline in `splines`, while `index` is the index of the spline in all annotations
+
+      // For each pair of points, check if point clicked is near the line segment
+      // having for end points two consecutive points in the spline
+      for (let j = 1; j < spline.coordinates.length; j += 1) {
+        if (
+          this.isClickNearLineSegment(
+            { x: imageX, y: imageY },
+            spline.coordinates[j - 1],
+            spline.coordinates[j]
+          )
+        )
+          return index;
+      }
+    }
+
+    return null;
+  };
+
+  isClickNearLineSegment = (
+    p: XYPoint, // test point
+    a: XYPoint, // line segment endpoint 1
+    b: XYPoint, // line segment endpoint 2
+    distanceThreshold = 12
+  ): boolean => {
+    // returns true if point p is within a capsule with endpoints a and b, and radius `distanceThreshold`
+    // math from https://iquilezles.org/www/articles/distfunctions/distfunctions.htm
+    const pa: XYPoint = { x: p.x - a.x, y: p.y - a.y };
+    const ba: XYPoint = { x: b.x - a.x, y: b.y - a.y };
+    let h = (pa.x * ba.x + pa.y * ba.y) / (ba.x ** 2 + ba.y ** 2);
+    h = Math.max(Math.min(h, 1), 0); // clamp between 0 and 1
+    const r = Math.sqrt((pa.x - h * ba.x) ** 2 + (pa.y - h * ba.y) ** 2);
+    return r < distanceThreshold;
+  };
+
+  // AUDIT
   addAudit(method: string, args: unknown): void {
     this.audit.push({
       method,
@@ -226,6 +398,7 @@ export class Annotations {
     return JSON.stringify(this.data) === JSON.stringify(annotationsObject.data);
   };
 
+  // BRUSHES
   clickNearBrushStroke = (
     imageX: number,
     imageY: number,
@@ -265,52 +438,19 @@ export class Annotations {
     return null;
   };
 
-  clickNearSpline = (
-    imageX: number,
-    imageY: number,
-    sliceIndex: number
-  ): number => {
-    // Check if point clicked (in image space) is near an existing spline.
-    // If true, return annotation index, otherwise return null.
-
-    const splines = this.getAllSplines(sliceIndex);
-    for (let i = 0; i < splines.length; i += 1) {
-      // index here is the index of the annotation this spline is from among all annotations,
-      // not the index within `splines`
-
-      const [spline, index] = splines[i];
-      // here `i` is the index of the spline in `splines`, while `index` is the index of the spline in all annotations
-
-      // For each pair of points, check if point clicked is near the line segment
-      // having for end points two consecutive points in the spline
-      for (let j = 1; j < spline.coordinates.length; j += 1) {
-        if (
-          this.isClickNearLineSegment(
-            { x: imageX, y: imageY },
-            spline.coordinates[j - 1],
-            spline.coordinates[j]
-          )
-        )
-          return index;
-      }
+  @log
+  addBrushStroke(newBrushStroke: BrushStroke): void {
+    if (
+      ["paintbrush", "eraser"].includes(
+        this.data[this.activeAnnotationID].toolbox
+      )
+    ) {
+      this.data[this.activeAnnotationID].brushStrokes.push(newBrushStroke);
     }
+  }
 
-    return null;
-  };
-
-  isClickNearLineSegment = (
-    p: XYPoint, // test point
-    a: XYPoint, // line segment endpoint 1
-    b: XYPoint, // line segment endpoint 2
-    threshold = 12
-  ): boolean => {
-    // returns true if point p is within a capsule with endpoints a and b, and radius `threshold`
-    // math from https://iquilezles.org/www/articles/distfunctions/distfunctions.htm
-    const pa: XYPoint = { x: p.x - a.x, y: p.y - a.y };
-    const ba: XYPoint = { x: b.x - a.x, y: b.y - a.y };
-    let h = (pa.x * ba.x + pa.y * ba.y) / (ba.x ** 2 + ba.y ** 2);
-    h = Math.max(Math.min(h, 1), 0); // clamp between 0 and 1
-    const r = Math.sqrt((pa.x - h * ba.x) ** 2 + (pa.y - h * ba.y) ** 2);
-    return r < threshold;
-  };
+  @log
+  clearBrushStrokes(): void {
+    this.data[this.activeAnnotationID].brushStrokes = [];
+  }
 }

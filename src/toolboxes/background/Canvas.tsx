@@ -13,7 +13,7 @@ interface Props extends BaseProps {
 interface State {
   edgeColour: string | null;
 }
-export class BackgroundCanvasClass extends Component<Props, State> {
+export class CanvasClass extends Component<Props, State> {
   private baseCanvas: BaseCanvas;
 
   constructor(props: Props) {
@@ -120,13 +120,13 @@ export class BackgroundCanvasClass extends Component<Props, State> {
   );
 }
 
-export const BackgroundCanvas = (
+export const Canvas = (
   props: Omit<Props, "contrast" | "brightness">
 ): ReactElement => {
   const [background] = useBackgroundStore();
 
   return (
-    <BackgroundCanvasClass
+    <CanvasClass
       contrast={background.contrast}
       brightness={background.brightness}
       scaleAndPan={props.scaleAndPan}

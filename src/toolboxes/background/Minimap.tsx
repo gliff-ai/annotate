@@ -221,4 +221,4 @@ class Minimap extends Component<Props, State> {
   );
 }
 
-export const MinimapUI = withStyles(styles)(Minimap);
+export default withStyles(styles)(Minimap);
