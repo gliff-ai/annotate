@@ -21,9 +21,9 @@ const Submenu = (props: Props): ReactElement => {
     setSpline({ splineType: tooltips.lassospline.name });
   }
 
-  function selectMagicSpline() {
-    setSpline({ splineType: tooltips.magicspline.name });
-  }
+  // function selectMagicSpline() {
+  //   setSpline({ splineType: tooltips.magicspline.name });
+  // }
 
   function closeSpline() {
     document.dispatchEvent(
