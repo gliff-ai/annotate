@@ -91,7 +91,7 @@ const tooltips: ToolTips = {
     name: "Convert Spline to Paintbrush",
     icon: require(`@/assets/convert-icon.svg`) as string,
     shortcut: "CTRL",
-    shortcutSymbol: "C",
+    shortcutSymbol: "Q",
   },
   fillspline: {
     name: "Convert Spline to Paintbrush and Fill",
@@ -123,7 +123,7 @@ const tooltips: ToolTips = {
     name: "Annotation Label",
     icon: require(`@/assets/annotation-label-icon.svg`) as string,
     shortcut: "CTRL",
-    shortcutSymbol: "L",
+    shortcutSymbol: "Space",
   },
   download: {
     name: "Download annotations",
