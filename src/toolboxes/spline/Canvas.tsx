@@ -30,6 +30,7 @@ export const events = [
   "deleteSelectedPoint",
   "deselectPoint",
   "closeSpline",
+  "convertSpline",
   "fillSpline",
 ] as const;
 
