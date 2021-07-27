@@ -19,6 +19,9 @@ const useStyles = makeStyles(() =>
       height: "297px",
       textAlign: "center",
     },
+    fillDiv: {
+      textAlign: "center",
+    },
   })
 );
 
@@ -52,11 +55,13 @@ const Submenu = (props: Props): ReactElement => {
           showEndValues={false}
         />
       </div>
-      <BaseIconButton
-        tooltip={tooltips.fillbrush}
-        onClick={fillBrush}
-        fill={false}
-      />
+      <div className={classes.fillDiv}>
+        <BaseIconButton
+          tooltip={tooltips.fillbrush}
+          onClick={fillBrush}
+          fill={false}
+        />
+      </div>
     </Popover>
   );
 };
