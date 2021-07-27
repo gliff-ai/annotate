@@ -57,6 +57,11 @@ const Submenu = (props: Props): ReactElement => {
           fill={false}
         />
       </div>
+      <BaseIconButton
+        tooltip={tooltips.fillbrush}
+        onClick={fillBrush}
+        fill={false}
+      />
     </Popover>
   );
 };
