@@ -421,6 +421,13 @@ class CanvasClass extends Component<Props> {
   convertSpline = (): void => {
     // Create a new paintbrush annotation that is equivalent to closing and filling the current spline shape
 
+    if (
+      this.props.activeTool !== tooltips.spline.name &&
+      this.props.activeTool !== tooltips.lassospline.name &&
+      this.props.activeTool !== tooltips.magicspline.name
+    )
+      return;
+
     // check the current annotation is on the current slice
     if (!this.sliceIndexMatch()) return;
 
@@ -438,6 +445,13 @@ class CanvasClass extends Component<Props> {
 
   fillSpline = (): void => {
     // Create a new paintbrush annotation that is equivalent to closing and filling the current spline shape
+
+    if (
+      this.props.activeTool !== tooltips.spline.name &&
+      this.props.activeTool !== tooltips.lassospline.name &&
+      this.props.activeTool !== tooltips.magicspline.name
+    )
+      return;
 
     // check the current annotation is on the current slice
     if (!this.sliceIndexMatch()) return;
