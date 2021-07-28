@@ -6,7 +6,8 @@ import {
   useEffect,
   FC,
 } from "react";
-
+import simplify from "simplify-js";
+import { slpfLines } from "@gliff-ai/slpf";
 import { BaseCanvas, CanvasProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/components/transforms";
@@ -16,6 +17,7 @@ import { Mode } from "@/ui";
 import { theme } from "@/components/theme";
 import { palette, getRGBAString } from "@/components/palette";
 import { usePaintbrushStore } from "./Store";
+import { BrushStroke } from "./interfaces";
 
 const mainColor = theme.palette.primary.main;
 const secondaryColor = theme.palette.secondary.main;
@@ -43,7 +45,7 @@ interface State {
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
 // We should maybe namespace them so we don't get conflicting methods across toolboxes.
-export const events = ["saveLine"] as const;
+export const events = ["saveLine", "fillBrush"] as const;
 
 interface Event extends CustomEvent {
   type: typeof events[number];
@@ -198,13 +200,6 @@ export class CanvasClass extends Component<Props, State> {
       return { x, y };
     });
 
-    function midPointBetween(p1: XYPoint, p2: XYPoint) {
-      return {
-        x: p1.x + (p2.x - p1.x) / 2,
-        y: p1.y + (p2.y - p1.y) / 2,
-      };
-    }
-
     context.lineJoin = "round";
     context.lineCap = "round";
 
@@ -235,26 +230,17 @@ export class CanvasClass extends Component<Props, State> {
 
     context.lineWidth = this.getCanvasBrushRadius(brush.radius);
 
-    let p1 = points[0];
-    let p2 = points[1];
+    const firstPoint = points[0];
 
-    context.moveTo(p2.x, p2.y);
     context.beginPath();
+    context.moveTo(firstPoint.x, firstPoint.y);
 
-    for (let i = 1, len = points.length; i < len; i += 1) {
-      // we pick the point between pi+1 & pi+2 as the
-      // end point and p1 as our control point
-      const midPoint = midPointBetween(p1, p2);
-
-      context.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
-      p1 = points[i];
-      p2 = points[i + 1];
+    for (let i = 1; i < points.length; i += 1) {
+      // we just use linear connections for now
+      const nextPoint = points[i];
+      context.lineTo(nextPoint.x, nextPoint.y);
     }
 
-    // Draw last line as a straight line while
-    // we wait for the next point to be able to calculate
-    // the bezier control point
-    context.lineTo(p1.x, p1.y);
     context.stroke();
   };
 
@@ -334,6 +320,46 @@ export class CanvasClass extends Component<Props, State> {
     this.drawAllStrokes();
     const context = this.interactionCanvas.canvasContext;
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+  };
+
+  fillBrush = (): void => {
+    // Treat the current paintbrush item as a closed polygon and fill
+    // Simplifying the line for computational efficiency
+    const strokeCoordinates =
+      this.props.annotationsObject.getBrushStrokeCoordinates();
+
+    // simplify
+    // TODO pick tolerance more cleverly
+    const simplifiedCoordinates = simplify(strokeCoordinates, 10, true);
+
+    const linesToFill: XYPoint[][] = slpfLines(simplifiedCoordinates);
+
+    let color = this.props.annotationsObject.getActiveAnnotationColor();
+    // Do we already have a colour for this layer?
+    color =
+      color ||
+      getRGBAString(
+        palette[
+          this.props.annotationsObject.getActiveAnnotationID() % palette.length
+        ]
+      );
+
+    for (let i = 0; i < linesToFill.length; i += 1) {
+      const coordinates = linesToFill[i];
+      const brushStroke: BrushStroke = {
+        coordinates,
+        spaceTimeInfo: { z: this.props.sliceIndex, t: 0 },
+        brush: {
+          color,
+          radius: 1,
+          type: "paint",
+        },
+      };
+
+      this.props.annotationsObject.addBrushStroke(brushStroke);
+    }
+
+    this.drawAllStrokes();
   };
 
   /* *** Mouse events *** */

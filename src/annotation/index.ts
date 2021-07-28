@@ -5,6 +5,7 @@ import {
   Annotation,
   XYPoint,
   AuditAction,
+  ZTPoint,
   UndoRedo,
   CanUndoRedo,
   UndoRedoAction,
@@ -410,6 +411,29 @@ export class Annotations {
     return r < distanceThreshold;
   };
 
+  getSplineSpaceTimeInfo = (): ZTPoint =>
+    this.data[this.activeAnnotationID].spline?.spaceTimeInfo;
+
+  @log
+  convertSplineToPaintbrush(radius: number): void {
+    const coordinates = this.getSplineCoordinates();
+    const color = this.getActiveAnnotationColor(); // FIXME always green
+    const labels = this.getLabels();
+    const spaceTimeInfo = this.getSplineSpaceTimeInfo();
+    const brushStroke: BrushStroke = {
+      coordinates,
+      spaceTimeInfo,
+      brush: {
+        radius,
+        type: "paint",
+        color,
+      },
+    };
+    this.deleteActiveAnnotation();
+    this.addAnnotation("paintbrush", labels);
+    this.addBrushStroke(brushStroke);
+  }
+
   // AUDIT
   addAudit(method: string, args: unknown): void {
     this.audit.push({
@@ -499,6 +523,13 @@ export class Annotations {
   clearBrushStrokes(): void {
     this.data[this.activeAnnotationID].brushStrokes = [];
   }
+
+  getBrushStrokeCoordinates = (index = 0): Array<XYPoint> =>
+    JSON.parse(
+      JSON.stringify(
+        this.data[this.activeAnnotationID].brushStrokes[index]?.coordinates
+      )
+    ) as Array<XYPoint>;
 
   // UNDO/REDO
   canUndo = (): boolean => this.undoData.length > 0;

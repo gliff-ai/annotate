@@ -31,6 +31,10 @@ const Submenu = (props: Props): ReactElement => {
     );
   }
 
+  function fillSpline() {
+    document.dispatchEvent(new CustomEvent("fillSpline", { detail: "spline" }));
+  }
+
   return (
     <Popover
       open={props.isOpen}
@@ -56,6 +60,11 @@ const Submenu = (props: Props): ReactElement => {
         <BaseIconButton
           tooltip={tooltips.closespline}
           onClick={closeSpline}
+          fill={false}
+        />
+        <BaseIconButton
+          tooltip={tooltips.fillspline}
+          onClick={fillSpline}
           fill={false}
         />
       </ButtonGroup>
