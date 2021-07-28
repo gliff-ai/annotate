@@ -302,6 +302,7 @@ export class Annotations {
       this.updateUndoRedoActions("deleteSplinePoint", [
         this.data[this.activeAnnotationID].spline.coordinates.length - 1,
       ]);
+      this.redoData = [];
     }
   }
 
@@ -313,6 +314,7 @@ export class Annotations {
     );
     if (addToUndoRedo) {
       this.updateUndoRedoActions("insertSplinePoint", [idx, point]);
+      this.redoData = [];
     }
   }
 
@@ -334,6 +336,7 @@ export class Annotations {
         point.y,
         index,
       ]);
+      this.redoData = [];
     }
   }
 
@@ -342,6 +345,7 @@ export class Annotations {
     this.data[this.activeAnnotationID].spline.coordinates.splice(idx, 0, point);
     if (addToUndoRedo) {
       this.updateUndoRedoActions("deleteSplinePoint", [idx]);
+      this.redoData = [];
     }
   }
 
