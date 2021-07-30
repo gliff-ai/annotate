@@ -136,13 +136,13 @@ const tooltips: ToolTips = {
   },
   undo: {
     name: "Undo last action",
-    icon: require(`@/assets/save-icon.svg`) as string, // Replace with undo icon
+    icon: require(`@/assets/undo-icon.svg`) as string,
     shortcut: "CTRL",
     shortcutSymbol: "Z",
   },
   redo: {
     name: "Redo last action",
-    icon: require(`@/assets/save-icon.svg`) as string, // Replace with redo icon
+    icon: require(`@/assets/redo-icon.svg`) as string,
     shortcut: "CTRL",
     shortcutSymbol: "Y",
   },
