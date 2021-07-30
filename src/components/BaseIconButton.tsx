@@ -25,6 +25,7 @@ interface Props {
   tooltipStyling?: CSSProperties;
   buttonStyling?: CSSProperties;
   hasAvatar?: boolean;
+  enabled?: boolean;
 }
 
 export const BaseIconButton = (props: Props): ReactElement => {
@@ -77,7 +78,11 @@ export const BaseIconButton = (props: Props): ReactElement => {
         size={props.buttonSize}
         edge={props.buttonEdge}
       >
-        {props.hasAvatar ? <Avatar>{svgIcon}</Avatar> : <>{svgIcon}</>}
+        {props.hasAvatar && props.enabled ? (
+          <Avatar>{svgIcon}</Avatar>
+        ) : (
+          <>{svgIcon}</>
+        )}
       </IconButton>
     </Tooltip>
   );
@@ -95,4 +100,5 @@ BaseIconButton.defaultProps = {
   hasAvatar: true,
   tooltipStyling: null,
   buttonStyling: null,
+  enabled: true,
 };

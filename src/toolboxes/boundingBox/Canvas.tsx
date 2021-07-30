@@ -423,8 +423,6 @@ export class CanvasClass extends Component<Props> {
             topLeft: { x: imageX, y: imageY },
             bottomRight: { x: null, y: null },
           });
-          boundingBoxCoordinates =
-            this.props.annotationsObject.getBoundingBoxCoordinates();
           this.selectedCorner = "topLeft";
         } else if (
           (topLeft?.x !== null || topLeft?.y !== null) &&

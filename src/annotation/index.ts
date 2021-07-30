@@ -1,7 +1,15 @@
 import { BoundingBox, BoundingBoxCoordinates } from "@/toolboxes/boundingBox";
 import { BrushStroke } from "@/toolboxes/paintbrush";
 import { Spline } from "@/toolboxes/spline";
-import { Annotation, XYPoint, AuditAction, ZTPoint } from "./interfaces";
+import {
+  Annotation,
+  XYPoint,
+  AuditAction,
+  ZTPoint,
+  UndoRedo,
+  CanUndoRedo,
+  UndoRedoAction,
+} from "./interfaces";
 
 interface Descriptor extends Omit<PropertyDescriptor, "value"> {
   // Ideally this would be the methods of Annotations
@@ -28,6 +36,10 @@ export class Annotations {
   private activeAnnotationID: number;
 
   private audit: AuditAction[];
+
+  private undoData: UndoRedo[];
+
+  private redoData: UndoRedo[];
 
   constructor(data?: Annotation[], audit?: AuditAction[]) {
     this.data = data || [];
@@ -62,6 +74,8 @@ export class Annotations {
         brushStrokes,
         parameters,
       }) - 1;
+
+    this.initUndoRedo();
   }
 
   @log
@@ -73,6 +87,7 @@ export class Annotations {
     if (this.data.length === 0) {
       this.addAnnotation("paintbrush"); // re-create a new empty annotation if we delete the last one (toolbox will be re-assigned by reuseEmptyAnnotation if necessary)
     }
+    this.initUndoRedo();
   }
 
   getActiveAnnotationID = (): number => this.activeAnnotationID;
@@ -276,31 +291,63 @@ export class Annotations {
   @log
   clearSplineCoordinates(): void {
     this.data[this.activeAnnotationID].spline.coordinates = [];
+    this.initUndoRedo();
   }
 
   @log
-  addSplinePoint(point: XYPoint): void {
+  addSplinePoint(point: XYPoint, addToUndoRedo = true): void {
     if (this.data[this.activeAnnotationID].toolbox === "spline") {
       this.data[this.activeAnnotationID].spline.coordinates.push(point);
+    }
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("deleteSplinePoint", [
+        this.data[this.activeAnnotationID].spline.coordinates.length - 1,
+      ]);
+      this.redoData = [];
     }
   }
 
   @log
-  deleteSplinePoint(idx: number): void {
-    this.data[this.activeAnnotationID].spline.coordinates.splice(idx, 1);
+  deleteSplinePoint(idx: number, addToUndoRedo = true): void {
+    const point = this.data[this.activeAnnotationID].spline.coordinates.splice(
+      idx,
+      1
+    );
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("insertSplinePoint", [idx, point]);
+      this.redoData = [];
+    }
   }
 
   @log
-  updateSplinePoint(newX: number, newY: number, index: number): void {
+  updateSplinePoint(
+    newX: number,
+    newY: number,
+    index: number,
+    addToUndoRedo = true
+  ): void {
+    const point = this.data[this.activeAnnotationID].spline.coordinates[index];
     this.data[this.activeAnnotationID].spline.coordinates[index] = {
       x: newX,
       y: newY,
     };
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("updateSplinePoint", [
+        point.x,
+        point.y,
+        index,
+      ]);
+      this.redoData = [];
+    }
   }
 
   @log
-  insertSplinePoint(idx: number, point: XYPoint): void {
+  insertSplinePoint(idx: number, point: XYPoint, addToUndoRedo = true): void {
     this.data[this.activeAnnotationID].spline.coordinates.splice(idx, 0, point);
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("deleteSplinePoint", [idx]);
+      this.redoData = [];
+    }
   }
 
   @log
@@ -483,4 +530,58 @@ export class Annotations {
         this.data[this.activeAnnotationID].brushStrokes[index]?.coordinates
       )
     ) as Array<XYPoint>;
+
+  // UNDO/REDO
+  canUndo = (): boolean => this.undoData.length > 0;
+
+  canRedo = (): boolean => this.redoData.length > 0;
+
+  canUndoRedo = (): CanUndoRedo => ({
+    undo: this.canUndo(),
+    redo: this.canRedo(),
+  });
+
+  private initUndoRedo = () => {
+    this.undoData = [];
+    this.redoData = [];
+  };
+
+  private updateUndoRedoActions = (method: string, args: unknown): void => {
+    this.undoData.push({
+      undoAction: {
+        method,
+        args: JSON.stringify(args),
+      },
+      redoAction: this.audit[this.audit.length - 1],
+    });
+  };
+
+  private applyAction = (
+    action: UndoRedoAction | AuditAction,
+    addToUndoRedo = true
+  ): void => {
+    const method = this[action.method as keyof Annotations];
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+    method.apply(this, [...JSON.parse(action.args), addToUndoRedo]);
+  };
+
+  undo(): CanUndoRedo {
+    const canUndoRedo = this.canUndoRedo();
+    if (canUndoRedo.undo) {
+      const undoRedo = this.undoData.pop();
+      this.applyAction(undoRedo.undoAction, false);
+      this.redoData.push(undoRedo);
+    }
+    return canUndoRedo;
+  }
+
+  redo(): CanUndoRedo {
+    const canUndoRedo = this.canUndoRedo();
+    if (canUndoRedo.redo) {
+      const undoRedo = this.redoData.pop();
+      this.applyAction(undoRedo.redoAction, false);
+      this.undoData.push(undoRedo);
+    }
+    return canUndoRedo;
+  }
 }

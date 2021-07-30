@@ -66,6 +66,8 @@ export const events = [
   "decrementScale",
   "resetScaleAndPan",
   "saveAnnotations",
+  "undo",
+  "redo",
 ] as const;
 
 interface State {
@@ -86,6 +88,7 @@ interface State {
   buttonClicked: string;
   mode: Mode;
   canvasContainerColour: number[];
+  canUndoRedo: { undo: boolean; redo: boolean };
 }
 
 const styles = {
@@ -203,6 +206,7 @@ class UserInterface extends Component<Props, State> {
       activeTool: Tools.paintbrush,
       mode: Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
+      canUndoRedo: { undo: false, redo: false },
     };
 
     this.annotationsObject.addAnnotation(this.state.activeTool);
@@ -627,6 +631,16 @@ class UserInterface extends Component<Props, State> {
     this.props.saveAnnotationsCallback(this.annotationsObject);
   };
 
+  undo = (): void => {
+    this.setState({ canUndoRedo: this.annotationsObject.undo() });
+    this.callRedraw();
+  };
+
+  redo = (): void => {
+    this.setState({ canUndoRedo: this.annotationsObject.redo() });
+    this.callRedraw();
+  };
+
   isTyping = (): boolean =>
     // Added to prevent single-key shortcuts that are also valid text input
     // to get triggered during text input.
@@ -748,6 +762,18 @@ class UserInterface extends Component<Props, State> {
                 setRefCallback={(ref) => {
                   this.refBtnsPopovers[tooltips.labels.name] = ref;
                 }}
+              />
+              <BaseIconButton
+                tooltip={tooltips.undo}
+                onClick={this.undo}
+                fill={false}
+                enabled={this.state.canUndoRedo.undo}
+              />
+              <BaseIconButton
+                tooltip={tooltips.redo}
+                onClick={this.redo}
+                fill={false}
+                enabled={this.state.canUndoRedo.redo}
               />
             </ButtonGroup>
           </Grid>

@@ -134,6 +134,18 @@ const tooltips: ToolTips = {
     shortcut: "CTRL",
     shortcutSymbol: "S",
   },
+  undo: {
+    name: "Undo last action",
+    icon: require(`@/assets/undo-icon.svg`) as string,
+    shortcut: "CTRL",
+    shortcutSymbol: "Z",
+  },
+  redo: {
+    name: "Redo last action",
+    icon: require(`@/assets/redo-icon.svg`) as string,
+    shortcut: "CTRL",
+    shortcutSymbol: "Y",
+  },
 } as const;
 
 export { ToolTip, ToolTips, tooltips };
