@@ -32,3 +32,12 @@ export interface AuditAction {
   args: string;
   timestamp: number; // milliseconds since epoch
 }
+
+export type UndoRedoAction = Omit<AuditAction, "timestamp">;
+
+export interface UndoRedo {
+  undoAction: UndoRedoAction;
+  redoAction: UndoRedoAction;
+}
+
+export type CanUndoRedo = { undo: boolean; redo: boolean };
