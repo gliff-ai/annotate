@@ -16,7 +16,7 @@ const useStyles = makeStyles(() =>
   createStyles({
     baseSlider: {
       width: "63px",
-      height: "297px",
+      height: "345px",
       textAlign: "center",
     },
   })
@@ -51,12 +51,12 @@ const Submenu = (props: Props): ReactElement => {
           onChange={() => changeBrushRadius}
           showEndValues={false}
         />
+        <BaseIconButton
+          tooltip={tooltips.fillbrush}
+          onClick={fillBrush}
+          fill={false}
+        />
       </div>
-      <BaseIconButton
-        tooltip={tooltips.fillbrush}
-        onClick={fillBrush}
-        fill={false}
-      />
     </Popover>
   );
 };
