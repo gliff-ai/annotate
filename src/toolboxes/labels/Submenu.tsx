@@ -67,7 +67,7 @@ export const Submenu = (props: Props): ReactElement => {
           </Avatar>
         </Paper>
         <Paper elevation={0} square>
-          <Grid container justify="center">
+          <Grid container justifyContent="center">
             <Labels
               annotationsObject={props.annotationsObject}
               activeAnnotationID={props.activeAnnotationID}
