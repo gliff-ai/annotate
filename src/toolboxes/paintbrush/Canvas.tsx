@@ -14,7 +14,7 @@ import { canvasToImage, imageToCanvas } from "@/components/transforms";
 import { XYPoint } from "@/annotation/interfaces";
 import { Tool, Tools } from "@/components/tools";
 import { Mode } from "@/ui";
-import { theme } from "@/components/theme";
+import { theme } from "@gliff-ai/style";
 import { palette, getRGBAString } from "@/components/palette";
 import { usePaintbrushStore } from "./Store";
 import { BrushStroke } from "./interfaces";

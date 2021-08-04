@@ -1,5 +1,5 @@
 import { Component, ReactElement } from "react";
-import { BaseIconButton } from "@/components/BaseIconButton";
+import { BaseIconButton } from "@gliff-ai/style";
 import { tooltips } from "@/components/tooltips";
 
 const events = ["selectBoundingBox"] as const;

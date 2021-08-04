@@ -1,7 +1,7 @@
 import { ReactNode, Component, ReactElement } from "react";
 
 import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
-import { theme } from "@/components/theme";
+import { theme } from "@gliff-ai/style";
 import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/components/transforms";
 import { XYPoint } from "@/annotation/interfaces";

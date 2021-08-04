@@ -1,7 +1,7 @@
 import { ChangeEvent, ReactElement, MouseEvent } from "react";
 import { createStyles, makeStyles, Popover } from "@material-ui/core";
 import { BaseSlider } from "@/components/BaseSlider";
-import { BaseIconButton } from "@/components/BaseIconButton";
+import { BaseIconButton } from "@gliff-ai/style";
 import { tooltips } from "@/components/tooltips";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { usePaintbrushStore } from "./Store";

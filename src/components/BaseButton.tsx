@@ -7,9 +7,7 @@ import {
   Button,
 } from "@material-ui/core";
 import SVG from "react-inlinesvg";
-import { theme } from "@/components/theme";
-import { ToolTip } from "@/components/tooltips";
-import { BaseTooltipTitle } from "@/components/BaseTooltipTitle";
+import { theme, ToolTip, BaseTooltipTitle } from "@gliff-ai/style";
 
 interface Props {
   tooltip: ToolTip;

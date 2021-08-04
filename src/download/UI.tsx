@@ -6,7 +6,7 @@ import { keydownListener } from "@/keybindings";
 import { downloadPaintbrushAsTiff } from "@/download/DownloadAsTiff";
 import { downloadAnnotationsAsJson } from "@/download/DownloadAsJson";
 import { tooltips } from "@/components/tooltips";
-import { BaseIconButton } from "@/components/BaseIconButton";
+import { BaseIconButton } from "@gliff-ai/style";
 
 const styles = {
   menu: {

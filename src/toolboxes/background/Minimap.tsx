@@ -1,10 +1,9 @@
 import { Component, ReactElement, MouseEvent } from "react";
 import { Slide, Card, WithStyles, withStyles } from "@material-ui/core";
 import { PositionAndSize } from "@/annotation/interfaces";
-import { BaseIconButton } from "@/components/BaseIconButton";
+import { theme, BaseIconButton } from "@gliff-ai/style";
 import { MinimapCanvas } from "@/baseCanvas";
 import { BackgroundCanvas } from "@/toolboxes/background";
-import { theme } from "@/components/theme";
 import { tooltips } from "@/components/tooltips";
 
 const styles = {
