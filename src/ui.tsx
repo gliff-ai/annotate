@@ -17,7 +17,7 @@ import {
 import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
-import { theme, BaseIconButton } from "@gliff-ai/style";
+import { theme, BaseIconButton, BaseButton } from "@gliff-ai/style";
 
 import {
   BackgroundCanvas,
@@ -37,7 +37,6 @@ import { keydownListener } from "@/keybindings";
 import { Tools, Tool } from "@/components/tools";
 import { tooltips } from "@/components/tooltips";
 import { BaseSlider, Config } from "@/components/BaseSlider";
-import { BaseButton } from "@/components/BaseButton";
 import { pageLoading } from "@/decorators";
 
 const logger = console;
@@ -663,9 +662,7 @@ class UserInterface extends Component<Props, State> {
                 fill={false}
                 hasAvatar={false}
                 tooltipPlacement="bottom"
-                tooltipStyling={{ marginTop: "30px", marginLeft: "0px" }}
-                svgStyling={{ width: "45px", height: "auto" }}
-                buttonStyling={{ justifyContent: "left", padding: 0 }}
+                buttonSize="medium"
               />
             }
             multiple={false}
