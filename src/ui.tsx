@@ -17,7 +17,7 @@ import {
 import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
-import { theme, BaseIconButton, BaseButton } from "@gliff-ai/style";
+import { theme, BaseIconButton, BaseUploadButton } from "@gliff-ai/style";
 
 import {
   BackgroundCanvas,
@@ -657,7 +657,7 @@ class UserInterface extends Component<Props, State> {
           <UploadImage
             setUploadedImage={this.setUploadedImage}
             spanElement={
-              <BaseButton
+              <BaseUploadButton
                 tooltip={tooltips.upload}
                 fill={false}
                 hasAvatar={false}
