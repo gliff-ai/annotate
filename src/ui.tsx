@@ -17,7 +17,7 @@ import {
 import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
-import { theme } from "@gliff-ai/style";
+import { theme, BaseIconButton } from "@gliff-ai/style";
 
 import {
   BackgroundCanvas,
@@ -36,7 +36,6 @@ import { Download } from "@/download/UI";
 import { keydownListener } from "@/keybindings";
 import { Tools, Tool } from "@/components/tools";
 import { tooltips } from "@/components/tooltips";
-import { BaseIconButton } from "@gliff-ai/style";
 import { BaseSlider, Config } from "@/components/BaseSlider";
 import { BaseButton } from "@/components/BaseButton";
 import { pageLoading } from "@/decorators";

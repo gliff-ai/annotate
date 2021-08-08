@@ -163,8 +163,7 @@ class DownloadUI extends Component<Props, State> {
           fill={false}
           hasAvatar={false}
           tooltipPlacement="bottom"
-          tooltipStyling={{ marginTop: "30px", marginLeft: "0px" }}
-          svgStyling={{ width: "45px", height: "auto" }}
+          buttonSize="medium"
           setRefCallback={(ref) => {
             this.refDownloadPopover = ref;
           }}

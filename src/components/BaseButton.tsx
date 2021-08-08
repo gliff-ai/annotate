@@ -18,7 +18,6 @@ interface Props {
   buttonSize?: "small" | "medium";
   tooltipPlacement?: TooltipProps["placement"];
   svgStyling?: CSSProperties;
-  tooltipStyling?: CSSProperties;
   buttonStyling?: CSSProperties;
   hasAvatar?: boolean;
 }
@@ -28,19 +27,16 @@ export const BaseButton = (props: Props): ReactElement => {
     iconButton: {
       marginBottom: "5px",
       marginTop: "7px",
-      ...props.buttonStyling,
     },
     tooltip: {
       backgroundColor: "#FFFFFF",
       fontSize: theme.typography.pxToRem(12),
       border: "1px solid #dadde9",
       color: "#2B2F3A",
-      ...props.tooltipStyling,
     },
     svg: {
-      width: "55%",
+      width: "45px",
       height: "auto",
-      ...props.svgStyling,
     },
   })(props);
 
