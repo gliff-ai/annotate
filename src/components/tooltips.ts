@@ -1,10 +1,10 @@
-interface ToolTip {
+interface Tooltip {
   name: string;
   icon: string;
   shortcut?: string;
   shortcutSymbol?: string;
 }
-type ToolTips = { [name: string]: ToolTip };
+type ToolTips = { [name: string]: Tooltip };
 
 const tooltips: ToolTips = {
   minimiseMap: {
@@ -148,4 +148,4 @@ const tooltips: ToolTips = {
   },
 } as const;
 
-export { ToolTip, ToolTips, tooltips };
+export { Tooltip, ToolTips, tooltips };
