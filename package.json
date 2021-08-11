@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "@gliff-ai/slpf": "^1.1.0",
-    "@gliff-ai/style": "file:gliff-ai-style-0.0.1.tgz",
+    "@gliff-ai/style": "^0.4.0",
     "@gliff-ai/upload": "^0.1.4",
     "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",
