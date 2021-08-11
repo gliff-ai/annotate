@@ -1,9 +1,5 @@
-interface Tooltip {
-  name: string;
-  icon: string;
-  shortcut?: string;
-  shortcutSymbol?: string;
-}
+import { Tooltip } from "@gliff-ai/style";
+
 type ToolTips = { [name: string]: Tooltip };
 
 const tooltips: ToolTips = {
