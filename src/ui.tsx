@@ -127,7 +127,7 @@ const styles = {
     marginTop: "7px",
   },
   imageGrid: {
-    justify: "flex-start",
+    justifyContent: "flex-start",
     marginTop: "20px",
   },
   mainGrid: {

@@ -63,18 +63,18 @@ const tooltips: ToolTips = {
     shortcut: "E",
   },
   fillbrush: {
-    name: "Fill Active Brushstroke",
-    icon: require(`@/assets/magic-spline-icon.svg`) as string,
+    name: "Fill Active Paintbrush",
+    icon: require(`@/assets/fill-icon.svg`) as string,
     shortcut: "F",
   },
   spline: {
     name: "Spline",
-    icon: require(`@/assets/splines-icon.svg`) as string,
+    icon: require(`@/assets/spline-icon.svg`) as string,
     shortcut: "S",
   },
   lassospline: {
     name: "Lasso Spline",
-    icon: require(`@/assets/magic-spline-icon.svg`) as string,
+    icon: require(`@/assets/lasso-spline-icon.svg`) as string,
     shortcut: "O",
   },
   magicspline: {
@@ -84,13 +84,20 @@ const tooltips: ToolTips = {
   },
   closespline: {
     name: "Close Active Spline",
-    icon: require(`@/assets/magic-spline-icon.svg`) as string,
+    icon: require(`@/assets/close-spline-icon.svg`) as string,
     shortcut: "L",
   },
+  convertspline: {
+    name: "Convert Spline to Paintbrush",
+    icon: require(`@/assets/convert-icon.svg`) as string,
+    shortcut: "CTRL",
+    shortcutSymbol: "Q",
+  },
   fillspline: {
-    name: "Fill Active Spline & Convert to Paintbrush",
-    icon: require(`@/assets/magic-spline-icon.svg`) as string,
-    shortcut: "F",
+    name: "Convert Spline to Paintbrush and Fill",
+    icon: require(`@/assets/fill-icon.svg`) as string,
+    shortcut: "CTRL",
+    shortcutSymbol: "F",
   },
   boundingBox: {
     name: "Rectangular Bounding Box",
@@ -116,7 +123,7 @@ const tooltips: ToolTips = {
     name: "Annotation Label",
     icon: require(`@/assets/annotation-label-icon.svg`) as string,
     shortcut: "CTRL",
-    shortcutSymbol: "L",
+    shortcutSymbol: "Space",
   },
   download: {
     name: "Download annotations",
