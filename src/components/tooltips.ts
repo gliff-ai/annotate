@@ -1,10 +1,6 @@
-interface ToolTip {
-  name: string;
-  icon: string;
-  shortcut?: string;
-  shortcutSymbol?: string;
-}
-type ToolTips = { [name: string]: ToolTip };
+import { Tooltip } from "@gliff-ai/style";
+
+type ToolTips = { [name: string]: Tooltip };
 
 const tooltips: ToolTips = {
   minimiseMap: {
@@ -155,4 +151,4 @@ const tooltips: ToolTips = {
   },
 } as const;
 
-export { ToolTip, ToolTips, tooltips };
+export { Tooltip, ToolTips, tooltips };

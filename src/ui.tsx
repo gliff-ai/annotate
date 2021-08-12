@@ -9,12 +9,16 @@ import {
   withStyles,
   Paper,
   WithStyles,
+  ThemeProvider,
+  StylesProvider,
+  createGenerateClassName,
 } from "@material-ui/core";
 
 import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
-import { ThemeProvider, theme } from "@/components/theme";
+import { theme, BaseIconButton } from "@gliff-ai/style";
+
 import {
   BackgroundCanvas,
   BackgroundToolbar,
@@ -32,9 +36,7 @@ import { Download } from "@/download/UI";
 import { keydownListener } from "@/keybindings";
 import { Tools, Tool } from "@/components/tools";
 import { tooltips } from "@/components/tooltips";
-import { BaseIconButton } from "@/components/BaseIconButton";
 import { BaseSlider, Config } from "@/components/BaseSlider";
-import { BaseButton } from "@/components/BaseButton";
 import { pageLoading } from "@/decorators";
 
 const logger = console;
@@ -655,14 +657,13 @@ class UserInterface extends Component<Props, State> {
           <UploadImage
             setUploadedImage={this.setUploadedImage}
             spanElement={
-              <BaseButton
+              <BaseIconButton
                 tooltip={tooltips.upload}
                 fill={false}
                 hasAvatar={false}
                 tooltipPlacement="bottom"
-                tooltipStyling={{ marginTop: "30px", marginLeft: "0px" }}
-                svgStyling={{ width: "45px", height: "auto" }}
-                buttonStyling={{ justifyContent: "left", padding: 0 }}
+                buttonSize="medium"
+                component="span"
               />
             }
             multiple={false}
@@ -707,104 +708,79 @@ class UserInterface extends Component<Props, State> {
       </AppBar>
     );
 
+    const generateClassName = createGenerateClassName({
+      seed: "annotate",
+      disableGlobal: true,
+    });
+
     return (
-      <ThemeProvider theme={theme}>
-        <Grid container className={classes.mainContainer}>
-          <Grid
-            container
-            direction="row"
-            className={classes.selectionContainer}
-            style={{ position: "fixed" }}
-          >
-            <ButtonGroup size="small" id="selection-toolbar">
-              <BaseIconButton
-                tooltip={tooltips.select}
-                onClick={this.toggleMode}
-                fill={this.state.buttonClicked === tooltips.select.name}
-              />
-              <BaseIconButton
-                tooltip={tooltips.addNewAnnotation}
-                onMouseDown={() => {
-                  this.setButtonClicked(tooltips.addNewAnnotation.name);
-                  this.addAnnotation();
-                }}
-                onMouseUp={this.selectDrawMode}
-                fill={
-                  this.state.buttonClicked === tooltips.addNewAnnotation.name
-                }
-              />
-              <BaseIconButton
-                tooltip={tooltips.clearAnnotation}
-                onMouseDown={() => {
-                  this.setButtonClicked(tooltips.clearAnnotation.name);
-                  this.clearActiveAnnotation();
-                }}
-                onMouseUp={this.selectDrawMode}
-                fill={
-                  this.state.buttonClicked === tooltips.clearAnnotation.name
-                }
-              />
-              {saveAnnotationsCallback && (
+      <StylesProvider generateClassName={generateClassName}>
+        <ThemeProvider theme={theme}>
+          <Grid container className={classes.mainContainer}>
+            <Grid
+              container
+              direction="row"
+              className={classes.selectionContainer}
+              style={{ position: "fixed" }}
+            >
+              <ButtonGroup size="small" id="selection-toolbar">
                 <BaseIconButton
-                  tooltip={tooltips.save}
+                  tooltip={tooltips.select}
+                  onClick={this.toggleMode}
+                  fill={this.state.buttonClicked === tooltips.select.name}
+                />
+                <BaseIconButton
+                  tooltip={tooltips.addNewAnnotation}
                   onMouseDown={() => {
-                    this.setButtonClicked(tooltips.save.name);
-                    this.saveAnnotations();
+                    this.setButtonClicked(tooltips.addNewAnnotation.name);
+                    this.addAnnotation();
                   }}
                   onMouseUp={this.selectDrawMode}
-                  fill={this.state.buttonClicked === tooltips.save.name}
+                  fill={
+                    this.state.buttonClicked === tooltips.addNewAnnotation.name
+                  }
                 />
-              )}
-              <BaseIconButton
-                tooltip={tooltips.labels}
-                onClick={this.selectAnnotationLabel}
-                fill={this.state.buttonClicked === tooltips.labels.name}
-                setRefCallback={(ref) => {
-                  this.refBtnsPopovers[tooltips.labels.name] = ref;
-                }}
-              />
-              <BaseIconButton
-                tooltip={tooltips.undo}
-                onClick={this.undo}
-                fill={false}
-                enabled={this.state.canUndoRedo.undo}
-              />
-              <BaseIconButton
-                tooltip={tooltips.redo}
-                onClick={this.redo}
-                fill={false}
-                enabled={this.state.canUndoRedo.redo}
-              />
-            </ButtonGroup>
-          </Grid>
-
-          <Grid
-            container
-            direction="row"
-            className={classes.bottomToolbars}
-            style={{ position: "fixed" }}
-          >
-            <Grid container direction="row">
-              <ButtonGroup id="paint-toolbar">
-                <PaintbrushToolbar
-                  buttonClicked={this.state.buttonClicked}
-                  setButtonClicked={this.setButtonClicked}
-                  activateTool={this.activateTool}
-                  handleOpen={this.handleOpen}
-                  isTyping={this.isTyping}
+                <BaseIconButton
+                  tooltip={tooltips.clearAnnotation}
+                  onMouseDown={() => {
+                    this.setButtonClicked(tooltips.clearAnnotation.name);
+                    this.clearActiveAnnotation();
+                  }}
+                  onMouseUp={this.selectDrawMode}
+                  fill={
+                    this.state.buttonClicked === tooltips.clearAnnotation.name
+                  }
                 />
-                <SplineToolbar
-                  buttonClicked={this.state.buttonClicked}
-                  setButtonClicked={this.setButtonClicked}
-                  activateTool={this.activateTool}
-                  handleOpen={this.handleOpen}
-                  isTyping={this.isTyping}
+                {saveAnnotationsCallback && (
+                  <BaseIconButton
+                    tooltip={tooltips.save}
+                    onMouseDown={() => {
+                      this.setButtonClicked(tooltips.save.name);
+                      this.saveAnnotations();
+                    }}
+                    onMouseUp={this.selectDrawMode}
+                    fill={this.state.buttonClicked === tooltips.save.name}
+                  />
+                )}
+                <BaseIconButton
+                  tooltip={tooltips.labels}
+                  onClick={this.selectAnnotationLabel}
+                  fill={this.state.buttonClicked === tooltips.labels.name}
+                  setRefCallback={(ref) => {
+                    this.refBtnsPopovers[tooltips.labels.name] = ref;
+                  }}
                 />
-                <BoundingBoxToolbar
-                  buttonClicked={this.state.buttonClicked}
-                  setButtonClicked={this.setButtonClicked}
-                  activateTool={this.activateTool}
-                  isTyping={this.isTyping}
+                <BaseIconButton
+                  tooltip={tooltips.undo}
+                  onClick={this.undo}
+                  fill={false}
+                  enabled={this.state.canUndoRedo.undo}
+                />
+                <BaseIconButton
+                  tooltip={tooltips.redo}
+                  onClick={this.redo}
+                  fill={false}
+                  enabled={this.state.canUndoRedo.redo}
                 />
               </ButtonGroup>
             </Grid>
@@ -812,207 +788,239 @@ class UserInterface extends Component<Props, State> {
             <Grid
               container
               direction="row"
-              className={classes.displayContainer}
+              className={classes.bottomToolbars}
+              style={{ position: "fixed" }}
             >
-              <ButtonGroup id="display-toolbar">
-                <BaseIconButton
-                  tooltip={tooltips.brightness}
-                  onClick={this.selectBrightness}
-                  fill={this.state.buttonClicked === tooltips.brightness.name}
-                  setRefCallback={(ref) => {
-                    this.refBtnsPopovers[tooltips.brightness.name] = ref;
-                  }}
-                />
-                <BaseIconButton
-                  tooltip={tooltips.contrast}
-                  onClick={this.selectContrast}
-                  fill={this.state.buttonClicked === tooltips.contrast.name}
-                  setRefCallback={(ref) => {
-                    this.refBtnsPopovers[tooltips.contrast.name] = ref;
-                  }}
-                />
-                <BaseIconButton
-                  tooltip={tooltips.channels}
-                  onClick={this.selectChannels}
-                  fill={this.state.buttonClicked === tooltips.channels.name}
-                  setRefCallback={(ref) => {
-                    this.refBtnsPopovers[tooltips.channels.name] = ref;
-                  }}
-                />
-              </ButtonGroup>
-            </Grid>
-          </Grid>
-
-          <CssBaseline />
-
-          <Container
-            disableGutters
-            maxWidth={false}
-            style={{
-              backgroundColor: this.getRGBAforCanvasContainerColour(),
-            }}
-          >
-            {appBar}
-            <Grid
-              container
-              spacing={0}
-              justifyContent="center"
-              wrap="nowrap"
-              className={classes.mainGrid}
-            >
-              <Grid
-                item
-                className={classes.canvasGrid}
-                style={{ position: "relative" }}
-                ref={(container) => {
-                  if (container) {
-                    this.canvasContainer = container;
-                  }
-                }}
-              >
-                <BackgroundCanvas
-                  scaleAndPan={this.state.scaleAndPan}
-                  displayedImage={this.state.displayedImage}
-                  canvasPositionAndSize={this.state.viewportPositionAndSize}
-                  setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                  setCanvasContainerColourCallback={(canvasContainerColour) =>
-                    this.setState({ canvasContainerColour })
-                  }
-                />
-                <SplineCanvas
-                  scaleAndPan={this.state.scaleAndPan}
-                  activeTool={this.state.activeTool}
-                  mode={this.state.mode}
-                  annotationsObject={this.annotationsObject}
-                  displayedImage={this.state.displayedImage}
-                  canvasPositionAndSize={this.state.viewportPositionAndSize}
-                  setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                  redraw={this.state.redraw}
-                  sliceIndex={this.state.sliceIndex}
-                  setUIActiveAnnotationID={(id) => {
-                    this.setState({ activeAnnotationID: id });
-                  }}
-                  setActiveTool={(tool: Tool) => {
-                    this.setState({ activeTool: tool });
-                  }}
-                />
-                <BoundingBoxCanvas
-                  scaleAndPan={this.state.scaleAndPan}
-                  activeTool={this.state.activeTool}
-                  mode={this.state.mode}
-                  annotationsObject={this.annotationsObject}
-                  displayedImage={this.state.displayedImage}
-                  canvasPositionAndSize={this.state.viewportPositionAndSize}
-                  setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                  redraw={this.state.redraw}
-                  sliceIndex={this.state.sliceIndex}
-                  setUIActiveAnnotationID={(id) => {
-                    this.setState({ activeAnnotationID: id });
-                  }}
-                  setActiveTool={(tool: Tool) => {
-                    this.setState({ activeTool: tool });
-                  }}
-                />
-                <PaintbrushCanvas
-                  scaleAndPan={this.state.scaleAndPan}
-                  activeTool={this.state.activeTool}
-                  mode={this.state.mode}
-                  annotationsObject={this.annotationsObject}
-                  displayedImage={this.state.displayedImage}
-                  canvasPositionAndSize={this.state.viewportPositionAndSize}
-                  setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                  redraw={this.state.redraw}
-                  sliceIndex={this.state.sliceIndex}
-                  setUIActiveAnnotationID={(id) => {
-                    this.setState({ activeAnnotationID: id });
-                  }}
-                  setActiveTool={(tool: Tool) => {
-                    this.setState({ activeTool: tool });
-                  }}
-                />
-                {this.slicesData?.length > 1 && (
-                  <Paper
-                    elevation={3}
-                    className={classes.slicesSlider}
-                    style={{
-                      position: "absolute",
-                      top: "110px",
-                      right: "30px",
-                    }}
-                  >
-                    <BaseSlider
-                      value={this.state.sliceIndex}
-                      config={
-                        {
-                          name: "slices",
-                          id: "slices-slider",
-                          initial: 1,
-                          step: 1,
-                          min: 0,
-                          max: this.slicesData.length - 1,
-                          unit: "",
-                        } as Config
-                      }
-                      onChange={() => this.changeSlice}
-                      sliderHeight="300px"
-                    />
-                  </Paper>
-                )}
+              <Grid container direction="row">
+                <ButtonGroup id="paint-toolbar">
+                  <PaintbrushToolbar
+                    buttonClicked={this.state.buttonClicked}
+                    setButtonClicked={this.setButtonClicked}
+                    activateTool={this.activateTool}
+                    handleOpen={this.handleOpen}
+                    isTyping={this.isTyping}
+                  />
+                  <SplineToolbar
+                    buttonClicked={this.state.buttonClicked}
+                    setButtonClicked={this.setButtonClicked}
+                    activateTool={this.activateTool}
+                    handleOpen={this.handleOpen}
+                    isTyping={this.isTyping}
+                  />
+                  <BoundingBoxToolbar
+                    buttonClicked={this.state.buttonClicked}
+                    setButtonClicked={this.setButtonClicked}
+                    activateTool={this.activateTool}
+                    isTyping={this.isTyping}
+                  />
+                </ButtonGroup>
               </Grid>
-              <LabelsSubmenu
-                isOpen={
-                  this.state.buttonClicked === "Annotation Label" &&
-                  Boolean(this.state.anchorElement)
-                }
-                anchorElement={this.state.anchorElement}
-                onClose={this.handleClose}
-                annotationsObject={this.annotationsObject}
-                presetLabels={this.presetLabels}
-                updatePresetLabels={this.updatePresetLabels}
-                activeAnnotationID={this.state.activeAnnotationID}
-              />
-              <BackgroundToolbar
-                buttonClicked={this.state.buttonClicked}
-                anchorElement={this.state.anchorElement}
-                onClose={this.handleClose}
-                channels={this.state.channels}
-                toggleChannelAtIndex={this.toggleChannelAtIndex}
-                displayedImage={this.state.displayedImage}
-              />
-              <PaintbrushSubmenu
-                isOpen={
-                  this.state.buttonClicked === "Brush" &&
-                  Boolean(this.state.anchorElement)
-                }
-                anchorElement={this.state.anchorElement}
-                onClose={this.handleClose}
-              />
-              <SplineSubmenu
-                isOpen={
-                  this.state.buttonClicked === "Spline" &&
-                  Boolean(this.state.anchorElement)
-                }
-                anchorElement={this.state.anchorElement}
-                onClose={this.handleClose}
-              />
+
+              <Grid
+                container
+                direction="row"
+                className={classes.displayContainer}
+              >
+                <ButtonGroup id="display-toolbar">
+                  <BaseIconButton
+                    tooltip={tooltips.brightness}
+                    onClick={this.selectBrightness}
+                    fill={this.state.buttonClicked === tooltips.brightness.name}
+                    setRefCallback={(ref) => {
+                      this.refBtnsPopovers[tooltips.brightness.name] = ref;
+                    }}
+                  />
+                  <BaseIconButton
+                    tooltip={tooltips.contrast}
+                    onClick={this.selectContrast}
+                    fill={this.state.buttonClicked === tooltips.contrast.name}
+                    setRefCallback={(ref) => {
+                      this.refBtnsPopovers[tooltips.contrast.name] = ref;
+                    }}
+                  />
+                  <BaseIconButton
+                    tooltip={tooltips.channels}
+                    onClick={this.selectChannels}
+                    fill={this.state.buttonClicked === tooltips.channels.name}
+                    setRefCallback={(ref) => {
+                      this.refBtnsPopovers[tooltips.channels.name] = ref;
+                    }}
+                  />
+                </ButtonGroup>
+              </Grid>
             </Grid>
-          </Container>
-          <Minimap
-            buttonClicked={this.state.buttonClicked}
-            displayedImage={this.state.displayedImage}
-            minimapPositionAndSize={this.state.minimapPositionAndSize}
-            viewportPositionAndSize={this.state.viewportPositionAndSize}
-            scaleAndPan={this.state.scaleAndPan}
-            setButtonClicked={this.setButtonClicked}
-            incrementScale={this.incrementScale}
-            decrementScale={this.decrementScale}
-            setMinimapPositionAndSize={this.setMinimapPositionAndSize}
-            resetScaleAndPan={this.resetScaleAndPan}
-            setScaleAndPan={this.setScaleAndPan}
-            canvasContainerColour={this.state.canvasContainerColour}
-          />
-        </Grid>
-      </ThemeProvider>
+
+            <CssBaseline />
+
+            <Container
+              disableGutters
+              maxWidth={false}
+              style={{
+                backgroundColor: this.getRGBAforCanvasContainerColour(),
+              }}
+            >
+              {appBar}
+              <Grid
+                container
+                spacing={0}
+                justify="center"
+                wrap="nowrap"
+                className={classes.mainGrid}
+              >
+                <Grid
+                  item
+                  className={classes.canvasGrid}
+                  style={{ position: "relative" }}
+                  ref={(container) => {
+                    if (container) {
+                      this.canvasContainer = container;
+                    }
+                  }}
+                >
+                  <BackgroundCanvas
+                    scaleAndPan={this.state.scaleAndPan}
+                    displayedImage={this.state.displayedImage}
+                    canvasPositionAndSize={this.state.viewportPositionAndSize}
+                    setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                    setCanvasContainerColourCallback={(canvasContainerColour) =>
+                      this.setState({ canvasContainerColour })
+                    }
+                  />
+                  <SplineCanvas
+                    scaleAndPan={this.state.scaleAndPan}
+                    activeTool={this.state.activeTool}
+                    mode={this.state.mode}
+                    annotationsObject={this.annotationsObject}
+                    displayedImage={this.state.displayedImage}
+                    canvasPositionAndSize={this.state.viewportPositionAndSize}
+                    setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                    redraw={this.state.redraw}
+                    sliceIndex={this.state.sliceIndex}
+                    setUIActiveAnnotationID={(id) => {
+                      this.setState({ activeAnnotationID: id });
+                    }}
+                    setActiveTool={(tool: Tool) => {
+                      this.setState({ activeTool: tool });
+                    }}
+                  />
+                  <BoundingBoxCanvas
+                    scaleAndPan={this.state.scaleAndPan}
+                    activeTool={this.state.activeTool}
+                    mode={this.state.mode}
+                    annotationsObject={this.annotationsObject}
+                    displayedImage={this.state.displayedImage}
+                    canvasPositionAndSize={this.state.viewportPositionAndSize}
+                    setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                    redraw={this.state.redraw}
+                    sliceIndex={this.state.sliceIndex}
+                    setUIActiveAnnotationID={(id) => {
+                      this.setState({ activeAnnotationID: id });
+                    }}
+                    setActiveTool={(tool: Tool) => {
+                      this.setState({ activeTool: tool });
+                    }}
+                  />
+                  <PaintbrushCanvas
+                    scaleAndPan={this.state.scaleAndPan}
+                    activeTool={this.state.activeTool}
+                    mode={this.state.mode}
+                    annotationsObject={this.annotationsObject}
+                    displayedImage={this.state.displayedImage}
+                    canvasPositionAndSize={this.state.viewportPositionAndSize}
+                    setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                    redraw={this.state.redraw}
+                    sliceIndex={this.state.sliceIndex}
+                    setUIActiveAnnotationID={(id) => {
+                      this.setState({ activeAnnotationID: id });
+                    }}
+                    setActiveTool={(tool: Tool) => {
+                      this.setState({ activeTool: tool });
+                    }}
+                  />
+                  {this.slicesData?.length > 1 && (
+                    <Paper
+                      elevation={3}
+                      className={classes.slicesSlider}
+                      style={{
+                        position: "absolute",
+                        top: "110px",
+                        right: "30px",
+                      }}
+                    >
+                      <BaseSlider
+                        value={this.state.sliceIndex}
+                        config={
+                          {
+                            name: "slices",
+                            id: "slices-slider",
+                            initial: 1,
+                            step: 1,
+                            min: 0,
+                            max: this.slicesData.length - 1,
+                            unit: "",
+                          } as Config
+                        }
+                        onChange={() => this.changeSlice}
+                        sliderHeight="300px"
+                      />
+                    </Paper>
+                  )}
+                </Grid>
+                <LabelsSubmenu
+                  isOpen={
+                    this.state.buttonClicked === "Annotation Label" &&
+                    Boolean(this.state.anchorElement)
+                  }
+                  anchorElement={this.state.anchorElement}
+                  onClose={this.handleClose}
+                  annotationsObject={this.annotationsObject}
+                  presetLabels={this.presetLabels}
+                  updatePresetLabels={this.updatePresetLabels}
+                  activeAnnotationID={this.state.activeAnnotationID}
+                />
+                <BackgroundToolbar
+                  buttonClicked={this.state.buttonClicked}
+                  anchorElement={this.state.anchorElement}
+                  onClose={this.handleClose}
+                  channels={this.state.channels}
+                  toggleChannelAtIndex={this.toggleChannelAtIndex}
+                  displayedImage={this.state.displayedImage}
+                />
+                <PaintbrushSubmenu
+                  isOpen={
+                    this.state.buttonClicked === "Brush" &&
+                    Boolean(this.state.anchorElement)
+                  }
+                  anchorElement={this.state.anchorElement}
+                  onClose={this.handleClose}
+                />
+                <SplineSubmenu
+                  isOpen={
+                    this.state.buttonClicked === "Spline" &&
+                    Boolean(this.state.anchorElement)
+                  }
+                  anchorElement={this.state.anchorElement}
+                  onClose={this.handleClose}
+                />
+              </Grid>
+            </Container>
+            <Minimap
+              buttonClicked={this.state.buttonClicked}
+              displayedImage={this.state.displayedImage}
+              minimapPositionAndSize={this.state.minimapPositionAndSize}
+              viewportPositionAndSize={this.state.viewportPositionAndSize}
+              scaleAndPan={this.state.scaleAndPan}
+              setButtonClicked={this.setButtonClicked}
+              incrementScale={this.incrementScale}
+              decrementScale={this.decrementScale}
+              setMinimapPositionAndSize={this.setMinimapPositionAndSize}
+              resetScaleAndPan={this.resetScaleAndPan}
+              setScaleAndPan={this.setScaleAndPan}
+              canvasContainerColour={this.state.canvasContainerColour}
+            />
+          </Grid>
+        </ThemeProvider>
+      </StylesProvider>
     );
   };
 }

@@ -1,6 +1,6 @@
 import { ReactElement, MouseEvent } from "react";
 import { ButtonGroup, Popover } from "@material-ui/core";
-import { BaseIconButton } from "@/components/BaseIconButton";
+import { BaseIconButton } from "@gliff-ai/style";
 import { tooltips } from "@/components/tooltips";
 import { useSplineStore } from "./Store";
 

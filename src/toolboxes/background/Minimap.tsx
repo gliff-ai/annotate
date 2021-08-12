@@ -1,10 +1,9 @@
 import { Component, ReactElement, MouseEvent } from "react";
 import { Slide, Card, WithStyles, withStyles } from "@material-ui/core";
 import { PositionAndSize } from "@/annotation/interfaces";
-import { BaseIconButton } from "@/components/BaseIconButton";
+import { theme, BaseIconButton } from "@gliff-ai/style";
 import { MinimapCanvas } from "@/baseCanvas";
 import { BackgroundCanvas } from "@/toolboxes/background";
-import { theme } from "@/components/theme";
 import { tooltips } from "@/components/tooltips";
 
 const styles = {
@@ -21,6 +20,19 @@ const styles = {
     padding: "10px",
     left: "250px",
     borderRadius: "10px 0 0 0",
+  },
+  baseIconButton: {
+    display: "flex",
+    justifyContent: "flex-end",
+    "& $button": {
+      marginRight: "10px",
+      "&:nth-child(4)": {
+        marginRight: "0",
+      },
+      "&:nth-child(1)": {
+        marginRight: "auto",
+      },
+    },
   },
   canvasCard: {
     width: "100%",
@@ -127,45 +139,44 @@ class Minimap extends Component<Props, State> {
           className={this.props.classes.minimapCard}
           style={{ position: "relative" }}
         >
-          <BaseIconButton
-            tooltip={tooltips.minimiseMap}
-            onClick={() => {
-              this.props.setButtonClicked(tooltips.minimiseMap.name);
-              this.handleDrawerClose();
-            }}
-            fill={this.props.buttonClicked === tooltips.minimiseMap.name}
-            tooltipPlacement="top"
-            buttonStyling={{ marginRight: "132px" }}
-          />
-          <BaseIconButton
-            tooltip={tooltips.zoomIn}
-            onClick={() => {
-              this.props.setButtonClicked(tooltips.zoomIn.name);
-              this.props.incrementScale();
-            }}
-            fill={this.props.buttonClicked === tooltips.zoomIn.name}
-            tooltipPlacement="top"
-            buttonStyling={{ marginRight: "10px" }}
-          />
-          <BaseIconButton
-            tooltip={tooltips.zoomOut}
-            onClick={() => {
-              this.props.setButtonClicked(tooltips.zoomOut.name);
-              this.props.decrementScale();
-            }}
-            fill={this.props.buttonClicked === tooltips.zoomOut.name}
-            tooltipPlacement="top"
-            buttonStyling={{ marginRight: "10px" }}
-          />
-          <BaseIconButton
-            tooltip={tooltips.fitToPage}
-            onClick={() => {
-              this.props.setButtonClicked(tooltips.fitToPage.name);
-              this.props.resetScaleAndPan();
-            }}
-            fill={this.props.buttonClicked === tooltips.fitToPage.name}
-            tooltipPlacement="top"
-          />
+          <div className={this.props.classes.baseIconButton}>
+            <BaseIconButton
+              tooltip={tooltips.minimiseMap}
+              onClick={() => {
+                this.props.setButtonClicked(tooltips.minimiseMap.name);
+                this.handleDrawerClose();
+              }}
+              fill={this.props.buttonClicked === tooltips.minimiseMap.name}
+              tooltipPlacement="top"
+            />
+            <BaseIconButton
+              tooltip={tooltips.zoomIn}
+              onClick={() => {
+                this.props.setButtonClicked(tooltips.zoomIn.name);
+                this.props.incrementScale();
+              }}
+              fill={this.props.buttonClicked === tooltips.zoomIn.name}
+              tooltipPlacement="top"
+            />
+            <BaseIconButton
+              tooltip={tooltips.zoomOut}
+              onClick={() => {
+                this.props.setButtonClicked(tooltips.zoomOut.name);
+                this.props.decrementScale();
+              }}
+              fill={this.props.buttonClicked === tooltips.zoomOut.name}
+              tooltipPlacement="top"
+            />
+            <BaseIconButton
+              tooltip={tooltips.fitToPage}
+              onClick={() => {
+                this.props.setButtonClicked(tooltips.fitToPage.name);
+                this.props.resetScaleAndPan();
+              }}
+              fill={this.props.buttonClicked === tooltips.fitToPage.name}
+              tooltipPlacement="top"
+            />
+          </div>
           {/* Background canvas for the minimap */}
           {this.props.displayedImage && (
             <div
