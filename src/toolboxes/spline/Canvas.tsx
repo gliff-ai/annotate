@@ -275,7 +275,7 @@ class CanvasClass extends Component<Props> {
     return -1;
   };
 
-  onClick = (x: number, y: number): void => {
+  onClick = (x: number, y: number, isCTRL?: boolean): void => {
     // handle click to select an annotation (Mode.select)
     // or add new point to a normal spline (Mode.draw and this.props.activeTool === tooltips.spline.name)
     // or add TL or BR point to a rectangle spline (Mode.draw and this.props.activeTool === tooltips.rectspline.name)
@@ -334,46 +334,53 @@ class CanvasClass extends Component<Props> {
     if (!this.isActive()) return;
 
     if (this.sliceIndexMatch()) {
-      // if our current spline annotation object is for the visible slice
-      // get the current spline coordinates
-      const coordinates = this.props.annotationsObject.getSplineCoordinates();
+      if (isCTRL) {
+        this.onCTRLClick(x, y);
+      } else {
+        // if our current spline annotation object is for the visible slice
+        // get the current spline coordinates
+        const coordinates = this.props.annotationsObject.getSplineCoordinates();
 
-      // check if we clicked within the nudge radius of an existing point
-      const nudgePointIdx = this.clickNearPoint(
-        { x: imageX, y: imageY },
-        coordinates
-      );
-      // check if the current spline is a closed one
-      const isClosed = this.isClosed(coordinates);
-
-      if (nudgePointIdx !== -1) {
-        // If the mouse click was near an existing point, nudge that point
-        const nudgePoint = coordinates[nudgePointIdx];
-
-        this.props.annotationsObject.updateSplinePoint(
-          (nudgePoint.x + imageX) / 2,
-          (nudgePoint.y + imageY) / 2,
-          nudgePointIdx
+        // check if we clicked within the nudge radius of an existing point
+        const nudgePointIdx = this.clickNearPoint(
+          { x: imageX, y: imageY },
+          coordinates
         );
+        // check if the current spline is a closed one
+        const isClosed = this.isClosed(coordinates);
 
-        if (nudgePointIdx === 0 && isClosed) {
-          // need to update the final point as well if we're nudging the first point of a closed spline,
-          // or else the loop gets broken
+        if (nudgePointIdx !== -1) {
+          // If the mouse click was near an existing point, nudge that point
+          const nudgePoint = coordinates[nudgePointIdx];
+
           this.props.annotationsObject.updateSplinePoint(
             (nudgePoint.x + imageX) / 2,
             (nudgePoint.y + imageY) / 2,
-            coordinates.length - 1
+            nudgePointIdx
           );
-        }
-      } else if (this.props.mode === Mode.draw && !isClosed) {
-        // else, i.e. not near an existing point
-        // if the spline is not closed and we are in Mode.draw then
-        // add coordinates to the current spline
-        if (this.props.activeTool === tooltips.spline.name) {
-          // if a normal spline, just add points as needed
-          this.props.annotationsObject.addSplinePoint({ x: imageX, y: imageY });
-          this.selectedPointIndex =
-            this.props.annotationsObject.getSplineLength() - 1;
+
+          if (nudgePointIdx === 0 && isClosed) {
+            // need to update the final point as well if we're nudging the first point of a closed spline,
+            // or else the loop gets broken
+            this.props.annotationsObject.updateSplinePoint(
+              (nudgePoint.x + imageX) / 2,
+              (nudgePoint.y + imageY) / 2,
+              coordinates.length - 1
+            );
+          }
+        } else if (this.props.mode === Mode.draw && !isClosed) {
+          // else, i.e. not near an existing point
+          // if the spline is not closed and we are in Mode.draw then
+          // add coordinates to the current spline
+          if (this.props.activeTool === tooltips.spline.name) {
+            // if a normal spline, just add points as needed
+            this.props.annotationsObject.addSplinePoint({
+              x: imageX,
+              y: imageY,
+            });
+            this.selectedPointIndex =
+              this.props.annotationsObject.getSplineLength() - 1;
+          }
         }
       }
     }
@@ -381,22 +388,16 @@ class CanvasClass extends Component<Props> {
     this.drawAllSplines();
   };
 
-  onDoubleClick = (x: number, y: number): void => {
-    // if no spline tool is turned on then do nothing
-    if (!this.isActive()) return;
-
-    if (this.sliceIndexMatch()) {
-      const { x: imageX, y: imageY } = canvasToImage(
-        x,
-        y,
-        this.props.displayedImage.width,
-        this.props.displayedImage.height,
-        this.props.scaleAndPan,
-        this.props.canvasPositionAndSize
-      );
-      this.addNewPointNearSpline(imageX, imageY);
-      this.drawAllSplines();
-    }
+  onCTRLClick = (x: number, y: number): void => {
+    const { x: imageX, y: imageY } = canvasToImage(
+      x,
+      y,
+      this.props.displayedImage.width,
+      this.props.displayedImage.height,
+      this.props.scaleAndPan,
+      this.props.canvasPositionAndSize
+    );
+    this.addNewPointNearSpline(imageX, imageY);
   };
 
   closeSpline = (): void => {
@@ -694,7 +695,6 @@ class CanvasClass extends Component<Props> {
       <div style={{ pointerEvents: this.isActive() ? "auto" : "none" }}>
         <BaseCanvas
           onClick={this.onClick}
-          onDoubleClick={this.onDoubleClick}
           onMouseDown={this.onMouseDown}
           onMouseMove={this.onMouseMove}
           onMouseUp={this.onMouseUp}
