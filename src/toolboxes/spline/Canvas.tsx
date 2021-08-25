@@ -382,19 +382,21 @@ class CanvasClass extends Component<Props> {
   };
 
   onDoubleClick = (x: number, y: number): void => {
-    // Add new point on double-click.
-    if (this.props.mode === Mode.draw || !this.sliceIndexMatch()) return;
+    // if no spline tool is turned on then do nothing
+    if (!this.isActive()) return;
 
-    const { x: imageX, y: imageY } = canvasToImage(
-      x,
-      y,
-      this.props.displayedImage.width,
-      this.props.displayedImage.height,
-      this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
-    );
-    this.addNewPointNearSpline(imageX, imageY);
-    this.drawAllSplines();
+    if (this.sliceIndexMatch()) {
+      const { x: imageX, y: imageY } = canvasToImage(
+        x,
+        y,
+        this.props.displayedImage.width,
+        this.props.displayedImage.height,
+        this.props.scaleAndPan,
+        this.props.canvasPositionAndSize
+      );
+      this.addNewPointNearSpline(imageX, imageY);
+      this.drawAllSplines();
+    }
   };
 
   closeSpline = (): void => {
