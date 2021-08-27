@@ -13,8 +13,7 @@ export interface Props {
     scale: number;
   };
   cursor?: "crosshair" | "move" | "pointer" | "none" | "not-allowed";
-  onDoubleClick?: (x: number, y: number) => void;
-  onClick?: (x: number, y: number) => void;
+  onClick?: (x: number, y: number, isCTRL?: boolean) => void;
   onMouseDown?: (x: number, y: number) => void;
   onMouseMove?: (x: number, y: number) => void;
   onMouseUp?: (x: number, y: number) => void;
@@ -90,19 +89,12 @@ export class BaseCanvas extends Component<Props> {
     return { x, y };
   };
 
-  onDoubleClickHandler = (e: MouseEvent): void => {
-    const { x, y } = this.windowToCanvas(e);
-
-    if (this.props.onDoubleClick) {
-      this.props.onDoubleClick(x, y);
-    }
-  };
-
   onClickHandler = (e: MouseEvent): void => {
     const { x, y } = this.windowToCanvas(e);
+    const isCTRL = e.ctrlKey;
 
     if (this.props.onClick) {
-      this.props.onClick(x, y);
+      this.props.onClick(x, y, isCTRL);
     }
   };
 
@@ -163,7 +155,6 @@ export class BaseCanvas extends Component<Props> {
         onMouseDown={this.onMouseDownHandler}
         onMouseMove={this.onMouseMoveHandler}
         onMouseUp={this.onMouseUpHandler}
-        onDoubleClick={this.onDoubleClickHandler}
         key={this.props.name}
         id={`${this.props.name}-canvas`}
         ref={(canvas) => {
