@@ -1,5 +1,5 @@
 import { createStore } from "@/store";
-import { tooltips } from "@/components/tooltips";
+import { ToolboxTooltips } from "./Toolbox";
 
 // types will include: paintbrush, eraser
 interface PaintbrushData {
@@ -8,7 +8,7 @@ interface PaintbrushData {
 }
 
 const defaultPaintbrush: PaintbrushData = {
-  brushType: tooltips.paintbrush.name,
+  brushType: ToolboxTooltips.paintbrush.name,
   brushRadius: 10,
 };
 

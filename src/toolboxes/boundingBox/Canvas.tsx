@@ -1,14 +1,15 @@
 import { ReactNode, Component, ReactElement } from "react";
-
-import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
 import { theme } from "@gliff-ai/style";
-import { Annotations } from "@/annotation";
-import { canvasToImage, imageToCanvas } from "@/components/transforms";
-import { XYPoint } from "@/annotation/interfaces";
-import { Tool, Tools } from "@/components/tools";
-import { tooltips } from "@/components/tooltips";
 import { Mode } from "@/ui";
-
+import { Toolboxes, Toolbox } from "@/Toolboxes";
+import { Annotations } from "@/annotation";
+import { XYPoint } from "@/annotation/interfaces";
+import {
+  BaseCanvas,
+  CanvasProps,
+  canvasToImage,
+  imageToCanvas,
+} from "@/components/baseCanvas";
 import { getRGBAString, palette } from "@/components/palette";
 import { BoundingBoxCoordinates } from "./interfaces";
 
@@ -26,14 +27,14 @@ type SelectedCorners =
   | "bottomRight"
   | "bottomLeft";
 
-interface Props extends BaseProps {
-  activeTool: string;
+interface Props extends CanvasProps {
+  activeToolbox: Toolbox;
   mode: Mode;
   annotationsObject: Annotations;
   redraw: number;
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
-  setActiveTool: (tool: Tool) => void;
+  setActiveToolbox: (tool: Toolbox) => void;
 }
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
@@ -50,7 +51,7 @@ interface Event extends CustomEvent {
 type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 
 export class CanvasClass extends Component<Props> {
-  readonly name = tooltips.boundingBox.name;
+  readonly name = Toolboxes.boundingBox;
 
   private baseCanvas: BaseCanvas;
 
@@ -342,8 +343,8 @@ export class CanvasClass extends Component<Props> {
 
   onClick = (x: number, y: number): void => {
     // handle click to select an annotation (Mode.select)
-    // or add new point to a normal spline (Mode.draw and this.props.activeTool === tooltips.boundingBox.name)
-    // or add TL or BR point to a rectangle spline (Mode.draw and this.props.activeTool === tooltips.rectspline.name)
+    // or add new point to a normal spline (Mode.draw and this.props.activeTool === ToolboxTooltips.boundingBox.name)
+    // or add TL or BR point to a rectangle spline (Mode.draw and this.props.activeTool === ToolboxTooltips.rectspline.name)
 
     // X and Y are in CanvasSpace, convert to ImageSpace
     const { x: imageX, y: imageY } = canvasToImage(
@@ -383,15 +384,15 @@ export class CanvasClass extends Component<Props> {
       ) {
         this.props.annotationsObject.setActiveAnnotationID(selectedBoundingBox);
         this.props.setUIActiveAnnotationID(selectedBoundingBox);
-        this.props.setActiveTool(Tools.boundingBox);
+        this.props.setActiveToolbox(Toolboxes.boundingBox);
       } else if (selectedSpline !== null) {
         this.props.annotationsObject.setActiveAnnotationID(selectedSpline);
         this.props.setUIActiveAnnotationID(selectedSpline);
-        this.props.setActiveTool(Tools.spline);
+        this.props.setActiveToolbox(Toolboxes.spline);
       } else if (selectedBrushStroke !== null) {
         this.props.annotationsObject.setActiveAnnotationID(selectedBrushStroke);
         this.props.setUIActiveAnnotationID(selectedBrushStroke);
-        this.props.setActiveTool(Tools.paintbrush);
+        this.props.setActiveToolbox(Toolboxes.paintbrush);
       }
     }
 
@@ -597,8 +598,7 @@ export class CanvasClass extends Component<Props> {
     return this.props.mode === Mode.draw ? "crosshair" : "pointer";
   };
 
-  // TODO make this fit with tooltips so we don't have tools and tooltips and strings all over the place
-  isActive = (): boolean => this.props.activeTool === "boundingBox";
+  isActive = (): boolean => this.props.activeToolbox === Toolboxes.boundingBox;
 
   sliceIndexMatch = (): boolean =>
     this.props.annotationsObject.getSplineForActiveAnnotation().spaceTimeInfo
@@ -616,7 +616,7 @@ export class CanvasClass extends Component<Props> {
           ref={(baseCanvas) => {
             this.baseCanvas = baseCanvas;
           }}
-          name={tooltips.boundingBox.name}
+          name={this.name}
           scaleAndPan={this.props.scaleAndPan}
           canvasPositionAndSize={this.props.canvasPositionAndSize}
           setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
@@ -627,7 +627,7 @@ export class CanvasClass extends Component<Props> {
 
 export const Canvas = (props: Props): ReactElement => (
   <CanvasClass
-    activeTool={props.activeTool}
+    activeToolbox={props.activeToolbox}
     mode={props.mode}
     annotationsObject={props.annotationsObject}
     displayedImage={props.displayedImage}
@@ -636,6 +636,6 @@ export const Canvas = (props: Props): ReactElement => (
     redraw={props.redraw}
     sliceIndex={props.sliceIndex}
     setUIActiveAnnotationID={props.setUIActiveAnnotationID}
-    setActiveTool={props.setActiveTool}
+    setActiveToolbox={props.setActiveToolbox}
   />
 );

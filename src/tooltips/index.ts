@@ -1,8 +1,11 @@
 import { Tooltip } from "@gliff-ai/style";
+import { PaintbrushToolbox } from "@/toolboxes/paintbrush";
+import { SplineToolbox } from "@/toolboxes/spline";
+import { BoundingBoxToolbox } from "@/toolboxes/boundingBox";
 
 type ToolTips = { [name: string]: Tooltip };
 
-const tooltips: ToolTips = {
+const DefaultTools: ToolTips = {
   minimiseMap: {
     name: "Minimise Map",
     icon: require(`@/assets/minimise-icon.svg`) as string,
@@ -11,7 +14,7 @@ const tooltips: ToolTips = {
   },
   maximiseMap: {
     name: "Maximise Map",
-    icon: require("../assets/maximise-icon.svg") as string,
+    icon: require("@/assets/maximise-icon.svg") as string,
     shortcut: "ALT",
     shortcutSymbol: "=",
   },
@@ -48,58 +51,6 @@ const tooltips: ToolTips = {
     icon: require(`@/assets/select-icon.svg`) as string,
     shortcut: "A",
   },
-  paintbrush: {
-    name: "Brush",
-    icon: require(`@/assets/brush-icon.svg`) as string,
-    shortcut: "B",
-  },
-  eraser: {
-    name: "Eraser",
-    icon: require(`@/assets/eraser-icon.svg`) as string,
-    shortcut: "E",
-  },
-  fillbrush: {
-    name: "Fill Active Paintbrush",
-    icon: require(`@/assets/fill-icon.svg`) as string,
-    shortcut: "F",
-  },
-  spline: {
-    name: "Spline",
-    icon: require(`@/assets/spline-icon.svg`) as string,
-    shortcut: "S",
-  },
-  lassospline: {
-    name: "Lasso Spline",
-    icon: require(`@/assets/lasso-spline-icon.svg`) as string,
-    shortcut: "O",
-  },
-  magicspline: {
-    name: "Magic Spline",
-    icon: require(`@/assets/magic-spline-icon.svg`) as string,
-    shortcut: "M",
-  },
-  closespline: {
-    name: "Close Active Spline",
-    icon: require(`@/assets/close-spline-icon.svg`) as string,
-    shortcut: "L",
-  },
-  convertspline: {
-    name: "Convert Spline to Paintbrush",
-    icon: require(`@/assets/convert-icon.svg`) as string,
-    shortcut: "CTRL",
-    shortcutSymbol: "Q",
-  },
-  fillspline: {
-    name: "Convert Spline to Paintbrush and Fill",
-    icon: require(`@/assets/fill-icon.svg`) as string,
-    shortcut: "CTRL",
-    shortcutSymbol: "F",
-  },
-  boundingBox: {
-    name: "Rectangular Bounding Box",
-    icon: require(`@/assets/bounding-box-icon.svg`) as string,
-    shortcut: "R",
-  },
   contrast: {
     name: "Contrast",
     icon: require(`@/assets/contrast-icon.svg`) as string,
@@ -123,7 +74,7 @@ const tooltips: ToolTips = {
   },
   download: {
     name: "Download annotations",
-    icon: require("../assets/download-icon.svg") as string,
+    icon: require("@/assets/download-icon.svg") as string,
     shortcut: "D",
   },
   upload: {
@@ -151,4 +102,11 @@ const tooltips: ToolTips = {
   },
 } as const;
 
-export { Tooltip, ToolTips, tooltips };
+const tools = {
+  ...DefaultTools,
+  ...PaintbrushToolbox,
+  ...BoundingBoxToolbox,
+  ...SplineToolbox,
+};
+
+export { tools };
