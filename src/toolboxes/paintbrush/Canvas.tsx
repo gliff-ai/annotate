@@ -16,6 +16,7 @@ import { Tool, Tools } from "@/components/tools";
 import { Mode } from "@/ui";
 import { theme } from "@gliff-ai/style";
 import { palette, getRGBAString } from "@/components/palette";
+import { tooltips } from "@/components/tooltips";
 import { usePaintbrushStore } from "./Store";
 import { BrushStroke } from "./interfaces";
 
@@ -83,7 +84,8 @@ const FauxCursor: FC<CursorProps> = ({
       id="cursor"
       style={{
         visibility:
-          activeTool === "paintbrush" || activeTool === "eraser"
+          activeTool === tooltips.paintbrush.name ||
+          activeTool === tooltips.eraser.name
             ? "visible"
             : "hidden",
         width: brushRadius,
@@ -168,7 +170,10 @@ export class CanvasClass extends Component<Props, State> {
       const brush = {
         color: mainColor,
         radius: this.props.brushRadius,
-        type: this.props.activeTool === "paintbrush" ? "paint" : "erase",
+        type:
+          this.props.activeTool === tooltips.paintbrush.name
+            ? "paint"
+            : "erase",
       } as Brush;
 
       // Draw current points
@@ -288,8 +293,8 @@ export class CanvasClass extends Component<Props, State> {
   };
 
   isActive = (): boolean =>
-    this.props.activeTool === "paintbrush" ||
-    this.props.activeTool === "eraser";
+    this.props.activeTool === tooltips.paintbrush.name ||
+    this.props.activeTool === tooltips.eraser.name;
 
   saveLine = (radius = 20): void => {
     if (this.points.length < 2) return;
@@ -310,7 +315,10 @@ export class CanvasClass extends Component<Props, State> {
       brush: {
         color,
         radius,
-        type: this.props.activeTool === "paintbrush" ? "paint" : "erase",
+        type:
+          this.props.activeTool === tooltips.paintbrush.name
+            ? "paint"
+            : "erase",
       },
     });
 
@@ -366,7 +374,7 @@ export class CanvasClass extends Component<Props, State> {
   onMouseDown = (canvasX: number, canvasY: number): void => {
     if (this.props.mode === Mode.draw) {
       // Start drawing
-      if (this.props.activeTool === "eraser") {
+      if (this.props.activeTool === tooltips.eraser.name) {
         // Copy the current BACK strokes to the front canvas
         this.drawAllStrokes(this.interactionCanvas.canvasContext);
         this.setState({ hideBackCanvas: true }, () => {
@@ -452,8 +460,8 @@ export class CanvasClass extends Component<Props, State> {
 
   getCursor = (): Cursor => {
     if (
-      this.props.activeTool === "paintbrush" ||
-      this.props.activeTool === "eraser"
+      this.props.activeTool === tooltips.paintbrush.name ||
+      this.props.activeTool === tooltips.eraser.name
     ) {
       return this.props.mode === Mode.draw ? "none" : "pointer";
     }
@@ -486,8 +494,8 @@ export class CanvasClass extends Component<Props, State> {
         <div
           style={{
             pointerEvents:
-              this.props.activeTool === "paintbrush" ||
-              this.props.activeTool === "eraser"
+              this.props.activeTool === tooltips.paintbrush.name ||
+              this.props.activeTool === tooltips.eraser.name
                 ? "auto"
                 : "none",
           }}
@@ -530,7 +538,7 @@ export const Canvas = (props: Omit<Props, "brushRadius">): ReactElement => {
 
   return (
     <CanvasClass
-      activeTool={props.activeTool}
+      activeTool={paintbrush.brushType}
       mode={props.mode}
       annotationsObject={props.annotationsObject}
       displayedImage={props.displayedImage}
