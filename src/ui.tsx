@@ -103,6 +103,17 @@ const styles = {
   displayContainer: {
     marginTop: "18px",
   },
+  leftToolbar: {
+    display: "flex",
+    flexDirection: "column",
+    top: "108px",
+    left: "18px",
+    bottom: "18px",
+    width: "63px",
+    zIndex: 100,
+    justifyContent: "space-between",
+    position: "fixed",
+  },
   bottomToolbars: {
     bottom: "18px",
     left: "18px",
@@ -708,169 +719,123 @@ class UserInterface extends Component<Props, State> {
       </AppBar>
     );
 
+    const leftToolbar = (
+      <Toolbar className={classes.leftToolbar}>
+        <ButtonGroup size="small">
+          <BaseIconButton
+            tooltip={Tools.select}
+            onClick={this.toggleMode}
+            fill={this.state.buttonClicked === Tools.select.name}
+          />
+          <BaseIconButton
+            tooltip={Tools.addNewAnnotation}
+            onMouseDown={() => {
+              this.setButtonClicked(Tools.addNewAnnotation.name);
+              this.addAnnotation();
+            }}
+            onMouseUp={this.selectDrawMode}
+            fill={this.state.buttonClicked === Tools.addNewAnnotation.name}
+          />
+          <BaseIconButton
+            tooltip={Tools.clearAnnotation}
+            onMouseDown={() => {
+              this.setButtonClicked(Tools.clearAnnotation.name);
+              this.clearActiveAnnotation();
+            }}
+            onMouseUp={this.selectDrawMode}
+            fill={this.state.buttonClicked === Tools.clearAnnotation.name}
+          />
+          {saveAnnotationsCallback && (
+            <BaseIconButton
+              tooltip={Tools.save}
+              onMouseDown={() => {
+                this.setButtonClicked(Tools.save.name);
+                this.saveAnnotations();
+              }}
+              onMouseUp={this.selectDrawMode}
+              fill={this.state.buttonClicked === Tools.save.name}
+            />
+          )}
+          <BaseIconButton
+            tooltip={Tools.labels}
+            onClick={this.selectAnnotationLabel}
+            fill={this.state.buttonClicked === Tools.labels.name}
+            setRefCallback={(ref) => {
+              this.refBtnsPopovers[Tools.labels.name] = ref;
+            }}
+          />
+          <BaseIconButton
+            tooltip={Tools.undo}
+            onClick={this.undo}
+            fill={false}
+            enabled={this.state.canUndoRedo.undo}
+          />
+          <BaseIconButton
+            tooltip={Tools.redo}
+            onClick={this.redo}
+            fill={false}
+            enabled={this.state.canUndoRedo.redo}
+          />
+        </ButtonGroup>
+
+        <ButtonGroup>
+          <PaintbrushToolbar
+            buttonClicked={this.state.buttonClicked}
+            setButtonClicked={this.setButtonClicked}
+            activateToolbox={this.activateToolbox}
+            handleOpen={this.handleOpen}
+            onClose={this.handleClose}
+            anchorElement={this.state.anchorElement}
+            isTyping={this.isTyping}
+          />
+          <SplineToolbar
+            buttonClicked={this.state.buttonClicked}
+            setButtonClicked={this.setButtonClicked}
+            activateToolbox={this.activateToolbox}
+            handleOpen={this.handleOpen}
+            onClose={this.handleClose}
+            anchorElement={this.state.anchorElement}
+            isTyping={this.isTyping}
+          />
+          <BoundingBoxToolbar
+            buttonClicked={this.state.buttonClicked}
+            setButtonClicked={this.setButtonClicked}
+            activateToolbox={this.activateToolbox}
+            isTyping={this.isTyping}
+          />
+          <BackgroundToolbar
+            buttonClicked={this.state.buttonClicked}
+            setButtonClicked={this.setButtonClicked}
+            handleOpen={this.handleOpen}
+            onClose={this.handleClose}
+            anchorElement={this.state.anchorElement}
+            isTyping={this.isTyping}
+            channels={this.state.channels}
+            toggleChannelAtIndex={this.toggleChannelAtIndex}
+            displayedImage={this.state.displayedImage}
+          />
+        </ButtonGroup>
+
+        <LabelsSubmenu
+          isOpen={
+            this.state.buttonClicked === "Annotation Label" &&
+            Boolean(this.state.anchorElement)
+          }
+          anchorElement={this.state.anchorElement}
+          onClose={this.handleClose}
+          annotationsObject={this.annotationsObject}
+          presetLabels={this.presetLabels}
+          updatePresetLabels={this.updatePresetLabels}
+          activeAnnotationID={this.state.activeAnnotationID}
+        />
+      </Toolbar>
+    );
+
     return (
       <StylesProvider generateClassName={generateClassName("annotate")}>
         <ThemeProvider theme={theme}>
           <Grid container className={classes.mainContainer}>
-            <Grid
-              container
-              direction="row"
-              className={classes.selectionContainer}
-              style={{ position: "fixed" }}
-            >
-              <ButtonGroup size="small" id="selection-toolbar">
-                <BaseIconButton
-                  tooltip={Tools.select}
-                  onClick={this.toggleMode}
-                  fill={this.state.buttonClicked === Tools.select.name}
-                />
-                <BaseIconButton
-                  tooltip={Tools.addNewAnnotation}
-                  onMouseDown={() => {
-                    this.setButtonClicked(Tools.addNewAnnotation.name);
-                    this.addAnnotation();
-                  }}
-                  onMouseUp={this.selectDrawMode}
-                  fill={
-                    this.state.buttonClicked === Tools.addNewAnnotation.name
-                  }
-                />
-                <BaseIconButton
-                  tooltip={Tools.clearAnnotation}
-                  onMouseDown={() => {
-                    this.setButtonClicked(Tools.clearAnnotation.name);
-                    this.clearActiveAnnotation();
-                  }}
-                  onMouseUp={this.selectDrawMode}
-                  fill={this.state.buttonClicked === Tools.clearAnnotation.name}
-                />
-                {saveAnnotationsCallback && (
-                  <BaseIconButton
-                    tooltip={Tools.save}
-                    onMouseDown={() => {
-                      this.setButtonClicked(Tools.save.name);
-                      this.saveAnnotations();
-                    }}
-                    onMouseUp={this.selectDrawMode}
-                    fill={this.state.buttonClicked === Tools.save.name}
-                  />
-                )}
-                <BaseIconButton
-                  tooltip={Tools.labels}
-                  onClick={this.selectAnnotationLabel}
-                  fill={this.state.buttonClicked === Tools.labels.name}
-                  setRefCallback={(ref) => {
-                    this.refBtnsPopovers[Tools.labels.name] = ref;
-                  }}
-                />
-                <BaseIconButton
-                  tooltip={Tools.undo}
-                  onClick={this.undo}
-                  fill={false}
-                  enabled={this.state.canUndoRedo.undo}
-                />
-                <BaseIconButton
-                  tooltip={Tools.redo}
-                  onClick={this.redo}
-                  fill={false}
-                  enabled={this.state.canUndoRedo.redo}
-                />
-              </ButtonGroup>
-            </Grid>
-
-            <Grid
-              container
-              direction="row"
-              className={classes.bottomToolbars}
-              style={{ position: "fixed" }}
-            >
-              <Grid container direction="row">
-                <ButtonGroup id="paint-toolbar">
-                  <PaintbrushToolbar
-                    buttonClicked={this.state.buttonClicked}
-                    setButtonClicked={this.setButtonClicked}
-                    activateToolbox={this.activateToolbox}
-                    handleOpen={this.handleOpen}
-                    onClose={this.handleClose}
-                    anchorElement={this.state.anchorElement}
-                    isTyping={this.isTyping}
-                  />
-                  <SplineToolbar
-                    buttonClicked={this.state.buttonClicked}
-                    setButtonClicked={this.setButtonClicked}
-                    activateToolbox={this.activateToolbox}
-                    handleOpen={this.handleOpen}
-                    onClose={this.handleClose}
-                    anchorElement={this.state.anchorElement}
-                    isTyping={this.isTyping}
-                  />
-                  <BoundingBoxToolbar
-                    buttonClicked={this.state.buttonClicked}
-                    setButtonClicked={this.setButtonClicked}
-                    activateToolbox={this.activateToolbox}
-                    isTyping={this.isTyping}
-                  />
-                  {this.props.trustedServiceButtonToolbar}
-                </ButtonGroup>
-              </Grid>
-
-              <Grid
-                container
-                direction="row"
-                className={classes.displayContainer}
-              >
-                <ButtonGroup id="display-toolbar">
-                  <BaseIconButton
-                    tooltip={Tools.brightness}
-                    onClick={this.selectBrightness}
-                    fill={this.state.buttonClicked === Tools.brightness.name}
-                    setRefCallback={(ref) => {
-                      this.refBtnsPopovers[Tools.brightness.name] = ref;
-                    }}
-                  />
-                  <BaseIconButton
-                    tooltip={Tools.contrast}
-                    onClick={this.selectContrast}
-                    fill={this.state.buttonClicked === Tools.contrast.name}
-                    setRefCallback={(ref) => {
-                      this.refBtnsPopovers[Tools.contrast.name] = ref;
-                    }}
-                  />
-                  <BaseIconButton
-                    tooltip={Tools.channels}
-                    onClick={this.selectChannels}
-                    fill={this.state.buttonClicked === Tools.channels.name}
-                    setRefCallback={(ref) => {
-                      this.refBtnsPopovers[Tools.channels.name] = ref;
-                    }}
-                  />
-                </ButtonGroup>
-              </Grid>
-            </Grid>
-
-            <LabelsSubmenu
-              isOpen={
-                this.state.buttonClicked === "Annotation Label" &&
-                Boolean(this.state.anchorElement)
-              }
-              anchorElement={this.state.anchorElement}
-              onClose={this.handleClose}
-              annotationsObject={this.annotationsObject}
-              presetLabels={this.presetLabels}
-              updatePresetLabels={this.updatePresetLabels}
-              activeAnnotationID={this.state.activeAnnotationID}
-            />
-            <BackgroundToolbar
-              buttonClicked={this.state.buttonClicked}
-              anchorElement={this.state.anchorElement}
-              onClose={this.handleClose}
-              channels={this.state.channels}
-              toggleChannelAtIndex={this.toggleChannelAtIndex}
-              displayedImage={this.state.displayedImage}
-            />
-
             <CssBaseline />
-
             <Container
               disableGutters
               maxWidth={false}
@@ -879,6 +844,7 @@ class UserInterface extends Component<Props, State> {
               }}
             >
               {appBar}
+              {leftToolbar}
               <Grid
                 container
                 spacing={0}

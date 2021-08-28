@@ -7,13 +7,13 @@ import { useSplineStore } from "./Store";
 
 const events = ["selectSpline"] as const;
 
-interface SubMenuProps {
+interface SubmenuProps {
   isOpen: boolean;
   anchorElement: HTMLButtonElement | null;
   onClose: (event: MouseEvent) => void;
 }
 
-const Submenu = (props: SubMenuProps): ReactElement => {
+const Submenu = (props: SubmenuProps): ReactElement => {
   const [spline, setSpline] = useSplineStore();
 
   function selectSpline() {
