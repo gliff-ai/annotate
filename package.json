@@ -1,6 +1,6 @@
 {
   "name": "@gliff-ai/annotate",
-  "version": "0.22.0",
+  "version": "0.21.5",
   "description": "gliff.ai ANNOTATE - a user friendly browser interface for annotating multidimensional images for machine learning",
   "repository": "git://github.com/gliff-ai/annotate.git",
   "main": "dist/main.js",
