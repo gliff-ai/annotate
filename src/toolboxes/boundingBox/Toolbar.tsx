@@ -1,6 +1,6 @@
 import { Component, ReactElement } from "react";
 import { BaseIconButton } from "@gliff-ai/style";
-import { tools } from "@/tooltips";
+import { Tools } from "@/tooltips";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 
 const events = ["selectBoundingBox"] as const;
@@ -12,7 +12,7 @@ interface Event extends CustomEvent {
 interface Props {
   buttonClicked: string;
   setButtonClicked: (buttonName: string) => void;
-  activateToolbox: (activeTool: Toolbox) => void;
+  activateToolbox: (activeToolbox: Toolbox) => void;
   isTyping: () => boolean;
 }
 
@@ -37,23 +37,23 @@ class Toolbar extends Component<Props> {
   }
 
   handleEvent = (event: Event): void => {
-    if (event.detail === tools.boundingBox.name) {
+    if (event.detail === Tools.boundingBox.name) {
       this[event.type]?.call(this);
     }
   };
 
   selectBoundingBox = (): void => {
     if (this.props.isTyping()) return;
-    this.props.setButtonClicked(tools.boundingBox.name);
+    this.props.setButtonClicked(Tools.boundingBox.name);
     this.props.activateToolbox(Toolboxes.boundingBox);
   };
 
   render = (): ReactElement => (
     <>
       <BaseIconButton
-        tooltip={tools.boundingBox}
+        tooltip={Tools.boundingBox}
         onClick={this.selectBoundingBox}
-        fill={this.props.buttonClicked === tools.boundingBox.name}
+        fill={this.props.buttonClicked === Tools.boundingBox.name}
       />
     </>
   );

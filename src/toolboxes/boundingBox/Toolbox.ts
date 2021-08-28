@@ -2,7 +2,7 @@ import { Toolbox, ToolTips } from "@/Toolboxes";
 
 const ToolboxName: Toolbox = "boundingBox";
 
-const ToolboxTooltips: ToolTips = {
+const Tools: ToolTips = {
   boundingBox: {
     name: "Rectangular Bounding Box",
     icon: require(`@/assets/bounding-box-icon.svg`) as string,
@@ -10,4 +10,4 @@ const ToolboxTooltips: ToolTips = {
   },
 } as const;
 
-export { ToolboxName, ToolboxTooltips };
+export { ToolboxName, Tools };

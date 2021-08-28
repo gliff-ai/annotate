@@ -11,7 +11,7 @@ import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { BaseSlider } from "@/components/BaseSlider";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { usePaintbrushStore } from "./Store";
-import { ToolboxName, ToolboxTooltips } from "./Toolbox";
+import { ToolboxName, Tools } from "./Toolbox";
 
 interface SubMenuProps {
   isOpen: boolean;
@@ -54,14 +54,14 @@ const Submenu = (props: SubMenuProps): ReactElement => {
 
   function selectBrush() {
     setPaintbrush({
-      brushType: ToolboxTooltips.paintbrush.name,
+      brushType: Tools.paintbrush.name,
       brushRadius: paintbrush.brushRadius, // FIXME
     });
   }
 
   function selectEraser() {
     setPaintbrush({
-      brushType: ToolboxTooltips.eraser.name,
+      brushType: Tools.eraser.name,
       brushRadius: paintbrush.brushRadius, // FIXME
     });
   }
@@ -80,17 +80,17 @@ const Submenu = (props: SubMenuProps): ReactElement => {
           id="paintbrush-toolbar"
         >
           <BaseIconButton
-            tooltip={ToolboxTooltips.paintbrush}
+            tooltip={Tools.paintbrush}
             onClick={selectBrush}
-            fill={paintbrush.brushType === ToolboxTooltips.paintbrush.name}
+            fill={paintbrush.brushType === Tools.paintbrush.name}
           />
           <BaseIconButton
-            tooltip={ToolboxTooltips.eraser}
+            tooltip={Tools.eraser}
             onClick={selectEraser}
-            fill={paintbrush.brushType === ToolboxTooltips.eraser.name}
+            fill={paintbrush.brushType === Tools.eraser.name}
           />
           <BaseIconButton
-            tooltip={ToolboxTooltips.fillbrush}
+            tooltip={Tools.fillbrush}
             onClick={fillBrush}
             fill={false}
           />
@@ -113,7 +113,7 @@ const Submenu = (props: SubMenuProps): ReactElement => {
 interface Props {
   buttonClicked: string;
   setButtonClicked: (buttonName: string) => void;
-  activateToolbox: (activeTool: Toolbox) => void;
+  activateToolbox: (activeToolbox: Toolbox) => void;
   handleOpen: (
     event?: MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
@@ -157,23 +157,23 @@ class Toolbar extends Component<Props> {
   selectBrush = (): void => {
     if (this.props.isTyping()) return;
     this.props.handleOpen()(this.refBrushPopover);
-    this.props.setButtonClicked(ToolboxTooltips.paintbrush.name);
+    this.props.setButtonClicked(Tools.paintbrush.name);
     this.props.activateToolbox(ToolboxName);
   };
 
   render = (): ReactElement => (
     <>
       <BaseIconButton
-        tooltip={ToolboxTooltips.paintbrush}
+        tooltip={Tools.paintbrush}
         onClick={this.selectBrush}
-        fill={this.props.buttonClicked === ToolboxTooltips.paintbrush.name}
+        fill={this.props.buttonClicked === Tools.paintbrush.name}
         setRefCallback={(ref) => {
           this.refBrushPopover = ref;
         }}
       />
       <Submenu
         isOpen={
-          this.props.buttonClicked === ToolboxTooltips.paintbrush.name &&
+          this.props.buttonClicked === Tools.paintbrush.name &&
           Boolean(this.props.anchorElement)
         }
         anchorElement={this.props.anchorElement}

@@ -2,7 +2,7 @@ import { Toolbox, ToolTips } from "@/Toolboxes";
 
 const ToolboxName: Toolbox = "spline";
 
-const ToolboxTooltips: ToolTips = {
+const Tools: ToolTips = {
   spline: {
     name: "Spline",
     icon: require(`@/assets/spline-icon.svg`) as string,
@@ -37,4 +37,4 @@ const ToolboxTooltips: ToolTips = {
   },
 } as const;
 
-export { ToolboxName, ToolboxTooltips };
+export { ToolboxName, Tools };

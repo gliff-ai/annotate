@@ -343,8 +343,8 @@ export class CanvasClass extends Component<Props> {
 
   onClick = (x: number, y: number): void => {
     // handle click to select an annotation (Mode.select)
-    // or add new point to a normal spline (Mode.draw and this.props.activeTool === ToolboxTooltips.boundingBox.name)
-    // or add TL or BR point to a rectangle spline (Mode.draw and this.props.activeTool === ToolboxTooltips.rectspline.name)
+    // or add new point to a normal spline (Mode.draw and this.props.activeToolbox === Tools.boundingBox.name)
+    // or add TL or BR point to a rectangle spline (Mode.draw and this.props.activeToolbox === Tools.rectspline.name)
 
     // X and Y are in CanvasSpace, convert to ImageSpace
     const { x: imageX, y: imageY } = canvasToImage(

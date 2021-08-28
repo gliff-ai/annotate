@@ -1,6 +1,6 @@
 export {
   ToolboxName as BoundingBoxToolboxName,
-  ToolboxTooltips as BoundingBoxToolbox,
+  Tools as BoundingBoxToolbox,
 } from "./Toolbox";
 export { Canvas as BoundingBoxCanvas, events } from "./Canvas";
 export { Toolbar as BoundingBoxToolbar } from "./Toolbar";

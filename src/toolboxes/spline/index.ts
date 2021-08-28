@@ -1,6 +1,6 @@
 export {
   ToolboxName as SplineToolboxName,
-  ToolboxTooltips as SplineToolbox,
+  Tools as SplineToolbox,
 } from "./Toolbox";
 export { Canvas as SplineCanvas, events } from "./Canvas";
 export { Toolbar as SplineToolbar } from "./Toolbar";

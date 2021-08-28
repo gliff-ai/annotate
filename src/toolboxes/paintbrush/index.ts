@@ -1,6 +1,6 @@
 export {
   ToolboxName as PaintbrushToolboxName,
-  ToolboxTooltips as PaintbrushToolbox,
+  Tools as PaintbrushToolbox,
 } from "./Toolbox";
 export { Canvas as PaintbrushCanvas } from "./Canvas";
 export { Toolbar as PaintbrushToolbar } from "./Toolbar";

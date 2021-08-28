@@ -2,7 +2,7 @@ import { Component, ReactElement, MouseEvent } from "react";
 import { ButtonGroup, Popover } from "@material-ui/core";
 import { BaseIconButton } from "@gliff-ai/style";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
-import { ToolboxTooltips } from "./Toolbox";
+import { Tools } from "./Toolbox";
 import { useSplineStore } from "./Store";
 
 const events = ["selectSpline"] as const;
@@ -17,15 +17,15 @@ const Submenu = (props: SubMenuProps): ReactElement => {
   const [spline, setSpline] = useSplineStore();
 
   function selectSpline() {
-    setSpline({ splineType: ToolboxTooltips.spline.name });
+    setSpline({ splineType: Tools.spline.name });
   }
 
   function selectLassoSpline() {
-    setSpline({ splineType: ToolboxTooltips.lassospline.name });
+    setSpline({ splineType: Tools.lassospline.name });
   }
 
   // function selectMagicSpline() {
-  //   setSpline({ splineType: ToolboxTooltips.magicspline.name });
+  //   setSpline({ splineType: Tools.magicspline.name });
   // }
 
   function closeSpline() {
@@ -48,27 +48,27 @@ const Submenu = (props: SubMenuProps): ReactElement => {
     >
       <ButtonGroup size="small" id="spline-toolbar">
         <BaseIconButton
-          tooltip={ToolboxTooltips.spline}
+          tooltip={Tools.spline}
           onClick={selectSpline}
-          fill={spline.splineType === ToolboxTooltips.spline.name}
+          fill={spline.splineType === Tools.spline.name}
         />
         <BaseIconButton
-          tooltip={ToolboxTooltips.lassospline}
+          tooltip={Tools.lassospline}
           onClick={selectLassoSpline}
-          fill={spline.splineType === ToolboxTooltips.lassospline.name}
+          fill={spline.splineType === Tools.lassospline.name}
         />
         {/* <BaseIconButton
-          tooltip={ToolboxTooltips.magicspline}
+          tooltip={Tools.magicspline}
           onClick={selectMagicSpline}
-          fill={spline.splineType === ToolboxTooltips.magicspline.name}
+          fill={spline.splineType === Tools.magicspline.name}
         /> */}
         <BaseIconButton
-          tooltip={ToolboxTooltips.closespline}
+          tooltip={Tools.closespline}
           onClick={closeSpline}
           fill={false}
         />
         <BaseIconButton
-          tooltip={ToolboxTooltips.convertspline}
+          tooltip={Tools.convertspline}
           onClick={convertSpline}
           fill={false}
         />
@@ -83,7 +83,7 @@ interface Event extends CustomEvent {
 interface Props {
   buttonClicked: string;
   setButtonClicked: (buttonName: string) => void;
-  activateToolbox: (activeTool: Toolbox) => void;
+  activateToolbox: (activeToolbox: Toolbox) => void;
   handleOpen: (
     event?: MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
@@ -121,23 +121,23 @@ class Toolbar extends Component<Props> {
   selectSpline = (): void => {
     if (this.props.isTyping()) return;
     this.props.handleOpen()(this.refSplinePopover);
-    this.props.setButtonClicked(ToolboxTooltips.spline.name);
+    this.props.setButtonClicked(Tools.spline.name);
     this.props.activateToolbox(Toolboxes.spline);
   };
 
   render = (): ReactElement => (
     <>
       <BaseIconButton
-        tooltip={ToolboxTooltips.spline}
+        tooltip={Tools.spline}
         onClick={this.selectSpline}
-        fill={this.props.buttonClicked === ToolboxTooltips.spline.name}
+        fill={this.props.buttonClicked === Tools.spline.name}
         setRefCallback={(ref) => {
           this.refSplinePopover = ref;
         }}
       />
       <Submenu
         isOpen={
-          this.props.buttonClicked === ToolboxTooltips.spline.name &&
+          this.props.buttonClicked === Tools.spline.name &&
           Boolean(this.props.anchorElement)
         }
         anchorElement={this.props.anchorElement}

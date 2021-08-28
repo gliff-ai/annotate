@@ -11,7 +11,7 @@ import {
   canvasToImage,
   imageToCanvas,
 } from "@/components/baseCanvas";
-import { ToolboxTooltips } from "./Toolbox";
+import { Tools } from "./Toolbox";
 import { calculateSobel } from "./sobel";
 import { useSplineStore } from "./Store";
 
@@ -278,8 +278,8 @@ class CanvasClass extends Component<Props> {
 
   onClick = (x: number, y: number, isCTRL?: boolean): void => {
     // handle click to select an annotation (Mode.select)
-    // or add new point to a normal spline (Mode.draw and this.props.activeToolbox === ToolboxTooltips.spline.name)
-    // or add TL or BR point to a rectangle spline (Mode.draw and this.props.activeToolbox === ToolboxTooltips.rectspline.name)
+    // or add new point to a normal spline (Mode.draw and this.props.activeToolbox === Tools.spline.name)
+    // or add TL or BR point to a rectangle spline (Mode.draw and this.props.activeToolbox === Tools.rectspline.name)
 
     // X and Y are in CanvasSpace, convert to ImageSpace
     const { x: imageX, y: imageY } = canvasToImage(
@@ -373,7 +373,7 @@ class CanvasClass extends Component<Props> {
           // else, i.e. not near an existing point
           // if the spline is not closed and we are in Mode.draw then
           // add coordinates to the current spline
-          if (this.props.activeToolbox === ToolboxTooltips.spline.name) {
+          if (this.props.activeToolbox === Tools.spline.name) {
             // if a normal spline, just add points as needed
             this.props.annotationsObject.addSplinePoint({
               x: imageX,
@@ -426,9 +426,9 @@ class CanvasClass extends Component<Props> {
     // Create a new paintbrush annotation that is equivalent to closing and filling the current spline shape
 
     if (
-      this.props.activeToolbox !== ToolboxTooltips.spline.name &&
-      this.props.activeToolbox !== ToolboxTooltips.lassospline.name &&
-      this.props.activeToolbox !== ToolboxTooltips.magicspline.name
+      this.props.activeToolbox !== Tools.spline.name &&
+      this.props.activeToolbox !== Tools.lassospline.name &&
+      this.props.activeToolbox !== Tools.magicspline.name
     )
       return;
 
@@ -451,9 +451,9 @@ class CanvasClass extends Component<Props> {
     // Create a new paintbrush annotation that is equivalent to closing and filling the current spline shape
 
     if (
-      this.props.activeToolbox !== ToolboxTooltips.spline.name &&
-      this.props.activeToolbox !== ToolboxTooltips.lassospline.name &&
-      this.props.activeToolbox !== ToolboxTooltips.magicspline.name
+      this.props.activeToolbox !== Tools.spline.name &&
+      this.props.activeToolbox !== Tools.lassospline.name &&
+      this.props.activeToolbox !== Tools.magicspline.name
     )
       return;
 
@@ -551,7 +551,7 @@ class CanvasClass extends Component<Props> {
       this.props.canvasPositionAndSize
     );
 
-    if (this.props.activeToolbox === ToolboxTooltips.magicspline.name) {
+    if (this.props.activeToolbox === Tools.magicspline.name) {
       // magic spline, add a new point and snap it to the highest gradient point within 25 pixels:
       if (this.gradientImage === undefined) {
         this.gradientImage = calculateSobel(this.props.displayedImage);
@@ -559,7 +559,7 @@ class CanvasClass extends Component<Props> {
       this.props.annotationsObject.addSplinePoint(clickPoint);
       this.snapToGradient(this.props.annotationsObject.getSplineLength() - 1);
       this.isMouseDown = true;
-    } else if (this.props.activeToolbox === ToolboxTooltips.lassospline.name) {
+    } else if (this.props.activeToolbox === Tools.lassospline.name) {
       // lasso spline, add a new point but no snapping
       this.props.annotationsObject.addSplinePoint(clickPoint);
       this.selectedPointIndex =
@@ -594,7 +594,7 @@ class CanvasClass extends Component<Props> {
     const coordinates = this.props.annotationsObject.getSplineCoordinates();
 
     if (
-      this.props.activeToolbox === ToolboxTooltips.magicspline.name &&
+      this.props.activeToolbox === Tools.magicspline.name &&
       this.numberOfMoves % 5 === 0
     ) {
       // magic spline, every 5 moves add a new point
@@ -608,7 +608,7 @@ class CanvasClass extends Component<Props> {
         25 / this.props.scaleAndPan.scale
       );
     } else if (
-      this.props.activeToolbox === ToolboxTooltips.lassospline.name &&
+      this.props.activeToolbox === Tools.lassospline.name &&
       this.numberOfMoves % 5 === 0
     ) {
       // lasso spline, every 5 moves add a new point
@@ -683,9 +683,9 @@ class CanvasClass extends Component<Props> {
   };
 
   isActive = (): boolean =>
-    this.props.activeToolbox === ToolboxTooltips.spline.name ||
-    this.props.activeToolbox === ToolboxTooltips.lassospline.name ||
-    this.props.activeToolbox === ToolboxTooltips.magicspline.name;
+    this.props.activeToolbox === Tools.spline.name ||
+    this.props.activeToolbox === Tools.lassospline.name ||
+    this.props.activeToolbox === Tools.magicspline.name;
 
   sliceIndexMatch = (): boolean =>
     this.props.annotationsObject.getSplineForActiveAnnotation().spaceTimeInfo
@@ -713,7 +713,7 @@ class CanvasClass extends Component<Props> {
 }
 
 export const Canvas = (props: Props): ReactElement => {
-  // we will overwrite props.activeTool, which will be spline
+  // we will overwrite props.activeToolbox, which will be spline
   // with spline.splineType, which will be spline/lasso/magic/rect
   const [spline] = useSplineStore();
   let { activeToolbox } = props;

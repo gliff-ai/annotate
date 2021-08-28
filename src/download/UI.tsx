@@ -5,7 +5,7 @@ import { Annotation } from "@/annotation/interfaces";
 import { keydownListener } from "@/keybindings";
 import { downloadPaintbrushAsTiff } from "@/download/DownloadAsTiff";
 import { downloadAnnotationsAsJson } from "@/download/DownloadAsJson";
-import { tools } from "@/tooltips";
+import { Tools } from "@/tooltips";
 import { BaseIconButton } from "@gliff-ai/style";
 import { Toolboxes } from "@/Toolboxes";
 
@@ -159,7 +159,7 @@ class DownloadUI extends Component<Props, State> {
     return (
       <>
         <BaseIconButton
-          tooltip={tools.download}
+          tooltip={Tools.download}
           onClick={this.handleOpen}
           fill={false}
           hasAvatar={false}

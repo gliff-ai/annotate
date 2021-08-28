@@ -20,7 +20,7 @@ import {
 } from "@/components/baseCanvas";
 import { palette, getRGBAString } from "@/components/palette";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
-import { ToolboxTooltips } from "./Toolbox";
+import { Tools } from "./Toolbox";
 import { usePaintbrushStore } from "./Store";
 import { BrushStroke } from "./interfaces";
 
@@ -169,7 +169,7 @@ export class CanvasClass extends Component<Props, State> {
         color: mainColor,
         radius: this.props.brushRadius,
         type:
-          this.props.activeToolbox === ToolboxTooltips.paintbrush.name
+          this.props.activeToolbox === Tools.paintbrush.name
             ? "paint"
             : "erase",
       } as Brush;
@@ -310,7 +310,7 @@ export class CanvasClass extends Component<Props, State> {
         color,
         radius,
         type:
-          this.props.activeToolbox === ToolboxTooltips.paintbrush.name
+          this.props.activeToolbox === Tools.paintbrush.name
             ? "paint"
             : "erase",
       },
@@ -368,7 +368,7 @@ export class CanvasClass extends Component<Props, State> {
   onMouseDown = (canvasX: number, canvasY: number): void => {
     if (this.props.mode === Mode.draw) {
       // Start drawing
-      if (this.props.activeToolbox === ToolboxTooltips.eraser.name) {
+      if (this.props.activeToolbox === Tools.eraser.name) {
         // Copy the current BACK strokes to the front canvas
         this.drawAllStrokes(this.interactionCanvas.canvasContext);
         this.setState({ hideBackCanvas: true }, () => {
@@ -383,7 +383,7 @@ export class CanvasClass extends Component<Props, State> {
       this.handlePointerMove(canvasX, canvasY);
     } else if (this.props.mode === Mode.select) {
       // In select mode a single click allows to select a different spline annotation
-      // DEVNOTE this is currently duplicated in each ToolboxTooltips!
+      // DEVNOTE this is currently duplicated in each Tools!
       const { x: imageX, y: imageY } = canvasToImage(
         canvasX,
         canvasY,
@@ -524,7 +524,7 @@ export class CanvasClass extends Component<Props, State> {
 export const Canvas = (
   props: Omit<Props, "brushRadius" | "isActive">
 ): ReactElement => {
-  // we will overwrite props.activeTool, which will be paintbrush
+  // we will overwrite props.activeToolbox, which will be paintbrush
   // with paintbrush.brushType, which will be paintbrush/eraser
   const [paintbrush] = usePaintbrushStore();
   let { activeToolbox } = props;

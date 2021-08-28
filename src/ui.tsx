@@ -30,7 +30,7 @@ import { PaintbrushCanvas, PaintbrushToolbar } from "@/toolboxes/paintbrush";
 import { LabelsSubmenu } from "@/toolboxes/labels";
 import { Download } from "@/download/UI";
 import { keydownListener } from "@/keybindings";
-import { tools } from "@/tooltips";
+import { Tools } from "@/tooltips";
 import { BaseSlider, Config } from "@/components/BaseSlider";
 
 const logger = console;
@@ -504,7 +504,7 @@ class UserInterface extends Component<Props, State> {
     // Select draw mode and re-activate last used paint tool
     this.setState((state) => ({
       mode: Mode.draw,
-      buttonClicked: tools[state.activeToolbox].name,
+      buttonClicked: Tools[state.activeToolbox].name,
     }));
   };
 
@@ -513,7 +513,7 @@ class UserInterface extends Component<Props, State> {
     if (this.isTyping()) return;
 
     if (this.state.mode === Mode.draw) {
-      this.setState({ mode: Mode.select, buttonClicked: tools.select.name });
+      this.setState({ mode: Mode.select, buttonClicked: Tools.select.name });
     } else {
       this.selectDrawMode();
     }
@@ -603,25 +603,25 @@ class UserInterface extends Component<Props, State> {
   // TODO: find a way to pass parameters in keybindings and get rid of code duplication
   selectContrast = (): void => {
     if (this.isTyping()) return;
-    this.handleOpen()(this.refBtnsPopovers[tools.contrast.name]);
-    this.setButtonClicked(tools.contrast.name);
+    this.handleOpen()(this.refBtnsPopovers[Tools.contrast.name]);
+    this.setButtonClicked(Tools.contrast.name);
   };
 
   selectBrightness = (): void => {
     if (this.isTyping()) return;
-    this.handleOpen()(this.refBtnsPopovers[tools.brightness.name]);
-    this.setButtonClicked(tools.brightness.name);
+    this.handleOpen()(this.refBtnsPopovers[Tools.brightness.name]);
+    this.setButtonClicked(Tools.brightness.name);
   };
 
   selectChannels = (): void => {
     if (this.isTyping()) return;
-    this.handleOpen()(this.refBtnsPopovers[tools.channels.name]);
-    this.setButtonClicked(tools.channels.name);
+    this.handleOpen()(this.refBtnsPopovers[Tools.channels.name]);
+    this.setButtonClicked(Tools.channels.name);
   };
 
   selectAnnotationLabel = (): void => {
-    this.handleOpen()(this.refBtnsPopovers[tools.labels.name]);
-    this.setButtonClicked(tools.labels.name);
+    this.handleOpen()(this.refBtnsPopovers[Tools.labels.name]);
+    this.setButtonClicked(Tools.labels.name);
   };
 
   saveAnnotations = (): void => {
@@ -642,7 +642,7 @@ class UserInterface extends Component<Props, State> {
   isTyping = (): boolean =>
     // Added to prevent single-key shortcuts that are also valid text input
     // to get triggered during text input.
-    this.refBtnsPopovers[tools.labels.name] === this.state.anchorElement;
+    this.refBtnsPopovers[Tools.labels.name] === this.state.anchorElement;
 
   render = (): ReactNode => {
     const { classes, showAppBar, saveAnnotationsCallback } = this.props;
@@ -654,7 +654,7 @@ class UserInterface extends Component<Props, State> {
             setUploadedImage={this.setUploadedImage}
             spanElement={
               <BaseIconButton
-                tooltip={tools.upload}
+                tooltip={Tools.upload}
                 fill={false}
                 hasAvatar={false}
                 tooltipPlacement="bottom"
@@ -721,57 +721,57 @@ class UserInterface extends Component<Props, State> {
             >
               <ButtonGroup size="small" id="selection-toolbar">
                 <BaseIconButton
-                  tooltip={tools.select}
+                  tooltip={Tools.select}
                   onClick={this.toggleMode}
-                  fill={this.state.buttonClicked === tools.select.name}
+                  fill={this.state.buttonClicked === Tools.select.name}
                 />
                 <BaseIconButton
-                  tooltip={tools.addNewAnnotation}
+                  tooltip={Tools.addNewAnnotation}
                   onMouseDown={() => {
-                    this.setButtonClicked(tools.addNewAnnotation.name);
+                    this.setButtonClicked(Tools.addNewAnnotation.name);
                     this.addAnnotation();
                   }}
                   onMouseUp={this.selectDrawMode}
                   fill={
-                    this.state.buttonClicked === tools.addNewAnnotation.name
+                    this.state.buttonClicked === Tools.addNewAnnotation.name
                   }
                 />
                 <BaseIconButton
-                  tooltip={tools.clearAnnotation}
+                  tooltip={Tools.clearAnnotation}
                   onMouseDown={() => {
-                    this.setButtonClicked(tools.clearAnnotation.name);
+                    this.setButtonClicked(Tools.clearAnnotation.name);
                     this.clearActiveAnnotation();
                   }}
                   onMouseUp={this.selectDrawMode}
-                  fill={this.state.buttonClicked === tools.clearAnnotation.name}
+                  fill={this.state.buttonClicked === Tools.clearAnnotation.name}
                 />
                 {saveAnnotationsCallback && (
                   <BaseIconButton
-                    tooltip={tools.save}
+                    tooltip={Tools.save}
                     onMouseDown={() => {
-                      this.setButtonClicked(tools.save.name);
+                      this.setButtonClicked(Tools.save.name);
                       this.saveAnnotations();
                     }}
                     onMouseUp={this.selectDrawMode}
-                    fill={this.state.buttonClicked === tools.save.name}
+                    fill={this.state.buttonClicked === Tools.save.name}
                   />
                 )}
                 <BaseIconButton
-                  tooltip={tools.labels}
+                  tooltip={Tools.labels}
                   onClick={this.selectAnnotationLabel}
-                  fill={this.state.buttonClicked === tools.labels.name}
+                  fill={this.state.buttonClicked === Tools.labels.name}
                   setRefCallback={(ref) => {
-                    this.refBtnsPopovers[tools.labels.name] = ref;
+                    this.refBtnsPopovers[Tools.labels.name] = ref;
                   }}
                 />
                 <BaseIconButton
-                  tooltip={tools.undo}
+                  tooltip={Tools.undo}
                   onClick={this.undo}
                   fill={false}
                   enabled={this.state.canUndoRedo.undo}
                 />
                 <BaseIconButton
-                  tooltip={tools.redo}
+                  tooltip={Tools.redo}
                   onClick={this.redo}
                   fill={false}
                   enabled={this.state.canUndoRedo.redo}
@@ -821,27 +821,27 @@ class UserInterface extends Component<Props, State> {
               >
                 <ButtonGroup id="display-toolbar">
                   <BaseIconButton
-                    tooltip={tools.brightness}
+                    tooltip={Tools.brightness}
                     onClick={this.selectBrightness}
-                    fill={this.state.buttonClicked === tools.brightness.name}
+                    fill={this.state.buttonClicked === Tools.brightness.name}
                     setRefCallback={(ref) => {
-                      this.refBtnsPopovers[tools.brightness.name] = ref;
+                      this.refBtnsPopovers[Tools.brightness.name] = ref;
                     }}
                   />
                   <BaseIconButton
-                    tooltip={tools.contrast}
+                    tooltip={Tools.contrast}
                     onClick={this.selectContrast}
-                    fill={this.state.buttonClicked === tools.contrast.name}
+                    fill={this.state.buttonClicked === Tools.contrast.name}
                     setRefCallback={(ref) => {
-                      this.refBtnsPopovers[tools.contrast.name] = ref;
+                      this.refBtnsPopovers[Tools.contrast.name] = ref;
                     }}
                   />
                   <BaseIconButton
-                    tooltip={tools.channels}
+                    tooltip={Tools.channels}
                     onClick={this.selectChannels}
-                    fill={this.state.buttonClicked === tools.channels.name}
+                    fill={this.state.buttonClicked === Tools.channels.name}
                     setRefCallback={(ref) => {
-                      this.refBtnsPopovers[tools.channels.name] = ref;
+                      this.refBtnsPopovers[Tools.channels.name] = ref;
                     }}
                   />
                 </ButtonGroup>

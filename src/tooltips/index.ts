@@ -102,11 +102,11 @@ const DefaultTools: ToolTips = {
   },
 } as const;
 
-const tools = {
+const Tools = {
   ...DefaultTools,
   ...PaintbrushToolbox,
   ...BoundingBoxToolbox,
   ...SplineToolbox,
 };
 
-export { tools };
+export { Tools };

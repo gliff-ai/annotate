@@ -2,7 +2,7 @@ import { Toolbox, ToolTips } from "@/Toolboxes";
 
 const ToolboxName: Toolbox = "paintbrush";
 
-const ToolboxTooltips: ToolTips = {
+const Tools: ToolTips = {
   paintbrush: {
     name: "Paintbrush",
     icon: require(`@/assets/brush-icon.svg`) as string,
@@ -20,4 +20,4 @@ const ToolboxTooltips: ToolTips = {
   },
 } as const;
 
-export { ToolboxName, ToolboxTooltips };
+export { ToolboxName, Tools };
