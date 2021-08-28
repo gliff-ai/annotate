@@ -7,7 +7,6 @@ import {
   Grid,
   CssBaseline,
   withStyles,
-  Paper,
   WithStyles,
   ThemeProvider,
   StylesProvider,
