@@ -2,6 +2,7 @@ import { Component, ReactElement, MouseEvent } from "react";
 
 import { BaseIconButton } from "@gliff-ai/style";
 import { tooltips } from "@/components/tooltips";
+import { Submenu } from "./Submenu";
 
 interface Props {
   buttonClicked: string;
@@ -10,10 +11,12 @@ interface Props {
   handleOpen: (
     event?: MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
+  onClose: (event: MouseEvent) => void;
+  anchorElement: HTMLButtonElement | null;
   isTyping: () => boolean;
 }
 
-const events = ["selectBrush", "selectEraser"] as const;
+const events = ["selectBrush"] as const;
 
 interface Event extends CustomEvent {
   type: typeof events[number];
@@ -52,12 +55,6 @@ class Toolbar extends Component<Props> {
     this.props.activateTool("paintbrush");
   };
 
-  selectEraser = (): void => {
-    if (this.props.isTyping()) return;
-    this.props.setButtonClicked(tooltips.eraser.name);
-    this.props.activateTool("eraser");
-  };
-
   render = (): ReactElement => (
     <>
       <BaseIconButton
@@ -68,10 +65,13 @@ class Toolbar extends Component<Props> {
           this.refBrushPopover = ref;
         }}
       />
-      <BaseIconButton
-        tooltip={tooltips.eraser}
-        onClick={this.selectEraser}
-        fill={this.props.buttonClicked === tooltips.eraser.name}
+      <Submenu
+        isOpen={
+          this.props.buttonClicked === "Brush" &&
+          Boolean(this.props.anchorElement)
+        }
+        anchorElement={this.props.anchorElement}
+        onClose={this.props.onClose}
       />
     </>
   );

@@ -798,6 +798,8 @@ class UserInterface extends Component<Props, State> {
                     setButtonClicked={this.setButtonClicked}
                     activateTool={this.activateTool}
                     handleOpen={this.handleOpen}
+                    onClose={this.handleClose}
+                    anchorElement={this.state.anchorElement}
                     isTyping={this.isTyping}
                   />
                   <SplineToolbar
@@ -852,6 +854,27 @@ class UserInterface extends Component<Props, State> {
               </Grid>
             </Grid>
 
+            <LabelsSubmenu
+              isOpen={
+                this.state.buttonClicked === "Annotation Label" &&
+                Boolean(this.state.anchorElement)
+              }
+              anchorElement={this.state.anchorElement}
+              onClose={this.handleClose}
+              annotationsObject={this.annotationsObject}
+              presetLabels={this.presetLabels}
+              updatePresetLabels={this.updatePresetLabels}
+              activeAnnotationID={this.state.activeAnnotationID}
+            />
+            <BackgroundToolbar
+              buttonClicked={this.state.buttonClicked}
+              anchorElement={this.state.anchorElement}
+              onClose={this.handleClose}
+              channels={this.state.channels}
+              toggleChannelAtIndex={this.toggleChannelAtIndex}
+              displayedImage={this.state.displayedImage}
+            />
+
             <CssBaseline />
 
             <Container
@@ -865,7 +888,7 @@ class UserInterface extends Component<Props, State> {
               <Grid
                 container
                 spacing={0}
-                justify="center"
+                justifyContent="center"
                 wrap="nowrap"
                 className={classes.mainGrid}
               >
