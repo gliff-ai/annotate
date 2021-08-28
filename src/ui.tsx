@@ -12,6 +12,7 @@ import {
   ThemeProvider,
   StylesProvider,
   createGenerateClassName,
+  Slider,
 } from "@material-ui/core";
 
 import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
@@ -36,7 +37,6 @@ import { Download } from "@/download/UI";
 import { keydownListener } from "@/keybindings";
 import { Tools, Tool } from "@/components/tools";
 import { tooltips } from "@/components/tooltips";
-import { BaseSlider, Config } from "@/components/BaseSlider";
 import { pageLoading } from "@/decorators";
 
 const logger = console;
@@ -140,10 +140,6 @@ const styles = {
   },
   canvasGrid: {
     width: "100%",
-  },
-  slicesSlider: {
-    width: "63px",
-    height: "450px",
   },
   tooltip: {
     backgroundColor: "#FFFFFF",
@@ -713,6 +709,12 @@ class UserInterface extends Component<Props, State> {
       disableGlobal: true,
     });
 
+    const SliceSlider = withStyles({
+      root: {
+        color: theme.palette.primary.main,
+      },
+    })(Slider);
+
     return (
       <StylesProvider generateClassName={generateClassName}>
         <ThemeProvider theme={theme}>
@@ -938,32 +940,32 @@ class UserInterface extends Component<Props, State> {
                     }}
                   />
                   {this.slicesData?.length > 1 && (
-                    <Paper
-                      elevation={3}
-                      className={classes.slicesSlider}
+                    <div
                       style={{
                         position: "absolute",
-                        top: "110px",
-                        right: "30px",
+                        top: `${
+                          this.state.viewportPositionAndSize.top +
+                          0.95 * this.state.viewportPositionAndSize.height
+                        }px`,
+                        left: `${
+                          0.1 * this.state.viewportPositionAndSize.width +
+                          this.state.viewportPositionAndSize.left
+                        }px`,
+                        width: `${
+                          0.7 * this.state.viewportPositionAndSize.width
+                        }px`,
                       }}
                     >
-                      <BaseSlider
+                      <SliceSlider
                         value={this.state.sliceIndex}
-                        config={
-                          {
-                            name: "slices",
-                            id: "slices-slider",
-                            initial: 1,
-                            step: 1,
-                            min: 0,
-                            max: this.slicesData.length - 1,
-                            unit: "",
-                          } as Config
-                        }
-                        onChange={() => this.changeSlice}
-                        sliderHeight="300px"
+                        onChange={this.changeSlice}
+                        aria-labelledby="slices-slider"
+                        step={1}
+                        min={0}
+                        max={this.slicesData.length - 1}
+                        valueLabelDisplay="auto"
                       />
-                    </Paper>
+                    </div>
                   )}
                 </Grid>
                 <LabelsSubmenu
