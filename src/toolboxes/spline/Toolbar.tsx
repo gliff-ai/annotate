@@ -1,6 +1,7 @@
 import { Component, ReactElement, MouseEvent } from "react";
 import { BaseIconButton } from "@gliff-ai/style";
 import { tooltips } from "@/components/tooltips";
+import { Submenu } from "./Submenu";
 
 const events = ["selectSpline"] as const;
 
@@ -15,6 +16,8 @@ interface Props {
   handleOpen: (
     event?: MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
+  onClose: (event: MouseEvent) => void;
+  anchorElement: HTMLButtonElement | null;
   isTyping: () => boolean;
 }
 
@@ -60,6 +63,14 @@ class Toolbar extends Component<Props> {
         setRefCallback={(ref) => {
           this.refSplinePopover = ref;
         }}
+      />
+      <Submenu
+        isOpen={
+          this.props.buttonClicked === "Spline" &&
+          Boolean(this.props.anchorElement)
+        }
+        anchorElement={this.props.anchorElement}
+        onClose={this.props.onClose}
       />
     </>
   );

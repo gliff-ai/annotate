@@ -805,6 +805,8 @@ class UserInterface extends Component<Props, State> {
                     setButtonClicked={this.setButtonClicked}
                     activateTool={this.activateTool}
                     handleOpen={this.handleOpen}
+                    onClose={this.handleClose}
+                    anchorElement={this.state.anchorElement}
                     isTyping={this.isTyping}
                   />
                   <BoundingBoxToolbar
@@ -966,42 +968,6 @@ class UserInterface extends Component<Props, State> {
                     </Paper>
                   )}
                 </Grid>
-                <LabelsSubmenu
-                  isOpen={
-                    this.state.buttonClicked === "Annotation Label" &&
-                    Boolean(this.state.anchorElement)
-                  }
-                  anchorElement={this.state.anchorElement}
-                  onClose={this.handleClose}
-                  annotationsObject={this.annotationsObject}
-                  presetLabels={this.presetLabels}
-                  updatePresetLabels={this.updatePresetLabels}
-                  activeAnnotationID={this.state.activeAnnotationID}
-                />
-                <BackgroundToolbar
-                  buttonClicked={this.state.buttonClicked}
-                  anchorElement={this.state.anchorElement}
-                  onClose={this.handleClose}
-                  channels={this.state.channels}
-                  toggleChannelAtIndex={this.toggleChannelAtIndex}
-                  displayedImage={this.state.displayedImage}
-                />
-                <PaintbrushSubmenu
-                  isOpen={
-                    this.state.buttonClicked === "Brush" &&
-                    Boolean(this.state.anchorElement)
-                  }
-                  anchorElement={this.state.anchorElement}
-                  onClose={this.handleClose}
-                />
-                <SplineSubmenu
-                  isOpen={
-                    this.state.buttonClicked === "Spline" &&
-                    Boolean(this.state.anchorElement)
-                  }
-                  anchorElement={this.state.anchorElement}
-                  onClose={this.handleClose}
-                />
               </Grid>
             </Container>
             <Minimap
