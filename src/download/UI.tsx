@@ -1,12 +1,12 @@
 import { ReactElement, MouseEvent, Component } from "react";
 import { Menu, MenuItem, withStyles, WithStyles } from "@material-ui/core";
 import { ImageFileInfo } from "@gliff-ai/upload";
+import { BaseIconButton } from "@gliff-ai/style";
 import { Annotation } from "@/annotation/interfaces";
 import { keydownListener } from "@/keybindings";
 import { downloadPaintbrushAsTiff } from "@/download/DownloadAsTiff";
 import { downloadAnnotationsAsJson } from "@/download/DownloadAsJson";
 import { tooltips } from "@/components/tooltips";
-import { BaseIconButton } from "@gliff-ai/style";
 
 const styles = {
   menu: {

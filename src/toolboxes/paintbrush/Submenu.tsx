@@ -1,7 +1,7 @@
 import { ChangeEvent, ReactElement, MouseEvent } from "react";
 import { createStyles, makeStyles, Popover } from "@material-ui/core";
-import { BaseSlider } from "@/components/BaseSlider";
 import { BaseIconButton } from "@gliff-ai/style";
+import { BaseSlider } from "@/components/BaseSlider";
 import { tooltips } from "@/components/tooltips";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { usePaintbrushStore } from "./Store";
@@ -53,7 +53,7 @@ const Submenu = (props: Props): ReactElement => {
         />
         <BaseIconButton
           tooltip={tooltips.fillbrush}
-          onClick={fillBrush}
+          onClick={() => fillBrush()}
           fill={false}
         />
       </div>

@@ -7,7 +7,7 @@ function exportAsJson(annotations: Annotation[], exportFileName: string) {
       [decodeURIComponent(encodeURI(JSON.stringify(annotations)))],
       { type: contentType }
     );
-    navigator.msSaveOrOpenBlob(blob, exportFileName);
+    window.navigator.msSaveOrOpenBlob(blob, exportFileName);
   } else {
     const a = document.createElement("a");
     a.download = exportFileName;

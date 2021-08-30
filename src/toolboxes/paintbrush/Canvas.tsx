@@ -8,13 +8,13 @@ import {
 } from "react";
 import simplify from "simplify-js";
 import { slpfLines } from "@gliff-ai/slpf";
+import { theme } from "@gliff-ai/style";
 import { BaseCanvas, CanvasProps } from "@/baseCanvas";
 import { Annotations } from "@/annotation";
 import { canvasToImage, imageToCanvas } from "@/components/transforms";
 import { XYPoint } from "@/annotation/interfaces";
 import { Tool, Tools } from "@/components/tools";
 import { Mode } from "@/ui";
-import { theme } from "@gliff-ai/style";
 import { palette, getRGBAString } from "@/components/palette";
 import { usePaintbrushStore } from "./Store";
 import { BrushStroke } from "./interfaces";

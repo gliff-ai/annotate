@@ -13,11 +13,10 @@ import {
   StylesProvider,
   createGenerateClassName,
 } from "@material-ui/core";
-
+import { theme, BaseIconButton } from "@gliff-ai/style";
 import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
-import { theme, BaseIconButton } from "@gliff-ai/style";
 
 import {
   BackgroundCanvas,
