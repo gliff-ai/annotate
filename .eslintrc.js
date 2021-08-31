@@ -18,6 +18,7 @@ module.exports = {
       files: ["*.ts", "*.tsx"],
       rules: {
         "global-require": 0,
+        "import/extensions": 0,
         "@typescript-eslint/no-var-requires": 0,
         "no-void": ["error", { allowAsStatement: true }],
         "react/react-in-jsx-scope": "off", // This isn't true as of React 17

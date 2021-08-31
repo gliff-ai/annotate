@@ -3,11 +3,11 @@
   "version": "0.22.0",
   "description": "gliff.ai ANNOTATE - a user friendly browser interface for annotating multidimensional images for machine learning",
   "repository": "git://github.com/gliff-ai/annotate.git",
-  "main": "dist/main.js",
-  "module": "dist/src/index.tsx",
-  "typings": "dist/src/index.d.ts",
+  "main": "dist/index.es.js",
+  "module": "dist/index.es.js",
+  "typings": "dist/index.d.ts",
   "files": [
-    "dist/*"
+    "dist"
   ],
   "scripts": {
     "build": "webpack --progress --config webpack.build.js",
@@ -46,7 +46,7 @@
     "vite-aliases": "^0.8.6"
   },
   "peerDependencies": {
-    "@gliff-ai/style": "^0.6.0",
+    "@gliff-ai/style": "^0.0.2-vite",
     "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.58",

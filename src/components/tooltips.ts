@@ -1,4 +1,12 @@
-import { Tooltip } from "@gliff-ai/style";
+// import { Tooltip } from "@gliff-ai/style";
+
+export interface Tooltip {
+  name: string;
+  icon: string;
+  shortcut?: string;
+  shortcutSymbol?: string;
+}
+
 
 type ToolTips = { [name: string]: Tooltip };
 
