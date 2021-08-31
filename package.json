@@ -12,12 +12,13 @@
   "scripts": {
     "build": "webpack --progress --config webpack.build.js",
     "format": "npx --no-install prettier --write src/{**,.}/{**,.}/*.ts*",
-    "prettier": "npx --no-install prettier -c src/{**,.}/{**,.}/*.ts*",
     "lint": "npm run lint:ts && npm run prettier",
     "lint:ts": "npx eslint src/{**,.}/{**,.}/*.ts*",
+    "prepublishOnly": "rm -r dist/; webpack --progress --config webpack.package.js",
+    "prettier": "npx --no-install prettier -c src/{**,.}/{**,.}/*.ts*",
     "serve": "webpack serve --config webpack.build.js",
     "test": "jest --coverage --passWithNoTests",
-    "prepublishOnly": "rm -r dist/; webpack --progress --config webpack.package.js"
+    "test:visual": "npx percy snapshot snapshots.yml"
   },
   "license": "AGPL-3.0-only",
   "devDependencies": {
@@ -26,6 +27,7 @@
     "@babel/preset-env": "^7.12.17",
     "@babel/preset-react": "^7.12.13",
     "@babel/preset-typescript": "^7.12.17",
+    "@percy/cli": "^1.0.0-beta.67",
     "@types/jest": "^26.0.21",
     "@types/react": "^17.0.3",
     "@types/react-dom": "^17.0.1",
