@@ -945,8 +945,8 @@ class UserInterface extends Component<Props, State> {
                       className={classes.slicesSlider}
                       style={{
                         position: "absolute",
-                        top: "110px",
-                        right: "30px",
+                        top: "180px",
+                        right: "18px",
                       }}
                     >
                       <BaseSlider
