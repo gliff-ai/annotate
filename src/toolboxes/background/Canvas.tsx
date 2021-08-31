@@ -1,11 +1,9 @@
 import { Component, ReactNode, ReactElement } from "react";
-
-import { BaseCanvas, CanvasProps as BaseProps } from "@/baseCanvas";
+import { BaseCanvas, CanvasProps } from "@/components/baseCanvas";
 import { drawImageOnCanvas, getImageDataFromCanvas } from "./drawImage";
-
 import { useBackgroundStore } from "./Store";
 
-interface Props extends BaseProps {
+interface Props extends CanvasProps {
   contrast: number;
   brightness: number;
   setCanvasContainerColourCallback?: (colour: number[]) => void;
