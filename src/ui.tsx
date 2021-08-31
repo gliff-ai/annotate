@@ -32,6 +32,7 @@ import { Download } from "@/download/UI";
 import { keydownListener } from "@/keybindings";
 import { Tools } from "@/tooltips";
 import { BaseSlider, Config } from "@/components/BaseSlider";
+import { imgSrc } from "./imgSrc";
 
 const logger = console;
 
@@ -693,7 +694,7 @@ class UserInterface extends Component<Props, State> {
           <Grid container direction="row">
             <Grid item className={classes.iconbutton}>
               <img
-                src={require(`./assets/gliff-master-black.svg`) as string}
+                src={imgSrc("gliff-master-black")}
                 width="79px"
                 height="60px"
                 alt="gliff logo"

@@ -1,11 +1,12 @@
 import { Toolbox, ToolTips } from "@/Toolboxes";
+import { imgSrc } from "@/imgSrc";
 
 const ToolboxName: Toolbox = "boundingBox";
 
 const Tools: ToolTips = {
   boundingBox: {
     name: "Rectangular Bounding Box",
-    icon: require(`@/assets/bounding-box-icon.svg`) as string,
+    icon: imgSrc("bounding-box-icon"),
     shortcut: "R",
   },
 } as const;

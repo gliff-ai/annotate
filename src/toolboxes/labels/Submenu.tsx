@@ -11,6 +11,7 @@ import {
 } from "@material-ui/core";
 import SVG from "react-inlinesvg";
 import { Labels, Props as LabelsProps } from "./Labels";
+import { imgSrc } from "@/imgSrc";
 
 const useStyles = makeStyles((theme: Theme) => ({
   annotationCard: {
@@ -61,7 +62,7 @@ export const Submenu = (props: Props): ReactElement => {
           </Typography>
           <Avatar className={classes.annotationAvatar}>
             <SVG
-              src={require("../../assets/pin-icon.svg") as string}
+              src={imgSrc("pin-icon")}
               className={classes.svg}
             />
           </Avatar>
