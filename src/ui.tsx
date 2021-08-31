@@ -1,4 +1,4 @@
-import { Component, ChangeEvent, ReactNode } from "react";
+import { Component, ChangeEvent, ReactNode, ReactElement } from "react";
 import {
   AppBar,
   Container,
@@ -165,11 +165,13 @@ interface Props extends WithStyles<typeof styles> {
   saveAnnotationsCallback?: (annotationsObject: Annotations) => void;
   showAppBar: boolean;
   setIsLoading?: (isLoading: boolean) => void;
+  trustedServiceButtonToolbar?: ReactElement | null;
 }
 
 class UserInterface extends Component<Props, State> {
   static defaultProps = {
     showAppBar: true,
+    trustedServiceButtonToolbar: null,
   } as Pick<Props, "showAppBar">;
 
   annotationsObject: Annotations;
@@ -812,6 +814,7 @@ class UserInterface extends Component<Props, State> {
                     activateTool={this.activateTool}
                     isTyping={this.isTyping}
                   />
+                  {this.props.trustedServiceButtonToolbar}
                 </ButtonGroup>
               </Grid>
 
