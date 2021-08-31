@@ -13,31 +13,25 @@ import {
   StylesProvider,
   createGenerateClassName,
 } from "@material-ui/core";
-
 import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
+import { theme, BaseIconButton } from "@gliff-ai/style";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
-import { theme, BaseIconButton } from "@gliff-ai/style";
-
+import { Toolboxes, Toolbox } from "@/Toolboxes";
+import { pageLoading } from "@/decorators";
 import {
   BackgroundCanvas,
   BackgroundToolbar,
   Minimap,
 } from "@/toolboxes/background";
-import { SplineCanvas, SplineSubmenu, SplineToolbar } from "@/toolboxes/spline";
+import { SplineCanvas, SplineToolbar } from "@/toolboxes/spline";
 import { BoundingBoxCanvas, BoundingBoxToolbar } from "@/toolboxes/boundingBox";
-import {
-  PaintbrushCanvas,
-  PaintbrushSubmenu,
-  PaintbrushToolbar,
-} from "@/toolboxes/paintbrush";
+import { PaintbrushCanvas, PaintbrushToolbar } from "@/toolboxes/paintbrush";
 import { LabelsSubmenu } from "@/toolboxes/labels";
 import { Download } from "@/download/UI";
 import { keydownListener } from "@/keybindings";
-import { Tools, Tool } from "@/components/tools";
-import { tooltips } from "@/components/tooltips";
+import { Tools } from "@/tooltips";
 import { BaseSlider, Config } from "@/components/BaseSlider";
-import { pageLoading } from "@/decorators";
 
 const logger = console;
 
@@ -78,7 +72,7 @@ interface State {
     y: number;
     scale: number;
   };
-  activeTool?: Tool;
+  activeToolbox?: Toolbox; // FIXME
   displayedImage?: ImageBitmap;
   activeAnnotationID: number;
   viewportPositionAndSize: Required<PositionAndSize>;
@@ -207,13 +201,13 @@ class UserInterface extends Component<Props, State> {
       redraw: 0,
       anchorElement: null,
       buttonClicked: null,
-      activeTool: Tools.paintbrush,
+      activeToolbox: Toolboxes.paintbrush,
       mode: Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
       canUndoRedo: { undo: false, redo: false },
     };
 
-    this.annotationsObject.addAnnotation(this.state.activeTool);
+    this.annotationsObject.addAnnotation(this.state.activeToolbox);
     this.presetLabels = this.props.presetLabels || [];
     this.imageFileInfo = this.props.imageFileInfo || null;
     this.refBtnsPopovers = {};
@@ -454,7 +448,7 @@ class UserInterface extends Component<Props, State> {
     // Otherwise the props for annotationsObject will update after the uplaoed image has been stored.
     if (!this.props.annotationsObject) {
       this.annotationsObject = new Annotations();
-      this.annotationsObject.addAnnotation(this.state.activeTool);
+      this.annotationsObject.addAnnotation(this.state.activeToolbox);
     }
 
     // TODO: Add saveImageCallback to store uplaoded image in dominate
@@ -485,15 +479,15 @@ class UserInterface extends Component<Props, State> {
       .catch((e) => logger.error(e));
   };
 
-  activateTool = (tool: Tool): void => {
-    this.setState({ activeTool: tool, mode: Mode.draw }, () => {
+  activateToolbox = (toolbox: Toolbox): void => {
+    this.setState({ activeToolbox: toolbox, mode: Mode.draw }, () => {
       this.reuseEmptyAnnotation();
     });
   };
 
   addAnnotation = (): void => {
     if (!this.state.displayedImage) return;
-    this.annotationsObject.addAnnotation(this.state.activeTool);
+    this.annotationsObject.addAnnotation(this.state.activeToolbox);
     this.annotationsObject.setSplineSpaceTimeInfo(this.state.sliceIndex);
     this.setState({
       activeAnnotationID: this.annotationsObject.getActiveAnnotationID(),
@@ -512,7 +506,7 @@ class UserInterface extends Component<Props, State> {
     // Select draw mode and re-activate last used paint tool
     this.setState((state) => ({
       mode: Mode.draw,
-      buttonClicked: tooltips[state.activeTool].name,
+      buttonClicked: Tools[state.activeToolbox].name,
     }));
   };
 
@@ -521,7 +515,7 @@ class UserInterface extends Component<Props, State> {
     if (this.isTyping()) return;
 
     if (this.state.mode === Mode.draw) {
-      this.setState({ mode: Mode.select, buttonClicked: tooltips.select.name });
+      this.setState({ mode: Mode.select, buttonClicked: Tools.select.name });
     } else {
       this.selectDrawMode();
     }
@@ -533,13 +527,13 @@ class UserInterface extends Component<Props, State> {
       let i = prevState.activeAnnotationID;
       const inc = forward ? 1 : -1;
 
-      // cycle i forward or backward until we reach another annotation whose toolbox attribute matches the current activeTool:
+      // cycle i forward or backward until we reach another annotation whose toolbox attribute matches the current activeToolbox:
       do {
         // increment or decrement i by 1, wrapping around if we go above the length of the array(-1) or below 0:
         i =
           (i + inc + this.annotationsObject.length()) %
           this.annotationsObject.length();
-      } while (data[i].toolbox !== Tools[prevState.activeTool]);
+      } while (data[i].toolbox !== prevState.activeToolbox);
 
       this.annotationsObject.setActiveAnnotationID(i);
       return { activeAnnotationID: i };
@@ -549,10 +543,10 @@ class UserInterface extends Component<Props, State> {
   reuseEmptyAnnotation = (): void => {
     /* If the active annotation object is empty, change the value of toolbox
     to match the active tool. */
-    const toolbox =
-      this.state.activeTool === "eraser" ? "paintbrush" : this.state.activeTool;
     if (this.annotationsObject.isActiveAnnotationEmpty()) {
-      this.annotationsObject.setActiveAnnotationToolbox(toolbox);
+      this.annotationsObject.setActiveAnnotationToolbox(
+        this.state.activeToolbox
+      );
       this.annotationsObject.setSplineSpaceTimeInfo(this.state.sliceIndex);
     }
   };
@@ -562,7 +556,9 @@ class UserInterface extends Component<Props, State> {
     if (this.annotationsObject.length() === 1) {
       // if we delete the last annotation, annotationsObject will make a new one with the paintbrush toolbox
       // (since it doesn't know which tool is active), so we set the toolbox correctly here:
-      this.annotationsObject.setActiveAnnotationToolbox(this.state.activeTool);
+      this.annotationsObject.setActiveAnnotationToolbox(
+        this.state.activeToolbox
+      );
     }
     this.callRedraw();
   };
@@ -609,25 +605,25 @@ class UserInterface extends Component<Props, State> {
   // TODO: find a way to pass parameters in keybindings and get rid of code duplication
   selectContrast = (): void => {
     if (this.isTyping()) return;
-    this.handleOpen()(this.refBtnsPopovers[tooltips.contrast.name]);
-    this.setButtonClicked(tooltips.contrast.name);
+    this.handleOpen()(this.refBtnsPopovers[Tools.contrast.name]);
+    this.setButtonClicked(Tools.contrast.name);
   };
 
   selectBrightness = (): void => {
     if (this.isTyping()) return;
-    this.handleOpen()(this.refBtnsPopovers[tooltips.brightness.name]);
-    this.setButtonClicked(tooltips.brightness.name);
+    this.handleOpen()(this.refBtnsPopovers[Tools.brightness.name]);
+    this.setButtonClicked(Tools.brightness.name);
   };
 
   selectChannels = (): void => {
     if (this.isTyping()) return;
-    this.handleOpen()(this.refBtnsPopovers[tooltips.channels.name]);
-    this.setButtonClicked(tooltips.channels.name);
+    this.handleOpen()(this.refBtnsPopovers[Tools.channels.name]);
+    this.setButtonClicked(Tools.channels.name);
   };
 
   selectAnnotationLabel = (): void => {
-    this.handleOpen()(this.refBtnsPopovers[tooltips.labels.name]);
-    this.setButtonClicked(tooltips.labels.name);
+    this.handleOpen()(this.refBtnsPopovers[Tools.labels.name]);
+    this.setButtonClicked(Tools.labels.name);
   };
 
   saveAnnotations = (): void => {
@@ -648,7 +644,7 @@ class UserInterface extends Component<Props, State> {
   isTyping = (): boolean =>
     // Added to prevent single-key shortcuts that are also valid text input
     // to get triggered during text input.
-    this.refBtnsPopovers[tooltips.labels.name] === this.state.anchorElement;
+    this.refBtnsPopovers[Tools.labels.name] === this.state.anchorElement;
 
   render = (): ReactNode => {
     const { classes, showAppBar, saveAnnotationsCallback } = this.props;
@@ -660,7 +656,7 @@ class UserInterface extends Component<Props, State> {
             setUploadedImage={this.setUploadedImage}
             spanElement={
               <BaseIconButton
-                tooltip={tooltips.upload}
+                tooltip={Tools.upload}
                 fill={false}
                 hasAvatar={false}
                 tooltipPlacement="bottom"
@@ -727,59 +723,57 @@ class UserInterface extends Component<Props, State> {
             >
               <ButtonGroup size="small" id="selection-toolbar">
                 <BaseIconButton
-                  tooltip={tooltips.select}
+                  tooltip={Tools.select}
                   onClick={this.toggleMode}
-                  fill={this.state.buttonClicked === tooltips.select.name}
+                  fill={this.state.buttonClicked === Tools.select.name}
                 />
                 <BaseIconButton
-                  tooltip={tooltips.addNewAnnotation}
+                  tooltip={Tools.addNewAnnotation}
                   onMouseDown={() => {
-                    this.setButtonClicked(tooltips.addNewAnnotation.name);
+                    this.setButtonClicked(Tools.addNewAnnotation.name);
                     this.addAnnotation();
                   }}
                   onMouseUp={this.selectDrawMode}
                   fill={
-                    this.state.buttonClicked === tooltips.addNewAnnotation.name
+                    this.state.buttonClicked === Tools.addNewAnnotation.name
                   }
                 />
                 <BaseIconButton
-                  tooltip={tooltips.clearAnnotation}
+                  tooltip={Tools.clearAnnotation}
                   onMouseDown={() => {
-                    this.setButtonClicked(tooltips.clearAnnotation.name);
+                    this.setButtonClicked(Tools.clearAnnotation.name);
                     this.clearActiveAnnotation();
                   }}
                   onMouseUp={this.selectDrawMode}
-                  fill={
-                    this.state.buttonClicked === tooltips.clearAnnotation.name
-                  }
+                  fill={this.state.buttonClicked === Tools.clearAnnotation.name}
                 />
                 {saveAnnotationsCallback && (
                   <BaseIconButton
-                    tooltip={tooltips.save}
+                    tooltip={Tools.save}
                     onMouseDown={() => {
-                      this.setButtonClicked(tooltips.save.name);
+                      this.setButtonClicked(Tools.save.name);
                       this.saveAnnotations();
                     }}
                     onMouseUp={this.selectDrawMode}
-                    fill={this.state.buttonClicked === tooltips.save.name}
+                    fill={this.state.buttonClicked === Tools.save.name}
                   />
                 )}
                 <BaseIconButton
-                  tooltip={tooltips.labels}
+                  tooltip={Tools.labels}
                   onClick={this.selectAnnotationLabel}
-                  fill={this.state.buttonClicked === tooltips.labels.name}
+                  fill={this.state.buttonClicked === Tools.labels.name}
                   setRefCallback={(ref) => {
-                    this.refBtnsPopovers[tooltips.labels.name] = ref;
+                    this.refBtnsPopovers[Tools.labels.name] = ref;
                   }}
                 />
                 <BaseIconButton
-                  tooltip={tooltips.undo}
+                  tooltip={Tools.undo}
                   onClick={this.undo}
                   fill={false}
                   enabled={this.state.canUndoRedo.undo}
                 />
                 <BaseIconButton
-                  tooltip={tooltips.redo}
+                  tooltip={Tools.redo}
                   onClick={this.redo}
                   fill={false}
                   enabled={this.state.canUndoRedo.redo}
@@ -798,21 +792,25 @@ class UserInterface extends Component<Props, State> {
                   <PaintbrushToolbar
                     buttonClicked={this.state.buttonClicked}
                     setButtonClicked={this.setButtonClicked}
-                    activateTool={this.activateTool}
+                    activateToolbox={this.activateToolbox}
                     handleOpen={this.handleOpen}
+                    onClose={this.handleClose}
+                    anchorElement={this.state.anchorElement}
                     isTyping={this.isTyping}
                   />
                   <SplineToolbar
                     buttonClicked={this.state.buttonClicked}
                     setButtonClicked={this.setButtonClicked}
-                    activateTool={this.activateTool}
+                    activateToolbox={this.activateToolbox}
                     handleOpen={this.handleOpen}
+                    onClose={this.handleClose}
+                    anchorElement={this.state.anchorElement}
                     isTyping={this.isTyping}
                   />
                   <BoundingBoxToolbar
                     buttonClicked={this.state.buttonClicked}
                     setButtonClicked={this.setButtonClicked}
-                    activateTool={this.activateTool}
+                    activateToolbox={this.activateToolbox}
                     isTyping={this.isTyping}
                   />
                   {this.props.trustedServiceButtonToolbar}
@@ -826,32 +824,53 @@ class UserInterface extends Component<Props, State> {
               >
                 <ButtonGroup id="display-toolbar">
                   <BaseIconButton
-                    tooltip={tooltips.brightness}
+                    tooltip={Tools.brightness}
                     onClick={this.selectBrightness}
-                    fill={this.state.buttonClicked === tooltips.brightness.name}
+                    fill={this.state.buttonClicked === Tools.brightness.name}
                     setRefCallback={(ref) => {
-                      this.refBtnsPopovers[tooltips.brightness.name] = ref;
+                      this.refBtnsPopovers[Tools.brightness.name] = ref;
                     }}
                   />
                   <BaseIconButton
-                    tooltip={tooltips.contrast}
+                    tooltip={Tools.contrast}
                     onClick={this.selectContrast}
-                    fill={this.state.buttonClicked === tooltips.contrast.name}
+                    fill={this.state.buttonClicked === Tools.contrast.name}
                     setRefCallback={(ref) => {
-                      this.refBtnsPopovers[tooltips.contrast.name] = ref;
+                      this.refBtnsPopovers[Tools.contrast.name] = ref;
                     }}
                   />
                   <BaseIconButton
-                    tooltip={tooltips.channels}
+                    tooltip={Tools.channels}
                     onClick={this.selectChannels}
-                    fill={this.state.buttonClicked === tooltips.channels.name}
+                    fill={this.state.buttonClicked === Tools.channels.name}
                     setRefCallback={(ref) => {
-                      this.refBtnsPopovers[tooltips.channels.name] = ref;
+                      this.refBtnsPopovers[Tools.channels.name] = ref;
                     }}
                   />
                 </ButtonGroup>
               </Grid>
             </Grid>
+
+            <LabelsSubmenu
+              isOpen={
+                this.state.buttonClicked === "Annotation Label" &&
+                Boolean(this.state.anchorElement)
+              }
+              anchorElement={this.state.anchorElement}
+              onClose={this.handleClose}
+              annotationsObject={this.annotationsObject}
+              presetLabels={this.presetLabels}
+              updatePresetLabels={this.updatePresetLabels}
+              activeAnnotationID={this.state.activeAnnotationID}
+            />
+            <BackgroundToolbar
+              buttonClicked={this.state.buttonClicked}
+              anchorElement={this.state.anchorElement}
+              onClose={this.handleClose}
+              channels={this.state.channels}
+              toggleChannelAtIndex={this.toggleChannelAtIndex}
+              displayedImage={this.state.displayedImage}
+            />
 
             <CssBaseline />
 
@@ -866,7 +885,7 @@ class UserInterface extends Component<Props, State> {
               <Grid
                 container
                 spacing={0}
-                justify="center"
+                justifyContent="center"
                 wrap="nowrap"
                 className={classes.mainGrid}
               >
@@ -891,7 +910,7 @@ class UserInterface extends Component<Props, State> {
                   />
                   <SplineCanvas
                     scaleAndPan={this.state.scaleAndPan}
-                    activeTool={this.state.activeTool}
+                    activeToolbox={this.state.activeToolbox}
                     mode={this.state.mode}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
@@ -902,13 +921,13 @@ class UserInterface extends Component<Props, State> {
                     setUIActiveAnnotationID={(id) => {
                       this.setState({ activeAnnotationID: id });
                     }}
-                    setActiveTool={(tool: Tool) => {
-                      this.setState({ activeTool: tool });
+                    setActiveToolbox={(tool: Toolbox) => {
+                      this.setState({ activeToolbox: tool });
                     }}
                   />
                   <BoundingBoxCanvas
                     scaleAndPan={this.state.scaleAndPan}
-                    activeTool={this.state.activeTool}
+                    activeToolbox={this.state.activeToolbox}
                     mode={this.state.mode}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
@@ -919,13 +938,13 @@ class UserInterface extends Component<Props, State> {
                     setUIActiveAnnotationID={(id) => {
                       this.setState({ activeAnnotationID: id });
                     }}
-                    setActiveTool={(tool: Tool) => {
-                      this.setState({ activeTool: tool });
+                    setActiveToolbox={(tool: Toolbox) => {
+                      this.setState({ activeToolbox: tool });
                     }}
                   />
                   <PaintbrushCanvas
                     scaleAndPan={this.state.scaleAndPan}
-                    activeTool={this.state.activeTool}
+                    activeToolbox={this.state.activeToolbox}
                     mode={this.state.mode}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
@@ -936,8 +955,8 @@ class UserInterface extends Component<Props, State> {
                     setUIActiveAnnotationID={(id) => {
                       this.setState({ activeAnnotationID: id });
                     }}
-                    setActiveTool={(tool: Tool) => {
-                      this.setState({ activeTool: tool });
+                    setActiveToolbox={(tool: Toolbox) => {
+                      this.setState({ activeToolbox: tool });
                     }}
                   />
                   {this.slicesData?.length > 1 && (
@@ -969,42 +988,6 @@ class UserInterface extends Component<Props, State> {
                     </Paper>
                   )}
                 </Grid>
-                <LabelsSubmenu
-                  isOpen={
-                    this.state.buttonClicked === "Annotation Label" &&
-                    Boolean(this.state.anchorElement)
-                  }
-                  anchorElement={this.state.anchorElement}
-                  onClose={this.handleClose}
-                  annotationsObject={this.annotationsObject}
-                  presetLabels={this.presetLabels}
-                  updatePresetLabels={this.updatePresetLabels}
-                  activeAnnotationID={this.state.activeAnnotationID}
-                />
-                <BackgroundToolbar
-                  buttonClicked={this.state.buttonClicked}
-                  anchorElement={this.state.anchorElement}
-                  onClose={this.handleClose}
-                  channels={this.state.channels}
-                  toggleChannelAtIndex={this.toggleChannelAtIndex}
-                  displayedImage={this.state.displayedImage}
-                />
-                <PaintbrushSubmenu
-                  isOpen={
-                    this.state.buttonClicked === "Brush" &&
-                    Boolean(this.state.anchorElement)
-                  }
-                  anchorElement={this.state.anchorElement}
-                  onClose={this.handleClose}
-                />
-                <SplineSubmenu
-                  isOpen={
-                    this.state.buttonClicked === "Spline" &&
-                    Boolean(this.state.anchorElement)
-                  }
-                  anchorElement={this.state.anchorElement}
-                  onClose={this.handleClose}
-                />
               </Grid>
             </Container>
             <Minimap

@@ -8,14 +8,19 @@ import {
 } from "react";
 import simplify from "simplify-js";
 import { slpfLines } from "@gliff-ai/slpf";
-import { BaseCanvas, CanvasProps } from "@/baseCanvas";
-import { Annotations } from "@/annotation";
-import { canvasToImage, imageToCanvas } from "@/components/transforms";
-import { XYPoint } from "@/annotation/interfaces";
-import { Tool, Tools } from "@/components/tools";
-import { Mode } from "@/ui";
 import { theme } from "@gliff-ai/style";
+import { Mode } from "@/ui";
+import { Annotations } from "@/annotation";
+import { XYPoint } from "@/annotation/interfaces";
+import {
+  BaseCanvas,
+  CanvasProps,
+  canvasToImage,
+  imageToCanvas,
+} from "@/components/baseCanvas";
 import { palette, getRGBAString } from "@/components/palette";
+import { Toolboxes, Toolbox } from "@/Toolboxes";
+import { Tools } from "./Toolbox";
 import { usePaintbrushStore } from "./Store";
 import { BrushStroke } from "./interfaces";
 
@@ -23,14 +28,15 @@ const mainColor = theme.palette.primary.main;
 const secondaryColor = theme.palette.secondary.main;
 
 interface Props extends CanvasProps {
-  activeTool: string;
+  isActive: boolean;
+  activeToolbox: Toolbox | string;
   mode: Mode;
   annotationsObject: Annotations;
   brushRadius: number;
   redraw: number;
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
-  setActiveTool: (tool: Tool) => void;
+  setActiveToolbox: (tool: Toolbox) => void;
 }
 
 interface Brush {
@@ -54,13 +60,11 @@ interface Event extends CustomEvent {
 type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 
 type CursorProps = {
-  activeTool: string;
   brushRadius: number;
   canvasTopAndLeft: { top: number; left: number };
 };
 
 const FauxCursor: FC<CursorProps> = ({
-  activeTool,
   brushRadius,
   canvasTopAndLeft,
 }: CursorProps): ReactElement => {
@@ -82,10 +86,6 @@ const FauxCursor: FC<CursorProps> = ({
     <div
       id="cursor"
       style={{
-        visibility:
-          activeTool === "paintbrush" || activeTool === "eraser"
-            ? "visible"
-            : "hidden",
         width: brushRadius,
         height: brushRadius,
         border: "2px solid #666666",
@@ -99,7 +99,7 @@ const FauxCursor: FC<CursorProps> = ({
 };
 
 export class CanvasClass extends Component<Props, State> {
-  readonly name = "paintbrush";
+  readonly name = Toolboxes.paintbrush;
 
   private interactionCanvas: BaseCanvas;
 
@@ -168,7 +168,10 @@ export class CanvasClass extends Component<Props, State> {
       const brush = {
         color: mainColor,
         radius: this.props.brushRadius,
-        type: this.props.activeTool === "paintbrush" ? "paint" : "erase",
+        type:
+          this.props.activeToolbox === Tools.paintbrush.name
+            ? "paint"
+            : "erase",
       } as Brush;
 
       // Draw current points
@@ -259,7 +262,7 @@ export class CanvasClass extends Component<Props, State> {
     this.props.annotationsObject
       .getAllAnnotations()
       .forEach((annotationsObject, i) => {
-        if (annotationsObject.toolbox === "paintbrush") {
+        if (annotationsObject.toolbox === Toolboxes.paintbrush) {
           annotationsObject.brushStrokes.forEach((brushStrokes) => {
             if (brushStrokes.spaceTimeInfo.z === this.props.sliceIndex) {
               this.drawPoints(
@@ -287,10 +290,6 @@ export class CanvasClass extends Component<Props, State> {
     return brushRadius * imageScalingFactor * 2 * this.props.scaleAndPan.scale;
   };
 
-  isActive = (): boolean =>
-    this.props.activeTool === "paintbrush" ||
-    this.props.activeTool === "eraser";
-
   saveLine = (radius = 20): void => {
     if (this.points.length < 2) return;
 
@@ -310,7 +309,10 @@ export class CanvasClass extends Component<Props, State> {
       brush: {
         color,
         radius,
-        type: this.props.activeTool === "paintbrush" ? "paint" : "erase",
+        type:
+          this.props.activeToolbox === Tools.paintbrush.name
+            ? "paint"
+            : "erase",
       },
     });
 
@@ -366,7 +368,7 @@ export class CanvasClass extends Component<Props, State> {
   onMouseDown = (canvasX: number, canvasY: number): void => {
     if (this.props.mode === Mode.draw) {
       // Start drawing
-      if (this.props.activeTool === "eraser") {
+      if (this.props.activeToolbox === Tools.eraser.name) {
         // Copy the current BACK strokes to the front canvas
         this.drawAllStrokes(this.interactionCanvas.canvasContext);
         this.setState({ hideBackCanvas: true }, () => {
@@ -381,7 +383,7 @@ export class CanvasClass extends Component<Props, State> {
       this.handlePointerMove(canvasX, canvasY);
     } else if (this.props.mode === Mode.select) {
       // In select mode a single click allows to select a different spline annotation
-      // DEVNOTE this is currently duplicated in each toolbox!
+      // DEVNOTE this is currently duplicated in each Tools!
       const { x: imageX, y: imageY } = canvasToImage(
         canvasX,
         canvasY,
@@ -411,11 +413,11 @@ export class CanvasClass extends Component<Props, State> {
       if (selectedBrushStroke !== null) {
         this.props.annotationsObject.setActiveAnnotationID(selectedBrushStroke);
         this.props.setUIActiveAnnotationID(selectedBrushStroke);
-        this.props.setActiveTool(Tools.paintbrush);
+        this.props.setActiveToolbox(Toolboxes.paintbrush);
       } else if (selectedSpline !== null) {
         this.props.annotationsObject.setActiveAnnotationID(selectedSpline);
         this.props.setUIActiveAnnotationID(selectedSpline);
-        this.props.setActiveTool(Tools.spline);
+        this.props.setActiveToolbox(Toolboxes.spline);
       } else if (
         selectedBoundingBox !== null &&
         selectedBoundingBox !==
@@ -423,7 +425,7 @@ export class CanvasClass extends Component<Props, State> {
       ) {
         this.props.annotationsObject.setActiveAnnotationID(selectedBoundingBox);
         this.props.setUIActiveAnnotationID(selectedBoundingBox);
-        this.props.setActiveTool(Tools.boundingBox);
+        this.props.setActiveToolbox(Toolboxes.boundingBox);
       }
     }
   };
@@ -451,10 +453,7 @@ export class CanvasClass extends Component<Props, State> {
   };
 
   getCursor = (): Cursor => {
-    if (
-      this.props.activeTool === "paintbrush" ||
-      this.props.activeTool === "eraser"
-    ) {
+    if (this.props.activeToolbox === Toolboxes.paintbrush) {
       return this.props.mode === Mode.draw ? "none" : "pointer";
     }
     return "none";
@@ -470,26 +469,23 @@ export class CanvasClass extends Component<Props, State> {
     this.props.displayedImage ? (
       <>
         {/* this div is basically a fake cursor */}
-        <FauxCursor
-          activeTool={this.props.activeTool}
-          brushRadius={this.getCanvasBrushRadius(this.props.brushRadius)}
-          canvasTopAndLeft={{
-            top:
-              this.backgroundCanvas?.canvasContext?.canvas?.getBoundingClientRect()
-                .top || 0,
-            left:
-              this.backgroundCanvas?.canvasContext?.canvas?.getBoundingClientRect()
-                .left || 0,
-          }}
-        />
+        {this.props.isActive ? (
+          <FauxCursor
+            brushRadius={this.getCanvasBrushRadius(this.props.brushRadius)}
+            canvasTopAndLeft={{
+              top:
+                this.backgroundCanvas?.canvasContext?.canvas?.getBoundingClientRect()
+                  .top || 0,
+              left:
+                this.backgroundCanvas?.canvasContext?.canvas?.getBoundingClientRect()
+                  .left || 0,
+            }}
+          />
+        ) : null}
         {/* We have two canvases in order to be able to erase stuff. */}
         <div
           style={{
-            pointerEvents:
-              this.props.activeTool === "paintbrush" ||
-              this.props.activeTool === "eraser"
-                ? "auto"
-                : "none",
+            pointerEvents: this.props.isActive ? "auto" : "none",
           }}
         >
           <div
@@ -500,7 +496,7 @@ export class CanvasClass extends Component<Props, State> {
               ref={(backgroundCanvas) => {
                 this.backgroundCanvas = backgroundCanvas;
               }}
-              name="background"
+              name={`${this.name}-background`}
               scaleAndPan={this.props.scaleAndPan}
               canvasPositionAndSize={this.props.canvasPositionAndSize}
               setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
@@ -515,7 +511,7 @@ export class CanvasClass extends Component<Props, State> {
             ref={(interactionCanvas) => {
               this.interactionCanvas = interactionCanvas;
             }}
-            name="interaction"
+            name={`${this.name}-interaction`}
             scaleAndPan={this.props.scaleAndPan}
             canvasPositionAndSize={this.props.canvasPositionAndSize}
             setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
@@ -525,12 +521,24 @@ export class CanvasClass extends Component<Props, State> {
     ) : null;
 }
 
-export const Canvas = (props: Omit<Props, "brushRadius">): ReactElement => {
+export const Canvas = (
+  props: Omit<Props, "brushRadius" | "isActive">
+): ReactElement => {
+  // we will overwrite props.activeToolbox, which will be paintbrush
+  // with paintbrush.brushType, which will be paintbrush/eraser
   const [paintbrush] = usePaintbrushStore();
+  let { activeToolbox } = props;
+  let isActive = false;
+  if (activeToolbox === Toolboxes.paintbrush) {
+    activeToolbox = paintbrush.brushType;
+    isActive = true;
+  }
+  // we will also use the brushRadius that's in the store
 
   return (
     <CanvasClass
-      activeTool={props.activeTool}
+      isActive={isActive}
+      activeToolbox={activeToolbox}
       mode={props.mode}
       annotationsObject={props.annotationsObject}
       displayedImage={props.displayedImage}
@@ -540,7 +548,7 @@ export const Canvas = (props: Omit<Props, "brushRadius">): ReactElement => {
       redraw={props.redraw}
       sliceIndex={props.sliceIndex}
       setUIActiveAnnotationID={props.setUIActiveAnnotationID}
-      setActiveTool={props.setActiveTool}
+      setActiveToolbox={props.setActiveToolbox}
     />
   );
 };

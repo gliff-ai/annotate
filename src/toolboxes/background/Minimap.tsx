@@ -2,9 +2,9 @@ import { Component, ReactElement, MouseEvent } from "react";
 import { Slide, Card, WithStyles, withStyles } from "@material-ui/core";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { theme, BaseIconButton } from "@gliff-ai/style";
-import { MinimapCanvas } from "@/baseCanvas";
+import { MinimapCanvas } from "@/components/baseCanvas";
 import { BackgroundCanvas } from "@/toolboxes/background";
-import { tooltips } from "@/components/tooltips";
+import { Tools } from "@/tooltips";
 
 const styles = {
   minimap: {
@@ -141,39 +141,39 @@ class Minimap extends Component<Props, State> {
         >
           <div className={this.props.classes.baseIconButton}>
             <BaseIconButton
-              tooltip={tooltips.minimiseMap}
+              tooltip={Tools.minimiseMap}
               onClick={() => {
-                this.props.setButtonClicked(tooltips.minimiseMap.name);
+                this.props.setButtonClicked(Tools.minimiseMap.name);
                 this.handleDrawerClose();
               }}
-              fill={this.props.buttonClicked === tooltips.minimiseMap.name}
+              fill={this.props.buttonClicked === Tools.minimiseMap.name}
               tooltipPlacement="top"
             />
             <BaseIconButton
-              tooltip={tooltips.zoomIn}
+              tooltip={Tools.zoomIn}
               onClick={() => {
-                this.props.setButtonClicked(tooltips.zoomIn.name);
+                this.props.setButtonClicked(Tools.zoomIn.name);
                 this.props.incrementScale();
               }}
-              fill={this.props.buttonClicked === tooltips.zoomIn.name}
+              fill={this.props.buttonClicked === Tools.zoomIn.name}
               tooltipPlacement="top"
             />
             <BaseIconButton
-              tooltip={tooltips.zoomOut}
+              tooltip={Tools.zoomOut}
               onClick={() => {
-                this.props.setButtonClicked(tooltips.zoomOut.name);
+                this.props.setButtonClicked(Tools.zoomOut.name);
                 this.props.decrementScale();
               }}
-              fill={this.props.buttonClicked === tooltips.zoomOut.name}
+              fill={this.props.buttonClicked === Tools.zoomOut.name}
               tooltipPlacement="top"
             />
             <BaseIconButton
-              tooltip={tooltips.fitToPage}
+              tooltip={Tools.fitToPage}
               onClick={() => {
-                this.props.setButtonClicked(tooltips.fitToPage.name);
+                this.props.setButtonClicked(Tools.fitToPage.name);
                 this.props.resetScaleAndPan();
               }}
-              fill={this.props.buttonClicked === tooltips.fitToPage.name}
+              fill={this.props.buttonClicked === Tools.fitToPage.name}
               tooltipPlacement="top"
             />
           </div>
@@ -213,16 +213,16 @@ class Minimap extends Component<Props, State> {
             }}
           >
             <BaseIconButton
-              tooltip={tooltips.maximiseMap}
+              tooltip={Tools.maximiseMap}
               onClick={(e: MouseEvent) => {
                 this.props.setButtonClicked(
-                  tooltips.maximiseMap.name,
+                  Tools.maximiseMap.name,
                   true,
                   e.currentTarget as HTMLButtonElement
                 );
                 this.handleDrawerOpen();
               }}
-              fill={this.props.buttonClicked === tooltips.maximiseMap.name}
+              fill={this.props.buttonClicked === Tools.maximiseMap.name}
               tooltipPlacement="top"
             />
           </Card>

@@ -1,3 +1,4 @@
+import { Toolboxes } from "@/Toolboxes";
 import { BoundingBox, BoundingBoxCoordinates } from "@/toolboxes/boundingBox";
 import { BrushStroke } from "@/toolboxes/paintbrush";
 import { Spline } from "@/toolboxes/spline";
@@ -85,7 +86,7 @@ export class Annotations {
       this.activeAnnotationID = this.data.length - 1; // necessary if we delete the one on the end
     }
     if (this.data.length === 0) {
-      this.addAnnotation("paintbrush"); // re-create a new empty annotation if we delete the last one (toolbox will be re-assigned by reuseEmptyAnnotation if necessary)
+      this.addAnnotation(Toolboxes.paintbrush); // re-create a new empty annotation if we delete the last one (toolbox will be re-assigned by reuseEmptyAnnotation if necessary)
     }
     this.initUndoRedo();
   }
@@ -158,7 +159,7 @@ export class Annotations {
 
     this.data.forEach((annotation, i) => {
       if (
-        annotation.toolbox === "boundingBox" &&
+        annotation.toolbox === Toolboxes.boundingBox &&
         annotation.spline.spaceTimeInfo.z === z
       ) {
         boundingBoxes.push([annotation.boundingBox, i]);
@@ -178,7 +179,7 @@ export class Annotations {
 
   @log
   updateBoundingBoxCoordinates(coordinates: BoundingBoxCoordinates): void {
-    if (this.data[this.activeAnnotationID].toolbox === "boundingBox") {
+    if (this.data[this.activeAnnotationID].toolbox === Toolboxes.boundingBox) {
       this.data[this.activeAnnotationID].boundingBox.coordinates = coordinates;
     }
   }
@@ -278,7 +279,7 @@ export class Annotations {
 
     this.data.forEach((annotation, i) => {
       if (
-        annotation.toolbox === "spline" &&
+        annotation.toolbox === Toolboxes.spline &&
         annotation.spline.spaceTimeInfo.z === z
       ) {
         splines.push([annotation.spline, i]);
@@ -296,7 +297,7 @@ export class Annotations {
 
   @log
   addSplinePoint(point: XYPoint, addToUndoRedo = true): void {
-    if (this.data[this.activeAnnotationID].toolbox === "spline") {
+    if (this.data[this.activeAnnotationID].toolbox === Toolboxes.spline) {
       this.data[this.activeAnnotationID].spline.coordinates.push(point);
     }
     if (addToUndoRedo) {
@@ -430,7 +431,7 @@ export class Annotations {
       },
     };
     this.deleteActiveAnnotation();
-    this.addAnnotation("paintbrush", labels);
+    this.addAnnotation(Toolboxes.paintbrush, labels);
     this.addBrushStroke(brushStroke);
   }
 
@@ -479,7 +480,7 @@ export class Annotations {
     // If more than one annotation at clicked point, select first drawn.
 
     for (let i = 0; i < this.data.length; i += 1) {
-      if (this.data[i].toolbox === "paintbrush") {
+      if (this.data[i].toolbox === Toolboxes.paintbrush) {
         let finalIndex = null;
 
         this.data[i].brushStrokes.forEach(
@@ -510,11 +511,7 @@ export class Annotations {
 
   @log
   addBrushStroke(newBrushStroke: BrushStroke): void {
-    if (
-      ["paintbrush", "eraser"].includes(
-        this.data[this.activeAnnotationID].toolbox
-      )
-    ) {
+    if (this.data[this.activeAnnotationID].toolbox === Toolboxes.paintbrush) {
       this.data[this.activeAnnotationID].brushStrokes.push(newBrushStroke);
     }
   }
