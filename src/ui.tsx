@@ -555,6 +555,7 @@ class UserInterface extends Component<Props, State> {
       this.annotationsObject.setActiveAnnotationToolbox(toolbox);
       this.annotationsObject.setSplineSpaceTimeInfo(this.state.sliceIndex);
     }
+    this.callRedraw();
   };
 
   clearActiveAnnotation = (): void => {
@@ -674,9 +675,10 @@ class UserInterface extends Component<Props, State> {
 
         <Grid item>
           <Download
-            annotations={this.annotationsObject.getAllAnnotations()}
+            annotationsObject={this.annotationsObject}
             imageFileInfo={this.imageFileInfo}
             isTyping={this.isTyping}
+            redraw={this.state.redraw}
           />
         </Grid>
       </>
