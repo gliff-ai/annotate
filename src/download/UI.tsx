@@ -5,8 +5,9 @@ import { Annotations } from "@/annotation";
 import { keydownListener } from "@/keybindings";
 import { downloadPaintbrushAsTiff } from "@/download/DownloadAsTiff";
 import { downloadAnnotationsAsJson } from "@/download/DownloadAsJson";
-import { tooltips } from "@/components/tooltips";
+import { Tools } from "@/tooltips";
 import { BaseIconButton } from "@gliff-ai/style";
+import { Toolboxes } from "@/Toolboxes";
 
 const styles = {
   menu: {
@@ -126,7 +127,7 @@ class DownloadUI extends Component<Props, State> {
     });
 
     toolboxes.forEach((toolbox) => {
-      if (toolbox === "paintbrush") {
+      if (toolbox === Toolboxes.paintbrush) {
         newMenuItems.push({
           key: "paintbrush-tiff",
           text: "Export paintbrush as Tiff",
@@ -156,7 +157,7 @@ class DownloadUI extends Component<Props, State> {
     return (
       <>
         <BaseIconButton
-          tooltip={tooltips.download}
+          tooltip={Tools.download}
           onClick={this.handleOpen}
           fill={false}
           hasAvatar={false}

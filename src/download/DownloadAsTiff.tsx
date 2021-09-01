@@ -4,6 +4,7 @@ import { ImageFileInfo } from "@gliff-ai/upload";
 import { Annotations } from "@/annotation";
 import { XYPoint } from "@/annotation/interfaces";
 import { palette } from "@/components/palette";
+import { Toolboxes } from "@/Toolboxes";
 
 function drawCapsule(
   point0: XYPoint,
@@ -231,7 +232,7 @@ export function downloadPaintbrushAsTiff(
   annotationsObject
     .getAllAnnotations()
     .forEach(({ toolbox, brushStrokes }, annotationIndex) => {
-      if (toolbox === "paintbrush") {
+      if (toolbox === Toolboxes.paintbrush) {
         brushStrokes.forEach(({ coordinates, brush, spaceTimeInfo }) => {
           coordinates.forEach((point0, i) => {
             slicesData[spaceTimeInfo.z] = drawCapsule(
