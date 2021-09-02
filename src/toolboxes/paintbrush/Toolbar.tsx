@@ -81,17 +81,17 @@ const Submenu = (props: SubMenuProps): ReactElement => {
         >
           <BaseIconButton
             tooltip={Tools.paintbrush}
-            onClick={selectBrush}
+            onClick={() => selectBrush}
             fill={paintbrush.brushType === Tools.paintbrush.name}
           />
           <BaseIconButton
             tooltip={Tools.eraser}
-            onClick={selectEraser}
+            onClick={() => selectEraser}
             fill={paintbrush.brushType === Tools.eraser.name}
           />
           <BaseIconButton
             tooltip={Tools.fillbrush}
-            onClick={fillBrush}
+            onClick={() => fillBrush}
             fill={false}
           />
         </ButtonGroup>
