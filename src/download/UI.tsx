@@ -6,7 +6,11 @@ import { Annotation } from "@/annotation/interfaces";
 import { keydownListener } from "@/keybindings";
 import { downloadPaintbrushAsTiff } from "@/download/DownloadAsTiff";
 import { downloadAnnotationsAsJson } from "@/download/DownloadAsJson";
-import { tooltips } from "@/components/tooltips";
+import { Annotations } from "@/annotation";
+import { downloadPaintbrushAsTiff } from "@/download/DownloadAsTiff";
+import { downloadAnnotationsAsJson } from "@/download/DownloadAsJson";
+import { Tools } from "@/tooltips";
+import { Toolboxes } from "@/Toolboxes";
 
 const styles = {
   menu: {
@@ -47,9 +51,10 @@ interface Event extends CustomEvent {
   type: typeof events[number];
 }
 interface Props extends WithStyles<typeof styles> {
-  annotations: Annotation[];
+  annotationsObject: Annotations;
   imageFileInfo: ImageFileInfo;
   isTyping: () => boolean;
+  redraw: number;
 }
 
 type ItemMenu = {
@@ -90,10 +95,7 @@ class DownloadUI extends Component<Props, State> {
   }
 
   componentDidUpdate = (prevProps: Props): void => {
-    if (
-      JSON.stringify(prevProps.annotations) !==
-      JSON.stringify(this.props.annotations)
-    ) {
+    if (prevProps.redraw !== this.props.redraw) {
       this.prepareMenuItems();
     }
   };
@@ -121,20 +123,20 @@ class DownloadUI extends Component<Props, State> {
     const toolboxes: string[] = [];
     const newMenuItems: ItemMenu[] = [];
 
-    this.props.annotations.forEach((a) => {
+    this.props.annotationsObject.getAllAnnotations().forEach((a) => {
       if (!toolboxes.includes(a.toolbox)) {
         toolboxes.push(a.toolbox);
       }
     });
 
     toolboxes.forEach((toolbox) => {
-      if (toolbox === "paintbrush") {
+      if (toolbox === Toolboxes.paintbrush) {
         newMenuItems.push({
           key: "paintbrush-tiff",
           text: "Export paintbrush as Tiff",
           onClick: () =>
             downloadPaintbrushAsTiff(
-              this.props.annotations,
+              this.props.annotationsObject,
               this.props.imageFileInfo
             ),
         });
@@ -144,7 +146,7 @@ class DownloadUI extends Component<Props, State> {
         text: `Export ${toolbox} as JSON`,
         onClick: () =>
           downloadAnnotationsAsJson(
-            this.props.annotations,
+            this.props.annotationsObject,
             toolbox,
             this.props.imageFileInfo.fileName
           ),
@@ -158,7 +160,7 @@ class DownloadUI extends Component<Props, State> {
     return (
       <>
         <BaseIconButton
-          tooltip={tooltips.download}
+          tooltip={Tools.download}
           onClick={this.handleOpen}
           fill={false}
           hasAvatar={false}

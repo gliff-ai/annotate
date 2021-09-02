@@ -1,4 +1,5 @@
 import { Annotation } from "@/annotation/interfaces";
+import { Annotations } from "@/annotation/";
 
 function exportAsJson(annotations: Annotation[], exportFileName: string) {
   const contentType = "application/json;charset=utf-8;";
@@ -14,13 +15,13 @@ function exportAsJson(annotations: Annotation[], exportFileName: string) {
 }
 
 export function downloadAnnotationsAsJson(
-  annotations: Annotation[],
+  annotationsObject: Annotations,
   selectedToolbox: string,
   fileName: string
 ): void {
-  const filteredAnnotations = annotations.filter(
-    ({ toolbox }) => toolbox === selectedToolbox
-  );
+  const filteredAnnotations = annotationsObject
+    .getAllAnnotations()
+    .filter(({ toolbox }) => toolbox === selectedToolbox);
   const name = fileName.split(".").shift();
   const exportFileName = `${name}_${selectedToolbox}.json`;
   exportAsJson(filteredAnnotations, exportFileName);

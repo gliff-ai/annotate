@@ -1,8 +1,10 @@
 /* eslint-disable no-param-reassign */
 import * as UTIF from "utif";
 import { ImageFileInfo } from "@gliff-ai/upload";
-import { Annotation, XYPoint } from "@/annotation/interfaces";
+import { Annotations } from "@/annotation";
+import { XYPoint } from "@/annotation/interfaces";
 import { palette } from "@/components/palette";
+import { Toolboxes } from "@/Toolboxes";
 
 function drawCapsule(
   point0: XYPoint,
@@ -196,7 +198,7 @@ function exportImageDataAsTiff(imageData: Uint8Array, fileName: string): void {
 }
 
 export function downloadPaintbrushAsTiff(
-  annotations: Annotation[],
+  annotationsObject: Annotations,
   imageFileInfo: ImageFileInfo
 ): void {
   // const uint16ColorMap = getColorMap(uint8ColorMap);
@@ -227,23 +229,25 @@ export function downloadPaintbrushAsTiff(
     () => new Uint8Array(width * height * samplesPerPixel)
   );
 
-  annotations.forEach(({ toolbox, brushStrokes }, annotationIndex) => {
-    if (toolbox === "paintbrush") {
-      brushStrokes.forEach(({ coordinates, brush, spaceTimeInfo }) => {
-        coordinates.forEach((point0, i) => {
-          slicesData[spaceTimeInfo.z] = drawCapsule(
-            point0,
-            i + 1 < coordinates.length ? coordinates[i + 1] : point0,
-            brush.radius,
-            slicesData[spaceTimeInfo.z],
-            width,
-            annotationIndex,
-            brush.type
-          );
+  annotationsObject
+    .getAllAnnotations()
+    .forEach(({ toolbox, brushStrokes }, annotationIndex) => {
+      if (toolbox === Toolboxes.paintbrush) {
+        brushStrokes.forEach(({ coordinates, brush, spaceTimeInfo }) => {
+          coordinates.forEach((point0, i) => {
+            slicesData[spaceTimeInfo.z] = drawCapsule(
+              point0,
+              i + 1 < coordinates.length ? coordinates[i + 1] : point0,
+              brush.radius,
+              slicesData[spaceTimeInfo.z],
+              width,
+              annotationIndex,
+              brush.type
+            );
+          });
         });
-      });
-    }
-  });
+      }
+    });
 
   // Prepare data for export, combining slicesData wi ifds
   const imageData = getImageData(slicesData, ifds);
