@@ -10,15 +10,15 @@
     "dist"
   ],
   "scripts": {
-    "build": "webpack --progress --config webpack.build.js",
-    "format": "npx --no-install prettier --write src/{**,.}/{**,.}/*.ts*",
+    "build": "npx vite build -c vite.config.lib.ts && tsc --emitDeclarationOnly --outDir dist",
+    "watch": "npx vite build -c vite.config.lib.ts --watch",
+    "format": "npx --no-install prettier --write src/*.ts*",
+    "prettier": "npx --no-install prettier -c src/*.ts*",
     "lint": "npm run lint:ts && npm run prettier",
-    "lint:ts": "npx eslint src/{**,.}/{**,.}/*.ts*",
-    "prepublishOnly": "rm -r dist/; webpack --progress --config webpack.package.js",
-    "prettier": "npx --no-install prettier -c src/{**,.}/{**,.}/*.ts*",
-    "serve": "webpack serve --config webpack.build.js",
-    "test": "jest --coverage --passWithNoTests",
-    "test:visual": "npx percy snapshot snapshots.yml"
+    "lint:ts": "npx --no-install eslint src/*.ts*",
+    "serve": "vite",
+    "build:example": "vite build",
+    "test": "jest --coverage --passWithNoTests"
   },
   "license": "AGPL-3.0-only",
   "devDependencies": {
