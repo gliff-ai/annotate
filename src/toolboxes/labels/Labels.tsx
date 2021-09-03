@@ -64,7 +64,9 @@ export const Labels: FunctionComponent<Props> = ({
   );
   const [newLabel, setNewLabel] = useState("");
 
-  function handleNewLabelChange(event: ChangeEvent<HTMLInputElement>): void {
+  function handleNewLabelChange(
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ): void {
     // Handle the input of a new label.
     const { value } = event.target; // TODO: add input validation
 
@@ -103,7 +105,7 @@ export const Labels: FunctionComponent<Props> = ({
           <InputBase
             placeholder="New label"
             value={newLabel}
-            onChange={handleNewLabelChange}
+            onChange={(e) => handleNewLabelChange(e)}
             inputProps={{ styles: `${classes.inputBaseProps}` }}
           />
 

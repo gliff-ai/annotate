@@ -49,27 +49,27 @@ const Submenu = (props: SubMenuProps): ReactElement => {
       <ButtonGroup size="small" id="spline-toolbar">
         <BaseIconButton
           tooltip={Tools.spline}
-          onClick={selectSpline}
+          onClick={() => selectSpline}
           fill={spline.splineType === Tools.spline.name}
         />
         <BaseIconButton
           tooltip={Tools.lassospline}
-          onClick={selectLassoSpline}
+          onClick={() => selectLassoSpline}
           fill={spline.splineType === Tools.lassospline.name}
         />
         {/* <BaseIconButton
           tooltip={Tools.magicspline}
-          onClick={selectMagicSpline}
+          onClick={() => selectMagicSpline}
           fill={spline.splineType === Tools.magicspline.name}
         /> */}
         <BaseIconButton
           tooltip={Tools.closespline}
-          onClick={closeSpline}
+          onClick={() => closeSpline}
           fill={false}
         />
         <BaseIconButton
           tooltip={Tools.convertspline}
-          onClick={convertSpline}
+          onClick={() => convertSpline}
           fill={false}
         />
       </ButtonGroup>

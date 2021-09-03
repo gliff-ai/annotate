@@ -1,7 +1,7 @@
 import { Component, ReactElement, MouseEvent } from "react";
 import { Slide, Card, WithStyles, withStyles } from "@material-ui/core";
-import { PositionAndSize } from "@/annotation/interfaces";
 import { theme, BaseIconButton } from "@gliff-ai/style";
+import { PositionAndSize } from "@/annotation/interfaces";
 import { MinimapCanvas } from "@/components/baseCanvas";
 import { BackgroundCanvas } from "@/toolboxes/background";
 import { Tools } from "@/tooltips";
