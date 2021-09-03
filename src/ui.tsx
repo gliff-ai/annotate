@@ -11,7 +11,6 @@ import {
   WithStyles,
   ThemeProvider,
   StylesProvider,
-  createGenerateClassName,
 } from "@material-ui/core";
 import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
 import { theme, BaseIconButton, generateClassName } from "@gliff-ai/style";
