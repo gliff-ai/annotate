@@ -17,7 +17,7 @@ const DefaultTools: ToolTips = {
   },
   maximiseMap: {
     name: "Maximise Map",
-    icon: imgSrc("/maximise-icon"),
+    icon: imgSrc("maximise-icon"),
     shortcut: "ALT",
     shortcutSymbol: "=",
   },
