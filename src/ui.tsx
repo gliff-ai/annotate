@@ -14,7 +14,7 @@ import {
   createGenerateClassName,
 } from "@material-ui/core";
 import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
-import { theme, BaseIconButton } from "@gliff-ai/style";
+import { theme, BaseIconButton, generateClassName } from "@gliff-ai/style";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
@@ -709,13 +709,8 @@ class UserInterface extends Component<Props, State> {
       </AppBar>
     );
 
-    const generateClassName = createGenerateClassName({
-      seed: "annotate",
-      disableGlobal: true,
-    });
-
     return (
-      <StylesProvider generateClassName={generateClassName}>
+      <StylesProvider generateClassName={generateClassName("annotate")}>
         <ThemeProvider theme={theme}>
           <Grid container className={classes.mainContainer}>
             <Grid
