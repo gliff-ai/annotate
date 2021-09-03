@@ -1,4 +1,4 @@
-import { UI } from "../ui";
+import { UnstyledUserInterface as UI } from "../ui";
 
 interface Descriptor extends Omit<PropertyDescriptor, "value"> {
   value?: (...args: unknown[]) => unknown;

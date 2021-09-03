@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom";
-import UserInterface from "../src/";
+import {UserInterface} from "../src";
 import loadImage from "./autoload";
 
 loadImage("./zebrafish-heart.jpg").then(

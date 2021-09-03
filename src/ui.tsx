@@ -1012,5 +1012,8 @@ class UserInterface extends Component<Props, State> {
   };
 }
 
-export { UserInterface as UI };
-export default withStyles(styles)(UserInterface);
+const styledUserInterface = withStyles(styles)(UserInterface);
+export {
+  styledUserInterface as UserInterface,
+  UserInterface as UnstyledUserInterface,
+};
