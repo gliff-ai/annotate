@@ -31,7 +31,7 @@ const loadImage = (filename: string): Promise<UploadData> =>
         });
     };
 
-    image.src =  new URL(filename, import.meta.url).href;
+    image.src =  filename;
   });
 
 export default loadImage;
