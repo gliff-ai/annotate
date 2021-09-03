@@ -4,7 +4,7 @@ import { PaintbrushToolbox } from "@/toolboxes/paintbrush";
 import { SplineToolbox } from "@/toolboxes/spline";
 import { BoundingBoxToolbox } from "@/toolboxes/boundingBox";
 
-import {imgSrc} from "@/imgSrc";
+import { imgSrc } from "@/imgSrc";
 
 type ToolTips = { [name: string]: Tooltip };
 

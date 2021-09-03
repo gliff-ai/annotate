@@ -61,10 +61,7 @@ export const Submenu = (props: Props): ReactElement => {
             Annotation
           </Typography>
           <Avatar className={classes.annotationAvatar}>
-            <SVG
-              src={imgSrc("pin-icon")}
-              className={classes.svg}
-            />
+            <SVG src={imgSrc("pin-icon")} className={classes.svg} />
           </Avatar>
         </Paper>
         <Paper elevation={0} square>

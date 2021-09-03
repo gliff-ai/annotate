@@ -233,4 +233,4 @@ class Minimap extends Component<Props, State> {
 }
 
 const styledMinimap = withStyles(styles)(Minimap);
-export {styledMinimap as Minimap};
+export { styledMinimap as Minimap };

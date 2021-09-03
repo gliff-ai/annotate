@@ -12,10 +12,10 @@
   "scripts": {
     "build": "npx vite build -c vite.config.lib.ts && tsc --emitDeclarationOnly --outDir dist",
     "watch": "npx vite build -c vite.config.lib.ts --watch",
-    "format": "npx --no-install prettier --write src/*.ts*",
-    "prettier": "npx --no-install prettier -c src/*.ts*",
+    "format": "npx --no-install prettier --write src",
+    "prettier": "npx --no-install prettier -c src",
     "lint": "npm run lint:ts && npm run prettier",
-    "lint:ts": "npx --no-install eslint src/*.ts*",
+    "lint:ts": "npx --no-install eslint src",
     "serve": "vite",
     "build:example": "vite build",
     "test": "jest --coverage --passWithNoTests"
