@@ -32,7 +32,7 @@ module.exports = {
     "\\.s?css$": "<rootDir>/src/testUtils/cssmock.js", // allows Jest to not die when importing a module that imports CSS
   },
 
-  "transform": {
-    "^.+\\.(ts|tsx)$": "ts-jest"
+  transform: {
+    "^.+\\.(ts|tsx)$": "ts-jest",
   },
 };

@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 const path = require("path");
 import { ViteAliases } from "vite-aliases";
+import checker from "vite-plugin-checker";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -20,7 +21,7 @@ export default defineConfig({
         "@material-ui/core",
         "@material-ui/icons",
         "@material-ui/lab",
-        "@gliff-ai/style"
+        "@gliff-ai/style",
       ],
       output: {
         globals: {},
@@ -30,5 +31,5 @@ export default defineConfig({
   esbuild: {
     jsxInject: `import React from 'react'`,
   },
-  plugins: [ViteAliases()],
+  plugins: [ViteAliases(), checker({ typescript: true } /** TS options */)],
 });
