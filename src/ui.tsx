@@ -105,14 +105,14 @@ const styles = {
   },
   leftToolbar: {
     display: "flex",
-    flexDirection: "column",
+    flexDirection: "column" as const,
     top: "108px",
     left: "18px",
     bottom: "18px",
     width: "63px",
     zIndex: 100,
     justifyContent: "space-between",
-    position: "fixed",
+    position: "fixed" as const,
   },
   bottomToolbars: {
     bottom: "18px",
