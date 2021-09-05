@@ -67,6 +67,7 @@ const useStyles = makeStyles(() =>
 const Submenu = (props: SubmenuProps): ReactElement => {
   const [paintbrush, setPaintbrush] = usePaintbrushStore();
   const [showTransparency, setShowTransparency] = useState(false);
+  const [showPixelated, setShowPixelated] = useState(false);
   const classes = useStyles();
 
   function changeBrushRadius(e: ChangeEvent, value: number) {
@@ -75,6 +76,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       brushRadius: value,
       annotationAlpha: paintbrush.annotationAlpha,
       annotationActiveAlpha: paintbrush.annotationActiveAlpha,
+      isPixelated: paintbrush.isPixelated,
     });
   }
 
@@ -90,6 +92,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       brushRadius: paintbrush.brushRadius, // FIXME
       annotationAlpha: paintbrush.annotationAlpha,
       annotationActiveAlpha: paintbrush.annotationActiveAlpha,
+      isPixelated: paintbrush.isPixelated,
     });
   }
 
@@ -99,6 +102,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       brushRadius: paintbrush.brushRadius, // FIXME
       annotationAlpha: paintbrush.annotationAlpha,
       annotationActiveAlpha: paintbrush.annotationActiveAlpha,
+      isPixelated: paintbrush.isPixelated,
     });
   }
 
@@ -110,12 +114,21 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     }
   }
 
+  function toggleShowPixelated() {
+    if (showPixelated) {
+      setShowPixelated(false);
+    } else {
+      setShowPixelated(true);
+    }
+  }
+
   function changeAnnotationTransparency(e: ChangeEvent, value: number) {
     setPaintbrush({
       brushType: paintbrush.brushType,
       brushRadius: paintbrush.brushRadius, // FIXME
       annotationAlpha: value,
       annotationActiveAlpha: paintbrush.annotationActiveAlpha,
+      isPixelated: paintbrush.isPixelated,
     });
   }
 
@@ -125,6 +138,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       brushRadius: paintbrush.brushRadius, // FIXME
       annotationAlpha: paintbrush.annotationAlpha,
       annotationActiveAlpha: value,
+      isPixelated: paintbrush.isPixelated,
     });
   }
 
@@ -160,6 +174,11 @@ const Submenu = (props: SubmenuProps): ReactElement => {
             tooltip={Tools.annotationAlpha}
             onClick={() => toggleShowTransparency()}
             fill={showTransparency}
+          />
+          <BaseIconButton
+            tooltip={Tools.togglesPixels}
+            onClick={() => toggleShowPixelated()}
+            fill={showPixelated}
           />
         </ButtonGroup>
         <Card className={classes.subMenuCard}>

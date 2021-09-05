@@ -35,6 +35,7 @@ interface Props extends CanvasProps {
   brushRadius: number;
   annotationActiveAlpha: number;
   annotationAlpha: number;
+  isPixelated: boolean;
   redraw: number;
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
@@ -278,6 +279,10 @@ export class CanvasClass extends Component<Props, State> {
           });
         }
       });
+
+    if (this.props.isPixelated) {
+      // TODO pixelate me
+    }
   };
 
   getCanvasBrushRadius = (brushRadius: number): number => {
@@ -526,7 +531,11 @@ export class CanvasClass extends Component<Props, State> {
 export const Canvas = (
   props: Omit<
     Props,
-    "brushRadius" | "isActive" | "annotationAlpha" | "annotationActiveAlpha"
+    | "brushRadius"
+    | "isActive"
+    | "annotationAlpha"
+    | "annotationActiveAlpha"
+    | "isPixelated"
   >
 ): ReactElement => {
   // we will overwrite props.activeToolbox, which will be paintbrush
@@ -552,6 +561,7 @@ export const Canvas = (
       brushRadius={paintbrush.brushRadius}
       annotationActiveAlpha={paintbrush.annotationActiveAlpha / 100}
       annotationAlpha={paintbrush.annotationAlpha / 100}
+      isPixelated={paintbrush.isPixelated}
       redraw={props.redraw}
       sliceIndex={props.sliceIndex}
       setUIActiveAnnotationID={props.setUIActiveAnnotationID}

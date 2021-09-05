@@ -8,6 +8,7 @@ interface PaintbrushData {
   brushRadius: number;
   annotationAlpha: number;
   annotationActiveAlpha: number;
+  isPixelated: boolean;
 }
 
 const defaultPaintbrush: PaintbrushData = {
@@ -15,6 +16,7 @@ const defaultPaintbrush: PaintbrushData = {
   brushRadius: SLIDER_CONFIG[Sliders.brushRadius].initial,
   annotationAlpha: SLIDER_CONFIG[Sliders.annotationAlpha].initial,
   annotationActiveAlpha: SLIDER_CONFIG[Sliders.annotationActiveAlpha].initial,
+  isPixelated: false,
 };
 
 // we've created store with initial value. This can now be used anywhere and will share the value.
