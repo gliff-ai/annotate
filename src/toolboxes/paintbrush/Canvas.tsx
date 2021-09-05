@@ -524,7 +524,10 @@ export class CanvasClass extends Component<Props, State> {
 }
 
 export const Canvas = (
-  props: Omit<Props, "brushRadius" | "isActive">
+  props: Omit<
+    Props,
+    "brushRadius" | "isActive" | "annotationAlpha" | "annotationActiveAlpha"
+  >
 ): ReactElement => {
   // we will overwrite props.activeToolbox, which will be paintbrush
   // with paintbrush.brushType, which will be paintbrush/eraser
