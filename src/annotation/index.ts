@@ -1,4 +1,4 @@
-import { Toolboxes } from "@/Toolboxes";
+import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { BoundingBox, BoundingBoxCoordinates } from "@/toolboxes/boundingBox";
 import { BrushStroke } from "@/toolboxes/paintbrush";
 import { Spline } from "@/toolboxes/spline";
@@ -511,6 +511,43 @@ export class Annotations {
       }
     }
     return null;
+  };
+
+  clickSelect = (
+    imageX: number,
+    imageY: number,
+    sliceIndex: number,
+    setUIActiveAnnotationID: (id: number) => void,
+    setActiveToolbox: (toolbox: Toolbox) => void
+  ) => {
+    const selectedBoundingBox = this.clickNearBoundingBox(
+      imageX,
+      imageY,
+      sliceIndex
+    );
+    const selectedSpline = this.clickNearSpline(imageX, imageY, sliceIndex);
+    const selectedBrushStroke = this.clickNearBrushStroke(
+      imageX,
+      imageY,
+      sliceIndex
+    );
+
+    if (selectedBrushStroke !== null) {
+      this.setActiveAnnotationID(selectedBrushStroke);
+      setUIActiveAnnotationID(selectedBrushStroke);
+      setActiveToolbox(Toolboxes.paintbrush);
+    } else if (selectedSpline !== null) {
+      this.setActiveAnnotationID(selectedSpline);
+      setUIActiveAnnotationID(selectedSpline);
+      setActiveToolbox(Toolboxes.spline);
+    } else if (
+      selectedBoundingBox !== null &&
+      selectedBoundingBox !== this.getActiveAnnotationID()
+    ) {
+      this.setActiveAnnotationID(selectedBoundingBox);
+      setUIActiveAnnotationID(selectedBoundingBox);
+      setActiveToolbox(Toolboxes.boundingBox);
+    }
   };
 
   @log
