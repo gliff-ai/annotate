@@ -4,4 +4,4 @@ export {
 } from "./Toolbox";
 export { Canvas as SplineCanvas, events } from "./Canvas";
 export { Toolbar as SplineToolbar } from "./Toolbar";
-export { Spline } from "./interfaces";
+export type { Spline } from "./interfaces";

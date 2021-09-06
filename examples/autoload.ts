@@ -30,6 +30,8 @@ const loadImage = (filename: string): Promise<UploadData> =>
           logger.error(e);
         });
     };
-    image.src = filename;
+
+    image.src =  filename;
   });
+
 export default loadImage;

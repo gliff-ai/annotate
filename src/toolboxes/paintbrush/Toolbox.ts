@@ -1,21 +1,22 @@
 import { Toolbox, ToolTips } from "@/Toolboxes";
+import { imgSrc } from "@/imgSrc";
 
 const ToolboxName: Toolbox = "paintbrush";
 
 const Tools: ToolTips = {
   paintbrush: {
     name: "Paintbrush",
-    icon: require(`@/assets/brush-icon.svg`) as string,
+    icon: imgSrc("brush-icon"),
     shortcut: "B",
   },
   eraser: {
     name: "Eraser",
-    icon: require(`@/assets/eraser-icon.svg`) as string,
+    icon: imgSrc("eraser-icon"),
     shortcut: "E",
   },
   fillbrush: {
     name: "Fill Active Paintbrush",
-    icon: require(`@/assets/fill-icon.svg`) as string,
+    icon: imgSrc("fill-icon"),
     shortcut: "F",
   },
 } as const;

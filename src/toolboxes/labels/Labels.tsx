@@ -21,6 +21,8 @@ import {
 
 import SVG from "react-inlinesvg";
 
+import { imgSrc } from "@/imgSrc";
+
 import { Annotations } from "@/annotation";
 
 export interface Props {
@@ -116,7 +118,7 @@ export const Labels: FunctionComponent<Props> = ({
             edge="end"
           >
             <SVG
-              src={require("../../assets/add-icon.svg") as string}
+              src={imgSrc("add-icon")}
               width="12px"
               height="100%"
               fill="#A1A1A1"
@@ -137,7 +139,7 @@ export const Labels: FunctionComponent<Props> = ({
                 onClick={handleRemoveLabel(label)}
               >
                 <SVG
-                  src={require("../../assets/backspace-icon.svg") as string}
+                  src={imgSrc("backspace-icon")}
                   width="28px"
                   height="100%"
                   fill="#02FFAD"
@@ -159,7 +161,7 @@ export const Labels: FunctionComponent<Props> = ({
                 onClick={handleAddLabel(label)}
               >
                 <SVG
-                  src={require("../../assets/add-icon.svg") as string}
+                  src={imgSrc("add-icon")}
                   width="12px"
                   height="100%"
                   fill="#000000"

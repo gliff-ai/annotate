@@ -11,10 +11,9 @@ import {
   WithStyles,
   ThemeProvider,
   StylesProvider,
-  createGenerateClassName,
 } from "@material-ui/core";
 import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
-import { theme, BaseIconButton } from "@gliff-ai/style";
+import { theme, BaseIconButton, generateClassName } from "@gliff-ai/style";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
@@ -32,6 +31,7 @@ import { Download } from "@/download/UI";
 import { keydownListener } from "@/keybindings";
 import { Tools } from "@/tooltips";
 import { BaseSlider, Config } from "@/components/BaseSlider";
+import { imgSrc } from "./imgSrc";
 
 const logger = console;
 
@@ -695,7 +695,7 @@ class UserInterface extends Component<Props, State> {
           <Grid container direction="row">
             <Grid item className={classes.iconbutton}>
               <img
-                src={require(`./assets/gliff-master-black.svg`) as string}
+                src={imgSrc("gliff-master-black")}
                 width="79px"
                 height="60px"
                 alt="gliff logo"
@@ -708,13 +708,8 @@ class UserInterface extends Component<Props, State> {
       </AppBar>
     );
 
-    const generateClassName = createGenerateClassName({
-      seed: "annotate",
-      disableGlobal: true,
-    });
-
     return (
-      <StylesProvider generateClassName={generateClassName}>
+      <StylesProvider generateClassName={generateClassName("annotate")}>
         <ThemeProvider theme={theme}>
           <Grid container className={classes.mainContainer}>
             <Grid
@@ -1013,5 +1008,8 @@ class UserInterface extends Component<Props, State> {
   };
 }
 
-export { UserInterface as UI };
-export default withStyles(styles)(UserInterface);
+const styledUserInterface = withStyles(styles)(UserInterface);
+export {
+  styledUserInterface as UserInterface,
+  UserInterface as UnstyledUserInterface,
+};

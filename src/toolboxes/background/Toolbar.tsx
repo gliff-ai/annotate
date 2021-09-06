@@ -27,6 +27,8 @@ import { Sliders, SLIDER_CONFIG } from "./configSlider";
 
 import { useBackgroundStore } from "./Store";
 
+import { imgSrc } from "@/imgSrc";
+
 interface Props {
   anchorElement: HTMLElement | null;
   buttonClicked: string;
@@ -106,17 +108,13 @@ const Toolbar = (props: Props): ReactElement => {
     // Update channel controls when a new image is uploaded.
     const untickedIcon = (
       <SVG
-        src={require("../../assets/not-selected-tickbox-icon.svg") as string}
+        src={imgSrc("not-selected-tickbox-icon")}
         width="18px"
         height="auto"
       />
     );
     const tickedIcon = (
-      <SVG
-        src={require("../../assets/selected-tickbox-icon.svg") as string}
-        width="18px"
-        height="auto"
-      />
+      <SVG src={imgSrc("selected-tickbox-icon")} width="18px" height="auto" />
     );
     setChannelControls(
       props.channels.map((channel, i) => (
@@ -172,11 +170,7 @@ const Toolbar = (props: Props): ReactElement => {
                 Channels
               </Typography>
               <Avatar className={classes.channelAvatar}>
-                <SVG
-                  src={require("../../assets/pin-icon.svg") as string}
-                  width="18px"
-                  height="auto"
-                />
+                <SVG src={imgSrc("pin-icon")} width="18px" height="auto" />
               </Avatar>
             </Paper>
             <FormControl component="fieldset">

@@ -4,4 +4,4 @@ export {
 } from "./Toolbox";
 export { Canvas as PaintbrushCanvas } from "./Canvas";
 export { Toolbar as PaintbrushToolbar } from "./Toolbar";
-export { BrushStroke } from "./interfaces";
+export type { BrushStroke } from "./interfaces";
