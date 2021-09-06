@@ -407,7 +407,7 @@ export class Annotations {
     const pa: XYPoint = { x: p.x - a.x, y: p.y - a.y };
     const ba: XYPoint = { x: b.x - a.x, y: b.y - a.y };
     let h = (pa.x * ba.x + pa.y * ba.y) / (ba.x ** 2 + ba.y ** 2);
-    if (isNaN(h)) {
+    if (Number.isNaN(h)) {
       // 0 / 0, happens when a == b. in this case h can be anything really, so set it to 0:
       h = 0;
     }
