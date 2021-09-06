@@ -23,6 +23,9 @@
   "license": "AGPL-3.0-only",
   "devDependencies": {
     "@gliff-ai/style": "^0.8.6",
+    "@material-ui/core": "^4.11.3",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.58",
     "@percy/cli": "^1.0.0-beta.67",
     "@types/jest": "^27.0.1",
     "@types/react": "^17.0.3",
