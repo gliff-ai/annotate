@@ -1,44 +1,14 @@
-import type { Tooltip } from "@gliff-ai/style";
-
-import { PaintbrushToolbox } from "@/toolboxes/paintbrush";
-import { SplineToolbox } from "@/toolboxes/spline";
-import { BoundingBoxToolbox } from "@/toolboxes/boundingBox";
+import { Tooltip } from "@gliff-ai/style";
+import { BackgroundTools, MinimapTools } from "@/toolboxes/background";
+import { PaintbrushTools } from "@/toolboxes/paintbrush";
+import { SplineTools } from "@/toolboxes/spline";
+import { BoundingBoxTools } from "@/toolboxes/boundingBox";
 
 import { imgSrc } from "@/imgSrc";
 
 type ToolTips = { [name: string]: Tooltip };
 
 const DefaultTools: ToolTips = {
-  minimiseMap: {
-    name: "Minimise Map",
-    icon: imgSrc("minimise-icon"),
-    shortcut: "ALT",
-    shortcutSymbol: "-",
-  },
-  maximiseMap: {
-    name: "Maximise Map",
-    icon: imgSrc("maximise-icon"),
-    shortcut: "ALT",
-    shortcutSymbol: "=",
-  },
-  zoomIn: {
-    name: "Zoom In",
-    icon: imgSrc("zoom-in-icon"),
-    shortcut: "ALT",
-    shortcutSymbol: "1",
-  },
-  zoomOut: {
-    name: "Zoom Out",
-    icon: imgSrc("zoom-out-icon"),
-    shortcut: "ALT",
-    shortcutSymbol: "2",
-  },
-  fitToPage: {
-    name: "Fit to Page",
-    icon: imgSrc("reset-zoom-and-pan-icon"),
-    shortcut: "ALT",
-    shortcutSymbol: "3",
-  },
   addNewAnnotation: {
     name: "Add New Annotation",
     icon: imgSrc("new-annotation-icon"),
@@ -53,21 +23,6 @@ const DefaultTools: ToolTips = {
     name: "Select",
     icon: imgSrc("select-icon"),
     shortcut: "A",
-  },
-  contrast: {
-    name: "Contrast",
-    icon: imgSrc("contrast-icon"),
-    shortcut: `\\`,
-  },
-  brightness: {
-    name: "Brightness",
-    icon: imgSrc("brightness-icon"),
-    shortcut: "/",
-  },
-  channels: {
-    name: "Channels",
-    icon: imgSrc("channels-icon"),
-    shortcut: "C",
   },
   labels: {
     name: "Annotation Label",
@@ -107,9 +62,11 @@ const DefaultTools: ToolTips = {
 
 const Tools: ToolTips = {
   ...DefaultTools,
-  ...PaintbrushToolbox,
-  ...BoundingBoxToolbox,
-  ...SplineToolbox,
+  ...BackgroundTools,
+  ...MinimapTools,
+  ...PaintbrushTools,
+  ...BoundingBoxTools,
+  ...SplineTools,
 };
 
 export { Tools };

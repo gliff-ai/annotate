@@ -6,17 +6,32 @@ import {
   Paper,
   Popover,
 } from "@material-ui/core";
+
 import { BaseIconButton } from "@gliff-ai/style";
+
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { BaseSlider } from "@/components/BaseSlider";
-import { Sliders, SLIDER_CONFIG } from "./configSlider";
-import { usePaintbrushStore } from "./Store";
-import { ToolboxName, Tools } from "./Toolbox";
 
-interface SubMenuProps {
+import { ToolboxName, Tools } from "./Toolbox";
+import { usePaintbrushStore } from "./Store";
+import { Sliders, SLIDER_CONFIG } from "./configSlider";
+
+interface SubmenuProps {
   isOpen: boolean;
   anchorElement: HTMLButtonElement | null;
   onClose: (event: MouseEvent) => void;
+}
+
+interface Props {
+  buttonClicked: string;
+  setButtonClicked: (buttonName: string) => void;
+  activateToolbox: (activeToolbox: Toolbox) => void;
+  handleOpen: (
+    event?: MouseEvent
+  ) => (anchorElement?: HTMLButtonElement) => void;
+  onClose: (event: MouseEvent) => void;
+  anchorElement: HTMLButtonElement | null;
+  isTyping: () => boolean;
 }
 
 const useStyles = makeStyles(() =>
@@ -35,7 +50,7 @@ const useStyles = makeStyles(() =>
   })
 );
 
-const Submenu = (props: SubMenuProps): ReactElement => {
+const Submenu = (props: SubmenuProps): ReactElement => {
   const [paintbrush, setPaintbrush] = usePaintbrushStore();
   const classes = useStyles();
 
@@ -81,17 +96,17 @@ const Submenu = (props: SubMenuProps): ReactElement => {
         >
           <BaseIconButton
             tooltip={Tools.paintbrush}
-            onClick={() => selectBrush}
+            onClick={() => selectBrush()}
             fill={paintbrush.brushType === Tools.paintbrush.name}
           />
           <BaseIconButton
             tooltip={Tools.eraser}
-            onClick={() => selectEraser}
+            onClick={() => selectEraser()}
             fill={paintbrush.brushType === Tools.eraser.name}
           />
           <BaseIconButton
             tooltip={Tools.fillbrush}
-            onClick={() => fillBrush}
+            onClick={() => fillBrush()}
             fill={false}
           />
         </ButtonGroup>
@@ -109,18 +124,6 @@ const Submenu = (props: SubMenuProps): ReactElement => {
     </>
   );
 };
-
-interface Props {
-  buttonClicked: string;
-  setButtonClicked: (buttonName: string) => void;
-  activateToolbox: (activeToolbox: Toolbox) => void;
-  handleOpen: (
-    event?: MouseEvent
-  ) => (anchorElement?: HTMLButtonElement) => void;
-  onClose: (event: MouseEvent) => void;
-  anchorElement: HTMLButtonElement | null;
-  isTyping: () => boolean;
-}
 
 const events = ["selectBrush"] as const;
 

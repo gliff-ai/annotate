@@ -1,38 +1,51 @@
 import {
+  Component,
   ChangeEvent,
   ReactElement,
-  useEffect,
   useState,
   MouseEvent,
 } from "react";
-
 import {
-  Typography,
+  ButtonGroup,
   Checkbox,
   FormControlLabel,
   FormGroup,
   FormControl,
   Popover,
   Card,
-  Paper,
-  Avatar,
   makeStyles,
   createStyles,
   Theme,
+  CardHeader,
+  CardContent,
 } from "@material-ui/core";
 import SVG from "react-inlinesvg";
 
+import { BaseIconButton } from "@gliff-ai/style";
 import { BaseSlider } from "@/components/BaseSlider";
-import { Sliders, SLIDER_CONFIG } from "./configSlider";
-
-import { useBackgroundStore } from "./Store";
-
+import { Toolboxes } from "@/Toolboxes";
 import { imgSrc } from "@/imgSrc";
 
-interface Props {
-  anchorElement: HTMLElement | null;
-  buttonClicked: string;
+import { Tools } from "./Toolbox";
+import { useBackgroundStore } from "./Store";
+import { Sliders, SLIDER_CONFIG } from "./configSlider";
+
+interface SubmenuProps {
+  isOpen: boolean;
+  anchorElement: HTMLButtonElement | null;
   onClose: (event: MouseEvent) => void;
+  channelControls: ReactElement[];
+}
+
+interface Props {
+  buttonClicked: string;
+  setButtonClicked: (buttonName: string) => void;
+  handleOpen: (
+    event?: MouseEvent
+  ) => (anchorElement?: HTMLButtonElement) => void;
+  onClose: (event: MouseEvent) => void;
+  anchorElement: HTMLButtonElement | null;
+  isTyping: () => boolean;
   channels: boolean[];
   toggleChannelAtIndex: (index: number) => void;
   displayedImage: ImageBitmap;
@@ -40,55 +53,40 @@ interface Props {
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    checkbox: {
-      marginLeft: "104px",
+    subMenu: {
+      display: "flex",
+      justifyContent: "space-between",
+      //   width: "136px",
+      height: "285px",
+      background: "none",
     },
-    contrastSlider: {
+    subMenuCard: {
+      height: "285px",
+      marginLeft: "18px", // TODO other toolbars should use this approach
+    },
+    baseSlider: {
       width: "63px",
-      height: "335px",
+      height: "250px",
+      textAlign: "center",
     },
-    brightnessSlider: {
-      width: "63px",
-      height: "335px",
-    },
-    channelCard: {
-      width: "189px",
-      height: "176px",
+    channelHeader: {
+      backgroundColor: theme.palette.primary.main,
     },
     channelTypography: {
       display: "inline",
       fontSize: "21px",
-      marginRight: "54px",
-      marginLeft: "3px",
-    },
-    channelAvatar: {
-      backgroundColor: theme.palette.primary.main,
-      display: "inline",
-    },
-    channelformGroup: {
-      margin: "0",
-      padding: "0",
-      marginLeft: "17px",
-    },
-    channelPaper: {
-      padding: "10px",
-      backgroundColor: theme.palette.primary.main,
-      width: "189px",
-      marginBottom: "15px",
+      marginRight: "18px",
     },
   })
 );
 
-const Toolbar = (props: Props): ReactElement => {
+const Submenu = (props: SubmenuProps): ReactElement => {
   const [background, setBackground] = useBackgroundStore();
-  const [channelControls, setChannelControls] = useState<JSX.Element[]>([]);
+  const [buttonClicked, setButtonClicked] = useState(null as string);
   const classes = useStyles();
 
-  function changeContrast(e: ChangeEvent, value: number) {
-    setBackground({
-      contrast: value,
-      brightness: background.brightness,
-    });
+  function selectBrightness() {
+    setButtonClicked(Tools.brightness.name);
   }
 
   function changeBrightness(e: ChangeEvent, value: number) {
@@ -98,13 +96,144 @@ const Toolbar = (props: Props): ReactElement => {
     });
   }
 
-  const isOpen = () =>
-    (props.buttonClicked === "Channels" ||
-      props.buttonClicked === "Brightness" ||
-      props.buttonClicked === "Contrast") &&
-    Boolean(props.anchorElement);
+  function selectContrast() {
+    setButtonClicked(Tools.contrast.name);
+  }
 
-  useEffect(() => {
+  function changeContrast(e: ChangeEvent, value: number) {
+    setBackground({
+      contrast: value,
+      brightness: background.brightness,
+    });
+  }
+
+  function selectChannels() {
+    setButtonClicked(Tools.channels.name);
+  }
+
+  return (
+    <>
+      <Popover
+        open={props.isOpen}
+        anchorEl={props.anchorElement}
+        onClose={props.onClose}
+        PaperProps={{ classes: { root: classes.subMenu } }}
+      >
+        <ButtonGroup
+          orientation="vertical"
+          size="small"
+          id="background-settings-toolbar"
+        >
+          <BaseIconButton
+            tooltip={Tools.brightness}
+            onClick={() => selectBrightness()}
+            fill={buttonClicked === Tools.brightness.name}
+          />
+          <BaseIconButton
+            tooltip={Tools.contrast}
+            onClick={() => selectContrast()}
+            fill={buttonClicked === Tools.contrast.name}
+          />
+          <BaseIconButton
+            tooltip={Tools.channels}
+            onClick={() => selectChannels()}
+            fill={buttonClicked === Tools.channels.name}
+          />
+        </ButtonGroup>
+        <Card className={classes.subMenuCard}>
+          {buttonClicked === Tools.brightness.name && (
+            <div className={classes.baseSlider}>
+              <BaseSlider
+                value={background.brightness}
+                config={SLIDER_CONFIG[Sliders.brightness]}
+                onChange={() => changeBrightness}
+                showEndValues={false}
+              />
+            </div>
+          )}
+          {buttonClicked === Tools.contrast.name && (
+            <div className={classes.baseSlider}>
+              <BaseSlider
+                value={background.contrast}
+                config={SLIDER_CONFIG[Sliders.contrast]}
+                onChange={() => changeContrast}
+                showEndValues={false}
+              />
+            </div>
+          )}
+          {buttonClicked === Tools.channels.name && props.channelControls && (
+            <>
+              <CardHeader
+                className={classes.channelHeader}
+                title="Channels"
+                titleTypographyProps={{ className: classes.channelTypography }}
+                action={
+                  <SVG src={imgSrc("pin-icon")} width="18px" height="auto" />
+                }
+              />
+              <CardContent>
+                <FormControl component="fieldset">
+                  <FormGroup aria-label="position" row>
+                    {props.channelControls.map((control, i) => (
+                      <FormControlLabel
+                        key={`C${i + 1}`}
+                        value="top"
+                        control={control}
+                        label={`C${i + 1}`}
+                        labelPlacement="start"
+                      />
+                    ))}
+                  </FormGroup>
+                </FormControl>
+              </CardContent>
+            </>
+          )}
+        </Card>
+      </Popover>
+    </>
+  );
+};
+
+const events = ["selectBackgroundSettings"] as const;
+
+interface Event extends CustomEvent {
+  type: typeof events[number];
+}
+class Toolbar extends Component<Props> {
+  private refBackgroundSettingsPopover: HTMLButtonElement;
+
+  private channelControls: JSX.Element[];
+
+  constructor(props: Props) {
+    super(props);
+    this.channelControls = null;
+    this.refBackgroundSettingsPopover = null;
+  }
+
+  componentDidMount = (): void => {
+    for (const event of events) {
+      document.addEventListener(event, this.handleEvent);
+    }
+    this.updateChannelChoices();
+  };
+
+  componentDidUpdate = (): void => {
+    this.updateChannelChoices();
+  };
+
+  componentWillUnmount(): void {
+    for (const event of events) {
+      document.removeEventListener(event, this.handleEvent);
+    }
+  }
+
+  handleEvent = (event: Event): void => {
+    if (event.detail === Toolboxes.background) {
+      this[event.type]?.call(this);
+    }
+  };
+
+  updateChannelChoices = (): void => {
     // Update channel controls when a new image is uploaded.
     const untickedIcon = (
       <SVG
@@ -116,82 +245,46 @@ const Toolbar = (props: Props): ReactElement => {
     const tickedIcon = (
       <SVG src={imgSrc("selected-tickbox-icon")} width="18px" height="auto" />
     );
-    setChannelControls(
-      props.channels.map((channel, i) => (
-        <Checkbox
-          className={classes.checkbox}
-          checked={channel}
-          icon={untickedIcon}
-          checkedIcon={tickedIcon}
-          onChange={() => {
-            props.toggleChannelAtIndex(i);
-          }}
-        />
-      ))
-    );
-  }, [props.displayedImage]);
+    this.channelControls = this.props.channels.map((channel, i) => (
+      <Checkbox
+        // className={classes.checkbox}
+        checked={channel}
+        icon={untickedIcon}
+        checkedIcon={tickedIcon}
+        onChange={() => {
+          this.props.toggleChannelAtIndex(i);
+        }}
+      />
+    ));
+  };
 
-  return props.displayedImage ? (
+  selectBackgroundSettings = (): void => {
+    if (this.props.isTyping()) return;
+    this.props.handleOpen()(this.refBackgroundSettingsPopover);
+    this.props.setButtonClicked(Tools.brightness.name);
+  };
+
+  render = (): ReactElement => (
     <>
-      <Popover
-        open={isOpen()}
-        anchorEl={props.anchorElement}
-        onClose={props.onClose}
-      >
-        {props.buttonClicked === "Contrast" && (
-          <div className={classes.contrastSlider}>
-            <BaseSlider
-              value={background.contrast}
-              config={SLIDER_CONFIG[Sliders.contrast]}
-              onChange={() => changeContrast}
-            />
-          </div>
-        )}
-
-        {props.buttonClicked === "Brightness" && (
-          <div className={classes.brightnessSlider}>
-            <BaseSlider
-              value={background.brightness}
-              config={SLIDER_CONFIG[Sliders.brightness]}
-              onChange={() => changeBrightness}
-            />
-          </div>
-        )}
-
-        {props.buttonClicked === "Channels" && (
-          <Card className={classes.channelCard}>
-            <Paper
-              elevation={0}
-              variant="outlined"
-              square
-              className={classes.channelPaper}
-            >
-              <Typography className={classes.channelTypography}>
-                Channels
-              </Typography>
-              <Avatar className={classes.channelAvatar}>
-                <SVG src={imgSrc("pin-icon")} width="18px" height="auto" />
-              </Avatar>
-            </Paper>
-            <FormControl component="fieldset">
-              <FormGroup aria-label="position" row>
-                {channelControls.map((control, i) => (
-                  <FormControlLabel
-                    key={`C${i + 1}`}
-                    value="top"
-                    control={control}
-                    label={`C${i + 1}`}
-                    labelPlacement="start"
-                    className={classes.channelformGroup}
-                  />
-                ))}
-              </FormGroup>
-            </FormControl>
-          </Card>
-        )}
-      </Popover>
+      <BaseIconButton
+        tooltip={Tools.brightness}
+        onClick={this.selectBackgroundSettings}
+        fill={this.props.buttonClicked === Tools.brightness.name}
+        setRefCallback={(ref) => {
+          this.refBackgroundSettingsPopover = ref;
+        }}
+      />
+      <Submenu
+        isOpen={
+          this.props.buttonClicked === Tools.brightness.name &&
+          Boolean(this.props.anchorElement)
+        }
+        anchorElement={this.props.anchorElement}
+        onClose={this.props.onClose}
+        channelControls={this.channelControls}
+      />
     </>
-  ) : null;
-};
+  );
+}
 
 export { Toolbar };
