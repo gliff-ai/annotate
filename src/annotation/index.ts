@@ -407,6 +407,10 @@ export class Annotations {
     const pa: XYPoint = { x: p.x - a.x, y: p.y - a.y };
     const ba: XYPoint = { x: b.x - a.x, y: b.y - a.y };
     let h = (pa.x * ba.x + pa.y * ba.y) / (ba.x ** 2 + ba.y ** 2);
+    if (isNaN(h)) {
+      // 0 / 0, happens when a == b. in this case h can be anything really, so set it to 0:
+      h = 0;
+    }
     h = Math.max(Math.min(h, 1), 0); // clamp between 0 and 1
     const r = Math.sqrt((pa.x - h * ba.x) ** 2 + (pa.y - h * ba.y) ** 2);
     return r < distanceThreshold;
@@ -486,12 +490,12 @@ export class Annotations {
         this.data[i].brushStrokes.forEach(
           ({ spaceTimeInfo, coordinates, brush }) => {
             if (spaceTimeInfo.z === sliceIndex) {
-              for (let j = 0; j < coordinates.length - 1; j += 1) {
+              for (let j = 0; j < coordinates.length; j += 1) {
                 if (
                   this.isClickNearLineSegment(
                     { x: imageX, y: imageY },
                     coordinates[j],
-                    coordinates[j + 1],
+                    coordinates[j + (j < coordinates.length - 1 ? 1 : 0)], // if we're on the last point, check for a click near that point rather than line segment to the next point. this allows us to select when there's only one point (so no line segments)
                     brush.radius
                   )
                 ) {
