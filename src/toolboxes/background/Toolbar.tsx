@@ -194,7 +194,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   );
 };
 
-const events = ["selectSettings"] as const;
+const events = ["selectBackgroundSettings"] as const;
 
 interface Event extends CustomEvent {
   type: typeof events[number];

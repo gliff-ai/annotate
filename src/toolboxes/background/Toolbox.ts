@@ -1,5 +1,5 @@
 import { imgSrc } from "@/imgSrc";
-import { ToolTips } from "@/Toolboxes";
+import { Toolbox, ToolTips } from "@/Toolboxes";
 
 const ToolboxName: Toolbox = "background";
 
