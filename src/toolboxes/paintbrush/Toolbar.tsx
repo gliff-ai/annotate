@@ -10,7 +10,6 @@ import {
   Card,
   createStyles,
   makeStyles,
-  Paper,
   Popover,
 } from "@material-ui/core";
 
