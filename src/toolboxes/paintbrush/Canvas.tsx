@@ -385,7 +385,6 @@ export class CanvasClass extends Component<Props, State> {
       this.handlePointerMove(canvasX, canvasY);
     } else if (this.props.mode === Mode.select) {
       // In select mode a single click allows to select a different spline annotation
-      // DEVNOTE this is currently duplicated in each Tools!
       const { x: imageX, y: imageY } = canvasToImage(
         canvasX,
         canvasY,
@@ -394,41 +393,13 @@ export class CanvasClass extends Component<Props, State> {
         this.props.scaleAndPan,
         this.props.canvasPositionAndSize
       );
-      const selectedBoundingBox =
-        this.props.annotationsObject.clickNearBoundingBox(
-          imageX,
-          imageY,
-          this.props.sliceIndex
-        );
-      const selectedSpline = this.props.annotationsObject.clickNearSpline(
+      this.props.annotationsObject.clickSelect(
         imageX,
         imageY,
-        this.props.sliceIndex
+        this.props.sliceIndex,
+        this.props.setUIActiveAnnotationID,
+        this.props.setActiveToolbox
       );
-      const selectedBrushStroke =
-        this.props.annotationsObject.clickNearBrushStroke(
-          imageX,
-          imageY,
-          this.props.sliceIndex
-        );
-
-      if (selectedBrushStroke !== null) {
-        this.props.annotationsObject.setActiveAnnotationID(selectedBrushStroke);
-        this.props.setUIActiveAnnotationID(selectedBrushStroke);
-        this.props.setActiveToolbox(Toolboxes.paintbrush);
-      } else if (selectedSpline !== null) {
-        this.props.annotationsObject.setActiveAnnotationID(selectedSpline);
-        this.props.setUIActiveAnnotationID(selectedSpline);
-        this.props.setActiveToolbox(Toolboxes.spline);
-      } else if (
-        selectedBoundingBox !== null &&
-        selectedBoundingBox !==
-          this.props.annotationsObject.getActiveAnnotationID()
-      ) {
-        this.props.annotationsObject.setActiveAnnotationID(selectedBoundingBox);
-        this.props.setUIActiveAnnotationID(selectedBoundingBox);
-        this.props.setActiveToolbox(Toolboxes.boundingBox);
-      }
     }
   };
 
