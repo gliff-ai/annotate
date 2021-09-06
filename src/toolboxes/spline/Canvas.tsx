@@ -293,7 +293,6 @@ class CanvasClass extends Component<Props> {
 
     if (this.props.mode === Mode.select) {
       // In select mode a single click allows to select a different spline annotation
-      // DEVNOTE this is currently duplicated in each toolbox!
       const selectedBoundingBox =
         this.props.annotationsObject.clickNearBoundingBox(
           imageX,

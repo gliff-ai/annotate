@@ -385,7 +385,6 @@ export class CanvasClass extends Component<Props, State> {
       this.handlePointerMove(canvasX, canvasY);
     } else if (this.props.mode === Mode.select) {
       // In select mode a single click allows to select a different spline annotation
-      // DEVNOTE this is currently duplicated in each Tools!
       const { x: imageX, y: imageY } = canvasToImage(
         canvasX,
         canvasY,
