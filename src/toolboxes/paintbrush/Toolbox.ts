@@ -19,6 +19,16 @@ const Tools: ToolTips = {
     icon: imgSrc("fill-icon"),
     shortcut: "F",
   },
+  annotationAlpha: {
+    name: "Annotation Transparency",
+    icon: imgSrc("channels-icon"),
+    shortcut: "T",
+  },
+  togglePixels: {
+    name: "Show strokes as pixels?",
+    icon: imgSrc("channels-icon"),
+    shortcut: "P",
+  },
 } as const;
 
 export { ToolboxName, Tools };

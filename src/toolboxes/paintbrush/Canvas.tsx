@@ -33,6 +33,8 @@ interface Props extends CanvasProps {
   mode: Mode;
   annotationsObject: Annotations;
   brushRadius: number;
+  annotationActiveAlpha: number;
+  annotationAlpha: number;
   redraw: number;
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
@@ -119,7 +121,7 @@ export class CanvasClass extends Component<Props, State> {
     this.isPressing = false;
     this.isDrawing = false;
     this.points = [];
-    this.annotationOpacity = 1;
+    this.annotationOpacity = this.props.annotationActiveAlpha;
     this.backgroundCanvas = null;
 
     this.state = {
@@ -209,10 +211,10 @@ export class CanvasClass extends Component<Props, State> {
     // Set annotation colour and transparency
     if (isActive) {
       context.strokeStyle = mainColor;
-      this.annotationOpacity = 1;
+      this.annotationOpacity = this.props.annotationActiveAlpha;
     } else {
       context.strokeStyle = brush.color;
-      this.annotationOpacity = 0.5;
+      this.annotationOpacity = this.props.annotationAlpha;
     }
     context.globalAlpha = this.annotationOpacity;
 
@@ -522,7 +524,10 @@ export class CanvasClass extends Component<Props, State> {
 }
 
 export const Canvas = (
-  props: Omit<Props, "brushRadius" | "isActive">
+  props: Omit<
+    Props,
+    "brushRadius" | "isActive" | "annotationAlpha" | "annotationActiveAlpha"
+  >
 ): ReactElement => {
   // we will overwrite props.activeToolbox, which will be paintbrush
   // with paintbrush.brushType, which will be paintbrush/eraser
@@ -545,6 +550,8 @@ export const Canvas = (
       scaleAndPan={props.scaleAndPan}
       canvasPositionAndSize={props.canvasPositionAndSize}
       brushRadius={paintbrush.brushRadius}
+      annotationActiveAlpha={paintbrush.annotationActiveAlpha / 100}
+      annotationAlpha={paintbrush.annotationAlpha / 100}
       redraw={props.redraw}
       sliceIndex={props.sliceIndex}
       setUIActiveAnnotationID={props.setUIActiveAnnotationID}
