@@ -519,7 +519,7 @@ export class Annotations {
     sliceIndex: number,
     setUIActiveAnnotationID: (id: number) => void,
     setActiveToolbox: (toolbox: Toolbox) => void
-  ) => {
+  ): void => {
     const selectedBoundingBox = this.clickNearBoundingBox(
       imageX,
       imageY,
