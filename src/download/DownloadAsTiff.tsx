@@ -6,7 +6,7 @@ import { XYPoint } from "@/annotation/interfaces";
 import { palette } from "@/components/palette";
 import { Toolboxes } from "@/Toolboxes";
 
-function drawCapsule(
+export function drawCapsule(
   point0: XYPoint,
   point1: XYPoint,
   r: number,
