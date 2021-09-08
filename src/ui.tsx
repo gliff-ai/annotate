@@ -64,6 +64,7 @@ export const events = [
   "saveAnnotations",
   "undo",
   "redo",
+  "togglePixelView",
 ] as const;
 
 interface State {
@@ -85,6 +86,7 @@ interface State {
   mode: Mode;
   canvasContainerColour: number[];
   canUndoRedo: { undo: boolean; redo: boolean };
+  pixelView: boolean;
 }
 
 const styles = {
@@ -216,6 +218,7 @@ class UserInterface extends Component<Props, State> {
       mode: Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
       canUndoRedo: { undo: false, redo: false },
+      pixelView: false,
     };
 
     this.annotationsObject.addAnnotation(this.state.activeToolbox);
@@ -651,6 +654,10 @@ class UserInterface extends Component<Props, State> {
   redo = (): void => {
     this.setState({ canUndoRedo: this.annotationsObject.redo() });
     this.callRedraw();
+  };
+
+  togglePixelView = (): void => {
+    this.setState({ pixelView: !this.state.pixelView });
   };
 
   isTyping = (): boolean =>

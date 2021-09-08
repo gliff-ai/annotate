@@ -113,6 +113,9 @@ const Submenu = (props: SubmenuProps): ReactElement => {
 
   function togglePixelView() {
     setPixelView(!pixelView);
+    document.dispatchEvent(
+      new CustomEvent("togglePixelView", { detail: Toolboxes.paintbrush })
+    );
   }
 
   function changeAnnotationTransparency(e: ChangeEvent, value: number) {
