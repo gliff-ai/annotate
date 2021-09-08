@@ -65,7 +65,9 @@ const useStyles = makeStyles(() =>
 
 const Submenu = (props: SubmenuProps): ReactElement => {
   const [paintbrush, setPaintbrush] = usePaintbrushStore();
-  const [showTransparency, setShowTransparency] = useState(false);
+  const [showTransparency, setShowTransparency] = useState<boolean>(false);
+  const [pixelView, setPixelView] = useState<boolean>(false);
+
   const classes = useStyles();
 
   function changeBrushRadius(e: ChangeEvent, value: number) {
@@ -107,6 +109,10 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     } else {
       setShowTransparency(true);
     }
+  }
+
+  function togglePixelView() {
+    setPixelView(!pixelView);
   }
 
   function changeAnnotationTransparency(e: ChangeEvent, value: number) {
@@ -159,6 +165,13 @@ const Submenu = (props: SubmenuProps): ReactElement => {
             tooltip={Tools.annotationAlpha}
             onClick={() => toggleShowTransparency()}
             fill={showTransparency}
+          />
+          <BaseIconButton
+            tooltip={Tools.togglePixels}
+            onClick={() => {
+              togglePixelView();
+            }}
+            fill={pixelView}
           />
         </ButtonGroup>
         <Card className={classes.subMenuCard}>

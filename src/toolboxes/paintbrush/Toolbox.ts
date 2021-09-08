@@ -25,7 +25,7 @@ const Tools: ToolTips = {
     shortcut: "T",
   },
   togglePixels: {
-    name: "Show strokes as pixels?",
+    name: "Show strokes as pixels",
     icon: imgSrc("channels-icon"),
     shortcut: "P",
   },
