@@ -23,6 +23,8 @@ import { Toolboxes, Toolbox } from "@/Toolboxes";
 import { Tools } from "./Toolbox";
 import { usePaintbrushStore } from "./Store";
 import { BrushStroke } from "./interfaces";
+import { drawCapsule } from "@/download/DownloadAsTiff";
+import { getNewImageSizeAndDisplacement } from "@/toolboxes/background/drawImage";
 
 const mainColor = theme.palette.primary.main;
 const secondaryColor = theme.palette.secondary.main;
@@ -49,11 +51,13 @@ interface Brush {
 
 interface State {
   hideBackCanvas: boolean;
+  pixelImage: HTMLCanvasElement | null;
+  pixelView: boolean;
 }
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
 // We should maybe namespace them so we don't get conflicting methods across toolboxes.
-export const events = ["saveLine", "fillBrush"] as const;
+export const events = ["saveLine", "fillBrush", "togglePixelView"] as const;
 
 interface Event extends CustomEvent {
   type: typeof events[number];
@@ -126,6 +130,8 @@ export class CanvasClass extends Component<Props, State> {
 
     this.state = {
       hideBackCanvas: false,
+      pixelImage: null,
+      pixelView: false,
     };
   }
 
@@ -249,6 +255,10 @@ export class CanvasClass extends Component<Props, State> {
     context.stroke();
   };
 
+  togglePixelView = (): void => {
+    this.setState({ pixelView: !this.state.pixelView });
+  };
+
   drawAllStrokes = (context = this.backgroundCanvas?.canvasContext): void => {
     // Draw strokes on active layer whiles showing existing paintbrush layers
     if (!context) return;
@@ -260,24 +270,68 @@ export class CanvasClass extends Component<Props, State> {
     // Clear paintbrush canvas
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-    // Draw all paintbrush annotations
-    this.props.annotationsObject
-      .getAllAnnotations()
-      .forEach((annotationsObject, i) => {
-        if (annotationsObject.toolbox === Toolboxes.paintbrush) {
-          annotationsObject.brushStrokes.forEach((brushStrokes) => {
-            if (brushStrokes.spaceTimeInfo.z === this.props.sliceIndex) {
-              this.drawPoints(
-                brushStrokes.coordinates,
-                brushStrokes.brush,
-                false,
-                context,
-                i === activeAnnotationID
+    if (this.state.pixelView) {
+      let img = new Uint8Array(
+        4 * this.props.displayedImage.width * this.props.displayedImage.height
+      );
+      for (let i = 0; i < img.length; i += 1) {
+        img[i] = i % 4 == 3 ? 255 : 0; // set alpha channel to 255
+      }
+      this.props.annotationsObject
+        .getAllAnnotations()
+        .filter(({ toolbox }) => toolbox === Toolboxes.paintbrush)
+        .forEach(({ brushStrokes }, annotationIndex) => {
+          brushStrokes.forEach(({ coordinates, brush }) => {
+            coordinates.forEach((point0, i) => {
+              img = drawCapsule(
+                point0,
+                i + 1 < coordinates.length ? coordinates[i + 1] : point0,
+                brush.radius,
+                img,
+                this.props.displayedImage.width,
+                annotationIndex,
+                brush.type,
+                4
               );
-            }
+            });
           });
-        }
-      });
+        });
+      const pixCanvas = document.createElement("canvas");
+      const pixCtx = pixCanvas.getContext("2d");
+      pixCanvas.width = this.props.displayedImage.width;
+      pixCanvas.height = this.props.displayedImage.height;
+      const imgData = new ImageData(
+        Uint8ClampedArray.from(img),
+        this.props.displayedImage.width
+      );
+      pixCtx.putImageData(imgData, 0, 0);
+      const { offsetX, offsetY, newWidth, newHeight } =
+        getNewImageSizeAndDisplacement(
+          context,
+          imgData,
+          this.props.scaleAndPan
+        );
+      context.drawImage(pixCanvas, offsetX, offsetY, newWidth, newHeight);
+    } else {
+      // Draw all paintbrush annotations
+      this.props.annotationsObject
+        .getAllAnnotations()
+        .forEach((annotationsObject, i) => {
+          if (annotationsObject.toolbox === Toolboxes.paintbrush) {
+            annotationsObject.brushStrokes.forEach((brushStrokes) => {
+              if (brushStrokes.spaceTimeInfo.z === this.props.sliceIndex) {
+                this.drawPoints(
+                  brushStrokes.coordinates,
+                  brushStrokes.brush,
+                  false,
+                  context,
+                  i === activeAnnotationID
+                );
+              }
+            });
+          }
+        });
+    }
   };
 
   getCanvasBrushRadius = (brushRadius: number): number => {
