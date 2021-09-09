@@ -274,9 +274,6 @@ export class CanvasClass extends Component<Props, State> {
       let img = new Uint8Array(
         4 * this.props.displayedImage.width * this.props.displayedImage.height
       );
-      for (let i = 0; i < img.length; i += 1) {
-        img[i] = i % 4 == 3 ? 255 : 0; // set alpha channel to 255
-      }
       this.props.annotationsObject
         .getAllAnnotations()
         .filter(({ toolbox }) => toolbox === Toolboxes.paintbrush)

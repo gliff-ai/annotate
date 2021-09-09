@@ -24,6 +24,9 @@ export function drawCapsule(
   // Each edge can be divided into three part: the top cap, the straight line, the bottom cap.
   const arr = dataSlice;
   const annotationColor = palette[annotationIndex];
+  if (samplesPerPixel === 4) {
+    annotationColor.push(255); // alpha
+  }
 
   const roundXYPoint = (point: XYPoint): XYPoint => ({
     x: Math.round(point.x),
