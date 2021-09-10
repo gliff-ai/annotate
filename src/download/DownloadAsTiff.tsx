@@ -23,10 +23,10 @@ export function drawCapsule(
   // This means that we must identify the left and right edges of the line.
   // Each edge can be divided into three part: the top cap, the straight line, the bottom cap.
   const arr = dataSlice;
-  const annotationColor = palette[annotationIndex];
-  if (samplesPerPixel === 4) {
-    annotationColor.push(255); // alpha
-  }
+  const annotationColor =
+    samplesPerPixel === 4
+      ? palette[annotationIndex].concat(255) // alpha
+      : palette[annotationIndex];
 
   const roundXYPoint = (point: XYPoint): XYPoint => ({
     x: Math.round(point.x),
