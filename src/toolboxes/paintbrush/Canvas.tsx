@@ -111,6 +111,10 @@ export class CanvasClass extends Component<Props, State> {
 
   private backgroundCanvas: BaseCanvas | null;
 
+  private pixelCanvas: HTMLCanvasElement | null;
+
+  private pixelCtx: CanvasRenderingContext2D | null;
+
   private isPressing: boolean;
 
   private isDrawing: boolean;
@@ -127,6 +131,8 @@ export class CanvasClass extends Component<Props, State> {
     this.points = [];
     this.annotationOpacity = this.props.annotationActiveAlpha;
     this.backgroundCanvas = null;
+    this.pixelCanvas = null;
+    this.pixelCtx = null;
 
     this.state = {
       hideBackCanvas: false,
@@ -293,22 +299,32 @@ export class CanvasClass extends Component<Props, State> {
             });
           });
         });
-      const pixCanvas = document.createElement("canvas");
-      const pixCtx = pixCanvas.getContext("2d");
-      pixCanvas.width = this.props.displayedImage.width;
-      pixCanvas.height = this.props.displayedImage.height;
+
+      if (this.pixelCanvas === null) {
+        this.pixelCanvas = document.createElement("canvas");
+        this.pixelCtx = this.pixelCanvas.getContext("2d");
+        this.pixelCanvas.width = this.props.displayedImage.width;
+        this.pixelCanvas.height = this.props.displayedImage.height;
+      }
+
       const imgData = new ImageData(
         Uint8ClampedArray.from(img),
         this.props.displayedImage.width
       );
-      pixCtx.putImageData(imgData, 0, 0);
+      this.pixelCtx.putImageData(imgData, 0, 0);
       const { offsetX, offsetY, newWidth, newHeight } =
         getNewImageSizeAndDisplacement(
           context,
           imgData,
           this.props.scaleAndPan
         );
-      context.drawImage(pixCanvas, offsetX, offsetY, newWidth, newHeight);
+      context.drawImage(
+        this.pixelCanvas,
+        offsetX,
+        offsetY,
+        newWidth,
+        newHeight
+      );
     } else {
       // Draw all paintbrush annotations
       this.props.annotationsObject
