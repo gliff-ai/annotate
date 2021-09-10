@@ -51,7 +51,6 @@ interface Brush {
 
 interface State {
   hideBackCanvas: boolean;
-  pixelImage: HTMLCanvasElement | null;
   pixelView: boolean;
 }
 
@@ -136,7 +135,6 @@ export class CanvasClass extends Component<Props, State> {
 
     this.state = {
       hideBackCanvas: false,
-      pixelImage: null,
       pixelView: false,
     };
   }
@@ -262,7 +260,7 @@ export class CanvasClass extends Component<Props, State> {
   };
 
   togglePixelView = (): void => {
-    this.setState({ pixelView: !this.state.pixelView });
+    this.setState((oldstate) => ({ pixelView: !oldstate.pixelView }));
   };
 
   drawAllStrokes = (context = this.backgroundCanvas?.canvasContext): void => {
