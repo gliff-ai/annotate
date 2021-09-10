@@ -275,6 +275,8 @@ export class CanvasClass extends Component<Props, State> {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
     if (this.state.pixelView) {
+      // rasterize the brushstrokes and display as image rather than vector:
+
       let img = new Uint8Array(
         4 * this.props.displayedImage.width * this.props.displayedImage.height
       );
@@ -298,6 +300,14 @@ export class CanvasClass extends Component<Props, State> {
           });
         });
 
+      // to get the Uint8Array to render as an image, we need to convert it to ImageData,
+      // then put that in a Canvas, then use drawImage to render that on the paintbrush canvas:
+
+      const imgData = new ImageData(
+        Uint8ClampedArray.from(img),
+        this.props.displayedImage.width
+      );
+
       if (this.pixelCanvas === null) {
         this.pixelCanvas = document.createElement("canvas");
         this.pixelCtx = this.pixelCanvas.getContext("2d");
@@ -305,11 +315,8 @@ export class CanvasClass extends Component<Props, State> {
         this.pixelCanvas.height = this.props.displayedImage.height;
       }
 
-      const imgData = new ImageData(
-        Uint8ClampedArray.from(img),
-        this.props.displayedImage.width
-      );
       this.pixelCtx.putImageData(imgData, 0, 0);
+
       const { offsetX, offsetY, newWidth, newHeight } =
         getNewImageSizeAndDisplacement(
           context,
