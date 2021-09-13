@@ -147,7 +147,7 @@ export function drawCapsule(
         if (x >= 0 && x <= imageWidth) {
           const index = samplesPerPixel * (imageWidth * y + x);
           if (
-            arr.slice(index, index + 3).toString() ===
+            arr.slice(index, index + samplesPerPixel).toString() ===
             annotationColor.toString()
           ) {
             annotationColor.forEach((c, i) => {

@@ -323,6 +323,9 @@ export class CanvasClass extends Component<Props, State> {
           imgData,
           this.props.scaleAndPan
         );
+      // // background canvas globalCompositeOperation may still be "destination-out" if
+      // the most recent brushstroke is an eraser, so make sure it's source-over here or else we won't see anything:
+      context.globalCompositeOperation = "source-over";
       context.drawImage(
         this.pixelCanvas,
         offsetX,
@@ -534,7 +537,7 @@ export class CanvasClass extends Component<Props, State> {
           }}
         >
           <div
-            style={{ opacity: this.state.hideBackCanvas ? "none" : "block" }}
+            style={{ opacity: this.state.hideBackCanvas ? "none" : "block" }} // DEVNOTE: this line does nothing!
           >
             <BaseCanvas
               cursor="none"
