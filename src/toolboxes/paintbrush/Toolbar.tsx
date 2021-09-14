@@ -73,7 +73,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   function changeBrushRadius(e: ChangeEvent, value: number) {
     setPaintbrush({
       brushType: paintbrush.brushType, // FIXME
-      brushRadius: value,
+      brushRadius: value / 2, // convert from diameter (the displayed size) to radius (what the rest of the codebase expects)
       annotationAlpha: paintbrush.annotationAlpha,
       annotationActiveAlpha: paintbrush.annotationActiveAlpha,
     });
@@ -181,7 +181,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
           <div className={classes.baseSliderContainer}>
             <div className={classes.baseSlider}>
               <BaseSlider
-                value={paintbrush.brushRadius}
+                value={paintbrush.brushRadius * 2}
                 config={SLIDER_CONFIG[Sliders.brushRadius]}
                 onChange={() => changeBrushRadius}
                 showEndValues={false}
