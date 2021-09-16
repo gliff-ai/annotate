@@ -6,7 +6,7 @@ import { XYPoint } from "@/annotation/interfaces";
 import { palette } from "@/components/palette";
 import { Toolboxes } from "@/Toolboxes";
 
-function drawCapsule(
+export function drawCapsule(
   point0: XYPoint,
   point1: XYPoint,
   r: number,
@@ -23,7 +23,10 @@ function drawCapsule(
   // This means that we must identify the left and right edges of the line.
   // Each edge can be divided into three part: the top cap, the straight line, the bottom cap.
   const arr = dataSlice;
-  const annotationColor = palette[annotationIndex];
+  const annotationColor =
+    samplesPerPixel === 4
+      ? palette[annotationIndex].concat(255) // alpha
+      : palette[annotationIndex];
 
   const roundXYPoint = (point: XYPoint): XYPoint => ({
     x: Math.round(point.x),
@@ -144,7 +147,7 @@ function drawCapsule(
         if (x >= 0 && x <= imageWidth) {
           const index = samplesPerPixel * (imageWidth * y + x);
           if (
-            arr.slice(index, index + 3).toString() ===
+            arr.slice(index, index + samplesPerPixel).toString() ===
             annotationColor.toString()
           ) {
             annotationColor.forEach((c, i) => {

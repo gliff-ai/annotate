@@ -15,7 +15,7 @@ export const SLIDER_CONFIG: {
     initial: 10,
     step: 1,
     min: 1,
-    max: 20,
+    max: 40,
     unit: "px",
   },
   [Sliders.annotationAlpha]: {

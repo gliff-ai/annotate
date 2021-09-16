@@ -1,6 +1,6 @@
-function getNewImageSizeAndDisplacement(
+export function getNewImageSizeAndDisplacement(
   ctx: CanvasRenderingContext2D,
-  img: HTMLImageElement | ImageBitmap,
+  img: HTMLImageElement | ImageBitmap | ImageData,
   scaleAndPan: {
     x: number;
     y: number;

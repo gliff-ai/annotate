@@ -10,6 +10,7 @@ export const keybindings = {
   KeyA: "ui.toggleMode",
   KeyB: "paintbrush.selectBrush",
   KeyE: "paintbrush.selectEraser",
+  KeyP: "paintbrush.togglePixelView",
   KeyS: "spline.selectSpline",
   KeyM: "spline.selectMagicspline",
   KeyD: "download.openDownloadDropdown",
