@@ -326,6 +326,7 @@ export class CanvasClass extends Component<Props, State> {
       // // background canvas globalCompositeOperation may still be "destination-out" if
       // the most recent brushstroke is an eraser, so make sure it's source-over here or else we won't see anything:
       context.globalCompositeOperation = "source-over";
+      context.imageSmoothingEnabled = false;
       context.drawImage(
         this.pixelCanvas,
         offsetX,
