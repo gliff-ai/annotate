@@ -45,6 +45,7 @@ export class CanvasClass extends Component<Props, State> {
     if (this.props.displayedImage) {
       this.baseCanvas.canvasContext.globalCompositeOperation =
         "destination-over";
+      this.baseCanvas.canvasContext.imageSmoothingEnabled = false;
       drawImageOnCanvas(
         this.baseCanvas.canvasContext,
         this.props.displayedImage,
