@@ -333,6 +333,7 @@ export class Annotations {
   }
 
   @log
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private setSplineCoordinates(newCoords: XYPoint[], addToUndoRedo = true) {
     // only used when undoing clearSplineCoordinates, hence private
     this.data[this.activeAnnotationID].spline.coordinates = newCoords;
@@ -605,6 +606,7 @@ export class Annotations {
   }
 
   @log
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private deleteBrushStroke(addToUndoRedo = true): void {
     // deletes the most recent brush stroke. only used when undoing addBrushStroke, hence it's private
     if (this.data[this.activeAnnotationID].toolbox === Toolboxes.paintbrush) {
@@ -626,7 +628,7 @@ export class Annotations {
   @log
   private setBrushStrokes(
     newBrushStrokes: BrushStroke[],
-    addToUndoRedo = true
+    addToUndoRedo = true // eslint-disable-line @typescript-eslint/no-unused-vars
   ): void {
     // only used when undoing clearBrushStrokes, hence it's private
     this.data[this.activeAnnotationID].brushStrokes = newBrushStrokes;
