@@ -178,7 +178,7 @@ export class Annotations {
   clearBoundingBoxCoordinates(addToUndoRedo = true): void {
     const oldCoords = JSON.parse(
       JSON.stringify(this.data[this.activeAnnotationID].boundingBox.coordinates)
-    );
+    ) as XYPoint[];
     this.data[this.activeAnnotationID].boundingBox.coordinates = {
       topLeft: null,
       bottomRight: null,
@@ -196,7 +196,7 @@ export class Annotations {
   ): void {
     const oldCoords = JSON.parse(
       JSON.stringify(this.data[this.activeAnnotationID].boundingBox.coordinates)
-    );
+    ) as BoundingBoxCoordinates;
     if (this.data[this.activeAnnotationID].toolbox === Toolboxes.boundingBox) {
       this.data[this.activeAnnotationID].boundingBox.coordinates = coordinates;
     }
@@ -213,7 +213,7 @@ export class Annotations {
       JSON.stringify(
         this.data[this.activeAnnotationID].boundingBox.spaceTimeInfo
       )
-    );
+    ) as { z: number; t: number };
     if (z === undefined && t === undefined) return;
     const { z: prevZ, t: prevT } =
       this.data[this.activeAnnotationID].boundingBox.spaceTimeInfo;
@@ -324,7 +324,7 @@ export class Annotations {
   clearSplineCoordinates(addToUndoRedo = true): void {
     const oldCoords = JSON.parse(
       JSON.stringify(this.data[this.activeAnnotationID].spline.coordinates)
-    );
+    ) as XYPoint[];
     this.data[this.activeAnnotationID].spline.coordinates = [];
     if (addToUndoRedo) {
       this.updateUndoRedoActions("setSplineCoordinates", [oldCoords]);
@@ -616,7 +616,7 @@ export class Annotations {
   clearBrushStrokes(addToUndoRedo = true): void {
     const oldBrushStrokes = JSON.parse(
       JSON.stringify(this.data[this.activeAnnotationID].brushStrokes)
-    );
+    ) as BrushStroke[];
     this.data[this.activeAnnotationID].brushStrokes = [];
     if (addToUndoRedo) {
       this.updateUndoRedoActions("setBrushStrokes", [oldBrushStrokes]);
