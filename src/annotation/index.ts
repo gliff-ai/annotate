@@ -180,6 +180,7 @@ export class Annotations {
     };
     if (addToUndoRedo) {
       this.updateUndoRedoActions("updateBoundingBoxCoordinates", [oldCoords]);
+      this.redoData = [];
     }
   }
 
@@ -196,6 +197,7 @@ export class Annotations {
     }
     if (addToUndoRedo) {
       this.updateUndoRedoActions("updateBoundingBoxCoordinates", [oldCoords]);
+      this.redoData = [];
     }
   }
 
@@ -216,6 +218,7 @@ export class Annotations {
     };
     if (addToUndoRedo) {
       this.updateUndoRedoActions("setBoundingBoxTimeInfo", [oldZT.z, oldZT.t]);
+      this.redoData = [];
     }
   }
 
@@ -574,15 +577,42 @@ export class Annotations {
   };
 
   @log
-  addBrushStroke(newBrushStroke: BrushStroke): void {
+  addBrushStroke(newBrushStroke: BrushStroke, addToUndoRedo = true): void {
     if (this.data[this.activeAnnotationID].toolbox === Toolboxes.paintbrush) {
       this.data[this.activeAnnotationID].brushStrokes.push(newBrushStroke);
+      if (addToUndoRedo) {
+        this.updateUndoRedoActions("deleteBrushStroke", []);
+        this.redoData = [];
+      }
     }
   }
 
   @log
-  clearBrushStrokes(): void {
+  private deleteBrushStroke(addToUndoRedo = true): void {
+    // deletes the most recent brush stroke. only used when undoing addBrushStroke, hence it's private
+    if (this.data[this.activeAnnotationID].toolbox === Toolboxes.paintbrush) {
+      this.data[this.activeAnnotationID].brushStrokes.pop();
+    }
+  }
+
+  @log
+  clearBrushStrokes(addToUndoRedo = true): void {
+    const oldBrushStrokes = JSON.parse(
+      JSON.stringify(this.data[this.activeAnnotationID].brushStrokes)
+    );
     this.data[this.activeAnnotationID].brushStrokes = [];
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("setBrushStrokes", [oldBrushStrokes]);
+    }
+  }
+
+  @log
+  private setBrushStrokes(
+    newBrushStrokes: BrushStroke[],
+    addToUndoRedo = true
+  ): void {
+    // only used when undoing clearBrushStrokes, hence it's private
+    this.data[this.activeAnnotationID].brushStrokes = newBrushStrokes;
   }
 
   getBrushStrokeCoordinates = (index = 0): Array<XYPoint> =>
