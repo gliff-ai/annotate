@@ -170,23 +170,43 @@ export class Annotations {
   };
 
   @log
-  clearBoundingBoxCoordinates(): void {
+  clearBoundingBoxCoordinates(addToUndoRedo = true): void {
+    const oldCoords = JSON.parse(
+      JSON.stringify(this.data[this.activeAnnotationID].boundingBox.coordinates)
+    );
     this.data[this.activeAnnotationID].boundingBox.coordinates = {
       topLeft: null,
       bottomRight: null,
     };
-  }
-
-  @log
-  updateBoundingBoxCoordinates(coordinates: BoundingBoxCoordinates): void {
-    if (this.data[this.activeAnnotationID].toolbox === Toolboxes.boundingBox) {
-      this.data[this.activeAnnotationID].boundingBox.coordinates = coordinates;
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("updateBoundingBoxCoordinates", [oldCoords]);
     }
   }
 
   @log
-  setBoundingBoxTimeInfo(z?: number, t?: number): void {
+  updateBoundingBoxCoordinates(
+    coordinates: BoundingBoxCoordinates,
+    addToUndoRedo = true
+  ): void {
+    const oldCoords = JSON.parse(
+      JSON.stringify(this.data[this.activeAnnotationID].boundingBox.coordinates)
+    );
+    if (this.data[this.activeAnnotationID].toolbox === Toolboxes.boundingBox) {
+      this.data[this.activeAnnotationID].boundingBox.coordinates = coordinates;
+    }
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("updateBoundingBoxCoordinates", [oldCoords]);
+    }
+  }
+
+  @log
+  setBoundingBoxTimeInfo(z?: number, t?: number, addToUndoRedo = true): void {
     // Set space and time data for bounding box of active annotation.
+    const oldZT = JSON.parse(
+      JSON.stringify(
+        this.data[this.activeAnnotationID].boundingBox.spaceTimeInfo
+      )
+    );
     if (z === undefined && t === undefined) return;
     const { z: prevZ, t: prevT } =
       this.data[this.activeAnnotationID].boundingBox.spaceTimeInfo;
@@ -194,6 +214,9 @@ export class Annotations {
       z: z || prevZ,
       t: t || prevT,
     };
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("setBoundingBoxTimeInfo", [oldZT.z, oldZT.t]);
+    }
   }
 
   clickNearBoundingBox = (
