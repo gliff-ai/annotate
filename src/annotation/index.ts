@@ -321,9 +321,21 @@ export class Annotations {
   };
 
   @log
-  clearSplineCoordinates(): void {
+  clearSplineCoordinates(addToUndoRedo = true): void {
+    const oldCoords = JSON.parse(
+      JSON.stringify(this.data[this.activeAnnotationID].spline.coordinates)
+    );
     this.data[this.activeAnnotationID].spline.coordinates = [];
-    this.initUndoRedo();
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("setSplineCoordinates", [oldCoords]);
+      this.redoData = [];
+    }
+  }
+
+  @log
+  private setSplineCoordinates(newCoords: XYPoint[], addToUndoRedo = true) {
+    // only used when undoing clearSplineCoordinates, hence private
+    this.data[this.activeAnnotationID].spline.coordinates = newCoords;
   }
 
   @log
