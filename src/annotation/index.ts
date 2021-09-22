@@ -107,8 +107,13 @@ export class Annotations {
   length = (): number => this.data.length;
 
   @log
-  setActiveAnnotationID(id: number): void {
+  setActiveAnnotationID(id: number, addToUndoRedo = true): void {
+    const oldAnnotationID = this.activeAnnotationID;
     this.activeAnnotationID = id;
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("setActiveAnnotationID", [oldAnnotationID]);
+      this.redoData = [];
+    }
   }
 
   @log
