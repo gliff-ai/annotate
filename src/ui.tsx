@@ -764,6 +764,7 @@ class UserInterface extends Component<Props, State> {
               this.refBtnsPopovers[Tools.labels.name] = ref;
             }}
           />
+          {this.props.trustedServiceButtonToolbar}
           <BaseIconButton
             tooltip={Tools.undo}
             onClick={this.undo}
