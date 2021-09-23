@@ -235,6 +235,9 @@ export class CanvasClass extends Component<Props, State> {
       context.strokeStyle = brush.color;
       this.annotationOpacity = this.props.annotationAlpha;
     }
+    if (isActive || brush.type === "erase") {
+      this.annotationOpacity = 1.0;
+    }
     context.globalAlpha = this.annotationOpacity;
 
     if (brush.type === "erase") {
