@@ -107,8 +107,13 @@ export class Annotations {
   length = (): number => this.data.length;
 
   @log
-  setActiveAnnotationID(id: number): void {
+  setActiveAnnotationID(id: number, addToUndoRedo = true): void {
+    const oldAnnotationID = this.activeAnnotationID;
     this.activeAnnotationID = id;
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("setActiveAnnotationID", [oldAnnotationID]);
+      this.redoData = [];
+    }
   }
 
   @log
@@ -170,23 +175,45 @@ export class Annotations {
   };
 
   @log
-  clearBoundingBoxCoordinates(): void {
+  clearBoundingBoxCoordinates(addToUndoRedo = true): void {
+    const oldCoords = JSON.parse(
+      JSON.stringify(this.data[this.activeAnnotationID].boundingBox.coordinates)
+    ) as XYPoint[];
     this.data[this.activeAnnotationID].boundingBox.coordinates = {
       topLeft: null,
       bottomRight: null,
     };
-  }
-
-  @log
-  updateBoundingBoxCoordinates(coordinates: BoundingBoxCoordinates): void {
-    if (this.data[this.activeAnnotationID].toolbox === Toolboxes.boundingBox) {
-      this.data[this.activeAnnotationID].boundingBox.coordinates = coordinates;
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("updateBoundingBoxCoordinates", [oldCoords]);
+      this.redoData = [];
     }
   }
 
   @log
-  setBoundingBoxTimeInfo(z?: number, t?: number): void {
+  updateBoundingBoxCoordinates(
+    coordinates: BoundingBoxCoordinates,
+    addToUndoRedo = true
+  ): void {
+    const oldCoords = JSON.parse(
+      JSON.stringify(this.data[this.activeAnnotationID].boundingBox.coordinates)
+    ) as BoundingBoxCoordinates;
+    if (this.data[this.activeAnnotationID].toolbox === Toolboxes.boundingBox) {
+      this.data[this.activeAnnotationID].boundingBox.coordinates = coordinates;
+    }
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("updateBoundingBoxCoordinates", [oldCoords]);
+      this.redoData = [];
+    }
+  }
+
+  @log
+  setBoundingBoxTimeInfo(z?: number, t?: number, addToUndoRedo = true): void {
     // Set space and time data for bounding box of active annotation.
+    const oldZT = JSON.parse(
+      JSON.stringify(
+        this.data[this.activeAnnotationID].boundingBox.spaceTimeInfo
+      )
+    ) as { z: number; t: number };
     if (z === undefined && t === undefined) return;
     const { z: prevZ, t: prevT } =
       this.data[this.activeAnnotationID].boundingBox.spaceTimeInfo;
@@ -194,6 +221,10 @@ export class Annotations {
       z: z || prevZ,
       t: t || prevT,
     };
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("setBoundingBoxTimeInfo", [oldZT.z, oldZT.t]);
+      this.redoData = [];
+    }
   }
 
   clickNearBoundingBox = (
@@ -290,9 +321,22 @@ export class Annotations {
   };
 
   @log
-  clearSplineCoordinates(): void {
+  clearSplineCoordinates(addToUndoRedo = true): void {
+    const oldCoords = JSON.parse(
+      JSON.stringify(this.data[this.activeAnnotationID].spline.coordinates)
+    ) as XYPoint[];
     this.data[this.activeAnnotationID].spline.coordinates = [];
-    this.initUndoRedo();
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("setSplineCoordinates", [oldCoords]);
+      this.redoData = [];
+    }
+  }
+
+  @log
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private setSplineCoordinates(newCoords: XYPoint[], addToUndoRedo = true) {
+    // only used when undoing clearSplineCoordinates, hence private
+    this.data[this.activeAnnotationID].spline.coordinates = newCoords;
   }
 
   @log
@@ -551,15 +595,43 @@ export class Annotations {
   };
 
   @log
-  addBrushStroke(newBrushStroke: BrushStroke): void {
+  addBrushStroke(newBrushStroke: BrushStroke, addToUndoRedo = true): void {
     if (this.data[this.activeAnnotationID].toolbox === Toolboxes.paintbrush) {
       this.data[this.activeAnnotationID].brushStrokes.push(newBrushStroke);
+      if (addToUndoRedo) {
+        this.updateUndoRedoActions("deleteBrushStroke", []);
+        this.redoData = [];
+      }
     }
   }
 
   @log
-  clearBrushStrokes(): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private deleteBrushStroke(addToUndoRedo = true): void {
+    // deletes the most recent brush stroke. only used when undoing addBrushStroke, hence it's private
+    if (this.data[this.activeAnnotationID].toolbox === Toolboxes.paintbrush) {
+      this.data[this.activeAnnotationID].brushStrokes.pop();
+    }
+  }
+
+  @log
+  clearBrushStrokes(addToUndoRedo = true): void {
+    const oldBrushStrokes = JSON.parse(
+      JSON.stringify(this.data[this.activeAnnotationID].brushStrokes)
+    ) as BrushStroke[];
     this.data[this.activeAnnotationID].brushStrokes = [];
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("setBrushStrokes", [oldBrushStrokes]);
+    }
+  }
+
+  @log
+  private setBrushStrokes(
+    newBrushStrokes: BrushStroke[],
+    addToUndoRedo = true // eslint-disable-line @typescript-eslint/no-unused-vars
+  ): void {
+    // only used when undoing clearBrushStrokes, hence it's private
+    this.data[this.activeAnnotationID].brushStrokes = newBrushStrokes;
   }
 
   getBrushStrokeCoordinates = (index = 0): Array<XYPoint> =>
