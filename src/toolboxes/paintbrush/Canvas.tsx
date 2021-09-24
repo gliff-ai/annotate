@@ -118,7 +118,7 @@ export class CanvasClass extends Component<Props, State> {
 
   private isDrawing: boolean;
 
-  private points: XYPoint[];
+  private points: XYPoint[]; // buffer of points being drawn by the current mouse stroke
 
   private annotationOpacity: number;
 
@@ -187,12 +187,21 @@ export class CanvasClass extends Component<Props, State> {
       } as Brush;
 
       // Draw current points
-      this.drawPoints(
-        this.points,
-        brush,
-        true,
-        this.interactionCanvas.canvasContext
-      );
+      if (brush.type === "paint") {
+        this.drawPoints(
+          this.points,
+          brush,
+          true,
+          this.interactionCanvas.canvasContext
+        );
+      } else {
+        this.drawPoints(
+          this.points,
+          brush,
+          false,
+          this.backgroundCanvas.canvasContext
+        );
+      }
     }
   };
 
@@ -225,6 +234,9 @@ export class CanvasClass extends Component<Props, State> {
     } else {
       context.strokeStyle = brush.color;
       this.annotationOpacity = this.props.annotationAlpha;
+    }
+    if (brush.type === "erase") {
+      this.annotationOpacity = 1.0;
     }
     context.globalAlpha = this.annotationOpacity;
 
