@@ -119,6 +119,16 @@ export class BaseCanvas extends Component<Props> {
     }
   };
 
+  onTouchMovehandler = (e: React.TouchEvent<HTMLCanvasElement>): void => {
+    const { x, y } = this.windowToCanvas({
+      clientX: e.touches[0].clientX,
+      clientY: e.touches[0].clientY,
+    });
+    if (this.props.onMouseMove) {
+      this.props.onMouseMove(x, y);
+    }
+  };
+
   onMouseMoveHandler = (e: MouseEvent): void => {
     const { x, y } = this.windowToCanvas(e);
 
@@ -168,6 +178,7 @@ export class BaseCanvas extends Component<Props> {
         onMouseDown={this.onMouseDownHandler}
         onTouchStart={this.onTouchStartHandler}
         onMouseMove={this.onMouseMoveHandler}
+        onTouchMove={this.onTouchMovehandler}
         onMouseUp={this.onMouseUpHandler}
         key={this.props.name}
         id={`${this.props.name}-canvas`}
