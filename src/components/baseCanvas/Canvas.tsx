@@ -17,6 +17,8 @@ export interface Props {
   onClick?: (x: number, y: number, isCTRL?: boolean) => void;
   onMouseDown?: (x: number, y: number) => void;
   onTouchStart?: (x: number, y: number) => void;
+  onTouchMove?: (x: number, y: number) => void;
+  onTouchEnd?: (x: number, y: number) => void;
   onMouseMove?: (x: number, y: number) => void;
   onMouseUp?: (x: number, y: number) => void;
   onContextMenu?: (x: number, y: number) => void;
