@@ -19,6 +19,11 @@ const Tools: ToolTips = {
     icon: imgSrc("channels-icon"),
     shortcut: "C",
   },
+  backgroundSettings: {
+    name: "Background Settings",
+    icon: imgSrc("background-settings-icon"),
+    shortcut: "P",
+  },
 } as const;
 
 export { ToolboxName, Tools };
