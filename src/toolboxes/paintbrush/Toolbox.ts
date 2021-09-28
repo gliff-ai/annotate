@@ -21,7 +21,7 @@ const Tools: ToolTips = {
   },
   annotationAlpha: {
     name: "Annotation Transparency",
-    icon: imgSrc("channels-icon"),
+    icon: imgSrc("annotation-transparency"),
     shortcut: "T",
   },
   togglePixels: {
