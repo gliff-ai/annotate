@@ -16,29 +16,29 @@ interface SubmenuProps {
 const Submenu = (props: SubmenuProps): ReactElement => {
   const [spline, setSpline] = useSplineStore();
 
-  function selectSpline() {
+  const selectSpline = () => {
     setSpline({ splineType: Tools.spline.name });
-  }
+  };
 
-  function selectLassoSpline() {
+  const selectLassoSpline = () => {
     setSpline({ splineType: Tools.lassospline.name });
-  }
+  };
 
   // function selectMagicSpline() {
   //   setSpline({ splineType: Tools.magicspline.name });
   // }
 
-  function closeSpline() {
+  const closeSpline = () => {
     document.dispatchEvent(
       new CustomEvent("closeSpline", { detail: Toolboxes.spline })
     );
-  }
+  };
 
-  function convertSpline() {
+  const convertSpline = () => {
     document.dispatchEvent(
       new CustomEvent("convertSpline", { detail: Toolboxes.spline })
     );
-  }
+  };
 
   return (
     <Popover
