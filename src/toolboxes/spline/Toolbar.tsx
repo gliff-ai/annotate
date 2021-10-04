@@ -16,29 +16,29 @@ interface SubmenuProps {
 const Submenu = (props: SubmenuProps): ReactElement => {
   const [spline, setSpline] = useSplineStore();
 
-  function selectSpline() {
+  const selectSpline = () => {
     setSpline({ splineType: Tools.spline.name });
-  }
+  };
 
-  function selectLassoSpline() {
+  const selectLassoSpline = () => {
     setSpline({ splineType: Tools.lassospline.name });
-  }
+  };
 
   // function selectMagicSpline() {
   //   setSpline({ splineType: Tools.magicspline.name });
   // }
 
-  function closeSpline() {
+  const closeSpline = () => {
     document.dispatchEvent(
       new CustomEvent("closeSpline", { detail: Toolboxes.spline })
     );
-  }
+  };
 
-  function convertSpline() {
+  const convertSpline = () => {
     document.dispatchEvent(
       new CustomEvent("convertSpline", { detail: Toolboxes.spline })
     );
-  }
+  };
 
   return (
     <Popover
@@ -49,12 +49,12 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       <ButtonGroup size="small" id="spline-toolbar">
         <BaseIconButton
           tooltip={Tools.spline}
-          onClick={() => selectSpline}
+          onClick={selectSpline}
           fill={spline.splineType === Tools.spline.name}
         />
         <BaseIconButton
           tooltip={Tools.lassospline}
-          onClick={() => selectLassoSpline}
+          onClick={selectLassoSpline}
           fill={spline.splineType === Tools.lassospline.name}
         />
         {/* <BaseIconButton
@@ -64,12 +64,12 @@ const Submenu = (props: SubmenuProps): ReactElement => {
         /> */}
         <BaseIconButton
           tooltip={Tools.closespline}
-          onClick={() => closeSpline}
+          onClick={closeSpline}
           fill={false}
         />
         <BaseIconButton
           tooltip={Tools.convertspline}
-          onClick={() => convertSpline}
+          onClick={convertSpline}
           fill={false}
         />
       </ButtonGroup>

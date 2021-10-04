@@ -261,22 +261,22 @@ class Toolbar extends Component<Props> {
   selectBackgroundSettings = (): void => {
     if (this.props.isTyping()) return;
     this.props.handleOpen()(this.refBackgroundSettingsPopover);
-    this.props.setButtonClicked(Tools.brightness.name);
+    this.props.setButtonClicked(Tools.backgroundSettings.name);
   };
 
   render = (): ReactElement => (
     <>
       <BaseIconButton
-        tooltip={Tools.brightness}
+        tooltip={Tools.backgroundSettings}
         onClick={this.selectBackgroundSettings}
-        fill={this.props.buttonClicked === Tools.brightness.name}
+        fill={this.props.buttonClicked === Tools.backgroundSettings.name}
         setRefCallback={(ref) => {
           this.refBackgroundSettingsPopover = ref;
         }}
       />
       <Submenu
         isOpen={
-          this.props.buttonClicked === Tools.brightness.name &&
+          this.props.buttonClicked === Tools.backgroundSettings.name &&
           Boolean(this.props.anchorElement)
         }
         anchorElement={this.props.anchorElement}
