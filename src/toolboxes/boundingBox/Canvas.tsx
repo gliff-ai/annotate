@@ -59,6 +59,8 @@ export class CanvasClass extends Component<Props> {
 
   private isMouseDown: boolean;
 
+  private dragCoords: BoundingBoxCoordinates; // holds the box's transient state as we drag a corner, since it's not committed to annotationsObject until we release
+
   constructor(props: Props) {
     super(props);
     this.selectedCorner = "none";
@@ -144,7 +146,14 @@ export class CanvasClass extends Component<Props> {
     }
 
     // get the four corners
-    const { topLeft, bottomRight } = boundingBoxCoordinates;
+    let topLeft, bottomRight;
+    if (this.isMouseDown && isActive) {
+      topLeft = this.dragCoords.topLeft;
+      bottomRight = this.dragCoords.bottomRight;
+    } else {
+      topLeft = boundingBoxCoordinates.topLeft;
+      bottomRight = boundingBoxCoordinates.bottomRight;
+    }
     const topRight: XYPoint = { x: topLeft?.x, y: bottomRight?.y };
     const bottomLeft: XYPoint = { x: bottomRight?.x, y: topLeft?.y };
     const corners: XYPoint[] = [topLeft, topRight, bottomRight, bottomLeft];
@@ -495,6 +504,7 @@ export class CanvasClass extends Component<Props> {
       // which actually doesnt exist but is a powerful feature to add
       this.selectedCorner = nearPoint;
       this.isMouseDown = true;
+      this.dragCoords = boundingBoxCoordinates;
     }
 
     this.drawAllBoundingBoxes();
@@ -530,9 +540,6 @@ export class CanvasClass extends Component<Props> {
             },
             { x: clickPoint.x, y: clickPoint.y } // prevents us overwriting the original click point
           );
-          this.props.annotationsObject.updateBoundingBoxCoordinates(
-            boundingBoxCoordinates
-          );
           break;
         case "topRight":
           boundingBoxCoordinates = this.orderCoordinates(
@@ -541,9 +548,6 @@ export class CanvasClass extends Component<Props> {
               y: boundingBoxCoordinates.topLeft.y,
             },
             { x: clickPoint.x, y: clickPoint.y } // prevents us overwriting the original click point
-          );
-          this.props.annotationsObject.updateBoundingBoxCoordinates(
-            boundingBoxCoordinates
           );
           break;
         case "bottomRight":
@@ -554,9 +558,6 @@ export class CanvasClass extends Component<Props> {
             },
             { x: clickPoint.x, y: clickPoint.y } // prevents us overwriting the original click point
           );
-          this.props.annotationsObject.updateBoundingBoxCoordinates(
-            boundingBoxCoordinates
-          );
           break;
         case "bottomLeft":
           boundingBoxCoordinates = this.orderCoordinates(
@@ -566,13 +567,11 @@ export class CanvasClass extends Component<Props> {
             },
             { x: clickPoint.x, y: clickPoint.y } // prevents us overwriting the original click point
           );
-          this.props.annotationsObject.updateBoundingBoxCoordinates(
-            boundingBoxCoordinates
-          );
           break;
         default:
           break;
       }
+      this.dragCoords = boundingBoxCoordinates;
     }
 
     // Redraw all the splines
@@ -581,7 +580,12 @@ export class CanvasClass extends Component<Props> {
 
   onMouseUp = (): void => {
     // Works as part of drag and drop for points.
-    this.isMouseDown = false;
+    if (this.isMouseDown) {
+      this.props.annotationsObject.updateBoundingBoxCoordinates(
+        this.dragCoords
+      );
+      this.isMouseDown = false;
+    }
   };
 
   isComplete = (boundingBoxCoordinates: BoundingBoxCoordinates): boolean =>
