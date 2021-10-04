@@ -146,13 +146,12 @@ export class CanvasClass extends Component<Props> {
     }
 
     // get the four corners
-    let topLeft, bottomRight;
+    let topLeft;
+    let bottomRight;
     if (this.isMouseDown && isActive) {
-      topLeft = this.dragCoords.topLeft;
-      bottomRight = this.dragCoords.bottomRight;
+      ({ topLeft, bottomRight } = this.dragCoords);
     } else {
-      topLeft = boundingBoxCoordinates.topLeft;
-      bottomRight = boundingBoxCoordinates.bottomRight;
+      ({ topLeft, bottomRight } = boundingBoxCoordinates);
     }
     const topRight: XYPoint = { x: topLeft?.x, y: bottomRight?.y };
     const bottomLeft: XYPoint = { x: bottomRight?.x, y: topLeft?.y };

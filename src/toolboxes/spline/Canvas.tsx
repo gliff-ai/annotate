@@ -122,7 +122,7 @@ class CanvasClass extends Component<Props> {
       if (isActive && this.selectedPointIndex === 0 && this.isMouseDown) {
         firstPoint = this.dragPoint;
       } else {
-        firstPoint = splineVector[0];
+        firstPoint = splineVector[0]; // eslint-disable-line prefer-destructuring
       }
 
       firstPoint = imageToCanvas(
@@ -602,8 +602,6 @@ class CanvasClass extends Component<Props> {
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
-
-    const coordinates = this.props.annotationsObject.getSplineCoordinates();
 
     if (
       this.props.activeToolbox === Tools.magicspline.name &&
