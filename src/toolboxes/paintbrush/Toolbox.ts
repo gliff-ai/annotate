@@ -1,32 +1,32 @@
+import { icons } from "@gliff-ai/style";
 import { Toolbox, ToolTips } from "@/Toolboxes";
-import { imgSrc } from "@/imgSrc";
 
 const ToolboxName: Toolbox = "paintbrush";
 
 const Tools: ToolTips = {
   paintbrush: {
     name: "Paintbrush",
-    icon: imgSrc("brush-icon"),
+    icon: icons.brush,
     shortcut: "B",
   },
   eraser: {
     name: "Eraser",
-    icon: imgSrc("eraser-icon"),
+    icon: icons.eraser,
     shortcut: "E",
   },
   fillbrush: {
     name: "Fill Active Paintbrush",
-    icon: imgSrc("fill-icon"),
+    icon: icons.fill,
     shortcut: "F",
   },
   annotationAlpha: {
     name: "Annotation Transparency",
-    icon: imgSrc("annotation-transparency"),
+    icon: icons.brush, // TODO: replace
     shortcut: "T",
   },
   togglePixels: {
     name: "Show strokes as pixels",
-    icon: imgSrc("channels-icon"),
+    icon: icons.channels,
     shortcut: "P",
   },
 } as const;

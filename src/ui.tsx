@@ -13,7 +13,12 @@ import {
   StylesProvider,
 } from "@material-ui/core";
 import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
-import { theme, BaseIconButton, generateClassName } from "@gliff-ai/style";
+import {
+  theme,
+  BaseIconButton,
+  Logo,
+  generateClassName,
+} from "@gliff-ai/style";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
@@ -705,12 +710,7 @@ class UserInterface extends Component<Props, State> {
         <Toolbar>
           <Grid container direction="row">
             <Grid item className={classes.iconbutton}>
-              <img
-                src={imgSrc("gliff-master-black")}
-                width="79px"
-                height="60px"
-                alt="gliff logo"
-              />
+              <Logo />
             </Grid>
           </Grid>
 

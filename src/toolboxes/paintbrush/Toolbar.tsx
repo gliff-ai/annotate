@@ -4,6 +4,7 @@ import {
   ReactElement,
   MouseEvent,
   useState,
+  useEffect,
 } from "react";
 import {
   ButtonGroup,
@@ -13,19 +14,20 @@ import {
   Popover,
 } from "@material-ui/core";
 
-import { BaseIconButton } from "@gliff-ai/style";
+import { IconButton, icons } from "@gliff-ai/style";
 
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { BaseSlider } from "@/components/BaseSlider";
 
-import { ToolboxName, Tools } from "./Toolbox";
 import { usePaintbrushStore } from "./Store";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
+import { getShortcut } from "@/keybindings";
 
 interface SubmenuProps {
   isOpen: boolean;
   anchorElement: HTMLButtonElement | null;
   onClose: (event: MouseEvent) => void;
+  openSubmenu: () => void;
 }
 
 interface Props {
@@ -63,19 +65,31 @@ const useStyles = makeStyles(() =>
   })
 );
 
+const events = ["selectBrush"] as const;
+const ToolboxName: Toolbox = "paintbrush";
+
+interface Event extends CustomEvent {
+  type: typeof events[number];
+}
+
 const Submenu = (props: SubmenuProps): ReactElement => {
   const [paintbrush, setPaintbrush] = usePaintbrushStore();
   const [showTransparency, setShowTransparency] = useState<boolean>(false);
-  const [pixelView, setPixelView] = useState<boolean>(false);
+
+  const submenuEvents = [
+    "selectBrush",
+    "selectEraser",
+    "fillBrush",
+    "toggleShowTransparency",
+    "togglePixelView",
+  ] as const;
 
   const classes = useStyles();
 
-  function changeBrushRadius(e: ChangeEvent, value: number) {
+  function changeBrushRadius(_e: ChangeEvent, value: number) {
     setPaintbrush({
-      brushType: paintbrush.brushType, // FIXME
+      ...paintbrush,
       brushRadius: value / 2, // convert from diameter (the displayed size) to radius (what the rest of the codebase expects)
-      annotationAlpha: paintbrush.annotationAlpha,
-      annotationActiveAlpha: paintbrush.annotationActiveAlpha,
     });
   }
 
@@ -87,20 +101,20 @@ const Submenu = (props: SubmenuProps): ReactElement => {
 
   function selectBrush() {
     setPaintbrush({
-      brushType: Tools.paintbrush.name,
-      brushRadius: paintbrush.brushRadius, // FIXME
-      annotationAlpha: paintbrush.annotationAlpha,
-      annotationActiveAlpha: paintbrush.annotationActiveAlpha,
+      ...paintbrush,
+      brushType: "Paintbrush",
     });
+
+    return true;
   }
 
   function selectEraser() {
     setPaintbrush({
-      brushType: Tools.eraser.name,
-      brushRadius: paintbrush.brushRadius, // FIXME
-      annotationAlpha: paintbrush.annotationAlpha,
-      annotationActiveAlpha: paintbrush.annotationActiveAlpha,
+      ...paintbrush,
+      brushType: "Eraser",
     });
+
+    return true;
   }
 
   function toggleShowTransparency() {
@@ -109,32 +123,108 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     } else {
       setShowTransparency(true);
     }
+
+    return true;
   }
 
   function togglePixelView() {
-    setPixelView(!pixelView);
+    setPaintbrush({
+      ...paintbrush,
+      pixelView: !paintbrush.pixelView,
+    });
     document.dispatchEvent(
       new CustomEvent("togglePixelView", { detail: Toolboxes.paintbrush })
     );
+
+    return true;
   }
 
-  function changeAnnotationTransparency(e: ChangeEvent, value: number) {
+  function changeAnnotationTransparency(
+    _e: ChangeEvent,
+    annotationAlpha: number
+  ) {
     setPaintbrush({
-      brushType: paintbrush.brushType,
-      brushRadius: paintbrush.brushRadius, // FIXME
-      annotationAlpha: value,
-      annotationActiveAlpha: paintbrush.annotationActiveAlpha,
+      ...paintbrush,
+      annotationAlpha,
     });
   }
 
-  function changeAnnotationTransparencyFocused(e: ChangeEvent, value: number) {
+  function changeAnnotationTransparencyFocused(
+    _e: ChangeEvent,
+    annotationActiveAlpha: number
+  ) {
     setPaintbrush({
-      brushType: paintbrush.brushType,
-      brushRadius: paintbrush.brushRadius, // FIXME
-      annotationAlpha: paintbrush.annotationAlpha,
-      annotationActiveAlpha: value,
+      ...paintbrush,
+      annotationActiveAlpha,
     });
   }
+
+  useEffect(() => {
+    const submenuEventFunctions = {
+      changeBrushRadius,
+      fillBrush,
+      selectBrush,
+      selectEraser,
+      toggleShowTransparency,
+      togglePixelView,
+      changeAnnotationTransparency,
+      changeAnnotationTransparencyFocused,
+    };
+
+    const handleEvent = (event: Event): void => {
+      if (event.detail === Toolboxes.paintbrush) {
+        // If the function we call returns true, also open the popup
+        const popup = submenuEventFunctions[event.type]?.call(this) as boolean;
+        if (popup) {
+          props.openSubmenu();
+        }
+      }
+    };
+
+    for (const event of submenuEvents) {
+      document.addEventListener(event, handleEvent);
+    }
+
+    // Specify how to clean up after this effect:
+    return function cleanup() {
+      for (const event of submenuEvents) {
+        document.removeEventListener(event, handleEvent);
+      }
+    };
+  }, []);
+
+  const tools = [
+    {
+      name: "Paintbrush",
+      icon: icons.brush,
+      event: selectBrush,
+      active: paintbrush.brushType === "Paintbrush",
+    },
+    {
+      name: "Eraser",
+      icon: icons.eraser,
+      event: selectEraser,
+      active: paintbrush.brushType === "Eraser",
+    },
+    {
+      name: "Fill Active Paintbrush",
+      icon: icons.fill,
+      event: fillBrush,
+      active: false,
+    },
+    {
+      name: "Annotation Transparency",
+      icon: icons.brush, // TODO: replace
+      event: toggleShowTransparency,
+      active: showTransparency,
+    },
+    {
+      name: "Show strokes as pixels",
+      icon: icons.channels, // TODO: replace
+      event: togglePixelView,
+      active: paintbrush.pixelView,
+    },
+  ] as const;
 
   return (
     <>
@@ -149,33 +239,18 @@ const Submenu = (props: SubmenuProps): ReactElement => {
           size="small"
           id="paintbrush-toolbar"
         >
-          <BaseIconButton
-            tooltip={Tools.paintbrush}
-            onClick={() => selectBrush()}
-            fill={paintbrush.brushType === Tools.paintbrush.name}
-          />
-          <BaseIconButton
-            tooltip={Tools.eraser}
-            onClick={() => selectEraser()}
-            fill={paintbrush.brushType === Tools.eraser.name}
-          />
-          <BaseIconButton
-            tooltip={Tools.fillbrush}
-            onClick={() => fillBrush()}
-            fill={false}
-          />
-          <BaseIconButton
-            tooltip={Tools.annotationAlpha}
-            onClick={() => toggleShowTransparency()}
-            fill={showTransparency}
-          />
-          <BaseIconButton
-            tooltip={Tools.togglePixels}
-            onClick={() => {
-              togglePixelView();
-            }}
-            fill={pixelView}
-          />
+          {tools.map(({ icon, name, event, active }) => (
+            <IconButton
+              key={name}
+              icon={icon}
+              tooltip={{
+                name,
+                ...getShortcut(`${ToolboxName}.${event.name}`),
+              }}
+              onClick={event}
+              fill={active}
+            />
+          ))}
         </ButtonGroup>
         <Card className={classes.subMenuCard}>
           <div className={classes.baseSliderContainer}>
@@ -214,12 +289,6 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   );
 };
 
-const events = ["selectBrush"] as const;
-
-interface Event extends CustomEvent {
-  type: typeof events[number];
-}
-
 class Toolbar extends Component<Props> {
   private refBrushPopover: HTMLButtonElement;
 
@@ -228,46 +297,34 @@ class Toolbar extends Component<Props> {
     this.refBrushPopover = null;
   }
 
-  componentDidMount = (): void => {
-    for (const event of events) {
-      document.addEventListener(event, this.handleEvent);
-    }
-  };
-
-  componentWillUnmount(): void {
-    for (const event of events) {
-      document.removeEventListener(event, this.handleEvent);
-    }
-  }
-
-  handleEvent = (event: Event): void => {
-    if (event.detail === Toolboxes.paintbrush) {
-      this[event.type]?.call(this);
-    }
-  };
-
-  selectBrush = (): void => {
+  openSubmenu = (): void => {
     if (this.props.isTyping()) return;
     this.props.handleOpen()(this.refBrushPopover);
-    this.props.setButtonClicked(Tools.paintbrush.name);
+    this.props.setButtonClicked("Paintbrush");
     this.props.activateToolbox(ToolboxName);
   };
 
   render = (): ReactElement => (
     <>
-      <BaseIconButton
-        tooltip={Tools.paintbrush}
-        onClick={this.selectBrush}
-        fill={this.props.buttonClicked === Tools.paintbrush.name}
-        setRefCallback={(ref) => {
+      <IconButton
+        tooltip={{
+          name: "Paintbush",
+          ...getShortcut("paintbrush.selectBrush"),
+        }}
+        icon={icons.brush}
+        onClick={this.openSubmenu}
+        fill={this.props.buttonClicked === "Paintbrush"}
+        setRefCallback={(ref: HTMLButtonElement) => {
           this.refBrushPopover = ref;
         }}
       />
+
       <Submenu
         isOpen={
-          this.props.buttonClicked === Tools.paintbrush.name &&
+          this.props.buttonClicked === "Paintbrush" &&
           Boolean(this.props.anchorElement)
         }
+        openSubmenu={this.openSubmenu}
         anchorElement={this.props.anchorElement}
         onClose={this.props.onClose}
       />

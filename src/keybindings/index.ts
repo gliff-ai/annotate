@@ -18,4 +18,53 @@ const keydownListener = (
   }
 };
 
+// TODO: all of these!
+const displayNames = {
+  Backspace: "&#x232b;",
+  ctrl: "CTRL",
+  Slash: "/",
+  Equal: "=",
+  Minus: "-",
+} as Readonly<{
+  [key: string]: string;
+}>;
+
+export function getShortcut(
+  value: string,
+  bindings = keybindings
+): { shortcutSymbol?: string; shortcut?: string } {
+  const [shortcut] =
+    Object.entries(bindings).find(([, v]) => v === value) || [];
+
+  if (!shortcut) return {};
+
+  const raw = shortcut.split("+");
+
+  let rawKey;
+  let rawModifier;
+
+  if (raw[1]) {
+    [rawModifier, rawKey] = raw;
+  } else {
+    [rawKey] = raw;
+  }
+
+  const shortcutSymbol = displayNames[rawModifier] || rawModifier || undefined;
+  const key =
+    displayNames[rawKey] ||
+    rawKey.split("Key")[1] ||
+    rawKey.split("Digit")[1] ||
+    rawKey ||
+    undefined;
+
+  if (!shortcutSymbol) {
+    return { shortcut: key };
+  }
+
+  return {
+    shortcutSymbol,
+    shortcut: key,
+  };
+}
+
 export { keydownListener };
