@@ -590,6 +590,9 @@ class CanvasClass extends Component<Props> {
   private addNewPointNearSpline = (x: number, y: number): void => {
     // Add a new point near the spline.
     const coordinates = this.props.annotationsObject.getSplineCoordinates();
+    if (this.props.annotationsObject.splineIsClosed()) {
+      coordinates.push(coordinates[0]); // add the closing edge if the spline is closed
+    }
 
     const dist = (x1: number, y1: number, x2: number, y2: number): number =>
       // Calculate Euclidean distance between two points (x1, y1) and (x2, y2).
@@ -603,15 +606,17 @@ class CanvasClass extends Component<Props> {
       // Calculate the euclidean distance from the new point
       const newDist =
         dist(x, y, prevPoint.x, prevPoint.y) +
-        dist(x, y, nextPoint.x, nextPoint.y);
+        dist(x, y, nextPoint.x, nextPoint.y) -
+        dist(prevPoint.x, prevPoint.y, nextPoint.x, nextPoint.y);
       // If the calculated distance is smaller than the min distance so far
-      if (minDist > newDist) {
+      if (newDist < minDist) {
         // Update minimum distance and new point index
         minDist = newDist;
         newPointIndex = i;
       }
     }
     this.props.annotationsObject.insertSplinePoint(newPointIndex, { x, y }); // Add new point to the coordinates array
+    this.selectedPointIndex = newPointIndex;
   };
 
   getCursor = (): Cursor => {
