@@ -43,8 +43,9 @@ const styles = {
     height: "53px",
     left: "540px",
     borderRadius: "10px 0 0 0",
-    padding: "7px 0",
+    paddingBottom: "58px",
   },
+
   miniMapToolTipAvatar: {
     backgroundColor: theme.palette.primary.main,
     color: "#2B2F3A",
