@@ -53,6 +53,8 @@ class CanvasClass extends Component<Props> {
 
   private isMouseDown: boolean;
 
+  private dragPoint: XYPoint; // current position of dragged point
+
   private gradientImage: ImageData;
 
   private numberOfMoves: number; // increments on mouse move; used to space out the magic spline points
@@ -116,7 +118,13 @@ class CanvasClass extends Component<Props> {
 
     if (splineVector.length > 1) {
       // Go to the first point
-      let firstPoint: XYPoint = splineVector[0];
+      let firstPoint: XYPoint;
+      if (isActive && this.selectedPointIndex === 0 && this.isMouseDown) {
+        firstPoint = this.dragPoint;
+      } else {
+        firstPoint = splineVector[0]; // eslint-disable-line prefer-destructuring
+      }
+
       firstPoint = imageToCanvas(
         firstPoint.x,
         firstPoint.y,
@@ -130,10 +138,23 @@ class CanvasClass extends Component<Props> {
       context.moveTo(firstPoint.x, firstPoint.y);
 
       // Draw each point by taking our raw coordinates and applying the transform so they fit on our canvas
-      for (const { x, y } of splineVector) {
+      for (const [idx, { x, y }] of splineVector.entries()) {
+        let drawPoint: XYPoint;
+        if (
+          isActive &&
+          this.isMouseDown &&
+          (idx === this.selectedPointIndex ||
+            (idx === splineVector.length - 1 && // make sure to draw the final point at this.dragPoint if the spline is closed and we're dragging the first point
+              this.isClosed(splineVector) &&
+              this.selectedPointIndex === 0))
+        ) {
+          drawPoint = this.dragPoint;
+        } else {
+          drawPoint = { x, y };
+        }
         nextPoint = imageToCanvas(
-          x,
-          y,
+          drawPoint.x,
+          drawPoint.y,
           this.props.displayedImage.width,
           this.props.displayedImage.height,
           this.props.scaleAndPan,
@@ -148,9 +169,22 @@ class CanvasClass extends Component<Props> {
     context.beginPath();
     splineVector.forEach(({ x, y }, i) => {
       if (i !== splineVector.length - 1 || !this.isClosed(splineVector)) {
+        let drawPoint: XYPoint;
+        if (
+          isActive &&
+          this.isMouseDown &&
+          (i === this.selectedPointIndex ||
+            (i === splineVector.length - 1 && // make sure to draw the final point at this.dragPoint if the spline is closed and we're dragging the first point
+              this.isClosed(splineVector) &&
+              this.selectedPointIndex === 0))
+        ) {
+          drawPoint = this.dragPoint;
+        } else {
+          drawPoint = { x, y };
+        }
         nextPoint = imageToCanvas(
-          x,
-          y,
+          drawPoint.x,
+          drawPoint.y,
           this.props.displayedImage.width,
           this.props.displayedImage.height,
           this.props.scaleAndPan,
@@ -280,6 +314,12 @@ class CanvasClass extends Component<Props> {
     // handle click to select an annotation (Mode.select)
     // or add new point to a normal spline (Mode.draw and this.props.activeToolbox === Tools.spline.name)
     // or add TL or BR point to a rectangle spline (Mode.draw and this.props.activeToolbox === Tools.rectspline.name)
+
+    if (this.isMouseDown) {
+      // turns out onClick still runs when releasing a drag, so we want to abort in that case:
+      this.isMouseDown = false;
+      return;
+    }
 
     // X and Y are in CanvasSpace, convert to ImageSpace
     const { x: imageX, y: imageY } = canvasToImage(
@@ -542,6 +582,7 @@ class CanvasClass extends Component<Props> {
       if (nearPoint !== -1) {
         this.selectedPointIndex = nearPoint;
         this.isMouseDown = true;
+        this.dragPoint = clickPoint;
       }
     }
     this.drawAllSplines();
@@ -561,8 +602,6 @@ class CanvasClass extends Component<Props> {
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
-
-    const coordinates = this.props.annotationsObject.getSplineCoordinates();
 
     if (
       this.props.activeToolbox === Tools.magicspline.name &&
@@ -590,20 +629,8 @@ class CanvasClass extends Component<Props> {
       this.selectedPointIndex =
         this.props.annotationsObject.getSplineLength() - 1;
     } else {
-      // normal spline, if dragging first point, update closed last
-      if (this.selectedPointIndex === 0 && this.isClosed(coordinates)) {
-        this.props.annotationsObject.updateSplinePoint(
-          clickPoint.x,
-          clickPoint.y,
-          this.props.annotationsObject.getSplineLength() - 1
-        );
-      }
-
-      this.props.annotationsObject.updateSplinePoint(
-        clickPoint.x,
-        clickPoint.y,
-        this.selectedPointIndex
-      );
+      // dragging a point on a normal spline
+      this.dragPoint = clickPoint;
     }
 
     // Redraw all the splines
@@ -612,7 +639,23 @@ class CanvasClass extends Component<Props> {
 
   onMouseUp = (): void => {
     // Works as part of drag and drop for points.
-    this.isMouseDown = false;
+    if (this.isMouseDown) {
+      const coords = this.props.annotationsObject.getSplineCoordinates();
+      if (this.isClosed(coords)) {
+        this.props.annotationsObject.updateSplinePoint(
+          this.dragPoint.x,
+          this.dragPoint.y,
+          coords.length - 1
+        );
+      }
+      this.props.annotationsObject.updateSplinePoint(
+        this.dragPoint.x,
+        this.dragPoint.y,
+        this.selectedPointIndex
+      );
+    }
+    // we set this.isMouseDown = false in onClick
+    // onMouseUp runs before onClick, so if we set it here then onClick wouldn't know to abort
   };
 
   isClosed = (splineVector: XYPoint[]): boolean =>

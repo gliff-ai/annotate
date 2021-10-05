@@ -177,12 +177,14 @@ interface Props extends WithStyles<typeof styles> {
   showAppBar: boolean;
   setIsLoading?: (isLoading: boolean) => void;
   trustedServiceButtonToolbar?: ReactElement | null;
+  isUserOwner?: boolean;
 }
 
 class UserInterface extends Component<Props, State> {
   static defaultProps = {
     showAppBar: true,
     trustedServiceButtonToolbar: null,
+    isUserOwner: false,
   } as Pick<Props, "showAppBar">;
 
   annotationsObject: Annotations;
@@ -450,6 +452,8 @@ class UserInterface extends Component<Props, State> {
     imageFileInfo: ImageFileInfo,
     slicesData: Array<Array<ImageBitmap>>
   ): void => {
+    if (!this.props.isUserOwner) return;
+
     this.imageFileInfo = imageFileInfo;
     this.slicesData = slicesData;
     this.setState(
@@ -668,23 +672,24 @@ class UserInterface extends Component<Props, State> {
 
     const uploadDownload = (
       <>
-        <Grid item>
-          <UploadImage
-            setUploadedImage={this.setUploadedImage}
-            spanElement={
-              <BaseIconButton
-                tooltip={Tools.upload}
-                fill={false}
-                hasAvatar={false}
-                tooltipPlacement="bottom"
-                buttonSize="medium"
-                component="span"
-              />
-            }
-            multiple={false}
-          />
-        </Grid>
-
+        {this.props.isUserOwner && (
+          <Grid item>
+            <UploadImage
+              setUploadedImage={this.setUploadedImage}
+              spanElement={
+                <BaseIconButton
+                  tooltip={Tools.upload}
+                  fill={false}
+                  hasAvatar={false}
+                  tooltipPlacement="bottom"
+                  buttonSize="medium"
+                  component="span"
+                />
+              }
+              multiple={false}
+            />
+          </Grid>
+        )}
         <Grid item>
           <Download
             annotationsObject={this.annotationsObject}
