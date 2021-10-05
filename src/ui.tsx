@@ -449,8 +449,8 @@ class UserInterface extends Component<Props, State> {
   ): void => {
     if (!this.props.isUserOwner) return;
 
-    this.imageFileInfo = imageFileInfo[0]; // the Upload component passes arrays of images/metadata even when multiple=false, as it is in ANNOTATE but not CURATE
-    this.slicesData = slicesData[0];
+    [this.imageFileInfo] = imageFileInfo; // the Upload component passes arrays of images/metadata even when multiple=false, as it is in ANNOTATE but not CURATE
+    [this.slicesData] = slicesData;
     this.setState(
       {
         sliceIndex: 0,
