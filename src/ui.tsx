@@ -444,13 +444,13 @@ class UserInterface extends Component<Props, State> {
   };
 
   setUploadedImage = (
-    imageFileInfo: ImageFileInfo,
-    slicesData: Array<Array<ImageBitmap>>
+    imageFileInfo: ImageFileInfo[],
+    slicesData: ImageBitmap[][][]
   ): void => {
     if (!this.props.isUserOwner) return;
 
-    this.imageFileInfo = imageFileInfo;
-    this.slicesData = slicesData;
+    [this.imageFileInfo] = imageFileInfo;
+    [this.slicesData] = slicesData;
     this.setState(
       {
         sliceIndex: 0,

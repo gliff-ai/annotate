@@ -55,6 +55,7 @@ export class Annotations {
     spline: Spline = {
       coordinates: [],
       spaceTimeInfo: { z: 0, t: 0 },
+      isClosed: false,
     },
     boundingBox: BoundingBox = {
       coordinates: {
@@ -320,6 +321,11 @@ export class Annotations {
     return splines;
   };
 
+  splineIsClosed(id: number = null): boolean {
+    const spline = this.data[id ? id : this.activeAnnotationID].spline;
+    return spline.isClosed;
+  }
+
   @log
   clearSplineCoordinates(addToUndoRedo = true): void {
     const oldCoords = JSON.parse(
@@ -405,6 +411,15 @@ export class Annotations {
       z: z || prevZ,
       t: t || prevT,
     };
+  }
+
+  @log
+  setSplineClosed(closed: boolean, addToUndoRedo = true): void {
+    this.data[this.activeAnnotationID].spline.isClosed = closed;
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("setSplineClosed", [!closed]);
+      this.redoData = [];
+    }
   }
 
   clickNearSpline = (
