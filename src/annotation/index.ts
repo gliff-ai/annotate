@@ -322,7 +322,7 @@ export class Annotations {
   };
 
   splineIsClosed(id: number = null): boolean {
-    const spline = this.data[id ? id : this.activeAnnotationID].spline;
+    const { spline } = this.data[id || this.activeAnnotationID];
     return spline.isClosed;
   }
 

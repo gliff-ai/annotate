@@ -451,6 +451,7 @@ class UserInterface extends Component<Props, State> {
 
     [this.imageFileInfo] = imageFileInfo;
     [this.slicesData] = slicesData;
+
     this.setState(
       {
         sliceIndex: 0,
