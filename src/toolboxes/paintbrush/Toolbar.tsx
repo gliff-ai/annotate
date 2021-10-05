@@ -214,13 +214,13 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     },
     {
       name: "Annotation Transparency",
-      icon: icons.brush, // TODO: replace
+      icon: icons.annotationTransparency,
       event: toggleShowTransparency,
       active: showTransparency,
     },
     {
       name: "Show strokes as pixels",
-      icon: icons.channels, // TODO: replace
+      icon: icons.convertStrokeToPixels,
       event: togglePixelView,
       active: paintbrush.pixelView,
     },
