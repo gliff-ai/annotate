@@ -484,6 +484,11 @@ export class Annotations {
     const color = this.getActiveAnnotationColor(); // FIXME always green
     const labels = this.getLabels();
     const spaceTimeInfo = this.getSplineSpaceTimeInfo();
+
+    if (this.splineIsClosed()) {
+      coordinates.push(coordinates[0]);
+    }
+
     const brushStroke: BrushStroke = {
       coordinates,
       spaceTimeInfo,
