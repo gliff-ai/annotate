@@ -18,6 +18,7 @@ import {
   Theme,
   CardHeader,
   CardContent,
+  Typography,
 } from "@material-ui/core";
 import SVG from "react-inlinesvg";
 
@@ -72,10 +73,11 @@ const useStyles = makeStyles((theme: Theme) =>
     channelHeader: {
       backgroundColor: theme.palette.primary.main,
     },
-    channelTypography: {
-      display: "inline",
-      fontSize: "21px",
-      marginRight: "18px",
+
+    channelInfo: {
+      fontSize: "0.875rem",
+      fontWeight: 400,
+      lineWeight: 1.43,
     },
   })
 );
@@ -165,10 +167,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
             <>
               <CardHeader
                 className={classes.channelHeader}
-                title="Channels"
-                titleTypographyProps={{ className: classes.channelTypography }}
-                action={
-                  <SVG src={imgSrc("pin-icon")} width="18px" height="auto" />
+                title={
+                  <Typography style={{ fontWeight: 500 }}>Channel</Typography>
                 }
               />
               <CardContent>
@@ -176,11 +176,12 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                   <FormGroup aria-label="position" row>
                     {props.channelControls.map((control, i) => (
                       <FormControlLabel
+                        className={classes.channelInfo}
                         key={`C${i + 1}`}
                         value="top"
                         control={control}
-                        label={`C${i + 1}`}
-                        labelPlacement="start"
+                        label={`Channel ${i + 1}`}
+                        labelPlacement="end"
                       />
                     ))}
                   </FormGroup>
