@@ -20,7 +20,6 @@ import {
 } from "@/components/baseCanvas";
 import { palette, getRGBAString } from "@/components/palette";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
-import { Tools } from "./Toolbox";
 import { usePaintbrushStore } from "./Store";
 import { BrushStroke } from "./interfaces";
 import { drawCapsule } from "@/download/DownloadAsTiff";
@@ -180,10 +179,7 @@ export class CanvasClass extends Component<Props, State> {
       const brush = {
         color: mainColor,
         radius: this.props.brushRadius,
-        type:
-          this.props.activeToolbox === Tools.paintbrush.name
-            ? "paint"
-            : "erase",
+        type: this.props.activeToolbox === "Paintbrush" ? "paint" : "erase",
       } as Brush;
 
       // Draw current points
@@ -399,10 +395,7 @@ export class CanvasClass extends Component<Props, State> {
       brush: {
         color,
         radius,
-        type:
-          this.props.activeToolbox === Tools.paintbrush.name
-            ? "paint"
-            : "erase",
+        type: this.props.activeToolbox === "Paintbrush" ? "paint" : "erase",
       },
     });
 
@@ -458,7 +451,7 @@ export class CanvasClass extends Component<Props, State> {
   onMouseDown = (canvasX: number, canvasY: number): void => {
     if (this.props.mode === Mode.draw) {
       // Start drawing
-      if (this.props.activeToolbox === Tools.eraser.name) {
+      if (this.props.activeToolbox === "Eraser") {
         // Copy the current BACK strokes to the front canvas
         this.drawAllStrokes(this.interactionCanvas.canvasContext);
         this.setState({ hideBackCanvas: true }, () => {

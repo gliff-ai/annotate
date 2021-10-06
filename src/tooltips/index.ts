@@ -1,6 +1,6 @@
 import { Tooltip } from "@gliff-ai/style";
 import { BackgroundTools, MinimapTools } from "@/toolboxes/background";
-import { PaintbrushTools } from "@/toolboxes/paintbrush";
+// import { PaintbrushTools } from "@/toolboxes/paintbrush";
 import { SplineTools } from "@/toolboxes/spline";
 import { BoundingBoxTools } from "@/toolboxes/boundingBox";
 
@@ -64,7 +64,7 @@ const Tools: ToolTips = {
   ...DefaultTools,
   ...BackgroundTools,
   ...MinimapTools,
-  ...PaintbrushTools,
+  // ...PaintbrushTools,
   ...BoundingBoxTools,
   ...SplineTools,
 };

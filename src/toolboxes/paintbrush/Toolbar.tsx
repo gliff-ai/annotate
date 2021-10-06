@@ -4,7 +4,6 @@ import {
   ReactElement,
   MouseEvent,
   useState,
-  useEffect,
 } from "react";
 import {
   ButtonGroup,
@@ -22,6 +21,7 @@ import { BaseSlider } from "@/components/BaseSlider";
 import { usePaintbrushStore } from "./Store";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { getShortcut } from "@/keybindings";
+import { useMountEffect } from "@/hooks/use-mountEffect";
 
 interface SubmenuProps {
   isOpen: boolean;
@@ -81,7 +81,6 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     "selectEraser",
     "fillBrush",
     "toggleShowTransparency",
-    "togglePixelView",
   ] as const;
 
   const classes = useStyles();
@@ -159,14 +158,13 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     });
   }
 
-  useEffect(() => {
+  useMountEffect(() => {
     const submenuEventFunctions = {
       changeBrushRadius,
       fillBrush,
       selectBrush,
       selectEraser,
       toggleShowTransparency,
-      togglePixelView,
       changeAnnotationTransparency,
       changeAnnotationTransparencyFocused,
     };
@@ -191,40 +189,40 @@ const Submenu = (props: SubmenuProps): ReactElement => {
         document.removeEventListener(event, handleEvent);
       }
     };
-  }, []);
+  });
 
   const tools = [
     {
       name: "Paintbrush",
       icon: icons.brush,
       event: selectBrush,
-      active: paintbrush.brushType === "Paintbrush",
+      active: () => paintbrush.brushType === "Paintbrush",
     },
     {
       name: "Eraser",
       icon: icons.eraser,
       event: selectEraser,
-      active: paintbrush.brushType === "Eraser",
+      active: () => paintbrush.brushType === "Eraser",
     },
     {
       name: "Fill Active Paintbrush",
       icon: icons.fill,
       event: fillBrush,
-      active: false,
+      active: () => false,
     },
     {
       name: "Annotation Transparency",
       icon: icons.annotationTransparency,
       event: toggleShowTransparency,
-      active: showTransparency,
+      active: () => showTransparency,
     },
     {
       name: "Show strokes as pixels",
-      icon: icons.convertStrokeToPixels,
+      icon: icons.convert,
       event: togglePixelView,
-      active: paintbrush.pixelView,
+      active: () => paintbrush.pixelView,
     },
-  ] as const;
+  ];
 
   return (
     <>
@@ -248,7 +246,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                 ...getShortcut(`${ToolboxName}.${event.name}`),
               }}
               onClick={event}
-              fill={active}
+              fill={active()}
             />
           ))}
         </ButtonGroup>
@@ -332,4 +330,4 @@ class Toolbar extends Component<Props> {
   );
 }
 
-export { Toolbar };
+export { Toolbar, ToolboxName };
