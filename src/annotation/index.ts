@@ -55,6 +55,7 @@ export class Annotations {
     spline: Spline = {
       coordinates: [],
       spaceTimeInfo: { z: 0, t: 0 },
+      isClosed: false,
     },
     boundingBox: BoundingBox = {
       coordinates: {
@@ -320,6 +321,11 @@ export class Annotations {
     return splines;
   };
 
+  splineIsClosed(id: number = null): boolean {
+    const { spline } = this.data[id || this.activeAnnotationID];
+    return spline.isClosed;
+  }
+
   @log
   clearSplineCoordinates(addToUndoRedo = true): void {
     const oldCoords = JSON.parse(
@@ -407,6 +413,15 @@ export class Annotations {
     };
   }
 
+  @log
+  setSplineClosed(closed: boolean, addToUndoRedo = true): void {
+    this.data[this.activeAnnotationID].spline.isClosed = closed;
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("setSplineClosed", [!closed]);
+      this.redoData = [];
+    }
+  }
+
   clickNearSpline = (
     imageX: number,
     imageY: number,
@@ -469,6 +484,11 @@ export class Annotations {
     const color = this.getActiveAnnotationColor(); // FIXME always green
     const labels = this.getLabels();
     const spaceTimeInfo = this.getSplineSpaceTimeInfo();
+
+    if (this.splineIsClosed()) {
+      coordinates.push(coordinates[0]);
+    }
+
     const brushStroke: BrushStroke = {
       coordinates,
       spaceTimeInfo,
