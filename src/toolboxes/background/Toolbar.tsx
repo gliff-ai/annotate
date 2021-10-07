@@ -89,7 +89,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     setButtonClicked(Tools.brightness.name);
   }
 
-  function changeBrightness(e: ChangeEvent, value: number) {
+  function changeBrightness(e: ChangeEvent | MouseEvent, value: number) {
     setBackground({
       brightness: value,
       contrast: background.contrast,
@@ -138,6 +138,11 @@ const Submenu = (props: SubmenuProps): ReactElement => {
             tooltip={Tools.channels}
             onClick={() => selectChannels()}
             fill={buttonClicked === Tools.channels.name}
+          />
+          <BaseIconButton
+            tooltip={Tools.brightness}
+            onClick={(e) => changeBrightness(e, 500)}
+            fill={buttonClicked === Tools.brightness.name}
           />
         </ButtonGroup>
         <Card className={classes.subMenuCard}>
