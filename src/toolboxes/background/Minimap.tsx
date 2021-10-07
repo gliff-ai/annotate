@@ -103,6 +103,7 @@ interface Props extends WithStyles<typeof styles> {
 
 interface State {
   isOpen: boolean;
+  transition: boolean;
 }
 
 class Minimap extends Component<Props, State> {
@@ -111,6 +112,7 @@ class Minimap extends Component<Props, State> {
 
     this.state = {
       isOpen: false,
+      transition: true,
     };
   }
 
@@ -134,10 +136,14 @@ class Minimap extends Component<Props, State> {
 
   handleDrawerClose = () => {
     this.setState({ isOpen: false });
+    setTimeout(() => {
+      this.setState({ transition: true });
+    }, 2000);
   };
 
   handleDrawerOpen = () => {
     this.setState({ isOpen: true });
+    this.setState({ transition: false });
   };
 
   render = (): ReactElement => (
@@ -218,7 +224,11 @@ class Minimap extends Component<Props, State> {
       </Slide>
 
       {!this.state.isOpen ? (
-        <Slide in={!this.state.isOpen} direction="up" timeout={{ enter: 1000 }}>
+        <Slide
+          in={this.state.transition}
+          direction="up"
+          timeout={{ enter: 1000 }}
+        >
           <Card
             className={this.props.classes.mimimapToggle}
             style={{
