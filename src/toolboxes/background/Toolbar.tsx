@@ -18,6 +18,7 @@ import {
   Theme,
   CardHeader,
   CardContent,
+  Button,
 } from "@material-ui/core";
 import SVG from "react-inlinesvg";
 
@@ -89,7 +90,10 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     setButtonClicked(Tools.brightness.name);
   }
 
-  function changeBrightness(e: ChangeEvent | MouseEvent, value: number) {
+  function changeBrightness(
+    e: ChangeEvent | MouseEvent | React.TouchEvent,
+    value: number
+  ) {
     setBackground({
       brightness: value,
       contrast: background.contrast,
@@ -144,6 +148,9 @@ const Submenu = (props: SubmenuProps): ReactElement => {
             onClick={(e) => changeBrightness(e, 500)}
             fill={buttonClicked === Tools.brightness.name}
           />
+          <Button onTouchStart={(e) => changeBrightness(e, 500)}>
+            Test Brightness
+          </Button>
         </ButtonGroup>
         <Card className={classes.subMenuCard}>
           {buttonClicked === Tools.brightness.name && (
