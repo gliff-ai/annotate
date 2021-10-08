@@ -50,7 +50,6 @@ interface Brush {
 }
 
 interface State {
-  hideBackCanvas: boolean;
   pixelView: boolean;
 }
 
@@ -134,7 +133,6 @@ export class CanvasClass extends Component<Props, State> {
     this.tempCtx = null;
 
     this.state = {
-      hideBackCanvas: false,
       pixelView: false,
     };
   }
@@ -583,20 +581,16 @@ export class CanvasClass extends Component<Props, State> {
             pointerEvents: this.props.isActive ? "auto" : "none",
           }}
         >
-          <div
-            style={{ opacity: this.state.hideBackCanvas ? "none" : "block" }} // DEVNOTE: this line does nothing!
-          >
-            <BaseCanvas
-              cursor="none"
-              ref={(backgroundCanvas) => {
-                this.backgroundCanvas = backgroundCanvas;
-              }}
-              name={`${this.name}-background`}
-              scaleAndPan={this.props.scaleAndPan}
-              canvasPositionAndSize={this.props.canvasPositionAndSize}
-              setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
-            />
-          </div>
+          <BaseCanvas
+            cursor="none"
+            ref={(backgroundCanvas) => {
+              this.backgroundCanvas = backgroundCanvas;
+            }}
+            name={`${this.name}-background`}
+            scaleAndPan={this.props.scaleAndPan}
+            canvasPositionAndSize={this.props.canvasPositionAndSize}
+            setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
+          />
 
           <BaseCanvas
             onMouseDown={this.onMouseDown}
