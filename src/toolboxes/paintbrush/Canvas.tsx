@@ -1,11 +1,4 @@
-import {
-  ReactNode,
-  Component,
-  ReactElement,
-  useState,
-  useEffect,
-  FC,
-} from "react";
+import { ReactNode, Component, ReactElement } from "react";
 import simplify from "simplify-js";
 import { slpfLines } from "@gliff-ai/slpf";
 import { theme } from "@gliff-ai/style";
@@ -27,7 +20,7 @@ import { drawCapsule } from "@/download/DownloadAsTiff";
 import { getNewImageSizeAndDisplacement } from "@/toolboxes/background/drawImage";
 
 const mainColor = theme.palette.primary.main;
-const secondaryColor = theme.palette.secondary.main;
+// const secondaryColor = theme.palette.secondary.main;
 
 interface Props extends CanvasProps {
   isActive: boolean;
@@ -310,7 +303,7 @@ export class CanvasClass extends Component<Props, State> {
             !(i === activeAnnotationID && skipActive)
           ) {
             this.clearCanvas(this.tempCtx);
-            annotation.brushStrokes.forEach((brushStrokes, j) => {
+            annotation.brushStrokes.forEach((brushStrokes) => {
               if (brushStrokes.spaceTimeInfo.z === this.props.sliceIndex) {
                 this.drawPoints(
                   brushStrokes.coordinates,
@@ -538,7 +531,7 @@ export class CanvasClass extends Component<Props, State> {
     }
   };
 
-  clearCanvas = (context: CanvasRenderingContext2D) => {
+  clearCanvas = (context: CanvasRenderingContext2D): void => {
     context.clearRect(
       0,
       0,
