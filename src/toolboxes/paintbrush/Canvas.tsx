@@ -206,7 +206,7 @@ export class CanvasClass extends Component<Props, State> {
     }
 
     if (clearCanvas) {
-      context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+      this.clearCanvas(context);
     }
 
     // Draw stroke:
@@ -233,7 +233,7 @@ export class CanvasClass extends Component<Props, State> {
     if (!context) return;
 
     // Clear paintbrush canvas
-    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+    this.clearCanvas(context);
 
     if (this.state.pixelView) {
       // rasterize the brushstrokes and display as image rather than vector:
@@ -308,12 +308,7 @@ export class CanvasClass extends Component<Props, State> {
             annotation.toolbox === Toolboxes.paintbrush &&
             !(i === activeAnnotationID && skipActive)
           ) {
-            this.tempCtx.clearRect(
-              0,
-              0,
-              this.tempCanvas.width,
-              this.tempCanvas.height
-            );
+            this.clearCanvas(this.tempCtx);
             annotation.brushStrokes.forEach((brushStrokes, j) => {
               if (brushStrokes.spaceTimeInfo.z === this.props.sliceIndex) {
                 this.drawPoints(
@@ -379,7 +374,7 @@ export class CanvasClass extends Component<Props, State> {
 
     this.drawAllStrokes();
     const context = this.interactionCanvas.canvasContext;
-    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+    this.clearCanvas(context);
   };
 
   fillBrush = (): void => {
@@ -437,12 +432,7 @@ export class CanvasClass extends Component<Props, State> {
         this.drawAllStrokes(true);
 
         // Clear tempCanvas and draw the active annotation on it:
-        this.tempCtx.clearRect(
-          0,
-          0,
-          this.tempCanvas.width,
-          this.tempCanvas.height
-        );
+        this.clearCanvas(this.tempCtx);
         this.props.annotationsObject
           .getActiveAnnotation()
           .brushStrokes.forEach((brushstroke) => {
@@ -456,12 +446,7 @@ export class CanvasClass extends Component<Props, State> {
           });
 
         // Copy tempCanvas onto interactionCanvas:
-        this.interactionCanvas.canvasContext.clearRect(
-          0,
-          0,
-          this.interactionCanvas.canvasContext.canvas.width,
-          this.interactionCanvas.canvasContext.canvas.height
-        );
+        this.clearCanvas(this.interactionCanvas.canvasContext);
         this.interactionCanvas.canvasContext.globalAlpha =
           this.props.annotationActiveAlpha;
         this.interactionCanvas.canvasContext.globalCompositeOperation =
