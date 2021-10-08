@@ -63,45 +63,6 @@ interface Event extends CustomEvent {
 
 type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 
-type CursorProps = {
-  brushRadius: number;
-  canvasTopAndLeft: { top: number; left: number };
-};
-
-const FauxCursor: FC<CursorProps> = ({
-  brushRadius,
-  canvasTopAndLeft,
-}: CursorProps): ReactElement => {
-  const [mousePosition, setMousePosition] = useState({ x: null, y: null });
-
-  useEffect(() => {
-    const mouseMoveHandler = (event: MouseEvent) => {
-      const { clientX, clientY } = event;
-      setMousePosition({ x: clientX, y: clientY });
-    };
-    document.addEventListener("mousemove", mouseMoveHandler);
-
-    return () => {
-      document.removeEventListener("mousemove", mouseMoveHandler);
-    };
-  }, []);
-
-  return (
-    <div
-      id="cursor"
-      style={{
-        width: brushRadius,
-        height: brushRadius,
-        border: "2px solid #666666",
-        borderRadius: "50%",
-        position: "absolute",
-        top: mousePosition.y - brushRadius / 2 - canvasTopAndLeft.top,
-        left: mousePosition.x - brushRadius / 2 - canvasTopAndLeft.left,
-      }}
-    />
-  );
-};
-
 export class CanvasClass extends Component<Props, State> {
   readonly name = Toolboxes.paintbrush;
 
@@ -116,6 +77,8 @@ export class CanvasClass extends Component<Props, State> {
   private tempCanvas: HTMLCanvasElement | null; // used for rendering brush annotations separately, to avoid eraser strokes interfering with other brush annotations
 
   private tempCtx: CanvasRenderingContext2D | null;
+
+  private cursorCtx: CanvasRenderingContext2D | null;
 
   private isDrawing: boolean;
 
@@ -150,6 +113,10 @@ export class CanvasClass extends Component<Props, State> {
     this.tempCtx = this.tempCanvas.getContext("2d");
     this.tempCanvas.width = this.backgroundCanvas.canvasContext.canvas.width;
     this.tempCanvas.height = this.backgroundCanvas.canvasContext.canvas.height;
+    if (this.cursorCtx) {
+      this.cursorCtx.canvas.width = this.props.canvasPositionAndSize.width;
+      this.cursorCtx.canvas.height = this.props.canvasPositionAndSize.height;
+    }
 
     // Redraw if we change pan or zoom
     this.drawAllStrokes();
@@ -219,7 +186,7 @@ export class CanvasClass extends Component<Props, State> {
     // Common setup:
     context.lineJoin = "round";
     context.lineCap = "round";
-    context.lineWidth = this.getCanvasBrushRadius(brush.radius);
+    context.lineWidth = this.getCanvasBrushDiameter(brush.radius);
     context.globalAlpha = 1.0;
     // drawing strokes with alpha=1.0 ensures we don't see where separate strokes overlap
     // we _do_ see where strokes from separate annotations overlap, because annotations are drawn to the
@@ -369,7 +336,7 @@ export class CanvasClass extends Component<Props, State> {
     }
   };
 
-  getCanvasBrushRadius = (brushRadius: number): number => {
+  getCanvasBrushDiameter = (brushRadius: number): number => {
     // Get brush radius given image to canvas scaling factor
     // and image scaling (zoom level).
     const imageScalingFactor =
@@ -528,6 +495,10 @@ export class CanvasClass extends Component<Props, State> {
     if (this.props.mode === Mode.draw && this.isDrawing) {
       this.updateStroke(canvasX, canvasY);
     }
+
+    if (this.cursorCtx) {
+      this.drawCursor(canvasX, canvasY);
+    }
   };
 
   onMouseUp = (canvasX: number, canvasY: number): void => {
@@ -542,6 +513,8 @@ export class CanvasClass extends Component<Props, State> {
 
       this.saveLine(this.props.brushRadius);
       this.drawAllStrokes();
+
+      this.drawCursor(canvasX, canvasY);
     }
   };
 
@@ -552,29 +525,42 @@ export class CanvasClass extends Component<Props, State> {
     return "none";
   };
 
+  drawCursor = (canvasX: number, canvasY: number): void => {
+    this.clearCanvas(this.cursorCtx);
+
+    this.cursorCtx.lineWidth = 2;
+    this.cursorCtx.strokeStyle = "white";
+    this.cursorCtx.globalAlpha = this.isDrawing ? 0.8 : 0.3;
+
+    this.cursorCtx.beginPath();
+    this.cursorCtx.arc(
+      canvasX,
+      canvasY,
+      this.getCanvasBrushDiameter(this.props.brushRadius) / 2,
+      0,
+      2 * Math.PI
+    );
+    this.cursorCtx.stroke();
+  };
+
   handleEvent = (event: Event): void => {
     if ((event.detail as string).includes(this.name)) {
       this[event.type]?.call(this);
     }
   };
 
+  clearCanvas = (context: CanvasRenderingContext2D) => {
+    context.clearRect(
+      0,
+      0,
+      this.props.canvasPositionAndSize.width,
+      this.props.canvasPositionAndSize.height
+    );
+  };
+
   render = (): ReactNode =>
     this.props.displayedImage ? (
       <>
-        {/* this div is basically a fake cursor */}
-        {this.props.isActive ? (
-          <FauxCursor
-            brushRadius={this.getCanvasBrushRadius(this.props.brushRadius)}
-            canvasTopAndLeft={{
-              top:
-                this.backgroundCanvas?.canvasContext?.canvas?.getBoundingClientRect()
-                  .top || 0,
-              left:
-                this.backgroundCanvas?.canvasContext?.canvas?.getBoundingClientRect()
-                  .left || 0,
-            }}
-          />
-        ) : null}
         {/* We have two canvases in order to be able to erase stuff. */}
         <div
           style={{
@@ -604,6 +590,23 @@ export class CanvasClass extends Component<Props, State> {
             scaleAndPan={this.props.scaleAndPan}
             canvasPositionAndSize={this.props.canvasPositionAndSize}
             setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
+          />
+
+          <canvas
+            style={{
+              position: "absolute",
+              top: this.props.canvasPositionAndSize.top,
+              left: this.props.canvasPositionAndSize.left,
+              width: this.props.canvasPositionAndSize.width,
+              height: this.props.canvasPositionAndSize.height,
+              pointerEvents: "none",
+              display: "block",
+            }}
+            ref={(canvas) => {
+              if (canvas) {
+                this.cursorCtx = canvas.getContext("2d");
+              }
+            }}
           />
         </div>
       </>
