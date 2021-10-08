@@ -218,6 +218,7 @@ export class CanvasClass extends Component<Props, State> {
       const nextPoint = points[i];
       context.lineTo(nextPoint.x, nextPoint.y);
     }
+    context.lineTo(points[points.length - 1].x, points[points.length - 1].y); // in case there's only one point in points
 
     context.stroke();
   };
@@ -456,6 +457,9 @@ export class CanvasClass extends Component<Props, State> {
 
       // Ensure the initial down position gets added to our line
       this.updateStroke(canvasX, canvasY);
+
+      // Draw cursor:
+      this.drawCursor(canvasX, canvasY);
     } else if (this.props.mode === Mode.select) {
       // In select mode a single click allows to select a different spline annotation
       const { x: imageX, y: imageY } = canvasToImage(
