@@ -110,28 +110,28 @@ export class CanvasClass extends Component<Props, State> {
 
   private backgroundCanvas: BaseCanvas | null;
 
-  private pixelCanvas: HTMLCanvasElement | null;
+  private pixelCanvas: HTMLCanvasElement | null; // used for transfering pixelView Uint8Array data into the (background/interaction)Canvas
 
   private pixelCtx: CanvasRenderingContext2D | null;
 
-  private isPressing: boolean;
+  private tempCanvas: HTMLCanvasElement | null; // used for rendering brush annotations separately, to avoid eraser strokes interfering with other brush annotations
+
+  private tempCtx: CanvasRenderingContext2D | null;
 
   private isDrawing: boolean;
 
   private points: XYPoint[]; // buffer of points being drawn by the current mouse stroke
 
-  private annotationOpacity: number;
-
   constructor(props: Props) {
     super(props);
 
-    this.isPressing = false;
     this.isDrawing = false;
     this.points = [];
-    this.annotationOpacity = this.props.annotationActiveAlpha;
     this.backgroundCanvas = null;
     this.pixelCanvas = null;
     this.pixelCtx = null;
+    this.tempCanvas = null;
+    this.tempCtx = null;
 
     this.state = {
       hideBackCanvas: false,
@@ -146,6 +146,13 @@ export class CanvasClass extends Component<Props, State> {
   }
 
   componentDidUpdate(): void {
+    // can't just initialize this canvas in the constructor because backgroundCanvas doesn't get
+    // the correct width/height until canvasPositionAndSize is set via callback from elsewhere
+    this.tempCanvas = document.createElement("canvas");
+    this.tempCtx = this.tempCanvas.getContext("2d");
+    this.tempCanvas.width = this.backgroundCanvas.canvasContext.canvas.width;
+    this.tempCanvas.height = this.backgroundCanvas.canvasContext.canvas.height;
+
     // Redraw if we change pan or zoom
     this.drawAllStrokes();
   }
@@ -156,7 +163,9 @@ export class CanvasClass extends Component<Props, State> {
     }
   }
 
-  handlePointerMove = (canvasX: number, canvasY: number): void => {
+  updateStroke = (canvasX: number, canvasY: number): void => {
+    // adds the given point to this.points and re-draws the interaction canvas
+
     const { x, y } = canvasToImage(
       canvasX,
       canvasY,
@@ -166,43 +175,28 @@ export class CanvasClass extends Component<Props, State> {
       this.props.canvasPositionAndSize
     );
 
-    if (this.isPressing && !this.isDrawing) {
-      // Start drawing and add point
-      this.isDrawing = true;
-      this.points.push({ x, y });
-    }
+    // Add new point
+    this.points.push({ x, y });
 
-    if (this.isDrawing) {
-      // Add new point
-      this.points.push({ x, y });
+    // Create/update brush
+    const brush = {
+      color: mainColor,
+      radius: this.props.brushRadius,
+      type:
+        this.props.activeToolbox === Tools.paintbrush.name ? "paint" : "erase",
+    } as Brush;
 
-      // Create/update brush
-      const brush = {
-        color: mainColor,
-        radius: this.props.brushRadius,
-        type:
-          this.props.activeToolbox === Tools.paintbrush.name
-            ? "paint"
-            : "erase",
-      } as Brush;
+    // Set interactionCanvas alpha (props.annotationActiveAlpha for paint, 1.0 for eraser):
+    this.interactionCanvas.canvasContext.globalAlpha =
+      brush.type === "paint" ? this.props.annotationActiveAlpha : 1.0;
 
-      // Draw current points
-      if (brush.type === "paint") {
-        this.drawPoints(
-          this.points,
-          brush,
-          true,
-          this.interactionCanvas.canvasContext
-        );
-      } else {
-        this.drawPoints(
-          this.points,
-          brush,
-          false,
-          this.backgroundCanvas.canvasContext
-        );
-      }
-    }
+    // Draw current points
+    this.drawPoints(
+      this.points,
+      brush,
+      brush.type === "paint",
+      this.interactionCanvas.canvasContext
+    );
   };
 
   drawPoints = (
@@ -224,43 +218,35 @@ export class CanvasClass extends Component<Props, State> {
       return { x, y };
     });
 
+    // Common setup:
     context.lineJoin = "round";
     context.lineCap = "round";
+    context.lineWidth = this.getCanvasBrushRadius(brush.radius);
+    context.globalAlpha = 1.0;
+    // drawing strokes with alpha=1.0 ensures we don't see where separate strokes overlap
+    // we _do_ see where strokes from separate annotations overlap, because annotations are drawn to the
+    // background canvas with alpha=this.props.annotation(Active)Alpha in drawAllStrokes
 
     // Set annotation colour and transparency
     if (isActive) {
       context.strokeStyle = mainColor;
-      this.annotationOpacity = this.props.annotationActiveAlpha;
     } else {
       context.strokeStyle = brush.color;
-      this.annotationOpacity = this.props.annotationAlpha;
     }
-    if (brush.type === "erase") {
-      this.annotationOpacity = 1.0;
-    }
-    context.globalAlpha = this.annotationOpacity;
 
     if (brush.type === "erase") {
-      // If we are live drawing, use a brush colour
-      if (context.canvas.id === "interaction-canvas") {
-        context.strokeStyle = secondaryColor;
-      } else {
-        // If we have saved this line, use a subtraction
-        context.globalCompositeOperation = "destination-out";
-      }
+      context.globalCompositeOperation = "destination-out";
     } else {
       context.globalCompositeOperation = "source-over";
-      if (clearCanvas) {
-        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-      }
     }
 
-    context.lineWidth = this.getCanvasBrushRadius(brush.radius);
+    if (clearCanvas) {
+      context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+    }
 
-    const firstPoint = points[0];
-
+    // Draw stroke:
     context.beginPath();
-    context.moveTo(firstPoint.x, firstPoint.y);
+    context.moveTo(points[0].x, points[0].y);
 
     for (let i = 1; i < points.length; i += 1) {
       // we just use linear connections for now
@@ -275,13 +261,11 @@ export class CanvasClass extends Component<Props, State> {
     this.setState((oldstate) => ({ pixelView: !oldstate.pixelView }));
   };
 
-  drawAllStrokes = (context = this.backgroundCanvas?.canvasContext): void => {
+  drawAllStrokes = (skipActive = false): void => {
     // Draw strokes on active layer whiles showing existing paintbrush layers
-    if (!context) return;
 
-    // Get active annotation ID
-    const activeAnnotationID =
-      this.props.annotationsObject.getActiveAnnotationID();
+    const context = this.backgroundCanvas?.canvasContext;
+    if (!context) return;
 
     // Clear paintbrush canvas
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
@@ -347,22 +331,41 @@ export class CanvasClass extends Component<Props, State> {
         newHeight
       );
     } else {
+      // Get active annotation ID
+      const activeAnnotationID =
+        this.props.annotationsObject.getActiveAnnotationID();
+
       // Draw all paintbrush annotations
       this.props.annotationsObject
         .getAllAnnotations()
-        .forEach((annotationsObject, i) => {
-          if (annotationsObject.toolbox === Toolboxes.paintbrush) {
-            annotationsObject.brushStrokes.forEach((brushStrokes) => {
+        .forEach((annotation, i) => {
+          if (
+            annotation.toolbox === Toolboxes.paintbrush &&
+            !(i === activeAnnotationID && skipActive)
+          ) {
+            this.tempCtx.clearRect(
+              0,
+              0,
+              this.tempCanvas.width,
+              this.tempCanvas.height
+            );
+            annotation.brushStrokes.forEach((brushStrokes, j) => {
               if (brushStrokes.spaceTimeInfo.z === this.props.sliceIndex) {
                 this.drawPoints(
                   brushStrokes.coordinates,
                   brushStrokes.brush,
                   false,
-                  context,
+                  this.tempCtx,
                   i === activeAnnotationID
                 );
               }
             });
+            context.globalCompositeOperation = "source-over";
+            context.globalAlpha =
+              i === activeAnnotationID
+                ? this.props.annotationActiveAlpha
+                : this.props.annotationAlpha;
+            context.drawImage(this.tempCanvas, 0, 0);
           }
         });
     }
@@ -458,19 +461,51 @@ export class CanvasClass extends Component<Props, State> {
   onMouseDown = (canvasX: number, canvasY: number): void => {
     if (this.props.mode === Mode.draw) {
       // Start drawing
+      this.isDrawing = true;
+
       if (this.props.activeToolbox === Tools.eraser.name) {
-        // Copy the current BACK strokes to the front canvas
-        this.drawAllStrokes(this.interactionCanvas.canvasContext);
-        this.setState({ hideBackCanvas: true }, () => {
-          this.isPressing = true;
-          this.handlePointerMove(canvasX, canvasY);
-        });
+        // if using the eraser, we redraw all strokes except the active annotation,
+        // then draw the active annotation on the interaction canvas and erase from
+        // there as we add to this.points
+
+        // Redraw everything except the active annotation:
+        this.drawAllStrokes(true);
+
+        // Clear tempCanvas and draw the active annotation on it:
+        this.tempCtx.clearRect(
+          0,
+          0,
+          this.tempCanvas.width,
+          this.tempCanvas.height
+        );
+        this.props.annotationsObject
+          .getActiveAnnotation()
+          .brushStrokes.forEach((brushstroke) => {
+            this.drawPoints(
+              brushstroke.coordinates,
+              brushstroke.brush,
+              false,
+              this.tempCtx,
+              true
+            );
+          });
+
+        // Copy tempCanvas onto interactionCanvas:
+        this.interactionCanvas.canvasContext.clearRect(
+          0,
+          0,
+          this.interactionCanvas.canvasContext.canvas.width,
+          this.interactionCanvas.canvasContext.canvas.height
+        );
+        this.interactionCanvas.canvasContext.globalAlpha =
+          this.props.annotationActiveAlpha;
+        this.interactionCanvas.canvasContext.globalCompositeOperation =
+          "source-over";
+        this.interactionCanvas.canvasContext.drawImage(this.tempCanvas, 0, 0);
       }
 
-      this.isPressing = true;
-
       // Ensure the initial down position gets added to our line
-      this.handlePointerMove(canvasX, canvasY);
+      this.updateStroke(canvasX, canvasY);
     } else if (this.props.mode === Mode.select) {
       // In select mode a single click allows to select a different spline annotation
       const { x: imageX, y: imageY } = canvasToImage(
@@ -492,18 +527,17 @@ export class CanvasClass extends Component<Props, State> {
   };
 
   onMouseMove = (canvasX: number, canvasY: number): void => {
-    if (this.props.mode === Mode.draw) {
-      this.handlePointerMove(canvasX, canvasY);
+    if (this.props.mode === Mode.draw && this.isDrawing) {
+      this.updateStroke(canvasX, canvasY);
     }
   };
 
   onMouseUp = (canvasX: number, canvasY: number): void => {
     if (this.props.mode === Mode.draw) {
       // End painting & save painting
-      this.isPressing = false;
 
       // Draw to this end pos
-      this.handlePointerMove(canvasX, canvasY);
+      this.updateStroke(canvasX, canvasY);
 
       // Stop drawing & save the drawn line
       this.isDrawing = false;
