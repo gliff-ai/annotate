@@ -62,7 +62,7 @@ const useStyles = makeStyles((theme: Theme) =>
       background: "none",
     },
     subMenuCard: {
-      height: "285px",
+      height: "fit-content",
       marginLeft: "18px", // TODO other toolbars should use this approach
     },
     baseSlider: {
@@ -75,9 +75,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
 
     channelInfo: {
-      fontSize: "0.875rem",
+      fontSize: "14px",
       fontWeight: 400,
-      lineWeight: 1.43,
     },
   })
 );
@@ -173,14 +172,17 @@ const Submenu = (props: SubmenuProps): ReactElement => {
               />
               <CardContent>
                 <FormControl component="fieldset">
-                  <FormGroup aria-label="position" row>
+                  <FormGroup aria-label="position">
                     {props.channelControls.map((control, i) => (
                       <FormControlLabel
-                        className={classes.channelInfo}
                         key={`C${i + 1}`}
                         value="top"
                         control={control}
-                        label={`Channel ${i + 1}`}
+                        label={
+                          <Typography className={classes.channelInfo}>
+                            {`Channel ${i + 1}`}
+                          </Typography>
+                        }
                         labelPlacement="end"
                       />
                     ))}
