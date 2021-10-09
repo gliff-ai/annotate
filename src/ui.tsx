@@ -646,11 +646,13 @@ class UserInterface extends Component<Props, State> {
   undo = (): void => {
     this.setState({ canUndoRedo: this.annotationsObject.undo() });
     this.callRedraw();
+    this.setButtonClicked(Tools.undo.name);
   };
 
   redo = (): void => {
     this.setState({ canUndoRedo: this.annotationsObject.redo() });
     this.callRedraw();
+    this.setButtonClicked(Tools.redo.name);
   };
 
   isTyping = (): boolean =>
@@ -768,14 +770,12 @@ class UserInterface extends Component<Props, State> {
           <BaseIconButton
             tooltip={Tools.undo}
             onClick={this.undo}
-            fill={false}
-            enabled={this.state.canUndoRedo.undo}
+            fill={this.state.buttonClicked === Tools.undo.name}
           />
           <BaseIconButton
             tooltip={Tools.redo}
             onClick={this.redo}
-            fill={false}
-            enabled={this.state.canUndoRedo.redo}
+            fill={this.state.buttonClicked === Tools.redo.name}
           />
         </ButtonGroup>
 
