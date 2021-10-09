@@ -517,7 +517,6 @@ class UserInterface extends Component<Props, State> {
     // Select draw mode and re-activate last used paint tool
     this.setState((state) => ({
       mode: Mode.draw,
-      buttonClicked: Tools[state.activeToolbox].name,
     }));
   };
 
@@ -747,6 +746,7 @@ class UserInterface extends Component<Props, State> {
             onMouseUp={this.selectDrawMode}
             fill={this.state.buttonClicked === Tools.clearAnnotation.name}
           />
+
           {saveAnnotationsCallback && (
             <BaseIconButton
               tooltip={Tools.save}
