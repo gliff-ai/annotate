@@ -53,6 +53,8 @@ class CanvasClass extends Component<Props> {
 
   private isMouseDown: boolean;
 
+  private dragPoint: XYPoint; // current position of dragged point
+
   private gradientImage: ImageData;
 
   private numberOfMoves: number; // increments on mouse move; used to space out the magic spline points
@@ -116,7 +118,13 @@ class CanvasClass extends Component<Props> {
 
     if (splineVector.length > 1) {
       // Go to the first point
-      let firstPoint: XYPoint = splineVector[0];
+      let firstPoint: XYPoint;
+      if (isActive && this.selectedPointIndex === 0 && this.isMouseDown) {
+        firstPoint = this.dragPoint;
+      } else {
+        firstPoint = splineVector[0]; // eslint-disable-line prefer-destructuring
+      }
+
       firstPoint = imageToCanvas(
         firstPoint.x,
         firstPoint.y,
@@ -130,10 +138,17 @@ class CanvasClass extends Component<Props> {
       context.moveTo(firstPoint.x, firstPoint.y);
 
       // Draw each point by taking our raw coordinates and applying the transform so they fit on our canvas
-      for (const { x, y } of splineVector) {
+      for (const [idx, { x, y }] of splineVector.entries()) {
+        let drawPoint: XYPoint;
+        if (isActive && this.isMouseDown && idx === this.selectedPointIndex) {
+          // draw the point at the current mouse position if we're dragging it:
+          drawPoint = this.dragPoint;
+        } else {
+          drawPoint = { x, y };
+        }
         nextPoint = imageToCanvas(
-          x,
-          y,
+          drawPoint.x,
+          drawPoint.y,
           this.props.displayedImage.width,
           this.props.displayedImage.height,
           this.props.scaleAndPan,
@@ -141,36 +156,43 @@ class CanvasClass extends Component<Props> {
         );
         context.lineTo(nextPoint.x, nextPoint.y);
       }
+      if (this.props.annotationsObject.splineIsClosed()) {
+        context.lineTo(firstPoint.x, firstPoint.y);
+      }
       context.stroke();
     }
 
     // Draw all points
     context.beginPath();
     splineVector.forEach(({ x, y }, i) => {
-      if (i !== splineVector.length - 1 || !this.isClosed(splineVector)) {
-        nextPoint = imageToCanvas(
-          x,
-          y,
-          this.props.displayedImage.width,
-          this.props.displayedImage.height,
-          this.props.scaleAndPan,
-          this.props.canvasPositionAndSize
-        );
-        if (this.selectedPointIndex === i && isActive) {
-          context.fillRect(
-            nextPoint.x - pointSize / 2,
-            nextPoint.y - pointSize / 2,
-            pointSize,
-            pointSize
-          ); // draw a filled square to mark the point as selected
-        } else {
-          context.rect(
-            nextPoint.x - pointSize / 2,
-            nextPoint.y - pointSize / 2,
-            pointSize,
-            pointSize
-          ); // draw a square to mark the point
-        }
+      let drawPoint: XYPoint;
+      if (isActive && this.isMouseDown && i === this.selectedPointIndex) {
+        drawPoint = this.dragPoint;
+      } else {
+        drawPoint = { x, y };
+      }
+      nextPoint = imageToCanvas(
+        drawPoint.x,
+        drawPoint.y,
+        this.props.displayedImage.width,
+        this.props.displayedImage.height,
+        this.props.scaleAndPan,
+        this.props.canvasPositionAndSize
+      );
+      if (this.selectedPointIndex === i && isActive) {
+        context.fillRect(
+          nextPoint.x - pointSize / 2,
+          nextPoint.y - pointSize / 2,
+          pointSize,
+          pointSize
+        ); // draw a filled square to mark the point as selected
+      } else {
+        context.rect(
+          nextPoint.x - pointSize / 2,
+          nextPoint.y - pointSize / 2,
+          pointSize,
+          pointSize
+        ); // draw a square to mark the point
       }
     });
     context.stroke();
@@ -206,37 +228,16 @@ class CanvasClass extends Component<Props> {
   deleteSelectedPoint = (): void => {
     if (this.selectedPointIndex === -1 || !this.sliceIndexMatch()) return;
 
-    const coordinates = this.props.annotationsObject.getSplineCoordinates();
-    const isClosed = this.isClosed(coordinates);
+    // Delete x,y point at selected index
+    this.props.annotationsObject.deleteSplinePoint(this.selectedPointIndex);
 
-    // If close spline
-    if (isClosed) {
-      // If selected index is last index, change selected index to first index
-      if (this.selectedPointIndex === coordinates.length - 1) {
-        this.selectedPointIndex = 0;
-      }
+    // decrement selectedPointIndex, unless it's already 0:
+    this.selectedPointIndex = Math.max(0, this.selectedPointIndex - 1);
 
-      // Delete x,y point at selected index
-      this.props.annotationsObject.deleteSplinePoint(this.selectedPointIndex);
-
-      // If selected index is first index, delete also point at last index
-      if (this.selectedPointIndex === 0) {
-        if (this.props.annotationsObject.getSplineLength() === 1) {
-          this.props.annotationsObject.clearSplineCoordinates();
-        } else {
-          this.props.annotationsObject.updateSplinePoint(
-            coordinates[1].x, // coordinates is outdated here due to deleteSplinePoint; coordinates[1] is therefore coordinates[0] now that we've deleted the previous first point
-            coordinates[1].y,
-            this.props.annotationsObject.getSplineLength() - 1
-          );
-        }
-      }
-    } else {
-      // Delete x,y point at selected index
-      this.props.annotationsObject.deleteSplinePoint(this.selectedPointIndex);
+    if (this.props.annotationsObject.getSplineCoordinates().length < 3) {
+      this.props.annotationsObject.setSplineClosed(false);
     }
 
-    this.selectedPointIndex = Math.max(0, this.selectedPointIndex - 1);
     this.drawAllSplines();
   };
 
@@ -281,6 +282,12 @@ class CanvasClass extends Component<Props> {
     // or add new point to a normal spline (Mode.draw and this.props.activeToolbox === Tools.spline.name)
     // or add TL or BR point to a rectangle spline (Mode.draw and this.props.activeToolbox === Tools.rectspline.name)
 
+    if (this.isMouseDown) {
+      // turns out onClick still runs when releasing a drag, so we want to abort in that case:
+      this.isMouseDown = false;
+      return;
+    }
+
     // X and Y are in CanvasSpace, convert to ImageSpace
     const { x: imageX, y: imageY } = canvasToImage(
       x,
@@ -318,8 +325,6 @@ class CanvasClass extends Component<Props> {
           { x: imageX, y: imageY },
           coordinates
         );
-        // check if the current spline is a closed one
-        const isClosed = this.isClosed(coordinates);
 
         if (nudgePointIdx !== -1) {
           // If the mouse click was near an existing point, nudge that point
@@ -330,17 +335,10 @@ class CanvasClass extends Component<Props> {
             (nudgePoint.y + imageY) / 2,
             nudgePointIdx
           );
-
-          if (nudgePointIdx === 0 && isClosed) {
-            // need to update the final point as well if we're nudging the first point of a closed spline,
-            // or else the loop gets broken
-            this.props.annotationsObject.updateSplinePoint(
-              (nudgePoint.x + imageX) / 2,
-              (nudgePoint.y + imageY) / 2,
-              coordinates.length - 1
-            );
-          }
-        } else if (this.props.mode === Mode.draw && !isClosed) {
+        } else if (
+          this.props.mode === Mode.draw &&
+          !this.props.annotationsObject.splineIsClosed()
+        ) {
           // else, i.e. not near an existing point
           // if the spline is not closed and we are in Mode.draw then
           // add coordinates to the current spline
@@ -383,32 +381,28 @@ class CanvasClass extends Component<Props> {
       return; // need at least three points to make a closed polygon
     }
 
-    if (this.isClosed(coordinates)) {
-      return; // don't duplicate the first point again if the loop is already closed
-    }
-
-    // add an endpoint that is the same as the startpoint
-    this.props.annotationsObject.addSplinePoint(coordinates[0]);
+    this.props.annotationsObject.setSplineClosed(true);
 
     this.drawAllSplines();
   };
 
-  convertSpline = (): void => {
-    // Create a new paintbrush annotation that is equivalent to closing and filling the current spline shape
+  convertSpline = (): boolean => {
+    // Create a new paintbrush annotation that is equivalent to closing the current spline shape
+    // Returns true if successful, false otherwise
 
     if (
       this.props.activeToolbox !== Tools.spline.name &&
       this.props.activeToolbox !== Tools.lassospline.name &&
       this.props.activeToolbox !== Tools.magicspline.name
     )
-      return;
+      return false;
 
     // check the current annotation is on the current slice
-    if (!this.sliceIndexMatch()) return;
+    if (!this.sliceIndexMatch()) return false;
 
     // convert to paintbrush annotation with diameter=1 pixel
     // TODO determine radius more cleverly
-    this.props.annotationsObject.convertSplineToPaintbrush(2);
+    this.props.annotationsObject.convertSplineToPaintbrush(0.5);
 
     // set the active tool to be the paintbrush
     document.dispatchEvent(
@@ -416,36 +410,19 @@ class CanvasClass extends Component<Props> {
     );
 
     this.drawAllSplines();
+
+    return true;
   };
 
   fillSpline = (): void => {
     // Create a new paintbrush annotation that is equivalent to closing and filling the current spline shape
 
-    if (
-      this.props.activeToolbox !== Tools.spline.name &&
-      this.props.activeToolbox !== Tools.lassospline.name &&
-      this.props.activeToolbox !== Tools.magicspline.name
-    )
-      return;
-
-    // check the current annotation is on the current slice
-    if (!this.sliceIndexMatch()) return;
-
-    // convert to paintbrush annotation with diameter=1 pixel
-    // TODO determine radius more cleverly
-    this.props.annotationsObject.convertSplineToPaintbrush(2);
-
-    // call the fill paintbrush function
-    document.dispatchEvent(
-      new CustomEvent("fillBrush", { detail: Toolboxes.paintbrush })
-    );
-
-    // set the active tool to be the paintbrush
-    document.dispatchEvent(
-      new CustomEvent("selectBrush", { detail: Toolboxes.paintbrush })
-    );
-
-    this.drawAllSplines();
+    if (this.convertSpline()) {
+      // call the fill paintbrush function
+      document.dispatchEvent(
+        new CustomEvent("fillBrush", { detail: Toolboxes.paintbrush })
+      );
+    }
   };
 
   snapToGradient = (idx: number, snapeRadius = 25): void => {
@@ -542,6 +519,7 @@ class CanvasClass extends Component<Props> {
       if (nearPoint !== -1) {
         this.selectedPointIndex = nearPoint;
         this.isMouseDown = true;
+        this.dragPoint = clickPoint;
       }
     }
     this.drawAllSplines();
@@ -561,8 +539,6 @@ class CanvasClass extends Component<Props> {
       this.props.scaleAndPan,
       this.props.canvasPositionAndSize
     );
-
-    const coordinates = this.props.annotationsObject.getSplineCoordinates();
 
     if (
       this.props.activeToolbox === Tools.magicspline.name &&
@@ -590,20 +566,8 @@ class CanvasClass extends Component<Props> {
       this.selectedPointIndex =
         this.props.annotationsObject.getSplineLength() - 1;
     } else {
-      // normal spline, if dragging first point, update closed last
-      if (this.selectedPointIndex === 0 && this.isClosed(coordinates)) {
-        this.props.annotationsObject.updateSplinePoint(
-          clickPoint.x,
-          clickPoint.y,
-          this.props.annotationsObject.getSplineLength() - 1
-        );
-      }
-
-      this.props.annotationsObject.updateSplinePoint(
-        clickPoint.x,
-        clickPoint.y,
-        this.selectedPointIndex
-      );
+      // dragging a point on a normal spline
+      this.dragPoint = clickPoint;
     }
 
     // Redraw all the splines
@@ -612,18 +576,23 @@ class CanvasClass extends Component<Props> {
 
   onMouseUp = (): void => {
     // Works as part of drag and drop for points.
-    this.isMouseDown = false;
+    if (this.isMouseDown) {
+      this.props.annotationsObject.updateSplinePoint(
+        this.dragPoint.x,
+        this.dragPoint.y,
+        this.selectedPointIndex
+      );
+    }
+    // we set this.isMouseDown = false in onClick
+    // onMouseUp runs before onClick, so if we set it here then onClick wouldn't know to abort
   };
-
-  isClosed = (splineVector: XYPoint[]): boolean =>
-    // Check whether the spline is a closed loop.
-    splineVector.length > 1 &&
-    splineVector[0].x === splineVector[splineVector.length - 1].x &&
-    splineVector[0].y === splineVector[splineVector.length - 1].y;
 
   private addNewPointNearSpline = (x: number, y: number): void => {
     // Add a new point near the spline.
     const coordinates = this.props.annotationsObject.getSplineCoordinates();
+    if (this.props.annotationsObject.splineIsClosed()) {
+      coordinates.push(coordinates[0]); // add the closing edge if the spline is closed
+    }
 
     const dist = (x1: number, y1: number, x2: number, y2: number): number =>
       // Calculate Euclidean distance between two points (x1, y1) and (x2, y2).
@@ -637,15 +606,17 @@ class CanvasClass extends Component<Props> {
       // Calculate the euclidean distance from the new point
       const newDist =
         dist(x, y, prevPoint.x, prevPoint.y) +
-        dist(x, y, nextPoint.x, nextPoint.y);
+        dist(x, y, nextPoint.x, nextPoint.y) -
+        dist(prevPoint.x, prevPoint.y, nextPoint.x, nextPoint.y);
       // If the calculated distance is smaller than the min distance so far
-      if (minDist > newDist) {
+      if (newDist < minDist) {
         // Update minimum distance and new point index
         minDist = newDist;
         newPointIndex = i;
       }
     }
     this.props.annotationsObject.insertSplinePoint(newPointIndex, { x, y }); // Add new point to the coordinates array
+    this.selectedPointIndex = newPointIndex;
   };
 
   getCursor = (): Cursor => {

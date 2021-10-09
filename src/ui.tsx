@@ -172,12 +172,14 @@ interface Props extends WithStyles<typeof styles> {
   showAppBar: boolean;
   setIsLoading?: (isLoading: boolean) => void;
   trustedServiceButtonToolbar?: ReactElement | null;
+  isUserOwner?: boolean;
 }
 
 class UserInterface extends Component<Props, State> {
   static defaultProps = {
     showAppBar: true,
     trustedServiceButtonToolbar: null,
+    isUserOwner: false,
   } as Pick<Props, "showAppBar">;
 
   annotationsObject: Annotations;
@@ -442,11 +444,13 @@ class UserInterface extends Component<Props, State> {
   };
 
   setUploadedImage = (
-    imageFileInfo: ImageFileInfo,
-    slicesData: Array<Array<ImageBitmap>>
+    imageFileInfo: ImageFileInfo[],
+    slicesData: ImageBitmap[][][]
   ): void => {
-    this.imageFileInfo = imageFileInfo;
-    this.slicesData = slicesData;
+    if (!this.props.isUserOwner) return;
+
+    [this.imageFileInfo] = imageFileInfo; // the Upload component passes arrays of images/metadata even when multiple=false, as it is in ANNOTATE but not CURATE
+    [this.slicesData] = slicesData;
     this.setState(
       {
         sliceIndex: 0,
@@ -664,23 +668,24 @@ class UserInterface extends Component<Props, State> {
 
     const uploadDownload = (
       <>
-        <Grid item>
-          <UploadImage
-            setUploadedImage={this.setUploadedImage}
-            spanElement={
-              <BaseIconButton
-                tooltip={Tools.upload}
-                fill={false}
-                hasAvatar={false}
-                tooltipPlacement="bottom"
-                buttonSize="medium"
-                component="span"
-              />
-            }
-            multiple={false}
-          />
-        </Grid>
-
+        {this.props.isUserOwner && (
+          <Grid item>
+            <UploadImage
+              setUploadedImage={this.setUploadedImage}
+              spanElement={
+                <BaseIconButton
+                  tooltip={Tools.upload}
+                  fill={false}
+                  hasAvatar={false}
+                  tooltipPlacement="bottom"
+                  buttonSize="medium"
+                  component="span"
+                />
+              }
+              multiple={false}
+            />
+          </Grid>
+        )}
         <Grid item>
           <Download
             annotationsObject={this.annotationsObject}

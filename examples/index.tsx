@@ -1,11 +1,15 @@
 import ReactDOM from "react-dom";
-import {UserInterface} from "../src";
+import { UserInterface } from "../src";
 import loadImage from "./autoload";
 
 loadImage("./zebrafish-heart.jpg").then(
   ({ slicesData, imageFileInfo }) => {
     ReactDOM.render(
-      <UserInterface slicesData={slicesData} imageFileInfo={imageFileInfo} />,
+      <UserInterface
+        slicesData={slicesData}
+        imageFileInfo={imageFileInfo}
+        isUserOwner={true}
+      />,
       document.getElementById("react-container")
     );
   },
@@ -16,4 +20,3 @@ loadImage("./zebrafish-heart.jpg").then(
     );
   }
 );
- 
