@@ -84,7 +84,6 @@ interface State {
   buttonClicked: string;
   mode: Mode;
   canvasContainerColour: number[];
-  canUndoRedo: { undo: boolean; redo: boolean };
 }
 
 const styles = {
@@ -217,7 +216,6 @@ class UserInterface extends Component<Props, State> {
       activeToolbox: Toolboxes.paintbrush,
       mode: Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
-      canUndoRedo: { undo: false, redo: false },
     };
 
     this.annotationsObject.addAnnotation(this.state.activeToolbox);
@@ -647,15 +645,15 @@ class UserInterface extends Component<Props, State> {
   };
 
   undo = (): void => {
-    this.setState({ canUndoRedo: this.annotationsObject.undo() });
     this.callRedraw();
     this.setButtonClicked(Tools.undo.name);
+    this.annotationsObject.undo();
   };
 
   redo = (): void => {
-    this.setState({ canUndoRedo: this.annotationsObject.redo() });
     this.callRedraw();
     this.setButtonClicked(Tools.redo.name);
+    this.annotationsObject.redo();
   };
 
   isTyping = (): boolean =>
@@ -783,7 +781,6 @@ class UserInterface extends Component<Props, State> {
             fill={this.state.buttonClicked === Tools.redo.name}
           />
         </ButtonGroup>
-
         <ButtonGroup>
           <PaintbrushToolbar
             buttonClicked={this.state.buttonClicked}

@@ -2,16 +2,13 @@ import { ReactElement, MouseEvent } from "react";
 import {
   Grid,
   Typography,
-  Avatar,
   Popover,
   Card,
   Paper,
   makeStyles,
   Theme,
 } from "@material-ui/core";
-import SVG from "react-inlinesvg";
 import { Labels, Props as LabelsProps } from "./Labels";
-import { imgSrc } from "@/imgSrc";
 
 const useStyles = makeStyles((theme: Theme) => ({
   annotationCard: {

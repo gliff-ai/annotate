@@ -25,7 +25,7 @@ const Tools: ToolTips = {
     shortcut: "L",
   },
   convertspline: {
-    name: "Turn Spline To Paintbrush",
+    name: "Convert Spline To Paintbrush",
     icon: imgSrc("convert-icon"),
     shortcut: "CTRL",
     shortcutSymbol: "Q",

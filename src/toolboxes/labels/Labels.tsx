@@ -15,17 +15,16 @@ import {
   InputBase,
   ListItemText,
   makeStyles,
-  Theme,
   Typography,
 } from "@material-ui/core";
 
 import SVG from "react-inlinesvg";
 
+import { theme } from "@gliff-ai/style";
+
 import { imgSrc } from "@/imgSrc";
 
 import { Annotations } from "@/annotation";
-
-import { theme } from "@gliff-ai/style";
 
 export interface Props {
   annotationsObject: Annotations;
@@ -34,7 +33,7 @@ export interface Props {
   activeAnnotationID: number;
 }
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     listItem: {
       color: theme.palette.primary.main,
