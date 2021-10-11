@@ -67,7 +67,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     baseSlider: {
       width: "63px",
-      height: "250px",
+      height: "auto",
       textAlign: "center",
     },
     channelHeader: {
@@ -119,6 +119,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
         anchorEl={props.anchorElement}
         onClose={props.onClose}
         PaperProps={{ classes: { root: classes.subMenu } }}
+        elevation={0}
       >
         <ButtonGroup
           orientation="vertical"
