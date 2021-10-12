@@ -20,9 +20,7 @@ import {
 
 import SVG from "react-inlinesvg";
 
-import { theme } from "@gliff-ai/style";
-
-import { imgSrc } from "@/imgSrc";
+import { theme, icons } from "@gliff-ai/style";
 
 import { Annotations } from "@/annotation";
 
@@ -135,12 +133,7 @@ export const Labels: FunctionComponent<Props> = ({
         onClick={handleAddLabel(newLabel)}
         edge="end"
       >
-        <SVG
-          src={imgSrc("add-icon")}
-          width="12px"
-          height="100%"
-          fill="#A1A1A1"
-        />
+        <SVG src={icons.add} width="12px" height="100%" fill="#A1A1A1" />
       </IconButton>
       <Divider className={classes.divider} />
       {assignedLabels.map((label) => (
@@ -153,7 +146,7 @@ export const Labels: FunctionComponent<Props> = ({
               onClick={handleRemoveLabel(label)}
             >
               <SVG
-                src={imgSrc("close")}
+                src={icons.removeLabel}
                 className={classes.svgSmall}
                 fill={theme.palette.primary.main}
               />
@@ -175,7 +168,7 @@ export const Labels: FunctionComponent<Props> = ({
               onClick={handleAddLabel(label)}
             >
               <SVG
-                src={imgSrc("add-icon")}
+                src={icons.add}
                 className={classes.svgSmall}
                 fill={theme.palette.text.secondary}
               />

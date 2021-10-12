@@ -734,14 +734,14 @@ class UserInterface extends Component<Props, State> {
       },
       {
         name: "Add New Annotation",
-        icon: icons.add,
+        icon: icons.addAnnotation,
         event: "addAnnotation",
         active: () => false, // TODO: add feedback when this is clicked
         enabled: () => true,
       },
       {
         name: "Clear Annotation",
-        icon: icons.delete,
+        icon: icons.deleteAnnotation,
         event: "clearActiveAnnotation",
         active: () => false, // TODO: add feedback when this is clicked
         enabled: () => true,
