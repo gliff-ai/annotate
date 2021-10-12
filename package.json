@@ -67,7 +67,7 @@
   },
   "dependencies": {
     "@gliff-ai/slpf": "^1.1.2",
-    "@gliff-ai/upload": "^0.3.2",
+    "@gliff-ai/upload": "^0.3.3",
     "react-inlinesvg": "^2.3.0",
     "simplify-js": "^1.2.4",
     "utif": "^3.1.0"

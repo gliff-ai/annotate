@@ -90,7 +90,6 @@ interface State {
   buttonClicked: string;
   mode: Mode;
   canvasContainerColour: number[];
-  canUndoRedo: { undo: boolean; redo: boolean };
 }
 
 const styles = {
@@ -223,7 +222,6 @@ class UserInterface extends Component<Props, State> {
       activeToolbox: Toolboxes.paintbrush,
       mode: Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
-      canUndoRedo: { undo: false, redo: false },
     };
 
     this.annotationsObject.addAnnotation(this.state.activeToolbox);
@@ -450,13 +448,13 @@ class UserInterface extends Component<Props, State> {
   };
 
   setUploadedImage = (
-    imageFileInfo: ImageFileInfo,
-    slicesData: Array<Array<ImageBitmap>>
+    imageFileInfo: ImageFileInfo[],
+    slicesData: ImageBitmap[][][]
   ): void => {
     if (!this.props.isUserOwner) return;
 
-    this.imageFileInfo = imageFileInfo;
-    this.slicesData = slicesData;
+    [this.imageFileInfo] = imageFileInfo; // the Upload component passes arrays of images/metadata even when multiple=false, as it is in ANNOTATE but not CURATE
+    [this.slicesData] = slicesData;
     this.setState(
       {
         sliceIndex: 0,
@@ -527,7 +525,6 @@ class UserInterface extends Component<Props, State> {
     // Select draw mode and re-activate last used paint tool
     this.setState((state) => ({
       mode: Mode.draw,
-      buttonClicked: Tools[state.activeToolbox].name,
     }));
   };
 
@@ -654,13 +651,15 @@ class UserInterface extends Component<Props, State> {
   };
 
   undo = (): void => {
-    this.setState({ canUndoRedo: this.annotationsObject.undo() });
     this.callRedraw();
+    this.setButtonClicked(Tools.undo.name);
+    this.annotationsObject.undo();
   };
 
   redo = (): void => {
-    this.setState({ canUndoRedo: this.annotationsObject.redo() });
     this.callRedraw();
+    this.setButtonClicked(Tools.redo.name);
+    this.annotationsObject.redo();
   };
 
   isTyping = (): boolean =>
@@ -759,14 +758,14 @@ class UserInterface extends Component<Props, State> {
         icon: icons.undo,
         event: this.undo,
         active: () => false,
-        enabled: () => this.state.canUndoRedo.undo,
+        enabled: () => this.state.buttonClicked === "Undo last action",
       },
       {
         name: "Redo last action",
         icon: icons.redo,
         event: this.redo,
         active: () => false,
-        enabled: () => this.state.canUndoRedo.redo,
+        enabled: () => this.state.buttonClicked === "Redo last action",
       },
     ] as const;
 
@@ -804,7 +803,6 @@ class UserInterface extends Component<Props, State> {
 
           {this.props.trustedServiceButtonToolbar}
         </ButtonGroup>
-
         <ButtonGroup>
           <PaintbrushToolbar
             buttonClicked={this.state.buttonClicked}

@@ -1,7 +1,7 @@
 import { Tooltip } from "@gliff-ai/style";
 import { BackgroundTools, MinimapTools } from "@/toolboxes/background";
 // import { PaintbrushTools } from "@/toolboxes/paintbrush";
-import { SplineTools } from "@/toolboxes/spline";
+// import { SplineTools } from "@/toolboxes/spline";
 import { BoundingBoxTools } from "@/toolboxes/boundingBox";
 
 import { imgSrc } from "@/imgSrc";
@@ -31,29 +31,29 @@ const DefaultTools: ToolTips = {
     shortcutSymbol: "Space",
   },
   download: {
-    name: "Download annotations",
+    name: "Download Annotations",
     icon: imgSrc("download-icon"),
     shortcut: "D",
   },
   upload: {
-    name: "Upload images",
+    name: "Upload Images",
     icon: imgSrc("upload-icon"),
     shortcut: "U",
   },
   save: {
-    name: "Save annotations",
+    name: "Save Annotations",
     icon: imgSrc("save-icon"),
     shortcut: "CTRL",
     shortcutSymbol: "S",
   },
   undo: {
-    name: "Undo last action",
+    name: "Undo Last Action",
     icon: imgSrc("undo-icon"),
     shortcut: "CTRL",
     shortcutSymbol: "Z",
   },
   redo: {
-    name: "Redo last action",
+    name: "Redo Last Action",
     icon: imgSrc("redo-icon"),
     shortcut: "CTRL",
     shortcutSymbol: "Y",
@@ -66,7 +66,7 @@ const Tools: ToolTips = {
   ...MinimapTools,
   // ...PaintbrushTools,
   ...BoundingBoxTools,
-  ...SplineTools,
+  // ...SplineTools,
 };
 
 export { Tools };
