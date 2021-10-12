@@ -84,7 +84,6 @@ interface State {
   buttonClicked: string;
   mode: Mode;
   canvasContainerColour: number[];
-  canUndoRedo: { undo: boolean; redo: boolean };
 }
 
 const styles = {
@@ -172,12 +171,14 @@ interface Props extends WithStyles<typeof styles> {
   showAppBar: boolean;
   setIsLoading?: (isLoading: boolean) => void;
   trustedServiceButtonToolbar?: ReactElement | null;
+  isUserOwner?: boolean;
 }
 
 class UserInterface extends Component<Props, State> {
   static defaultProps = {
     showAppBar: true,
     trustedServiceButtonToolbar: null,
+    isUserOwner: false,
   } as Pick<Props, "showAppBar">;
 
   annotationsObject: Annotations;
@@ -215,7 +216,6 @@ class UserInterface extends Component<Props, State> {
       activeToolbox: Toolboxes.paintbrush,
       mode: Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
-      canUndoRedo: { undo: false, redo: false },
     };
 
     this.annotationsObject.addAnnotation(this.state.activeToolbox);
@@ -442,11 +442,13 @@ class UserInterface extends Component<Props, State> {
   };
 
   setUploadedImage = (
-    imageFileInfo: ImageFileInfo,
-    slicesData: Array<Array<ImageBitmap>>
+    imageFileInfo: ImageFileInfo[],
+    slicesData: ImageBitmap[][][]
   ): void => {
-    this.imageFileInfo = imageFileInfo;
-    this.slicesData = slicesData;
+    if (!this.props.isUserOwner) return;
+
+    [this.imageFileInfo] = imageFileInfo; // the Upload component passes arrays of images/metadata even when multiple=false, as it is in ANNOTATE but not CURATE
+    [this.slicesData] = slicesData;
     this.setState(
       {
         sliceIndex: 0,
@@ -517,7 +519,6 @@ class UserInterface extends Component<Props, State> {
     // Select draw mode and re-activate last used paint tool
     this.setState((state) => ({
       mode: Mode.draw,
-      buttonClicked: Tools[state.activeToolbox].name,
     }));
   };
 
@@ -644,13 +645,15 @@ class UserInterface extends Component<Props, State> {
   };
 
   undo = (): void => {
-    this.setState({ canUndoRedo: this.annotationsObject.undo() });
     this.callRedraw();
+    this.setButtonClicked(Tools.undo.name);
+    this.annotationsObject.undo();
   };
 
   redo = (): void => {
-    this.setState({ canUndoRedo: this.annotationsObject.redo() });
     this.callRedraw();
+    this.setButtonClicked(Tools.redo.name);
+    this.annotationsObject.redo();
   };
 
   isTyping = (): boolean =>
@@ -663,23 +666,24 @@ class UserInterface extends Component<Props, State> {
 
     const uploadDownload = (
       <>
-        <Grid item>
-          <UploadImage
-            setUploadedImage={this.setUploadedImage}
-            spanElement={
-              <BaseIconButton
-                tooltip={Tools.upload}
-                fill={false}
-                hasAvatar={false}
-                tooltipPlacement="bottom"
-                buttonSize="medium"
-                component="span"
-              />
-            }
-            multiple={false}
-          />
-        </Grid>
-
+        {this.props.isUserOwner && (
+          <Grid item>
+            <UploadImage
+              setUploadedImage={this.setUploadedImage}
+              spanElement={
+                <BaseIconButton
+                  tooltip={Tools.upload}
+                  fill={false}
+                  hasAvatar={false}
+                  tooltipPlacement="bottom"
+                  buttonSize="medium"
+                  component="span"
+                />
+              }
+              multiple={false}
+            />
+          </Grid>
+        )}
         <Grid item>
           <Download
             annotationsObject={this.annotationsObject}
@@ -745,6 +749,7 @@ class UserInterface extends Component<Props, State> {
             onMouseUp={this.selectDrawMode}
             fill={this.state.buttonClicked === Tools.clearAnnotation.name}
           />
+
           {saveAnnotationsCallback && (
             <BaseIconButton
               tooltip={Tools.save}
@@ -768,17 +773,14 @@ class UserInterface extends Component<Props, State> {
           <BaseIconButton
             tooltip={Tools.undo}
             onClick={this.undo}
-            fill={false}
-            enabled={this.state.canUndoRedo.undo}
+            fill={this.state.buttonClicked === Tools.undo.name}
           />
           <BaseIconButton
             tooltip={Tools.redo}
             onClick={this.redo}
-            fill={false}
-            enabled={this.state.canUndoRedo.redo}
+            fill={this.state.buttonClicked === Tools.redo.name}
           />
         </ButtonGroup>
-
         <ButtonGroup>
           <PaintbrushToolbar
             buttonClicked={this.state.buttonClicked}

@@ -19,6 +19,7 @@ import {
   CardHeader,
   CardContent,
   Button,
+  Typography,
 } from "@material-ui/core";
 import SVG from "react-inlinesvg";
 
@@ -62,21 +63,21 @@ const useStyles = makeStyles((theme: Theme) =>
       background: "none",
     },
     subMenuCard: {
-      height: "285px",
+      height: "fit-content",
       marginLeft: "18px", // TODO other toolbars should use this approach
     },
     baseSlider: {
       width: "63px",
-      height: "250px",
+      height: "auto",
       textAlign: "center",
     },
     channelHeader: {
       backgroundColor: theme.palette.primary.main,
     },
-    channelTypography: {
-      display: "inline",
-      fontSize: "21px",
-      marginRight: "18px",
+
+    channelInfo: {
+      fontSize: "14px",
+      fontWeight: 400,
     },
   })
 );
@@ -122,6 +123,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
         anchorEl={props.anchorElement}
         onClose={props.onClose}
         PaperProps={{ classes: { root: classes.subMenu } }}
+        elevation={0}
       >
         <ButtonGroup
           orientation="vertical"
@@ -177,22 +179,24 @@ const Submenu = (props: SubmenuProps): ReactElement => {
             <>
               <CardHeader
                 className={classes.channelHeader}
-                title="Channels"
-                titleTypographyProps={{ className: classes.channelTypography }}
-                action={
-                  <SVG src={imgSrc("pin-icon")} width="18px" height="auto" />
+                title={
+                  <Typography style={{ fontWeight: 500 }}>Channel</Typography>
                 }
               />
               <CardContent>
                 <FormControl component="fieldset">
-                  <FormGroup aria-label="position" row>
+                  <FormGroup aria-label="position">
                     {props.channelControls.map((control, i) => (
                       <FormControlLabel
                         key={`C${i + 1}`}
                         value="top"
                         control={control}
-                        label={`C${i + 1}`}
-                        labelPlacement="start"
+                        label={
+                          <Typography className={classes.channelInfo}>
+                            {`Channel ${i + 1}`}
+                          </Typography>
+                        }
+                        labelPlacement="end"
                       />
                     ))}
                   </FormGroup>

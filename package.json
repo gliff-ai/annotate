@@ -19,7 +19,9 @@
     "serve": "vite",
     "build:example": "vite build",
     "test": "jest --coverage --passWithNoTests",
-    "test:visual": "npx percy snapshot snapshots.yml"
+    "test:visual": "npx percy snapshot snapshots.yml",
+    "dev": "vite --host"
+
   },
   "license": "AGPL-3.0-only",
   "devDependencies": {
