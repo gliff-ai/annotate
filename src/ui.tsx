@@ -17,6 +17,8 @@ import {
   theme,
   BaseIconButton,
   Logo,
+  IconButton,
+  icons,
   generateClassName,
 } from "@gliff-ai/style";
 import { Annotations } from "@/annotation";
@@ -33,10 +35,9 @@ import { BoundingBoxCanvas, BoundingBoxToolbar } from "@/toolboxes/boundingBox";
 import { PaintbrushCanvas, PaintbrushToolbar } from "@/toolboxes/paintbrush";
 import { LabelsSubmenu } from "@/toolboxes/labels";
 import { Download } from "@/download/UI";
-import { keydownListener } from "@/keybindings";
+import { getShortcut, keydownListener } from "@/keybindings";
 import { Tools } from "@/tooltips";
 import { BaseSlider, Config } from "@/components/BaseSlider";
-import { imgSrc } from "./imgSrc";
 
 const logger = console;
 
@@ -724,32 +725,71 @@ class UserInterface extends Component<Props, State> {
       </AppBar>
     );
 
+    const tools = [
+      {
+        name: "Select",
+        icon: icons.select,
+        event: this.toggleMode,
+        active: () => this.state.buttonClicked === "Select",
+        enabled: () => true,
+      },
+      {
+        name: "Add New Annotation",
+        icon: icons.add,
+        event: this.addAnnotation,
+        active: () => false, // TODO: add feedback when this is clicked
+        enabled: () => true,
+      },
+      {
+        name: "Clear Annotation",
+        icon: icons.delete,
+        event: this.clearActiveAnnotation,
+        active: () => false, // TODO: add feedback when this is clicked
+        enabled: () => true,
+      },
+      {
+        name: "Annotation Label",
+        icon: icons.annotationLabel,
+        event: this.selectAnnotationLabel,
+        active: () => this.state.buttonClicked === "Annotation Label",
+        enabled: () => true,
+      },
+      {
+        name: "Undo last action",
+        icon: icons.undo,
+        event: this.undo,
+        active: () => false,
+        enabled: () => this.state.canUndoRedo.undo,
+      },
+      {
+        name: "Redo last action",
+        icon: icons.redo,
+        event: this.redo,
+        active: () => false,
+        enabled: () => this.state.canUndoRedo.redo,
+      },
+    ] as const;
+
     const leftToolbar = (
       <Toolbar className={classes.leftToolbar}>
         <ButtonGroup size="small">
-          <BaseIconButton
-            tooltip={Tools.select}
-            onClick={this.toggleMode}
-            fill={this.state.buttonClicked === Tools.select.name}
-          />
-          <BaseIconButton
-            tooltip={Tools.addNewAnnotation}
-            onMouseDown={() => {
-              this.setButtonClicked(Tools.addNewAnnotation.name);
-              this.addAnnotation();
-            }}
-            onMouseUp={this.selectDrawMode}
-            fill={this.state.buttonClicked === Tools.addNewAnnotation.name}
-          />
-          <BaseIconButton
-            tooltip={Tools.clearAnnotation}
-            onMouseDown={() => {
-              this.setButtonClicked(Tools.clearAnnotation.name);
-              this.clearActiveAnnotation();
-            }}
-            onMouseUp={this.selectDrawMode}
-            fill={this.state.buttonClicked === Tools.clearAnnotation.name}
-          />
+          {tools.map(({ icon, name, event, active, enabled }) => (
+            <IconButton
+              key={name}
+              icon={icon}
+              tooltip={{
+                name,
+                ...getShortcut(`ui.${event.name}`),
+              }}
+              onClick={event}
+              fill={active()}
+              setRefCallback={(ref: HTMLButtonElement) => {
+                this.refBtnsPopovers[name] = ref;
+              }}
+              enabled={enabled()}
+            />
+          ))}
+
           {saveAnnotationsCallback && (
             <BaseIconButton
               tooltip={Tools.save}
@@ -761,27 +801,8 @@ class UserInterface extends Component<Props, State> {
               fill={this.state.buttonClicked === Tools.save.name}
             />
           )}
-          <BaseIconButton
-            tooltip={Tools.labels}
-            onClick={this.selectAnnotationLabel}
-            fill={this.state.buttonClicked === Tools.labels.name}
-            setRefCallback={(ref) => {
-              this.refBtnsPopovers[Tools.labels.name] = ref;
-            }}
-          />
+
           {this.props.trustedServiceButtonToolbar}
-          <BaseIconButton
-            tooltip={Tools.undo}
-            onClick={this.undo}
-            fill={false}
-            enabled={this.state.canUndoRedo.undo}
-          />
-          <BaseIconButton
-            tooltip={Tools.redo}
-            onClick={this.redo}
-            fill={false}
-            enabled={this.state.canUndoRedo.redo}
-          />
         </ButtonGroup>
 
         <ButtonGroup>
