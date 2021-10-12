@@ -37,7 +37,7 @@ const useStyles = (sliderHeight?: string) =>
     },
     slider: {
       textAlign: "center",
-      height: sliderHeight || "204px",
+      height: sliderHeight || "194px",
       marginBottom: "18px",
     },
     maxSliderValue: {

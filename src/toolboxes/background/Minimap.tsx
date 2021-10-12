@@ -1,5 +1,11 @@
 import { Component, ReactElement, MouseEvent } from "react";
-import { Slide, Card, WithStyles, withStyles } from "@material-ui/core";
+import {
+  Slide,
+  Card,
+  WithStyles,
+  withStyles,
+  Divider,
+} from "@material-ui/core";
 import { theme, BaseIconButton } from "@gliff-ai/style";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { MinimapCanvas } from "@/components/baseCanvas";
@@ -24,6 +30,7 @@ const styles = {
   baseIconButton: {
     display: "flex",
     justifyContent: "flex-end",
+    margin: "-10px 0 13px",
     "& $button": {
       marginRight: "10px",
       "&:nth-child(4)": {
@@ -34,6 +41,11 @@ const styles = {
       },
     },
   },
+  divider: {
+    width: "inherit",
+    marginLeft: "-10px",
+    marginBottom: "4px",
+  },
   canvasCard: {
     width: "100%",
     height: "200px",
@@ -43,8 +55,9 @@ const styles = {
     height: "53px",
     left: "540px",
     borderRadius: "10px 0 0 0",
-    padding: "7px 0",
+    paddingBottom: "58px",
   },
+
   miniMapToolTipAvatar: {
     backgroundColor: theme.palette.primary.main,
     color: "#2B2F3A",
@@ -90,6 +103,7 @@ interface Props extends WithStyles<typeof styles> {
 
 interface State {
   isOpen: boolean;
+  transition: boolean;
 }
 
 class Minimap extends Component<Props, State> {
@@ -98,6 +112,7 @@ class Minimap extends Component<Props, State> {
 
     this.state = {
       isOpen: false,
+      transition: true,
     };
   }
 
@@ -121,10 +136,14 @@ class Minimap extends Component<Props, State> {
 
   handleDrawerClose = () => {
     this.setState({ isOpen: false });
+    setTimeout(() => {
+      this.setState({ transition: true });
+    }, 2000);
   };
 
   handleDrawerOpen = () => {
     this.setState({ isOpen: true });
+    this.setState({ transition: false });
   };
 
   render = (): ReactElement => (
@@ -177,6 +196,7 @@ class Minimap extends Component<Props, State> {
               tooltipPlacement="top"
             />
           </div>
+          <Divider className={this.props.classes.divider} />
           {/* Background canvas for the minimap */}
           {this.props.displayedImage && (
             <div
@@ -204,7 +224,11 @@ class Minimap extends Component<Props, State> {
       </Slide>
 
       {!this.state.isOpen ? (
-        <Slide in={!this.state.isOpen} direction="up" timeout={{ enter: 1000 }}>
+        <Slide
+          in={this.state.transition}
+          direction="up"
+          timeout={{ enter: 1000 }}
+        >
           <Card
             className={this.props.classes.mimimapToggle}
             style={{
