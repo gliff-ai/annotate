@@ -728,42 +728,42 @@ class UserInterface extends Component<Props, State> {
       {
         name: "Select",
         icon: icons.select,
-        event: this.toggleMode,
+        event: "toggleMode",
         active: () => this.state.buttonClicked === "Select",
         enabled: () => true,
       },
       {
         name: "Add New Annotation",
         icon: icons.add,
-        event: this.addAnnotation,
+        event: "addAnnotation",
         active: () => false, // TODO: add feedback when this is clicked
         enabled: () => true,
       },
       {
         name: "Clear Annotation",
         icon: icons.delete,
-        event: this.clearActiveAnnotation,
+        event: "clearActiveAnnotation",
         active: () => false, // TODO: add feedback when this is clicked
         enabled: () => true,
       },
       {
         name: "Annotation Label",
         icon: icons.annotationLabel,
-        event: this.selectAnnotationLabel,
+        event: "selectAnnotationLabel",
         active: () => this.state.buttonClicked === "Annotation Label",
         enabled: () => true,
       },
       {
         name: "Undo last action",
         icon: icons.undo,
-        event: this.undo,
+        event: "undo",
         active: () => false,
         enabled: () => this.state.buttonClicked === "Undo last action",
       },
       {
         name: "Redo last action",
         icon: icons.redo,
-        event: this.redo,
+        event: "redo",
         active: () => false,
         enabled: () => this.state.buttonClicked === "Redo last action",
       },
@@ -778,9 +778,9 @@ class UserInterface extends Component<Props, State> {
               icon={icon}
               tooltip={{
                 name,
-                ...getShortcut(`ui.${event.name}`),
+                ...getShortcut(`ui.${event}`),
               }}
-              onClick={event}
+              onClick={this[event]}
               fill={active()}
               setRefCallback={(ref: HTMLButtonElement) => {
                 this.refBtnsPopovers[name] = ref;
