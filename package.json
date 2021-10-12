@@ -21,7 +21,6 @@
     "test": "jest --coverage --passWithNoTests",
     "test:visual": "npx percy snapshot snapshots.yml",
     "dev": "vite --host"
-
   },
   "license": "AGPL-3.0-only",
   "devDependencies": {
@@ -69,6 +68,7 @@
   "dependencies": {
     "@gliff-ai/slpf": "^1.1.2",
     "@gliff-ai/upload": "^0.3.2",
+    "detect-browser": "^5.2.1",
     "react-inlinesvg": "^2.3.0",
     "simplify-js": "^1.2.4",
     "utif": "^3.1.0"

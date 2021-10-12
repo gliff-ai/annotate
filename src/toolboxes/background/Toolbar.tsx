@@ -31,6 +31,7 @@ import { imgSrc } from "@/imgSrc";
 import { Tools } from "./Toolbox";
 import { useBackgroundStore } from "./Store";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
+import { detect } from "detect-browser";
 
 interface SubmenuProps {
   isOpen: boolean;
@@ -116,6 +117,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     setButtonClicked(Tools.channels.name);
   }
 
+  const browser = detect().name;
+
   return (
     <>
       <Popover
@@ -129,30 +132,30 @@ const Submenu = (props: SubmenuProps): ReactElement => {
           orientation="vertical"
           size="small"
           id="background-settings-toolbar"
+          style={{ height: "fit-content" }}
         >
-          <BaseIconButton
-            tooltip={Tools.brightness}
-            onClick={() => selectBrightness()}
-            fill={buttonClicked === Tools.brightness.name}
-          />
-          <BaseIconButton
-            tooltip={Tools.contrast}
-            onClick={() => selectContrast()}
-            fill={buttonClicked === Tools.contrast.name}
-          />
           <BaseIconButton
             tooltip={Tools.channels}
             onClick={() => selectChannels()}
             fill={buttonClicked === Tools.channels.name}
           />
-          <BaseIconButton
-            tooltip={Tools.brightness}
-            onClick={(e) => changeBrightness(e, 500)}
-            fill={buttonClicked === Tools.brightness.name}
-          />
-          <Button onTouchStart={(e) => changeBrightness(e, 500)}>
-            Test Brightness
-          </Button>
+          {browser !== "safari"
+            ? [
+                <BaseIconButton
+                  tooltip={Tools.brightness}
+                  onClick={() => selectBrightness()}
+                  fill={buttonClicked === Tools.brightness.name}
+                  key={1}
+                />,
+
+                <BaseIconButton
+                  tooltip={Tools.contrast}
+                  onClick={() => selectContrast()}
+                  fill={buttonClicked === Tools.contrast.name}
+                  key={2}
+                />,
+              ]
+            : null}
         </ButtonGroup>
         <Card className={classes.subMenuCard}>
           {buttonClicked === Tools.brightness.name && (
