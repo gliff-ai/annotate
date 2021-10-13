@@ -79,10 +79,10 @@ class CanvasClass extends Component<Props, State> {
     }
   }
 
-  componentDidUpdate(prevProps: Props): void {
+  componentDidUpdate(): void {
     // Redraw if we change pan or zoom
-
     const spline = this.props.annotationsObject.getSplineForActiveAnnotation();
+
     if (spline?.coordinates) {
       this.drawAllSplines();
     }
