@@ -511,9 +511,10 @@ class UserInterface extends Component<Props, State> {
   };
 
   selectDrawMode = (): void => {
-    // Select draw mode and re-activate last used paint tool
+    // Select draw mode and re-activate last used toolbox
     this.setState((state) => ({
       mode: Mode.draw,
+      buttonClicked: Tools[this.state.activeToolbox].name,
     }));
   };
 
