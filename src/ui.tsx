@@ -880,8 +880,6 @@ class UserInterface extends Component<Props, State> {
                     mode={this.state.mode}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
-                    canvasPositionAndSize={this.state.viewportPositionAndSize}
-                    setCanvasPositionAndSize={this.setViewportPositionAndSize}
                     redraw={this.state.redraw}
                     sliceIndex={this.state.sliceIndex}
                     setUIActiveAnnotationID={(id) => {
@@ -897,8 +895,6 @@ class UserInterface extends Component<Props, State> {
                     mode={this.state.mode}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
-                    canvasPositionAndSize={this.state.viewportPositionAndSize}
-                    setCanvasPositionAndSize={this.setViewportPositionAndSize}
                     redraw={this.state.redraw}
                     sliceIndex={this.state.sliceIndex}
                     setUIActiveAnnotationID={(id) => {
@@ -914,8 +910,6 @@ class UserInterface extends Component<Props, State> {
                     mode={this.state.mode}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
-                    canvasPositionAndSize={this.state.viewportPositionAndSize}
-                    setCanvasPositionAndSize={this.setViewportPositionAndSize}
                     redraw={this.state.redraw}
                     sliceIndex={this.state.sliceIndex}
                     setUIActiveAnnotationID={(id) => {
