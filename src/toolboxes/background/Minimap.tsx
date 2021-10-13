@@ -56,6 +56,18 @@ const styles = {
     left: "540px",
     borderRadius: "10px 0 0 0",
     paddingBottom: "58px",
+    [theme.breakpoints.up("md")]: {
+      left: "557px",
+      height: "30px",
+      paddingBottom: "30px",
+    },
+    "& $button": {
+      [theme.breakpoints.up("md")]: {
+        marginRight: "30px",
+        marginTop: "-7px",
+        marginLeft: "-5px",
+      },
+    },
   },
 
   miniMapToolTipAvatar: {
