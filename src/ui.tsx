@@ -189,8 +189,6 @@ class UserInterface extends Component<Props, State> {
 
   private imageFileInfo: ImageFileInfo | null;
 
-  private canvasContainer: HTMLDivElement;
-
   private refBtnsPopovers: { [buttonName: string]: HTMLButtonElement };
 
   constructor(props: Props) {
@@ -232,9 +230,6 @@ class UserInterface extends Component<Props, State> {
       document.addEventListener(event, this.handleEvent);
     }
     this.mixChannels();
-
-    const { clientHeight: height, clientWidth: width } = this.canvasContainer;
-    this.setViewportPositionAndSize({ top: 0, left: 0, width, height });
   }
 
   componentDidUpdate = (prevProps: Props): void => {
@@ -859,11 +854,6 @@ class UserInterface extends Component<Props, State> {
                   item
                   className={classes.canvasGrid}
                   style={{ position: "relative" }}
-                  ref={(container) => {
-                    if (container) {
-                      this.canvasContainer = container;
-                    }
-                  }}
                 >
                   <BackgroundCanvas
                     scaleAndPan={this.state.scaleAndPan}
