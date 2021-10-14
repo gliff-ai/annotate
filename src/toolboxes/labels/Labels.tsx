@@ -4,6 +4,7 @@ import {
   ReactElement,
   useState,
   useEffect,
+  useCallback,
 } from "react";
 
 import {
@@ -74,10 +75,12 @@ export const Labels: FunctionComponent<Props> = ({
     annotationsObject.getLabels()
   );
 
-  function getMenuLabels(labels: string[]): string[] {
-    // Get array with labels that are yet to be assigned.
-    return presetLabels.filter((label) => !labels.includes(label));
-  }
+  // Get array with labels that are yet to be assigned.
+  const getMenuLabels = useCallback(
+    (labels: string[]): string[] =>
+      presetLabels.filter((label) => !labels.includes(label)),
+    [presetLabels]
+  );
 
   const [menuLabels, setMenuLabels] = useState(
     getMenuLabels(annotationsObject.getLabels())
@@ -93,11 +96,11 @@ export const Labels: FunctionComponent<Props> = ({
     setNewLabel(value);
   }
 
-  const updateAllLabels = (): void => {
+  const updateAllLabels = useCallback(() => {
     const labels = annotationsObject.getLabels();
     setAssignedLabels(labels);
     setMenuLabels(getMenuLabels(labels));
-  };
+  }, [annotationsObject, getMenuLabels]);
 
   const handleAddLabel = (label: string) => (): void => {
     // Add a label to active annotation object and update some states.
