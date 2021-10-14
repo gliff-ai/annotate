@@ -36,9 +36,11 @@ const styles = {
     },
   },
   baseIconButton: {
-    display: "flex",
     justifyContent: "flex-end",
     margin: "-10px 0 13px",
+    [theme.breakpoints.down("md")]: {
+      margin: "0px",
+    },
     "& $button": {
       marginRight: "10px",
       "&:nth-child(4)": {

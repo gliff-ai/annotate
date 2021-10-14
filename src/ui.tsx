@@ -112,7 +112,17 @@ const styles = {
     zIndex: 100,
     justifyContent: "space-between",
     position: "fixed" as const,
+    "& $button": {
+      [theme.breakpoints.down("md")]: {
+        margin: "0px",
+      },
+    },
   },
+  buttonGroup: {
+    width: "45px",
+    padding: "0px",
+  },
+
   bottomToolbars: {
     bottom: "18px",
     left: "18px",
@@ -725,7 +735,7 @@ class UserInterface extends Component<Props, State> {
 
     const leftToolbar = (
       <Toolbar className={classes.leftToolbar}>
-        <ButtonGroup size="small">
+        <ButtonGroup size="small" className={classes.buttonGroup}>
           <BaseIconButton
             tooltip={Tools.select}
             onClick={this.toggleMode}
@@ -781,7 +791,7 @@ class UserInterface extends Component<Props, State> {
             fill={this.state.buttonClicked === Tools.redo.name}
           />
         </ButtonGroup>
-        <ButtonGroup>
+        <ButtonGroup className={classes.buttonGroup}>
           <PaintbrushToolbar
             buttonClicked={this.state.buttonClicked}
             setButtonClicked={this.setButtonClicked}
