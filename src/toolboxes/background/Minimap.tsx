@@ -6,7 +6,7 @@ import {
   withStyles,
   Divider,
 } from "@material-ui/core";
-import { theme, BaseIconButton, IconButton, icons } from "@gliff-ai/style";
+import { theme, IconButton, icons } from "@gliff-ai/style";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { MinimapCanvas } from "@/components/baseCanvas";
 import { BackgroundCanvas } from "@/toolboxes/background";
@@ -67,7 +67,7 @@ const styles = {
   },
 };
 
-const ToolboxName: Toolbox = "background";
+const ToolboxName: Toolbox = "ui";
 
 export const events = ["handleDrawerOpen", "handleDrawerClose"] as const;
 

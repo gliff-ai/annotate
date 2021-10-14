@@ -116,7 +116,7 @@ export const Labels: FunctionComponent<Props> = ({
   useEffect(() => {
     // Re-render assigned labels at change of active annotation ID.
     updateAllLabels();
-  }, [activeAnnotationID]);
+  }, [activeAnnotationID, updateAllLabels]);
 
   return (
     <>

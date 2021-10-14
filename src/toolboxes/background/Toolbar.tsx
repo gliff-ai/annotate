@@ -22,7 +22,7 @@ import {
 } from "@material-ui/core";
 import SVG from "react-inlinesvg";
 
-import { BaseIconButton, IconButton, icons } from "@gliff-ai/style";
+import { IconButton, icons } from "@gliff-ai/style";
 import { BaseSlider } from "@/components/BaseSlider";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { getShortcut } from "@/keybindings";

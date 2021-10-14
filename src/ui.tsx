@@ -15,7 +15,6 @@ import {
 import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
 import {
   theme,
-  BaseIconButton,
   Logo,
   IconButton,
   icons,
@@ -37,7 +36,6 @@ import { LabelsSubmenu } from "@/toolboxes/labels";
 import { Download } from "@/download/UI";
 import { getShortcut, keydownListener } from "@/keybindings";
 import { BaseSlider, Config } from "@/components/BaseSlider";
-import { Tools } from "./tooltips";
 
 const logger = console;
 
@@ -154,17 +152,6 @@ const styles = {
   slicesSlider: {
     width: "63px",
     height: "450px",
-  },
-  tooltip: {
-    backgroundColor: "#FFFFFF",
-    border: "1px solid #dadde9",
-    opacity: "1",
-    marginTop: "30px",
-    marginLeft: "0px",
-    fontSize: "17px",
-    letterSpacing: 0,
-    color: "#2B2F3A",
-    fontWeight: 400,
   },
 };
 
@@ -523,7 +510,7 @@ class UserInterface extends Component<Props, State> {
 
   selectDrawMode = (): void => {
     // Select draw mode and re-activate last used paint tool
-    this.setState((state) => ({
+    this.setState(() => ({
       mode: Mode.draw,
     }));
   };
@@ -533,7 +520,7 @@ class UserInterface extends Component<Props, State> {
     if (this.isTyping()) return;
 
     if (this.state.mode === Mode.draw) {
-      this.setState({ mode: Mode.select, buttonClicked: Tools.select.name });
+      this.setState({ mode: Mode.select, buttonClicked: "Select" });
     } else {
       this.selectDrawMode();
     }
@@ -624,25 +611,25 @@ class UserInterface extends Component<Props, State> {
   // TODO: find a way to pass parameters in keybindings and get rid of code duplication
   selectContrast = (): void => {
     if (this.isTyping()) return;
-    this.handleOpen()(this.refBtnsPopovers[Tools.contrast.name]);
-    this.setButtonClicked(Tools.contrast.name);
+    this.handleOpen()(this.refBtnsPopovers.Contrast);
+    this.setButtonClicked("Contrast");
   };
 
   selectBrightness = (): void => {
     if (this.isTyping()) return;
-    this.handleOpen()(this.refBtnsPopovers[Tools.brightness.name]);
-    this.setButtonClicked(Tools.brightness.name);
+    this.handleOpen()(this.refBtnsPopovers.Brightness);
+    this.setButtonClicked("Brightness");
   };
 
   selectChannels = (): void => {
     if (this.isTyping()) return;
-    this.handleOpen()(this.refBtnsPopovers[Tools.channels.name]);
-    this.setButtonClicked(Tools.channels.name);
+    this.handleOpen()(this.refBtnsPopovers.Channels);
+    this.setButtonClicked("Channels");
   };
 
   selectAnnotationLabel = (): void => {
-    this.handleOpen()(this.refBtnsPopovers[Tools.labels.name]);
-    this.setButtonClicked(Tools.labels.name);
+    this.handleOpen()(this.refBtnsPopovers.Labels);
+    this.setButtonClicked("Labels");
   };
 
   saveAnnotations = (): void => {
@@ -652,20 +639,20 @@ class UserInterface extends Component<Props, State> {
 
   undo = (): void => {
     this.callRedraw();
-    this.setButtonClicked(Tools.undo.name);
+    this.setButtonClicked("Undo");
     this.annotationsObject.undo();
   };
 
   redo = (): void => {
     this.callRedraw();
-    this.setButtonClicked(Tools.redo.name);
+    this.setButtonClicked("Redo");
     this.annotationsObject.redo();
   };
 
   isTyping = (): boolean =>
     // Added to prevent single-key shortcuts that are also valid text input
     // to get triggered during text input.
-    this.refBtnsPopovers[Tools.labels.name] === this.state.anchorElement;
+    this.refBtnsPopovers.Labels === this.state.anchorElement;
 
   render = (): ReactNode => {
     const { classes, showAppBar, saveAnnotationsCallback } = this.props;
@@ -677,12 +664,12 @@ class UserInterface extends Component<Props, State> {
             <UploadImage
               setUploadedImage={this.setUploadedImage}
               spanElement={
-                <BaseIconButton
-                  tooltip={Tools.upload}
+                <IconButton
+                  tooltip={{ name: "Upload Images" }}
+                  icon={icons.upload}
                   fill={false}
-                  hasAvatar={false}
                   tooltipPlacement="bottom"
-                  buttonSize="medium"
+                  size="medium"
                   component="span"
                 />
               }
@@ -790,14 +777,15 @@ class UserInterface extends Component<Props, State> {
           ))}
 
           {saveAnnotationsCallback && (
-            <BaseIconButton
-              tooltip={Tools.save}
+            <IconButton
+              tooltip={{ name: "Save Annotations" }}
+              icon={icons.download}
               onMouseDown={() => {
-                this.setButtonClicked(Tools.save.name);
+                this.setButtonClicked("Save Annotations");
                 this.saveAnnotations();
               }}
               onMouseUp={this.selectDrawMode}
-              fill={this.state.buttonClicked === Tools.save.name}
+              fill={this.state.buttonClicked === "Save Annotations"}
             />
           )}
 

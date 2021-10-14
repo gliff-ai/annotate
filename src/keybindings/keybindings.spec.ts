@@ -1,9 +1,10 @@
-import { keydownListener, getShortcut } from "./index";
+const { keydownListener, getShortcut } = require("./index");
 
+global.navigator = { ...global.navigator, platform: "MacOS" };
 const bindings = {
   KeyA: "test.Only A",
-  "ctrl+KeyA": "test.Ctrl + A",
-  "ctrl+shift+KeyA": "test.Ctrl + Shift + A",
+  "cmdCtrl+KeyA": "test.Ctrl + A",
+  "cmdCtrl+shift+KeyA": "test.Ctrl + Shift + A",
   Backspace: "test.backspace",
 };
 
@@ -52,6 +53,17 @@ test("Correctly gets shortcut keys", (): void => {
     shortcut: "A",
   });
   expect(getShortcut("test.backspace", bindings)).toEqual({
+    shortcut: "&#x232b;",
+  });
+});
+
+test("Correctly gets Mac shortcut keys", (): void => {
+  expect(getShortcut("test.Only A", bindings, true)).toEqual({ shortcut: "A" });
+  expect(getShortcut("test.Ctrl + A", bindings, true)).toEqual({
+    shortcutSymbol: "CMD",
+    shortcut: "A",
+  });
+  expect(getShortcut("test.backspace", bindings, true)).toEqual({
     shortcut: "&#x232b;",
   });
 });
