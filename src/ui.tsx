@@ -182,8 +182,6 @@ class UserInterface extends Component<Props, State> {
 
   private imageFileInfo: ImageFileInfo | null;
 
-  private canvasContainer: HTMLDivElement;
-
   private refBtnsPopovers: { [buttonName: string]: HTMLButtonElement };
 
   constructor(props: Props) {
@@ -225,9 +223,6 @@ class UserInterface extends Component<Props, State> {
       document.addEventListener(event, this.handleEvent);
     }
     this.mixChannels();
-
-    const { clientHeight: height, clientWidth: width } = this.canvasContainer;
-    this.setViewportPositionAndSize({ top: 0, left: 0, width, height });
   }
 
   componentDidUpdate = (prevProps: Props): void => {
@@ -509,13 +504,11 @@ class UserInterface extends Component<Props, State> {
   };
 
   selectDrawMode = (): void => {
-    // Select draw mode and re-activate last used paint tool
-    this.setState((prevstate) => {
-      console.log(prevstate);
-      return {
-        mode: Mode.draw,
-      };
-    });
+    // Select draw mode and re-activate last used toolbox
+    this.setState((prevState) => ({
+      mode: Mode.draw,
+      buttonClicked: prevState.activeToolbox,
+    }));
   };
 
   toggleMode = (): void => {
@@ -872,11 +865,6 @@ class UserInterface extends Component<Props, State> {
                   item
                   className={classes.canvasGrid}
                   style={{ position: "relative" }}
-                  ref={(container) => {
-                    if (container) {
-                      this.canvasContainer = container;
-                    }
-                  }}
                 >
                   <BackgroundCanvas
                     scaleAndPan={this.state.scaleAndPan}
@@ -893,8 +881,6 @@ class UserInterface extends Component<Props, State> {
                     mode={this.state.mode}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
-                    canvasPositionAndSize={this.state.viewportPositionAndSize}
-                    setCanvasPositionAndSize={this.setViewportPositionAndSize}
                     redraw={this.state.redraw}
                     sliceIndex={this.state.sliceIndex}
                     setUIActiveAnnotationID={(id) => {
@@ -910,8 +896,6 @@ class UserInterface extends Component<Props, State> {
                     mode={this.state.mode}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
-                    canvasPositionAndSize={this.state.viewportPositionAndSize}
-                    setCanvasPositionAndSize={this.setViewportPositionAndSize}
                     redraw={this.state.redraw}
                     sliceIndex={this.state.sliceIndex}
                     setUIActiveAnnotationID={(id) => {
@@ -927,8 +911,6 @@ class UserInterface extends Component<Props, State> {
                     mode={this.state.mode}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
-                    canvasPositionAndSize={this.state.viewportPositionAndSize}
-                    setCanvasPositionAndSize={this.setViewportPositionAndSize}
                     redraw={this.state.redraw}
                     sliceIndex={this.state.sliceIndex}
                     setUIActiveAnnotationID={(id) => {

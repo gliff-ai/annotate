@@ -3,7 +3,7 @@ import { theme } from "@gliff-ai/style";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
 import { Mode } from "@/ui";
 import { Annotations } from "@/annotation";
-import { XYPoint } from "@/annotation/interfaces";
+import { XYPoint, PositionAndSize } from "@/annotation/interfaces";
 import { getRGBAString, palette } from "@/components/palette";
 import {
   BaseCanvas,
@@ -14,7 +14,7 @@ import {
 import { calculateSobel } from "./sobel";
 import { useSplineStore } from "./Store";
 
-interface Props extends CanvasProps {
+interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   activeToolbox: Toolbox | string;
   mode: Mode;
   annotationsObject: Annotations;
@@ -22,6 +22,10 @@ interface Props extends CanvasProps {
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
   setActiveToolbox: (tool: Toolbox) => void;
+}
+
+interface State {
+  canvasPositionAndSize: PositionAndSize;
 }
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
@@ -43,7 +47,7 @@ interface Event extends CustomEvent {
 
 type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 
-class CanvasClass extends Component<Props> {
+class CanvasClass extends Component<Props, State> {
   readonly name = Toolboxes.spline;
 
   private baseCanvas: BaseCanvas;
@@ -63,6 +67,9 @@ class CanvasClass extends Component<Props> {
     this.selectedPointIndex = -1;
     this.isMouseDown = false;
     this.numberOfMoves = 0;
+    this.state = {
+      canvasPositionAndSize: { top: 0, left: 0, width: 0, height: 0 },
+    };
   }
 
   componentDidMount(): void {
@@ -130,7 +137,7 @@ class CanvasClass extends Component<Props> {
         this.props.displayedImage.width,
         this.props.displayedImage.height,
         this.props.scaleAndPan,
-        this.props.canvasPositionAndSize
+        this.state.canvasPositionAndSize
       );
 
       context.beginPath();
@@ -151,7 +158,7 @@ class CanvasClass extends Component<Props> {
           this.props.displayedImage.width,
           this.props.displayedImage.height,
           this.props.scaleAndPan,
-          this.props.canvasPositionAndSize
+          this.state.canvasPositionAndSize
         );
         context.lineTo(nextPoint.x, nextPoint.y);
       }
@@ -176,7 +183,7 @@ class CanvasClass extends Component<Props> {
         this.props.displayedImage.width,
         this.props.displayedImage.height,
         this.props.scaleAndPan,
-        this.props.canvasPositionAndSize
+        this.state.canvasPositionAndSize
       );
       if (this.selectedPointIndex === i && isActive) {
         context.fillRect(
@@ -199,7 +206,6 @@ class CanvasClass extends Component<Props> {
 
   drawAllSplines = (): void => {
     // Draw all the splines
-    if (!this.baseCanvas) return;
 
     // Clear all the splines:
     const { canvasContext: context } = this.baseCanvas;
@@ -251,7 +257,7 @@ class CanvasClass extends Component<Props> {
       this.props.displayedImage.width,
       this.props.displayedImage.height,
       this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
+      this.state.canvasPositionAndSize
     );
 
     for (let i = 0; i < splineVector.length; i += 1) {
@@ -263,7 +269,7 @@ class CanvasClass extends Component<Props> {
         this.props.displayedImage.width,
         this.props.displayedImage.height,
         this.props.scaleAndPan,
-        this.props.canvasPositionAndSize
+        this.state.canvasPositionAndSize
       );
 
       const distanceToPoint = Math.sqrt(
@@ -294,7 +300,7 @@ class CanvasClass extends Component<Props> {
       this.props.displayedImage.width,
       this.props.displayedImage.height,
       this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
+      this.state.canvasPositionAndSize
     );
 
     if (this.props.mode === Mode.select) {
@@ -364,7 +370,7 @@ class CanvasClass extends Component<Props> {
       this.props.displayedImage.width,
       this.props.displayedImage.height,
       this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
+      this.state.canvasPositionAndSize
     );
     this.addNewPointNearSpline(imageX, imageY);
   };
@@ -495,7 +501,7 @@ class CanvasClass extends Component<Props> {
       this.props.displayedImage.width,
       this.props.displayedImage.height,
       this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
+      this.state.canvasPositionAndSize
     );
 
     if (this.props.activeToolbox === "Magic Spline") {
@@ -536,7 +542,7 @@ class CanvasClass extends Component<Props> {
       this.props.displayedImage.width,
       this.props.displayedImage.height,
       this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
+      this.state.canvasPositionAndSize
     );
 
     if (
@@ -632,6 +638,23 @@ class CanvasClass extends Component<Props> {
     this.props.annotationsObject.getSplineForActiveAnnotation().spaceTimeInfo
       .z === this.props.sliceIndex;
 
+  setCanvasPositionAndSize = (
+    newCanvasPositionAndSize: PositionAndSize
+  ): void => {
+    this.setState((prevState: State) => {
+      const { canvasPositionAndSize } = prevState;
+      return {
+        canvasPositionAndSize: {
+          top: newCanvasPositionAndSize.top || canvasPositionAndSize.top,
+          left: newCanvasPositionAndSize.left || canvasPositionAndSize.left,
+          width: newCanvasPositionAndSize.width || canvasPositionAndSize.width,
+          height:
+            newCanvasPositionAndSize.height || canvasPositionAndSize.height,
+        },
+      };
+    });
+  };
+
   render = (): ReactNode =>
     this.props?.displayedImage ? (
       <div style={{ pointerEvents: this.isActive() ? "auto" : "none" }}>
@@ -642,12 +665,14 @@ class CanvasClass extends Component<Props> {
           onMouseUp={this.onMouseUp}
           cursor={this.getCursor()}
           ref={(baseCanvas) => {
-            this.baseCanvas = baseCanvas;
+            if (baseCanvas) {
+              this.baseCanvas = baseCanvas;
+            }
           }}
           name={this.name}
           scaleAndPan={this.props.scaleAndPan}
-          canvasPositionAndSize={this.props.canvasPositionAndSize}
-          setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
+          canvasPositionAndSize={this.state.canvasPositionAndSize}
+          setCanvasPositionAndSize={this.setCanvasPositionAndSize}
         />
       </div>
     ) : null;
@@ -669,7 +694,6 @@ export const Canvas = (props: Props): ReactElement => {
       annotationsObject={props.annotationsObject}
       displayedImage={props.displayedImage}
       scaleAndPan={props.scaleAndPan}
-      canvasPositionAndSize={props.canvasPositionAndSize}
       redraw={props.redraw}
       sliceIndex={props.sliceIndex}
       setUIActiveAnnotationID={props.setUIActiveAnnotationID}
