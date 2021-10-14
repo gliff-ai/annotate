@@ -1,6 +1,7 @@
 import { Component, ReactNode, MouseEvent } from "react";
 
 import { XYPoint, PositionAndSize } from "@/annotation/interfaces";
+import { theme } from "@gliff-ai/style";
 
 export interface Props {
   name?: string;
