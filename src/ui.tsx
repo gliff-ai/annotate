@@ -624,8 +624,8 @@ class UserInterface extends Component<Props, State> {
   };
 
   selectAnnotationLabel = (): void => {
-    this.handleOpen()(this.refBtnsPopovers.Labels);
-    this.setButtonClicked("Labels");
+    this.handleOpen()(this.refBtnsPopovers["Annotation Label"]);
+    this.setButtonClicked("Annotation Label");
   };
 
   saveAnnotations = (): void => {
