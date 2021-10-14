@@ -36,8 +36,8 @@ import { PaintbrushCanvas, PaintbrushToolbar } from "@/toolboxes/paintbrush";
 import { LabelsSubmenu } from "@/toolboxes/labels";
 import { Download } from "@/download/UI";
 import { getShortcut, keydownListener } from "@/keybindings";
-import { Tools } from "@/tooltips";
 import { BaseSlider, Config } from "@/components/BaseSlider";
+import { Tools } from "./tooltips";
 
 const logger = console;
 

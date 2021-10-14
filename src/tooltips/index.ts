@@ -1,13 +1,10 @@
 import { Tooltip } from "@gliff-ai/style";
-import { MinimapTools } from "@/toolboxes/background";
-// import { PaintbrushTools } from "@/toolboxes/paintbrush";
-// import { SplineTools } from "@/toolboxes/spline";
-// import { BoundingBoxTools } from "@/toolboxes/boundingBox";
 
 import { imgSrc } from "@/imgSrc";
 
 type ToolTips = { [name: string]: Tooltip };
 
+// TODO remove
 const DefaultTools: ToolTips = {
   addNewAnnotation: {
     name: "Add New Annotation",
