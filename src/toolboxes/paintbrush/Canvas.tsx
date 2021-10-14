@@ -4,7 +4,7 @@ import { slpfLines } from "@gliff-ai/slpf";
 import { theme } from "@gliff-ai/style";
 import { Mode } from "@/ui";
 import { Annotations } from "@/annotation";
-import { XYPoint } from "@/annotation/interfaces";
+import { XYPoint, PositionAndSize } from "@/annotation/interfaces";
 import {
   BaseCanvas,
   CanvasProps,
@@ -22,7 +22,7 @@ import { getNewImageSizeAndDisplacement } from "@/toolboxes/background/drawImage
 const mainColor = theme.palette.primary.main;
 // const secondaryColor = theme.palette.secondary.main;
 
-interface Props extends CanvasProps {
+interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   isActive: boolean;
   activeToolbox: Toolbox | string;
   mode: Mode;
@@ -44,6 +44,7 @@ interface Brush {
 
 interface State {
   pixelView: boolean;
+  canvasPositionAndSize: PositionAndSize;
 }
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
@@ -90,6 +91,7 @@ export class CanvasClass extends Component<Props, State> {
 
     this.state = {
       pixelView: false,
+      canvasPositionAndSize: { top: 0, left: 0, width: 0, height: 0 },
     };
   }
 
@@ -107,8 +109,8 @@ export class CanvasClass extends Component<Props, State> {
     this.tempCanvas.width = this.backgroundCanvas.canvasContext.canvas.width;
     this.tempCanvas.height = this.backgroundCanvas.canvasContext.canvas.height;
     if (this.cursorCtx) {
-      this.cursorCtx.canvas.width = this.props.canvasPositionAndSize.width;
-      this.cursorCtx.canvas.height = this.props.canvasPositionAndSize.height;
+      this.cursorCtx.canvas.width = this.state.canvasPositionAndSize.width;
+      this.cursorCtx.canvas.height = this.state.canvasPositionAndSize.height;
     }
 
     // Redraw if we change pan or zoom
@@ -130,7 +132,7 @@ export class CanvasClass extends Component<Props, State> {
       this.props.displayedImage.width,
       this.props.displayedImage.height,
       this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
+      this.state.canvasPositionAndSize
     );
 
     // Add new point
@@ -171,7 +173,7 @@ export class CanvasClass extends Component<Props, State> {
         this.props.displayedImage.width,
         this.props.displayedImage.height,
         this.props.scaleAndPan,
-        this.props.canvasPositionAndSize
+        this.state.canvasPositionAndSize
       );
       return { x, y };
     });
@@ -330,9 +332,9 @@ export class CanvasClass extends Component<Props, State> {
     // and image scaling (zoom level).
     const imageScalingFactor =
       Math.min(
-        this.props.canvasPositionAndSize.height /
+        this.state.canvasPositionAndSize.height /
           this.props.displayedImage.height,
-        this.props.canvasPositionAndSize.width / this.props.displayedImage.width
+        this.state.canvasPositionAndSize.width / this.props.displayedImage.width
       ) || 1;
     return brushRadius * imageScalingFactor * 2 * this.props.scaleAndPan.scale;
   };
@@ -461,7 +463,7 @@ export class CanvasClass extends Component<Props, State> {
         this.props.displayedImage.width,
         this.props.displayedImage.height,
         this.props.scaleAndPan,
-        this.props.canvasPositionAndSize
+        this.state.canvasPositionAndSize
       );
       this.props.annotationsObject.clickSelect(
         imageX,
@@ -535,9 +537,26 @@ export class CanvasClass extends Component<Props, State> {
     context.clearRect(
       0,
       0,
-      this.props.canvasPositionAndSize.width,
-      this.props.canvasPositionAndSize.height
+      this.state.canvasPositionAndSize.width,
+      this.state.canvasPositionAndSize.height
     );
+  };
+
+  setCanvasPositionAndSize = (
+    newCanvasPositionAndSize: PositionAndSize
+  ): void => {
+    this.setState((prevState: State) => {
+      const { canvasPositionAndSize } = prevState;
+      return {
+        canvasPositionAndSize: {
+          top: newCanvasPositionAndSize.top || canvasPositionAndSize.top,
+          left: newCanvasPositionAndSize.left || canvasPositionAndSize.left,
+          width: newCanvasPositionAndSize.width || canvasPositionAndSize.width,
+          height:
+            newCanvasPositionAndSize.height || canvasPositionAndSize.height,
+        },
+      };
+    });
   };
 
   render = (): ReactNode =>
@@ -556,8 +575,8 @@ export class CanvasClass extends Component<Props, State> {
             }}
             name={`${this.name}-background`}
             scaleAndPan={this.props.scaleAndPan}
-            canvasPositionAndSize={this.props.canvasPositionAndSize}
-            setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
+            canvasPositionAndSize={this.state.canvasPositionAndSize}
+            setCanvasPositionAndSize={this.setCanvasPositionAndSize}
           />
 
           <BaseCanvas
@@ -570,17 +589,17 @@ export class CanvasClass extends Component<Props, State> {
             }}
             name={`${this.name}-interaction`}
             scaleAndPan={this.props.scaleAndPan}
-            canvasPositionAndSize={this.props.canvasPositionAndSize}
-            setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
+            canvasPositionAndSize={this.state.canvasPositionAndSize}
+            setCanvasPositionAndSize={this.setCanvasPositionAndSize}
           />
 
           <canvas
             style={{
               position: "absolute",
-              top: this.props.canvasPositionAndSize.top,
-              left: this.props.canvasPositionAndSize.left,
-              width: this.props.canvasPositionAndSize.width,
-              height: this.props.canvasPositionAndSize.height,
+              top: this.state.canvasPositionAndSize.top,
+              left: this.state.canvasPositionAndSize.left,
+              width: this.state.canvasPositionAndSize.width,
+              height: this.state.canvasPositionAndSize.height,
               pointerEvents: "none",
               display: "block",
             }}
@@ -620,7 +639,6 @@ export const Canvas = (
       annotationsObject={props.annotationsObject}
       displayedImage={props.displayedImage}
       scaleAndPan={props.scaleAndPan}
-      canvasPositionAndSize={props.canvasPositionAndSize}
       brushRadius={paintbrush.brushRadius}
       annotationActiveAlpha={paintbrush.annotationActiveAlpha / 100}
       annotationAlpha={paintbrush.annotationAlpha / 100}
