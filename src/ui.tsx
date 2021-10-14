@@ -119,8 +119,10 @@ const styles = {
     },
   },
   buttonGroup: {
-    width: "45px",
-    padding: "0px",
+    [theme.breakpoints.down("md")]: {
+      width: "45px",
+      padding: "0px",
+    },
   },
 
   bottomToolbars: {

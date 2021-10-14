@@ -1,6 +1,11 @@
 import { Component, ReactElement, MouseEvent } from "react";
-import { ButtonGroup, Popover } from "@material-ui/core";
-import { BaseIconButton } from "@gliff-ai/style";
+import {
+  ButtonGroup,
+  createStyles,
+  makeStyles,
+  Popover,
+} from "@material-ui/core";
+import { BaseIconButton, theme } from "@gliff-ai/style";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { Tools } from "./Toolbox";
 import { useSplineStore } from "./Store";
@@ -13,8 +18,20 @@ interface SubmenuProps {
   onClose: (event: MouseEvent) => void;
 }
 
+const useStyles = makeStyles(() =>
+  createStyles({
+    buttonGroup: {
+      [theme.breakpoints.down("md")]: {
+        width: "45px",
+        padding: "0px",
+      },
+    },
+  })
+);
+
 const Submenu = (props: SubmenuProps): ReactElement => {
   const [spline, setSpline] = useSplineStore();
+  const classes = useStyles();
 
   const selectSpline = () => {
     setSpline({ splineType: Tools.spline.name });
@@ -46,7 +63,11 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       anchorEl={props.anchorElement}
       onClose={props.onClose}
     >
-      <ButtonGroup size="small" id="spline-toolbar">
+      <ButtonGroup
+        size="small"
+        id="spline-toolbar"
+        className={classes.buttonGroup}
+      >
         <BaseIconButton
           tooltip={Tools.spline}
           onClick={selectSpline}

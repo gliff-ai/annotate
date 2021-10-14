@@ -13,7 +13,7 @@ import {
   Popover,
 } from "@material-ui/core";
 
-import { BaseIconButton } from "@gliff-ai/style";
+import { BaseIconButton, theme } from "@gliff-ai/style";
 
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { BaseSlider } from "@/components/BaseSlider";
@@ -59,6 +59,12 @@ const useStyles = makeStyles(() =>
     baseSliderContainer: {
       display: "flex",
       flexDirection: "row",
+    },
+    buttonGroup: {
+      [theme.breakpoints.down("md")]: {
+        width: "45px",
+        padding: "0px",
+      },
     },
   })
 );
@@ -148,6 +154,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
           orientation="vertical"
           size="small"
           id="paintbrush-toolbar"
+          className={classes.buttonGroup}
         >
           <BaseIconButton
             tooltip={Tools.paintbrush}

@@ -32,15 +32,14 @@ const styles = {
     [theme.breakpoints.down("md")]: {
       width: "60%",
       height: "auto",
-      left: "456px",
+      left: "463px",
     },
   },
   baseIconButton: {
+    display: "flex",
     justifyContent: "flex-end",
     margin: "-10px 0 13px",
-    [theme.breakpoints.down("md")]: {
-      margin: "0px",
-    },
+
     "& $button": {
       marginRight: "10px",
       "&:nth-child(4)": {
@@ -49,6 +48,11 @@ const styles = {
       "&:nth-child(1)": {
         marginRight: "auto",
       },
+    },
+    [theme.breakpoints.down("md")]: {
+      display: "inline-block",
+      justifyContent: "flex-end",
+      margin: "-10px 0 13px",
     },
   },
   divider: {
@@ -62,6 +66,7 @@ const styles = {
     [theme.breakpoints.down("md")]: {
       marginTop: "-30px",
       marginBottom: "-50px",
+      width: "90%",
     },
   },
   mimimapToggle: {
