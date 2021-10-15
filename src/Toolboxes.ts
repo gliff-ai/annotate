@@ -5,6 +5,7 @@ export const Toolboxes = {
   paintbrush: "paintbrush",
   spline: "spline",
   boundingBox: "boundingBox",
+  ui: "ui",
 } as const;
 
 export type Toolbox = typeof Toolboxes[keyof typeof Toolboxes];

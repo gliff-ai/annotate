@@ -4,24 +4,24 @@ import {
   ReactElement,
   useState,
   useEffect,
+  useCallback,
 } from "react";
 
 import {
+  Avatar,
+  Chip,
   createStyles,
   Divider,
   IconButton,
   InputBase,
-  List,
-  ListItem,
-  ListItemSecondaryAction,
   ListItemText,
   makeStyles,
-  Theme,
+  Typography,
 } from "@material-ui/core";
 
 import SVG from "react-inlinesvg";
 
-import { imgSrc } from "@/imgSrc";
+import { theme, icons } from "@gliff-ai/style";
 
 import { Annotations } from "@/annotation";
 
@@ -32,15 +32,34 @@ export interface Props {
   activeAnnotationID: number;
 }
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     listItem: {
       color: theme.palette.primary.main,
-      fontSize: "50px",
-      marginLeft: "-7px",
+      fontSize: "14px",
     },
     list: { width: "100%" },
-    inputBaseProps: { fontSize: 18, marginRight: 57, marginLeft: -7 },
+    inputBase: { marginRight: "55px", fontSize: "14px" },
+    labelsChip: {
+      margin: "5px",
+      borderColor: theme.palette.primary.main,
+      borderRadius: "9px",
+      color: theme.palette.primary.main,
+    },
+    chipFont: {
+      fontSize: "14px",
+    },
+    menuLabelsChip: {
+      color: theme.palette.text.secondary,
+      borderColor: theme.palette.text.secondary,
+    },
+
+    divider: {
+      width: "97%",
+      marginTop: "inherit",
+      marginLeft: "-1%",
+    },
+    svgSmall: { width: "10px", height: "100%" },
   })
 );
 
@@ -56,10 +75,12 @@ export const Labels: FunctionComponent<Props> = ({
     annotationsObject.getLabels()
   );
 
-  function getMenuLabels(labels: string[]): string[] {
-    // Get array with labels that are yet to be assigned.
-    return presetLabels.filter((label) => !labels.includes(label));
-  }
+  // Get array with labels that are yet to be assigned.
+  const getMenuLabels = useCallback(
+    (labels: string[]): string[] =>
+      presetLabels.filter((label) => !labels.includes(label)),
+    [presetLabels]
+  );
 
   const [menuLabels, setMenuLabels] = useState(
     getMenuLabels(annotationsObject.getLabels())
@@ -75,11 +96,11 @@ export const Labels: FunctionComponent<Props> = ({
     setNewLabel(value);
   }
 
-  const updateAllLabels = (): void => {
+  const updateAllLabels = useCallback(() => {
     const labels = annotationsObject.getLabels();
     setAssignedLabels(labels);
     setMenuLabels(getMenuLabels(labels));
-  };
+  }, [annotationsObject, getMenuLabels]);
 
   const handleAddLabel = (label: string) => (): void => {
     // Add a label to active annotation object and update some states.
@@ -98,79 +119,75 @@ export const Labels: FunctionComponent<Props> = ({
   useEffect(() => {
     // Re-render assigned labels at change of active annotation ID.
     updateAllLabels();
-  }, [activeAnnotationID]);
+  }, [activeAnnotationID, updateAllLabels]);
 
   return (
     <>
-      <List component="div" disablePadding className={classes.list}>
-        <ListItem>
-          <InputBase
-            placeholder="New label"
-            value={newLabel}
-            onChange={(e) => handleNewLabelChange(e)}
-            inputProps={{ styles: `${classes.inputBaseProps}` }}
-          />
+      <InputBase
+        placeholder="Add new label..."
+        value={newLabel}
+        onChange={(e) => handleNewLabelChange(e)}
+        className={classes.inputBase}
+      />
 
-          <IconButton
-            type="submit"
-            aria-label="add-new-label"
-            onClick={handleAddLabel(newLabel)}
-            edge="end"
-          >
-            <SVG
-              src={imgSrc("add-icon")}
-              width="12px"
-              height="100%"
-              fill="#A1A1A1"
+      <IconButton
+        type="submit"
+        aria-label="add-new-label"
+        onClick={handleAddLabel(newLabel)}
+        edge="end"
+      >
+        <SVG src={icons.add} width="12px" height="100%" fill="#A1A1A1" />
+      </IconButton>
+      <Divider className={classes.divider} />
+      {assignedLabels.map((label) => (
+        <Chip
+          key={`chip-add-${label}`}
+          avatar={
+            <Avatar
+              variant="circular"
+              style={{ cursor: "pointer" }}
+              onClick={handleRemoveLabel(label)}
+            >
+              <SVG
+                src={icons.removeLabel}
+                className={classes.svgSmall}
+                fill={theme.palette.primary.main}
+              />
+            </Avatar>
+          }
+          className={classes.labelsChip}
+          label={<Typography className={classes.chipFont}>{label}</Typography>}
+          variant="outlined"
+        />
+      ))}
+
+      {menuLabels.map((label) => (
+        <Chip
+          key={`chip-add-${label}`}
+          avatar={
+            <Avatar
+              variant="circular"
+              style={{ cursor: "pointer" }}
+              onClick={handleAddLabel(label)}
+            >
+              <SVG
+                src={icons.add}
+                className={classes.svgSmall}
+                fill={theme.palette.text.secondary}
+              />
+            </Avatar>
+          }
+          className={[classes.labelsChip, classes.menuLabelsChip].join(" ")}
+          label={
+            <ListItemText
+              primary={
+                <Typography className={classes.chipFont}>{label}</Typography>
+              }
             />
-          </IconButton>
-        </ListItem>
-        <Divider />
-      </List>
-
-      <List component="div" disablePadding className={classes.list}>
-        {assignedLabels.map((label) => (
-          <ListItem key={label} dense>
-            <ListItemText primary={label} className={classes.listItem} />
-            <ListItemSecondaryAction>
-              <IconButton
-                edge="end"
-                aria-label="delete"
-                onClick={handleRemoveLabel(label)}
-              >
-                <SVG
-                  src={imgSrc("backspace-icon")}
-                  width="28px"
-                  height="100%"
-                  fill="#02FFAD"
-                />
-              </IconButton>
-            </ListItemSecondaryAction>
-          </ListItem>
-        ))}
-      </List>
-
-      <List component="div" disablePadding className={classes.list}>
-        {menuLabels.map((label) => (
-          <ListItem key={label} dense>
-            <ListItemText primary={label} />
-            <ListItemSecondaryAction>
-              <IconButton
-                edge="end"
-                aria-label="add"
-                onClick={handleAddLabel(label)}
-              >
-                <SVG
-                  src={imgSrc("add-icon")}
-                  width="12px"
-                  height="100%"
-                  fill="#000000"
-                />
-              </IconButton>
-            </ListItemSecondaryAction>
-          </ListItem>
-        ))}
-      </List>
+          }
+          variant="outlined"
+        />
+      ))}
     </>
   );
 };

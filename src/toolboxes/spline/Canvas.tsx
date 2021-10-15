@@ -3,7 +3,7 @@ import { theme } from "@gliff-ai/style";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
 import { Mode } from "@/ui";
 import { Annotations } from "@/annotation";
-import { XYPoint } from "@/annotation/interfaces";
+import { XYPoint, PositionAndSize } from "@/annotation/interfaces";
 import { getRGBAString, palette } from "@/components/palette";
 import {
   BaseCanvas,
@@ -11,11 +11,10 @@ import {
   canvasToImage,
   imageToCanvas,
 } from "@/components/baseCanvas";
-import { Tools } from "./Toolbox";
 import { calculateSobel } from "./sobel";
 import { useSplineStore } from "./Store";
 
-interface Props extends CanvasProps {
+interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   activeToolbox: Toolbox | string;
   mode: Mode;
   annotationsObject: Annotations;
@@ -25,8 +24,10 @@ interface Props extends CanvasProps {
   setActiveToolbox: (tool: Toolbox) => void;
 }
 
-// Here we define the methods that are exposed to be called by keyboard shortcuts
-// We should maybe namespace them so we don't get conflicting methods across toolboxes.
+interface State {
+  canvasPositionAndSize: PositionAndSize;
+}
+
 export const events = [
   "deleteSelectedPoint",
   "deselectPoint",
@@ -44,7 +45,7 @@ interface Event extends CustomEvent {
 
 type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 
-class CanvasClass extends Component<Props> {
+class CanvasClass extends Component<Props, State> {
   readonly name = Toolboxes.spline;
 
   private baseCanvas: BaseCanvas;
@@ -64,6 +65,9 @@ class CanvasClass extends Component<Props> {
     this.selectedPointIndex = -1;
     this.isMouseDown = false;
     this.numberOfMoves = 0;
+    this.state = {
+      canvasPositionAndSize: { top: 0, left: 0, width: 0, height: 0 },
+    };
   }
 
   componentDidMount(): void {
@@ -131,7 +135,7 @@ class CanvasClass extends Component<Props> {
         this.props.displayedImage.width,
         this.props.displayedImage.height,
         this.props.scaleAndPan,
-        this.props.canvasPositionAndSize
+        this.state.canvasPositionAndSize
       );
 
       context.beginPath();
@@ -152,7 +156,7 @@ class CanvasClass extends Component<Props> {
           this.props.displayedImage.width,
           this.props.displayedImage.height,
           this.props.scaleAndPan,
-          this.props.canvasPositionAndSize
+          this.state.canvasPositionAndSize
         );
         context.lineTo(nextPoint.x, nextPoint.y);
       }
@@ -177,7 +181,7 @@ class CanvasClass extends Component<Props> {
         this.props.displayedImage.width,
         this.props.displayedImage.height,
         this.props.scaleAndPan,
-        this.props.canvasPositionAndSize
+        this.state.canvasPositionAndSize
       );
       if (this.selectedPointIndex === i && isActive) {
         context.fillRect(
@@ -200,7 +204,6 @@ class CanvasClass extends Component<Props> {
 
   drawAllSplines = (): void => {
     // Draw all the splines
-    if (!this.baseCanvas) return;
 
     // Clear all the splines:
     const { canvasContext: context } = this.baseCanvas;
@@ -252,7 +255,7 @@ class CanvasClass extends Component<Props> {
       this.props.displayedImage.width,
       this.props.displayedImage.height,
       this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
+      this.state.canvasPositionAndSize
     );
 
     for (let i = 0; i < splineVector.length; i += 1) {
@@ -264,7 +267,7 @@ class CanvasClass extends Component<Props> {
         this.props.displayedImage.width,
         this.props.displayedImage.height,
         this.props.scaleAndPan,
-        this.props.canvasPositionAndSize
+        this.state.canvasPositionAndSize
       );
 
       const distanceToPoint = Math.sqrt(
@@ -279,7 +282,7 @@ class CanvasClass extends Component<Props> {
 
   onClick = (x: number, y: number, isCTRL?: boolean): void => {
     // handle click to select an annotation (Mode.select)
-    // or add new point to a normal spline (Mode.draw and this.props.activeToolbox === Tools.spline.name)
+    // or add new point to a normal spline (Mode.draw and this.props.activeToolbox === "Spline")
     // or add TL or BR point to a rectangle spline (Mode.draw and this.props.activeToolbox === Tools.rectspline.name)
 
     if (this.isMouseDown) {
@@ -295,7 +298,7 @@ class CanvasClass extends Component<Props> {
       this.props.displayedImage.width,
       this.props.displayedImage.height,
       this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
+      this.state.canvasPositionAndSize
     );
 
     if (this.props.mode === Mode.select) {
@@ -342,7 +345,7 @@ class CanvasClass extends Component<Props> {
           // else, i.e. not near an existing point
           // if the spline is not closed and we are in Mode.draw then
           // add coordinates to the current spline
-          if (this.props.activeToolbox === Tools.spline.name) {
+          if (this.props.activeToolbox === "Spline") {
             // if a normal spline, just add points as needed
             this.props.annotationsObject.addSplinePoint({
               x: imageX,
@@ -365,7 +368,7 @@ class CanvasClass extends Component<Props> {
       this.props.displayedImage.width,
       this.props.displayedImage.height,
       this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
+      this.state.canvasPositionAndSize
     );
     this.addNewPointNearSpline(imageX, imageY);
   };
@@ -391,9 +394,9 @@ class CanvasClass extends Component<Props> {
     // Returns true if successful, false otherwise
 
     if (
-      this.props.activeToolbox !== Tools.spline.name &&
-      this.props.activeToolbox !== Tools.lassospline.name &&
-      this.props.activeToolbox !== Tools.magicspline.name
+      this.props.activeToolbox !== "Spline" &&
+      this.props.activeToolbox !== "Lasso Spline" &&
+      this.props.activeToolbox !== "Magic Spline"
     )
       return false;
 
@@ -496,10 +499,10 @@ class CanvasClass extends Component<Props> {
       this.props.displayedImage.width,
       this.props.displayedImage.height,
       this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
+      this.state.canvasPositionAndSize
     );
 
-    if (this.props.activeToolbox === Tools.magicspline.name) {
+    if (this.props.activeToolbox === "Magic Spline") {
       // magic spline, add a new point and snap it to the highest gradient point within 25 pixels:
       if (this.gradientImage === undefined) {
         this.gradientImage = calculateSobel(this.props.displayedImage);
@@ -507,7 +510,7 @@ class CanvasClass extends Component<Props> {
       this.props.annotationsObject.addSplinePoint(clickPoint);
       this.snapToGradient(this.props.annotationsObject.getSplineLength() - 1);
       this.isMouseDown = true;
-    } else if (this.props.activeToolbox === Tools.lassospline.name) {
+    } else if (this.props.activeToolbox === "Lasso Spline") {
       // lasso spline, add a new point but no snapping
       this.props.annotationsObject.addSplinePoint(clickPoint);
       this.selectedPointIndex =
@@ -537,11 +540,11 @@ class CanvasClass extends Component<Props> {
       this.props.displayedImage.width,
       this.props.displayedImage.height,
       this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
+      this.state.canvasPositionAndSize
     );
 
     if (
-      this.props.activeToolbox === Tools.magicspline.name &&
+      this.props.activeToolbox === "Magic Spline" &&
       this.numberOfMoves % 5 === 0
     ) {
       // magic spline, every 5 moves add a new point
@@ -555,7 +558,7 @@ class CanvasClass extends Component<Props> {
         25 / this.props.scaleAndPan.scale
       );
     } else if (
-      this.props.activeToolbox === Tools.lassospline.name &&
+      this.props.activeToolbox === "Lasso Spline" &&
       this.numberOfMoves % 5 === 0
     ) {
       // lasso spline, every 5 moves add a new point
@@ -625,13 +628,30 @@ class CanvasClass extends Component<Props> {
   };
 
   isActive = (): boolean =>
-    this.props.activeToolbox === Tools.spline.name ||
-    this.props.activeToolbox === Tools.lassospline.name ||
-    this.props.activeToolbox === Tools.magicspline.name;
+    this.props.activeToolbox === "Spline" ||
+    this.props.activeToolbox === "Lasso Spline" ||
+    this.props.activeToolbox === "Magic Spline";
 
   sliceIndexMatch = (): boolean =>
     this.props.annotationsObject.getSplineForActiveAnnotation().spaceTimeInfo
       .z === this.props.sliceIndex;
+
+  setCanvasPositionAndSize = (
+    newCanvasPositionAndSize: PositionAndSize
+  ): void => {
+    this.setState((prevState: State) => {
+      const { canvasPositionAndSize } = prevState;
+      return {
+        canvasPositionAndSize: {
+          top: newCanvasPositionAndSize.top || canvasPositionAndSize.top,
+          left: newCanvasPositionAndSize.left || canvasPositionAndSize.left,
+          width: newCanvasPositionAndSize.width || canvasPositionAndSize.width,
+          height:
+            newCanvasPositionAndSize.height || canvasPositionAndSize.height,
+        },
+      };
+    });
+  };
 
   render = (): ReactNode =>
     this.props?.displayedImage ? (
@@ -643,12 +663,14 @@ class CanvasClass extends Component<Props> {
           onMouseUp={this.onMouseUp}
           cursor={this.getCursor()}
           ref={(baseCanvas) => {
-            this.baseCanvas = baseCanvas;
+            if (baseCanvas) {
+              this.baseCanvas = baseCanvas;
+            }
           }}
           name={this.name}
           scaleAndPan={this.props.scaleAndPan}
-          canvasPositionAndSize={this.props.canvasPositionAndSize}
-          setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
+          canvasPositionAndSize={this.state.canvasPositionAndSize}
+          setCanvasPositionAndSize={this.setCanvasPositionAndSize}
         />
       </div>
     ) : null;
@@ -670,7 +692,6 @@ export const Canvas = (props: Props): ReactElement => {
       annotationsObject={props.annotationsObject}
       displayedImage={props.displayedImage}
       scaleAndPan={props.scaleAndPan}
-      canvasPositionAndSize={props.canvasPositionAndSize}
       redraw={props.redraw}
       sliceIndex={props.sliceIndex}
       setUIActiveAnnotationID={props.setUIActiveAnnotationID}

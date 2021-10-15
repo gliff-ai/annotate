@@ -105,6 +105,11 @@ export class Annotations {
   getAllAnnotations = (): Annotation[] =>
     JSON.parse(JSON.stringify(this.data)) as Annotation[]; // deep copy to ensure no modification without audit logging
 
+  getActiveAnnotation = (): Annotation =>
+    JSON.parse(
+      JSON.stringify(this.data[this.activeAnnotationID])
+    ) as Annotation;
+
   length = (): number => this.data.length;
 
   @log

@@ -1,10 +1,17 @@
 import { Component, ReactElement, MouseEvent } from "react";
-import { Slide, Card, WithStyles, withStyles } from "@material-ui/core";
-import { theme, BaseIconButton } from "@gliff-ai/style";
+import {
+  Slide,
+  Card,
+  WithStyles,
+  withStyles,
+  Divider,
+} from "@material-ui/core";
+import { theme, IconButton, icons } from "@gliff-ai/style";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { MinimapCanvas } from "@/components/baseCanvas";
 import { BackgroundCanvas } from "@/toolboxes/background";
-import { Tools } from "@/tooltips";
+import { getShortcut } from "@/keybindings";
+import { Toolbox } from "@/Toolboxes";
 
 const styles = {
   minimap: {
@@ -24,6 +31,7 @@ const styles = {
   baseIconButton: {
     display: "flex",
     justifyContent: "flex-end",
+    margin: "-10px 0 13px",
     "& $button": {
       marginRight: "10px",
       "&:nth-child(4)": {
@@ -34,6 +42,11 @@ const styles = {
       },
     },
   },
+  divider: {
+    width: "inherit",
+    marginLeft: "-10px",
+    marginBottom: "4px",
+  },
   canvasCard: {
     width: "100%",
     height: "200px",
@@ -43,8 +56,9 @@ const styles = {
     height: "53px",
     left: "540px",
     borderRadius: "10px 0 0 0",
-    padding: "7px 0",
+    paddingBottom: "58px",
   },
+
   miniMapToolTipAvatar: {
     backgroundColor: theme.palette.primary.main,
     color: "#2B2F3A",
@@ -52,6 +66,8 @@ const styles = {
     height: "40px",
   },
 };
+
+const ToolboxName: Toolbox = "ui";
 
 export const events = ["handleDrawerOpen", "handleDrawerClose"] as const;
 
@@ -90,6 +106,7 @@ interface Props extends WithStyles<typeof styles> {
 
 interface State {
   isOpen: boolean;
+  transition: boolean;
 }
 
 class Minimap extends Component<Props, State> {
@@ -98,6 +115,7 @@ class Minimap extends Component<Props, State> {
 
     this.state = {
       isOpen: false,
+      transition: true,
     };
   }
 
@@ -121,116 +139,146 @@ class Minimap extends Component<Props, State> {
 
   handleDrawerClose = () => {
     this.setState({ isOpen: false });
+    setTimeout(() => {
+      this.setState({ transition: true });
+    }, 2000);
   };
 
   handleDrawerOpen = () => {
     this.setState({ isOpen: true });
+    this.setState({ transition: false });
   };
 
-  render = (): ReactElement => (
-    <div
-      className={this.props.classes.minimap}
-      style={{
-        position: "fixed",
-      }}
-    >
-      <Slide in={this.state.isOpen} direction="up" timeout={1000}>
-        <Card
-          className={this.props.classes.minimapCard}
-          style={{ position: "relative" }}
-        >
-          <div className={this.props.classes.baseIconButton}>
-            <BaseIconButton
-              tooltip={Tools.minimiseMap}
-              onClick={() => {
-                this.props.setButtonClicked(Tools.minimiseMap.name);
-                this.handleDrawerClose();
-              }}
-              fill={this.props.buttonClicked === Tools.minimiseMap.name}
-              tooltipPlacement="top"
-            />
-            <BaseIconButton
-              tooltip={Tools.zoomIn}
-              onClick={() => {
-                this.props.setButtonClicked(Tools.zoomIn.name);
-                this.props.incrementScale();
-              }}
-              fill={this.props.buttonClicked === Tools.zoomIn.name}
-              tooltipPlacement="top"
-            />
-            <BaseIconButton
-              tooltip={Tools.zoomOut}
-              onClick={() => {
-                this.props.setButtonClicked(Tools.zoomOut.name);
-                this.props.decrementScale();
-              }}
-              fill={this.props.buttonClicked === Tools.zoomOut.name}
-              tooltipPlacement="top"
-            />
-            <BaseIconButton
-              tooltip={Tools.fitToPage}
-              onClick={() => {
-                this.props.setButtonClicked(Tools.fitToPage.name);
-                this.props.resetScaleAndPan();
-              }}
-              fill={this.props.buttonClicked === Tools.fitToPage.name}
-              tooltipPlacement="top"
-            />
-          </div>
-          {/* Background canvas for the minimap */}
-          {this.props.displayedImage && (
-            <div
-              className={this.props.classes.canvasCard}
-              style={{ position: "relative" }}
-            >
-              <BackgroundCanvas
-                scaleAndPan={{ x: 0, y: 0, scale: 1 }}
-                displayedImage={this.props.displayedImage}
-                canvasPositionAndSize={this.props.minimapPositionAndSize}
-                setCanvasPositionAndSize={this.props.setMinimapPositionAndSize}
-              />
-              <MinimapCanvas
-                displayedImage={this.props.displayedImage}
-                scaleAndPan={this.props.scaleAndPan}
-                setScaleAndPan={this.props.setScaleAndPan}
-                canvasPositionAndSize={this.props.viewportPositionAndSize}
-                minimapPositionAndSize={this.props.minimapPositionAndSize}
-                setMinimapPositionAndSize={this.props.setMinimapPositionAndSize}
-                canvasContainerColour={this.props.canvasContainerColour}
-              />
-            </div>
-          )}
-        </Card>
-      </Slide>
+  render = (): ReactElement => {
+    const tools = [
+      {
+        name: "Minimise Map",
+        icon: icons.minimise,
+        event: this.handleDrawerClose,
+      },
+      {
+        name: "Zoom In",
+        icon: icons.zoomIn,
+        event: "incrementScale",
+      },
+      {
+        name: "Zoom Out",
+        icon: icons.zoomOut,
+        event: "decrementScale",
+      },
+      {
+        name: "Fit to Page",
+        icon: icons.fitToPage,
+        event: "resetScaleAndPan",
+      },
+    ] as const;
 
-      {!this.state.isOpen ? (
-        <Slide in={!this.state.isOpen} direction="up" timeout={{ enter: 1000 }}>
+    return (
+      <div
+        className={this.props.classes.minimap}
+        style={{
+          position: "fixed",
+        }}
+      >
+        <Slide in={this.state.isOpen} direction="up" timeout={1000}>
           <Card
-            className={this.props.classes.mimimapToggle}
-            style={{
-              position: "relative",
-              textAlign: "center",
-            }}
+            className={this.props.classes.minimapCard}
+            style={{ position: "relative" }}
           >
-            <BaseIconButton
-              tooltip={Tools.maximiseMap}
-              onClick={(e: MouseEvent) => {
-                this.props.setButtonClicked(
-                  Tools.maximiseMap.name,
-                  true,
-                  e.currentTarget as HTMLButtonElement
-                );
-                this.handleDrawerOpen();
-              }}
-              fill={this.props.buttonClicked === Tools.maximiseMap.name}
-              tooltipPlacement="top"
-            />
+            <div className={this.props.classes.baseIconButton}>
+              {tools.map(({ icon, name, event }) => (
+                <IconButton
+                  key={name}
+                  icon={icon}
+                  tooltip={{
+                    name,
+                    ...getShortcut(
+                      `${ToolboxName}.${
+                        typeof event === "string" ? event : event.name
+                      }`
+                    ),
+                  }}
+                  onClick={() => {
+                    this.props.setButtonClicked(name);
+                    if (typeof event === "string") {
+                      this.props[event]();
+                    } else {
+                      event();
+                    }
+                  }}
+                  fill={this.props.buttonClicked === name}
+                  tooltipPlacement="top"
+                />
+              ))}
+            </div>
+            <Divider className={this.props.classes.divider} />
+            {/* Background canvas for the minimap */}
+            {this.props.displayedImage && (
+              <div
+                className={this.props.classes.canvasCard}
+                style={{ position: "relative" }}
+              >
+                <BackgroundCanvas
+                  scaleAndPan={{ x: 0, y: 0, scale: 1 }}
+                  displayedImage={this.props.displayedImage}
+                  canvasPositionAndSize={this.props.minimapPositionAndSize}
+                  setCanvasPositionAndSize={
+                    this.props.setMinimapPositionAndSize
+                  }
+                />
+                <MinimapCanvas
+                  displayedImage={this.props.displayedImage}
+                  scaleAndPan={this.props.scaleAndPan}
+                  setScaleAndPan={this.props.setScaleAndPan}
+                  canvasPositionAndSize={this.props.viewportPositionAndSize}
+                  minimapPositionAndSize={this.props.minimapPositionAndSize}
+                  setMinimapPositionAndSize={
+                    this.props.setMinimapPositionAndSize
+                  }
+                  canvasContainerColour={this.props.canvasContainerColour}
+                />
+              </div>
+            )}
           </Card>
         </Slide>
-      ) : null}
-    </div>
-  );
+
+        {!this.state.isOpen ? (
+          <Slide
+            in={this.state.transition}
+            direction="up"
+            timeout={{ enter: 1000 }}
+          >
+            <Card
+              className={this.props.classes.mimimapToggle}
+              style={{
+                position: "relative",
+                textAlign: "center",
+              }}
+            >
+              <IconButton
+                icon={icons.maximise}
+                tooltip={{
+                  name: "Maximise Map",
+                  ...getShortcut(`${ToolboxName}.maximiseMap`),
+                }}
+                onClick={(e: MouseEvent) => {
+                  this.props.setButtonClicked(
+                    "Maximise Map",
+                    true,
+                    e.currentTarget as HTMLButtonElement
+                  );
+                  this.handleDrawerOpen();
+                }}
+                fill={this.props.buttonClicked === "Maximise Map"}
+                tooltipPlacement="top"
+              />
+            </Card>
+          </Slide>
+        ) : null}
+      </div>
+    );
+  };
 }
 
 const styledMinimap = withStyles(styles)(Minimap);
-export { styledMinimap as Minimap };
+export { styledMinimap as Minimap, ToolboxName };
