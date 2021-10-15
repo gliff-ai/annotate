@@ -28,8 +28,6 @@ interface State {
   canvasPositionAndSize: PositionAndSize;
 }
 
-// Here we define the methods that are exposed to be called by keyboard shortcuts
-// We should maybe namespace them so we don't get conflicting methods across toolboxes.
 export const events = [
   "deleteSelectedPoint",
   "deselectPoint",

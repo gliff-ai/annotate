@@ -768,7 +768,7 @@ class UserInterface extends Component<Props, State> {
               setRefCallback={(ref: HTMLButtonElement) => {
                 this.refBtnsPopovers[name] = ref;
               }}
-              enabled={enabled()}
+              disabled={!enabled()}
             />
           ))}
 

@@ -23,8 +23,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   const submenuEvents = [
     "selectSpline",
     "selectLassoSpline",
-    "closeSpline",
-    "convertSpline",
+    // "closeSpline", // This is listened for in the canvas, the keybinding calls that directly
+    // "convertSpline", // This is listened for in the canvas, the keybinding calls that directly
   ] as const;
 
   const selectSpline = () => {

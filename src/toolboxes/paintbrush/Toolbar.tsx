@@ -79,7 +79,6 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   const submenuEvents = [
     "selectBrush",
     "selectEraser",
-    "fillBrush",
     "toggleShowTransparency",
   ] as const;
 
