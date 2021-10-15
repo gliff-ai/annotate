@@ -1,7 +1,9 @@
 import { Component, ReactElement } from "react";
-import { BaseIconButton } from "@gliff-ai/style";
-import { Tools } from "@/tooltips";
+import { IconButton, icons } from "@gliff-ai/style";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
+import { getShortcut } from "@/keybindings";
+
+const ToolboxName: Toolbox = "boundingBox";
 
 const events = ["selectBoundingBox"] as const;
 
@@ -17,13 +19,6 @@ interface Props {
 }
 
 class Toolbar extends Component<Props> {
-  private refSplinePopover: HTMLButtonElement;
-
-  constructor(props: Props) {
-    super(props);
-    this.refSplinePopover = null;
-  }
-
   componentDidMount = (): void => {
     for (const event of events) {
       document.addEventListener(event, this.handleEvent);
@@ -37,26 +32,30 @@ class Toolbar extends Component<Props> {
   }
 
   handleEvent = (event: Event): void => {
-    if (event.detail === Tools.boundingBox.name) {
+    if (event.detail === "Rectangular Bounding Box") {
       this[event.type]?.call(this);
     }
   };
 
   selectBoundingBox = (): void => {
     if (this.props.isTyping()) return;
-    this.props.setButtonClicked(Tools.boundingBox.name);
+    this.props.setButtonClicked("Rectangular Bounding Box");
     this.props.activateToolbox(Toolboxes.boundingBox);
   };
 
   render = (): ReactElement => (
     <>
-      <BaseIconButton
-        tooltip={Tools.boundingBox}
+      <IconButton
+        tooltip={{
+          name: "Rectangular Bounding Box",
+          ...getShortcut(`${ToolboxName}.selectBoundingBox`),
+        }}
+        icon={icons.boundingBox}
+        fill={this.props.buttonClicked === "Rectangular Bounding Box"}
         onClick={this.selectBoundingBox}
-        fill={this.props.buttonClicked === Tools.boundingBox.name}
       />
     </>
   );
 }
 
-export { Toolbar };
+export { Toolbar, ToolboxName };

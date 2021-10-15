@@ -3,7 +3,7 @@ import { theme } from "@gliff-ai/style";
 import { Mode } from "@/ui";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
 import { Annotations } from "@/annotation";
-import { XYPoint } from "@/annotation/interfaces";
+import { XYPoint, PositionAndSize } from "@/annotation/interfaces";
 import {
   BaseCanvas,
   CanvasProps,
@@ -27,7 +27,7 @@ type SelectedCorners =
   | "bottomRight"
   | "bottomLeft";
 
-interface Props extends CanvasProps {
+interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   activeToolbox: Toolbox;
   mode: Mode;
   annotationsObject: Annotations;
@@ -35,6 +35,10 @@ interface Props extends CanvasProps {
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
   setActiveToolbox: (tool: Toolbox) => void;
+}
+
+interface State {
+  canvasPositionAndSize: PositionAndSize;
 }
 
 // Here we define the methods that are exposed to be called by keyboard shortcuts
@@ -50,7 +54,7 @@ interface Event extends CustomEvent {
 
 type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 
-export class CanvasClass extends Component<Props> {
+export class CanvasClass extends Component<Props, State> {
   readonly name = Toolboxes.boundingBox;
 
   private baseCanvas: BaseCanvas;
@@ -65,6 +69,9 @@ export class CanvasClass extends Component<Props> {
     super(props);
     this.selectedCorner = "none";
     this.isMouseDown = false;
+    this.state = {
+      canvasPositionAndSize: { top: 0, left: 0, width: 0, height: 0 },
+    };
   }
 
   componentDidMount(): void {
@@ -133,7 +140,7 @@ export class CanvasClass extends Component<Props> {
         this.props.displayedImage.width,
         this.props.displayedImage.height,
         this.props.scaleAndPan,
-        this.props.canvasPositionAndSize
+        this.state.canvasPositionAndSize
       ));
       context.beginPath();
       context.fillRect(
@@ -165,7 +172,7 @@ export class CanvasClass extends Component<Props> {
         this.props.displayedImage.width,
         this.props.displayedImage.height,
         this.props.scaleAndPan,
-        this.props.canvasPositionAndSize
+        this.state.canvasPositionAndSize
       );
     }
 
@@ -300,7 +307,7 @@ export class CanvasClass extends Component<Props> {
       this.props.displayedImage.width,
       this.props.displayedImage.height,
       this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
+      this.state.canvasPositionAndSize
     );
 
     for (let i = 0; i < cornersVector.length; i += 1) {
@@ -312,7 +319,7 @@ export class CanvasClass extends Component<Props> {
         this.props.displayedImage.width,
         this.props.displayedImage.height,
         this.props.scaleAndPan,
-        this.props.canvasPositionAndSize
+        this.state.canvasPositionAndSize
       );
 
       const distanceToPoint = Math.sqrt(
@@ -361,7 +368,7 @@ export class CanvasClass extends Component<Props> {
       this.props.displayedImage.width,
       this.props.displayedImage.height,
       this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
+      this.state.canvasPositionAndSize
     );
 
     if (this.props.mode === Mode.select) {
@@ -492,7 +499,7 @@ export class CanvasClass extends Component<Props> {
       this.props.displayedImage.width,
       this.props.displayedImage.height,
       this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
+      this.state.canvasPositionAndSize
     );
 
     const nearPoint = this.clickNearCorner(clickPoint, boundingBoxCoordinates);
@@ -519,7 +526,7 @@ export class CanvasClass extends Component<Props> {
       this.props.displayedImage.width,
       this.props.displayedImage.height,
       this.props.scaleAndPan,
-      this.props.canvasPositionAndSize
+      this.state.canvasPositionAndSize
     );
 
     let boundingBoxCoordinates =
@@ -607,6 +614,23 @@ export class CanvasClass extends Component<Props> {
     this.props.annotationsObject.getSplineForActiveAnnotation().spaceTimeInfo
       .z === this.props.sliceIndex;
 
+  setCanvasPositionAndSize = (
+    newCanvasPositionAndSize: PositionAndSize
+  ): void => {
+    this.setState((prevState: State) => {
+      const { canvasPositionAndSize } = prevState;
+      return {
+        canvasPositionAndSize: {
+          top: newCanvasPositionAndSize.top || canvasPositionAndSize.top,
+          left: newCanvasPositionAndSize.left || canvasPositionAndSize.left,
+          width: newCanvasPositionAndSize.width || canvasPositionAndSize.width,
+          height:
+            newCanvasPositionAndSize.height || canvasPositionAndSize.height,
+        },
+      };
+    });
+  };
+
   render = (): ReactNode =>
     this.props?.displayedImage ? (
       <div style={{ pointerEvents: this.isActive() ? "auto" : "none" }}>
@@ -621,8 +645,8 @@ export class CanvasClass extends Component<Props> {
           }}
           name={this.name}
           scaleAndPan={this.props.scaleAndPan}
-          canvasPositionAndSize={this.props.canvasPositionAndSize}
-          setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
+          canvasPositionAndSize={this.state.canvasPositionAndSize}
+          setCanvasPositionAndSize={this.setCanvasPositionAndSize}
         />
       </div>
     ) : null;
@@ -635,7 +659,6 @@ export const Canvas = (props: Props): ReactElement => (
     annotationsObject={props.annotationsObject}
     displayedImage={props.displayedImage}
     scaleAndPan={props.scaleAndPan}
-    canvasPositionAndSize={props.canvasPositionAndSize}
     redraw={props.redraw}
     sliceIndex={props.sliceIndex}
     setUIActiveAnnotationID={props.setUIActiveAnnotationID}

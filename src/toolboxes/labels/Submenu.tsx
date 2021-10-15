@@ -2,21 +2,18 @@ import { ReactElement, MouseEvent } from "react";
 import {
   Grid,
   Typography,
-  Avatar,
   Popover,
   Card,
   Paper,
   makeStyles,
   Theme,
 } from "@material-ui/core";
-import SVG from "react-inlinesvg";
 import { Labels, Props as LabelsProps } from "./Labels";
-import { imgSrc } from "@/imgSrc";
 
 const useStyles = makeStyles((theme: Theme) => ({
   annotationCard: {
     width: "271px",
-    height: "375px",
+    height: "fit-content",
   },
   annotationPaper: {
     padding: "10px",
@@ -25,12 +22,14 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   annotationTypography: {
     display: "inline",
-    fontSize: "21px",
-    marginRight: "125px",
+    fontWeight: 500,
   },
   annotationAvatar: {
     backgroundColor: theme.palette.primary.main,
     display: "inline",
+  },
+  labelsPaper: {
+    padding: "15px",
   },
   svg: { width: "18px", height: "auto" },
 }));
@@ -58,14 +57,11 @@ export const Submenu = (props: Props): ReactElement => {
           className={classes.annotationPaper}
         >
           <Typography className={classes.annotationTypography}>
-            Annotation
+            Annotation Labels
           </Typography>
-          <Avatar className={classes.annotationAvatar}>
-            <SVG src={imgSrc("pin-icon")} className={classes.svg} />
-          </Avatar>
         </Paper>
-        <Paper elevation={0} square>
-          <Grid container justifyContent="center">
+        <Paper elevation={0} square className={classes.labelsPaper}>
+          <Grid>
             <Labels
               annotationsObject={props.annotationsObject}
               activeAnnotationID={props.activeAnnotationID}
