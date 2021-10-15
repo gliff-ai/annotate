@@ -18,9 +18,6 @@ const styles = {
     bottom: "0",
     marginTop: "30px",
     zIndex: 100,
-    [theme.breakpoints.down("md")]: {
-      right: "380px",
-    },
   },
   minimapCard: {
     width: "344px",
@@ -29,11 +26,6 @@ const styles = {
     padding: "10px",
     left: "250px",
     borderRadius: "10px 0 0 0",
-    [theme.breakpoints.down("md")]: {
-      width: "60%",
-      height: "auto",
-      left: "463px",
-    },
   },
   baseIconButton: {
     display: "flex",
@@ -49,11 +41,6 @@ const styles = {
         marginRight: "auto",
       },
     },
-    [theme.breakpoints.down("md")]: {
-      display: "inline-block",
-      justifyContent: "flex-end",
-      margin: "-10px 0 13px",
-    },
   },
   divider: {
     width: "inherit",
@@ -63,11 +50,6 @@ const styles = {
   canvasCard: {
     width: "100%",
     height: "200px",
-    [theme.breakpoints.down("md")]: {
-      marginTop: "-30px",
-      marginBottom: "-50px",
-      width: "90%",
-    },
   },
   mimimapToggle: {
     width: "61px",
@@ -75,18 +57,6 @@ const styles = {
     left: "540px",
     borderRadius: "10px 0 0 0",
     paddingBottom: "58px",
-    [theme.breakpoints.down("md")]: {
-      left: "556px",
-      height: "30px",
-      paddingBottom: "30px",
-    },
-    "& $button": {
-      [theme.breakpoints.down("md")]: {
-        marginRight: "30px",
-        marginTop: "-7px",
-        marginLeft: "-5px",
-      },
-    },
   },
 
   miniMapToolTipAvatar: {
