@@ -18,20 +18,8 @@ interface SubmenuProps {
   onClose: (event: MouseEvent) => void;
 }
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    buttonGroup: {
-      [theme.breakpoints.down("md")]: {
-        width: "45px",
-        padding: "0px",
-      },
-    },
-  })
-);
-
 const Submenu = (props: SubmenuProps): ReactElement => {
   const [spline, setSpline] = useSplineStore();
-  const classes = useStyles();
 
   const selectSpline = () => {
     setSpline({ splineType: Tools.spline.name });
@@ -63,11 +51,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       anchorEl={props.anchorElement}
       onClose={props.onClose}
     >
-      <ButtonGroup
-        size="small"
-        id="spline-toolbar"
-        className={classes.buttonGroup}
-      >
+      <ButtonGroup size="small" id="spline-toolbar">
         <BaseIconButton
           tooltip={Tools.spline}
           onClick={selectSpline}

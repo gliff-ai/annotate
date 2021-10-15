@@ -43,7 +43,7 @@ interface Props {
 const useStyles = makeStyles(() =>
   createStyles({
     baseSlider: {
-      width: "63px",
+      width: "50px",
       height: "285px",
       textAlign: "center",
     },
@@ -59,12 +59,6 @@ const useStyles = makeStyles(() =>
     baseSliderContainer: {
       display: "flex",
       flexDirection: "row",
-    },
-    buttonGroup: {
-      [theme.breakpoints.down("md")]: {
-        width: "45px",
-        padding: "0px",
-      },
     },
   })
 );
@@ -154,7 +148,6 @@ const Submenu = (props: SubmenuProps): ReactElement => {
           orientation="vertical"
           size="small"
           id="paintbrush-toolbar"
-          className={classes.buttonGroup}
         >
           <BaseIconButton
             tooltip={Tools.paintbrush}

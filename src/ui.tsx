@@ -118,12 +118,6 @@ const styles = {
       },
     },
   },
-  buttonGroup: {
-    [theme.breakpoints.down("md")]: {
-      width: "45px",
-      padding: "0px",
-    },
-  },
 
   bottomToolbars: {
     bottom: "18px",
@@ -733,7 +727,7 @@ class UserInterface extends Component<Props, State> {
 
     const leftToolbar = (
       <Toolbar className={classes.leftToolbar}>
-        <ButtonGroup size="small" className={classes.buttonGroup}>
+        <ButtonGroup size="small">
           <BaseIconButton
             tooltip={Tools.select}
             onClick={this.toggleMode}
@@ -789,7 +783,7 @@ class UserInterface extends Component<Props, State> {
             fill={this.state.buttonClicked === Tools.redo.name}
           />
         </ButtonGroup>
-        <ButtonGroup className={classes.buttonGroup}>
+        <ButtonGroup>
           <PaintbrushToolbar
             buttonClicked={this.state.buttonClicked}
             setButtonClicked={this.setButtonClicked}
