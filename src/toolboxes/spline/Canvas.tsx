@@ -11,7 +11,6 @@ import {
   canvasToImage,
   imageToCanvas,
 } from "@/components/baseCanvas";
-import { Tools } from "./Toolbox";
 import { calculateSobel } from "./sobel";
 import { useSplineStore } from "./Store";
 
@@ -29,8 +28,6 @@ interface State {
   canvasPositionAndSize: PositionAndSize;
 }
 
-// Here we define the methods that are exposed to be called by keyboard shortcuts
-// We should maybe namespace them so we don't get conflicting methods across toolboxes.
 export const events = [
   "deleteSelectedPoint",
   "deselectPoint",
@@ -285,7 +282,7 @@ class CanvasClass extends Component<Props, State> {
 
   onClick = (x: number, y: number, isCTRL?: boolean): void => {
     // handle click to select an annotation (Mode.select)
-    // or add new point to a normal spline (Mode.draw and this.props.activeToolbox === Tools.spline.name)
+    // or add new point to a normal spline (Mode.draw and this.props.activeToolbox === "Spline")
     // or add TL or BR point to a rectangle spline (Mode.draw and this.props.activeToolbox === Tools.rectspline.name)
 
     if (this.isMouseDown) {
@@ -348,7 +345,7 @@ class CanvasClass extends Component<Props, State> {
           // else, i.e. not near an existing point
           // if the spline is not closed and we are in Mode.draw then
           // add coordinates to the current spline
-          if (this.props.activeToolbox === Tools.spline.name) {
+          if (this.props.activeToolbox === "Spline") {
             // if a normal spline, just add points as needed
             this.props.annotationsObject.addSplinePoint({
               x: imageX,
@@ -397,9 +394,9 @@ class CanvasClass extends Component<Props, State> {
     // Returns true if successful, false otherwise
 
     if (
-      this.props.activeToolbox !== Tools.spline.name &&
-      this.props.activeToolbox !== Tools.lassospline.name &&
-      this.props.activeToolbox !== Tools.magicspline.name
+      this.props.activeToolbox !== "Spline" &&
+      this.props.activeToolbox !== "Lasso Spline" &&
+      this.props.activeToolbox !== "Magic Spline"
     )
       return false;
 
@@ -505,7 +502,7 @@ class CanvasClass extends Component<Props, State> {
       this.state.canvasPositionAndSize
     );
 
-    if (this.props.activeToolbox === Tools.magicspline.name) {
+    if (this.props.activeToolbox === "Magic Spline") {
       // magic spline, add a new point and snap it to the highest gradient point within 25 pixels:
       if (this.gradientImage === undefined) {
         this.gradientImage = calculateSobel(this.props.displayedImage);
@@ -513,7 +510,7 @@ class CanvasClass extends Component<Props, State> {
       this.props.annotationsObject.addSplinePoint(clickPoint);
       this.snapToGradient(this.props.annotationsObject.getSplineLength() - 1);
       this.isMouseDown = true;
-    } else if (this.props.activeToolbox === Tools.lassospline.name) {
+    } else if (this.props.activeToolbox === "Lasso Spline") {
       // lasso spline, add a new point but no snapping
       this.props.annotationsObject.addSplinePoint(clickPoint);
       this.selectedPointIndex =
@@ -547,7 +544,7 @@ class CanvasClass extends Component<Props, State> {
     );
 
     if (
-      this.props.activeToolbox === Tools.magicspline.name &&
+      this.props.activeToolbox === "Magic Spline" &&
       this.numberOfMoves % 5 === 0
     ) {
       // magic spline, every 5 moves add a new point
@@ -561,7 +558,7 @@ class CanvasClass extends Component<Props, State> {
         25 / this.props.scaleAndPan.scale
       );
     } else if (
-      this.props.activeToolbox === Tools.lassospline.name &&
+      this.props.activeToolbox === "Lasso Spline" &&
       this.numberOfMoves % 5 === 0
     ) {
       // lasso spline, every 5 moves add a new point
@@ -631,9 +628,9 @@ class CanvasClass extends Component<Props, State> {
   };
 
   isActive = (): boolean =>
-    this.props.activeToolbox === Tools.spline.name ||
-    this.props.activeToolbox === Tools.lassospline.name ||
-    this.props.activeToolbox === Tools.magicspline.name;
+    this.props.activeToolbox === "Spline" ||
+    this.props.activeToolbox === "Lasso Spline" ||
+    this.props.activeToolbox === "Magic Spline";
 
   sliceIndexMatch = (): boolean =>
     this.props.annotationsObject.getSplineForActiveAnnotation().spaceTimeInfo

@@ -1,27 +1,42 @@
 import { Component, ReactElement, MouseEvent } from "react";
 import { ButtonGroup, Popover } from "@material-ui/core";
-import { BaseIconButton } from "@gliff-ai/style";
+import { IconButton, icons } from "@gliff-ai/style";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
-import { Tools } from "./Toolbox";
+import { getShortcut } from "@/keybindings";
 import { useSplineStore } from "./Store";
+import { useMountEffect } from "@/hooks/use-mountEffect";
 
 const events = ["selectSpline"] as const;
+
+const ToolboxName: Toolbox = "spline";
 
 interface SubmenuProps {
   isOpen: boolean;
   anchorElement: HTMLButtonElement | null;
   onClose: (event: MouseEvent) => void;
+  openSubmenu: () => void;
 }
 
 const Submenu = (props: SubmenuProps): ReactElement => {
   const [spline, setSpline] = useSplineStore();
 
+  const submenuEvents = [
+    "selectSpline",
+    "selectLassoSpline",
+    // "closeSpline", // This is listened for in the canvas, the keybinding calls that directly
+    // "convertSpline", // This is listened for in the canvas, the keybinding calls that directly
+  ] as const;
+
   const selectSpline = () => {
-    setSpline({ splineType: Tools.spline.name });
+    setSpline({ splineType: "Spline" });
+
+    return true;
   };
 
   const selectLassoSpline = () => {
-    setSpline({ splineType: Tools.lassospline.name });
+    setSpline({ splineType: "Lasso Spline" });
+
+    return true;
   };
 
   // function selectMagicSpline() {
@@ -32,13 +47,83 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     document.dispatchEvent(
       new CustomEvent("closeSpline", { detail: Toolboxes.spline })
     );
+
+    return true;
   };
 
   const convertSpline = () => {
     document.dispatchEvent(
       new CustomEvent("convertSpline", { detail: Toolboxes.spline })
     );
+
+    return true;
   };
+
+  const tools = [
+    {
+      name: "Spline",
+      icon: icons.spline,
+      event: selectSpline,
+      active: () => spline.splineType === "Spline",
+    },
+    {
+      name: "Lasso Spline",
+      icon: icons.lassoSpline,
+      event: selectLassoSpline,
+      active: () => spline.splineType === "Lasso Spline",
+    },
+
+    {
+      name: "Close Active Spline",
+      icon: icons.closeSpline,
+      event: closeSpline,
+      active: () => false,
+    },
+    {
+      name: "Convert Spline To Paintbrush",
+      icon: icons.convert,
+      event: convertSpline,
+      active: () => false,
+    },
+
+    // TODO:
+    // {
+    //   name: "Convert Spline to Paintbrush and Fill",
+    // },
+    // {
+    //   name: "Magic Spline",
+    // },
+  ];
+
+  useMountEffect(() => {
+    const submenuEventFunctions = {
+      selectSpline,
+      selectLassoSpline,
+      closeSpline,
+      convertSpline,
+    };
+
+    const handleEvent = (event: Event): void => {
+      if (event.detail === Toolboxes.spline) {
+        // If the function we call returns true, also open the popup
+        const popup = submenuEventFunctions[event.type]?.call(this) as boolean;
+        if (popup) {
+          props.openSubmenu();
+        }
+      }
+    };
+
+    for (const event of submenuEvents) {
+      document.addEventListener(event, handleEvent);
+    }
+
+    // Specify how to clean up after this effect:
+    return function cleanup() {
+      for (const event of submenuEvents) {
+        document.removeEventListener(event, handleEvent);
+      }
+    };
+  });
 
   return (
     <Popover
@@ -47,31 +132,18 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       onClose={props.onClose}
     >
       <ButtonGroup size="small" id="spline-toolbar">
-        <BaseIconButton
-          tooltip={Tools.spline}
-          onClick={selectSpline}
-          fill={spline.splineType === Tools.spline.name}
-        />
-        <BaseIconButton
-          tooltip={Tools.lassospline}
-          onClick={selectLassoSpline}
-          fill={spline.splineType === Tools.lassospline.name}
-        />
-        {/* <BaseIconButton
-          tooltip={Tools.magicspline}
-          onClick={() => selectMagicSpline}
-          fill={spline.splineType === Tools.magicspline.name}
-        /> */}
-        <BaseIconButton
-          tooltip={Tools.closespline}
-          onClick={closeSpline}
-          fill={false}
-        />
-        <BaseIconButton
-          tooltip={Tools.convertspline}
-          onClick={convertSpline}
-          fill={false}
-        />
+        {tools.map(({ icon, name, event, active }) => (
+          <IconButton
+            key={name}
+            icon={icon}
+            tooltip={{
+              name,
+              ...getShortcut(`${ToolboxName}.${event.name}`),
+            }}
+            onClick={event}
+            fill={active()}
+          />
+        ))}
       </ButtonGroup>
     </Popover>
   );
@@ -100,51 +172,38 @@ class Toolbar extends Component<Props> {
     this.refSplinePopover = null;
   }
 
-  componentDidMount = (): void => {
-    for (const event of events) {
-      document.addEventListener(event, this.handleEvent);
-    }
-  };
-
-  componentWillUnmount(): void {
-    for (const event of events) {
-      document.removeEventListener(event, this.handleEvent);
-    }
-  }
-
-  handleEvent = (event: Event): void => {
-    if (event.detail === Toolboxes.spline) {
-      this[event.type]?.call(this);
-    }
-  };
-
-  selectSpline = (): void => {
+  openSubmenu = (): void => {
     if (this.props.isTyping()) return;
     this.props.handleOpen()(this.refSplinePopover);
-    this.props.setButtonClicked(Tools.spline.name);
-    this.props.activateToolbox(Toolboxes.spline);
+    this.props.setButtonClicked("Spline");
+    this.props.activateToolbox(ToolboxName);
   };
 
   render = (): ReactElement => (
     <>
-      <BaseIconButton
-        tooltip={Tools.spline}
-        onClick={this.selectSpline}
-        fill={this.props.buttonClicked === Tools.spline.name}
-        setRefCallback={(ref) => {
+      <IconButton
+        tooltip={{
+          name: "Spline",
+          ...getShortcut("spline.selectSpline"),
+        }}
+        icon={icons.spline}
+        onClick={this.openSubmenu}
+        fill={this.props.buttonClicked === "Spline"}
+        setRefCallback={(ref: HTMLButtonElement) => {
           this.refSplinePopover = ref;
         }}
       />
       <Submenu
         isOpen={
-          this.props.buttonClicked === Tools.spline.name &&
+          this.props.buttonClicked === "Spline" &&
           Boolean(this.props.anchorElement)
         }
         anchorElement={this.props.anchorElement}
         onClose={this.props.onClose}
+        openSubmenu={this.openSubmenu}
       />
     </>
   );
 }
 
-export { Toolbar };
+export { Toolbar, ToolboxName };

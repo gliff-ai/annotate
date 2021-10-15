@@ -13,7 +13,6 @@ import {
 } from "@/components/baseCanvas";
 import { palette, getRGBAString } from "@/components/palette";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
-import { Tools } from "./Toolbox";
 import { usePaintbrushStore } from "./Store";
 import { BrushStroke } from "./interfaces";
 import { drawCapsule } from "@/download/DownloadAsTiff";
@@ -142,8 +141,7 @@ export class CanvasClass extends Component<Props, State> {
     const brush = {
       color: mainColor,
       radius: this.props.brushRadius,
-      type:
-        this.props.activeToolbox === Tools.paintbrush.name ? "paint" : "erase",
+      type: this.props.activeToolbox === "Paintbrush" ? "paint" : "erase",
     } as Brush;
 
     // Set interactionCanvas alpha (props.annotationActiveAlpha for paint, 1.0 for eraser):
@@ -358,10 +356,7 @@ export class CanvasClass extends Component<Props, State> {
       brush: {
         color,
         radius,
-        type:
-          this.props.activeToolbox === Tools.paintbrush.name
-            ? "paint"
-            : "erase",
+        type: this.props.activeToolbox === "Paintbrush" ? "paint" : "erase",
       },
     });
 
@@ -419,7 +414,7 @@ export class CanvasClass extends Component<Props, State> {
       // Start drawing
       this.isDrawing = true;
 
-      if (this.props.activeToolbox === Tools.eraser.name) {
+      if (this.props.activeToolbox === "Eraser") {
         // if using the eraser, we redraw all strokes except the active annotation,
         // then draw the active annotation on the interaction canvas and erase from
         // there as we add to this.points

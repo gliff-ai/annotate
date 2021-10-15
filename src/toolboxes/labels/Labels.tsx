@@ -4,6 +4,7 @@ import {
   ReactElement,
   useState,
   useEffect,
+  useCallback,
 } from "react";
 
 import {
@@ -20,9 +21,7 @@ import {
 
 import SVG from "react-inlinesvg";
 
-import { theme } from "@gliff-ai/style";
-
-import { imgSrc } from "@/imgSrc";
+import { theme, icons } from "@gliff-ai/style";
 
 import { Annotations } from "@/annotation";
 
@@ -76,10 +75,12 @@ export const Labels: FunctionComponent<Props> = ({
     annotationsObject.getLabels()
   );
 
-  function getMenuLabels(labels: string[]): string[] {
-    // Get array with labels that are yet to be assigned.
-    return presetLabels.filter((label) => !labels.includes(label));
-  }
+  // Get array with labels that are yet to be assigned.
+  const getMenuLabels = useCallback(
+    (labels: string[]): string[] =>
+      presetLabels.filter((label) => !labels.includes(label)),
+    [presetLabels]
+  );
 
   const [menuLabels, setMenuLabels] = useState(
     getMenuLabels(annotationsObject.getLabels())
@@ -95,11 +96,11 @@ export const Labels: FunctionComponent<Props> = ({
     setNewLabel(value);
   }
 
-  const updateAllLabels = (): void => {
+  const updateAllLabels = useCallback(() => {
     const labels = annotationsObject.getLabels();
     setAssignedLabels(labels);
     setMenuLabels(getMenuLabels(labels));
-  };
+  }, [annotationsObject, getMenuLabels]);
 
   const handleAddLabel = (label: string) => (): void => {
     // Add a label to active annotation object and update some states.
@@ -118,7 +119,7 @@ export const Labels: FunctionComponent<Props> = ({
   useEffect(() => {
     // Re-render assigned labels at change of active annotation ID.
     updateAllLabels();
-  }, [activeAnnotationID]);
+  }, [activeAnnotationID, updateAllLabels]);
 
   return (
     <>
@@ -135,12 +136,7 @@ export const Labels: FunctionComponent<Props> = ({
         onClick={handleAddLabel(newLabel)}
         edge="end"
       >
-        <SVG
-          src={imgSrc("add-icon")}
-          width="12px"
-          height="100%"
-          fill="#A1A1A1"
-        />
+        <SVG src={icons.add} width="12px" height="100%" fill="#A1A1A1" />
       </IconButton>
       <Divider className={classes.divider} />
       {assignedLabels.map((label) => (
@@ -153,7 +149,7 @@ export const Labels: FunctionComponent<Props> = ({
               onClick={handleRemoveLabel(label)}
             >
               <SVG
-                src={imgSrc("close")}
+                src={icons.removeLabel}
                 className={classes.svgSmall}
                 fill={theme.palette.primary.main}
               />
@@ -175,7 +171,7 @@ export const Labels: FunctionComponent<Props> = ({
               onClick={handleAddLabel(label)}
             >
               <SVG
-                src={imgSrc("add-icon")}
+                src={icons.add}
                 className={classes.svgSmall}
                 fill={theme.palette.text.secondary}
               />
