@@ -56,9 +56,14 @@ const useStyles = makeStyles(() =>
       background: "none",
     },
     subMenuCard: {
-      height: "65px",
+      height: "80px",
       width: "285px",
       marginLeft: "18px", // TODO other toolbars should use this approach
+    },
+    brushSize: {
+      marginLeft: "10px",
+      marginBottom: "-5px",
+      paddingTop: "6px",
     },
   })
 );
@@ -248,39 +253,41 @@ const Submenu = (props: SubmenuProps): ReactElement => {
           ))}
         </ButtonGroup>
         <Card className={classes.subMenuCard}>
-          <div>
-            <div>test</div>
-
-            <div className={classes.baseSlider}>
-              <BaseSlider
-                value={paintbrush.brushRadius * 2}
-                config={SLIDER_CONFIG[Sliders.brushRadius]}
-                onChange={() => changeBrushRadius}
-                showEndValues={false}
-              />
-            </div>
-
-            {showTransparency && (
-              <>
-                <div>
-                  <BaseSlider
-                    value={paintbrush.annotationAlpha}
-                    config={SLIDER_CONFIG[Sliders.annotationAlpha]}
-                    onChange={() => changeAnnotationTransparency}
-                    showEndValues={false}
-                  />
-                </div>
-                <div>
-                  <BaseSlider
-                    value={paintbrush.annotationActiveAlpha}
-                    config={SLIDER_CONFIG[Sliders.annotationActiveAlpha]}
-                    onChange={() => changeAnnotationTransparencyFocused}
-                    showEndValues={false}
-                  />
-                </div>
-              </>
-            )}
+          <div className={classes.brushSize}>
+            {paintbrush.brushType == "Paintbrush"
+              ? "Brush Size"
+              : "Eraser Size"}
           </div>
+
+          <div className={classes.baseSlider}>
+            <BaseSlider
+              value={paintbrush.brushRadius * 2}
+              config={SLIDER_CONFIG[Sliders.brushRadius]}
+              onChange={() => changeBrushRadius}
+              showEndValues={true}
+            />
+          </div>
+
+          {showTransparency && (
+            <>
+              <div>
+                <BaseSlider
+                  value={paintbrush.annotationAlpha}
+                  config={SLIDER_CONFIG[Sliders.annotationAlpha]}
+                  onChange={() => changeAnnotationTransparency}
+                  showEndValues={true}
+                />
+              </div>
+              <div>
+                <BaseSlider
+                  value={paintbrush.annotationActiveAlpha}
+                  config={SLIDER_CONFIG[Sliders.annotationActiveAlpha]}
+                  onChange={() => changeAnnotationTransparencyFocused}
+                  showEndValues={false}
+                />
+              </div>
+            </>
+          )}
         </Card>
       </Popover>
     </>
