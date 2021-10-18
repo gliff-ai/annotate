@@ -1,5 +1,5 @@
 import { ChangeEvent, ReactElement } from "react";
-import { makeStyles, Slider } from "@material-ui/core";
+import { Input, makeStyles, Slider } from "@material-ui/core";
 
 export interface Config {
   name: string;
@@ -22,23 +22,20 @@ function getAriaValueText(value: number): string {
   return `${value}`;
 }
 
-const useStyles = (sliderHeight?: string) =>
+const useStyles = () =>
   makeStyles({
     value: {
       width: "42px",
       height: "42px",
       border: "1px solid #02FFAD",
       borderRadius: "9px",
-      margin: "auto",
       textAlign: "center",
       padding: "10px 0",
-      marginTop: "10px",
-      marginBottom: "20px",
+      margin: "10px 20px 10px 10px",
     },
     slider: {
-      textAlign: "center",
-      height: sliderHeight || "194px",
-      marginBottom: "18px",
+      marginLeft: "10px",
+      width: "180px",
     },
     maxSliderValue: {
       marginBottom: "18px",
@@ -49,21 +46,28 @@ export const BaseSlider = ({
   value,
   config,
   onChange,
-  sliderHeight,
   showEndValues,
 }: Props): ReactElement => {
-  const classes = useStyles(sliderHeight)();
+  const classes = useStyles()();
+
+  const marks = [
+    {
+      value: 0,
+      label: `${config.min}`,
+    },
+    {
+      value: 40,
+      label: `${config.max}`,
+    },
+  ];
 
   return (
     <>
       <div className={classes.value}>{`${value}`}</div>
       <div className={classes.slider}>
-        <div className={classes.maxSliderValue}>
-          {showEndValues ? `${config.max}${config.unit}` : null}
-        </div>
         <Slider
           color="primary"
-          orientation="vertical"
+          orientation="horizontal"
           value={value}
           onChange={onChange(config.name)}
           aria-labelledby={config.id}
@@ -71,8 +75,8 @@ export const BaseSlider = ({
           min={config.min}
           max={config.max}
           getAriaValueText={getAriaValueText}
+          marks={marks}
         />
-        <div>{showEndValues ? `${config.min}${config.unit}` : null}</div>
       </div>
     </>
   );

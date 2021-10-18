@@ -45,9 +45,10 @@ interface Props {
 const useStyles = makeStyles(() =>
   createStyles({
     baseSlider: {
-      width: "63px",
-      height: "285px",
+      width: "285",
+      height: "65px",
       textAlign: "center",
+      display: "flex",
     },
     subMenu: {
       display: "flex",
@@ -55,12 +56,9 @@ const useStyles = makeStyles(() =>
       background: "none",
     },
     subMenuCard: {
-      height: "285px",
+      height: "65px",
+      width: "285px",
       marginLeft: "18px", // TODO other toolbars should use this approach
-    },
-    baseSliderContainer: {
-      display: "flex",
-      flexDirection: "row",
     },
   })
 );
@@ -250,7 +248,9 @@ const Submenu = (props: SubmenuProps): ReactElement => {
           ))}
         </ButtonGroup>
         <Card className={classes.subMenuCard}>
-          <div className={classes.baseSliderContainer}>
+          <div>
+            <div>test</div>
+
             <div className={classes.baseSlider}>
               <BaseSlider
                 value={paintbrush.brushRadius * 2}
@@ -259,9 +259,10 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                 showEndValues={false}
               />
             </div>
+
             {showTransparency && (
               <>
-                <div className={classes.baseSlider}>
+                <div>
                   <BaseSlider
                     value={paintbrush.annotationAlpha}
                     config={SLIDER_CONFIG[Sliders.annotationAlpha]}
@@ -269,7 +270,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                     showEndValues={false}
                   />
                 </div>
-                <div className={classes.baseSlider}>
+                <div>
                   <BaseSlider
                     value={paintbrush.annotationActiveAlpha}
                     config={SLIDER_CONFIG[Sliders.annotationActiveAlpha]}
