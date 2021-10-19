@@ -14,7 +14,6 @@ interface Props {
   value: number;
   config: Config;
   onChange: (arg0: string) => (arg1: ChangeEvent, arg2: number) => void;
-  showEndValues?: boolean;
   sliderHeight?: string;
 }
 
@@ -84,6 +83,5 @@ export const BaseSlider = ({
 };
 
 BaseSlider.defaultProps = {
-  showEndValues: true,
   sliderHeight: null,
 };
