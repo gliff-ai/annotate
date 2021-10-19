@@ -52,11 +52,11 @@ export const BaseSlider = ({
 
   const marks = [
     {
-      value: 0,
+      value: parseInt(`${config.min}`),
       label: `${config.min}`,
     },
     {
-      value: 40,
+      value: parseInt(`${config.max}`),
       label: `${config.max}`,
     },
   ];

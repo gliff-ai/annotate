@@ -9,6 +9,7 @@ import {
   ButtonGroup,
   Card,
   createStyles,
+  Divider,
   makeStyles,
   Popover,
 } from "@material-ui/core";
@@ -62,8 +63,12 @@ const useStyles = makeStyles(() =>
     },
     sliderName: {
       marginLeft: "10px",
-      marginBottom: "-5px",
+      marginBottom: "5px",
       paddingTop: "6px",
+    },
+    divider: {
+      margin: 0,
+      width: "100%",
     },
   })
 );
@@ -253,20 +258,23 @@ const Submenu = (props: SubmenuProps): ReactElement => {
           ))}
         </ButtonGroup>
         <Card className={classes.subMenuCard}>
-          <div className={classes.sliderName}>
-            {paintbrush.brushType == "Paintbrush"
-              ? "Brush Size"
-              : "Eraser Size"}
-          </div>
-
-          <div className={classes.baseSlider}>
-            <BaseSlider
-              value={paintbrush.brushRadius * 2}
-              config={SLIDER_CONFIG[Sliders.brushRadius]}
-              onChange={() => changeBrushRadius}
-              showEndValues={true}
-            />
-          </div>
+          {!showTransparency && (
+            <>
+              <div className={classes.sliderName}>
+                {paintbrush.brushType == "Paintbrush"
+                  ? "Brush Size"
+                  : "Eraser Size"}
+              </div>
+              <div className={classes.baseSlider}>
+                <BaseSlider
+                  value={paintbrush.brushRadius * 2}
+                  config={SLIDER_CONFIG[Sliders.brushRadius]}
+                  onChange={() => changeBrushRadius}
+                  showEndValues={true}
+                />
+              </div>
+            </>
+          )}
 
           {showTransparency && (
             <>
@@ -276,16 +284,15 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                   value={paintbrush.annotationAlpha}
                   config={SLIDER_CONFIG[Sliders.annotationAlpha]}
                   onChange={() => changeAnnotationTransparency}
-                  showEndValues={true}
                 />
               </div>
+              <Divider className={classes.divider} />
               <div className={classes.sliderName}>Active Annotation</div>
               <div className={classes.baseSlider}>
                 <BaseSlider
                   value={paintbrush.annotationActiveAlpha}
                   config={SLIDER_CONFIG[Sliders.annotationActiveAlpha]}
                   onChange={() => changeAnnotationTransparencyFocused}
-                  showEndValues={false}
                 />
               </div>
             </>
