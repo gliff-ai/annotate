@@ -261,7 +261,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
           {!showTransparency && (
             <>
               <div className={classes.sliderName}>
-                {paintbrush.brushType == "Paintbrush"
+                {paintbrush.brushType === "Paintbrush"
                   ? "Brush Size"
                   : "Eraser Size"}
               </div>
@@ -270,7 +270,6 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                   value={paintbrush.brushRadius * 2}
                   config={SLIDER_CONFIG[Sliders.brushRadius]}
                   onChange={() => changeBrushRadius}
-                  showEndValues={true}
                 />
               </div>
             </>

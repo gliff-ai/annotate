@@ -151,7 +151,9 @@ const styles = {
   },
   slicesSlider: {
     width: "63px",
-    height: "450px",
+    height: "390px",
+    top: "180px",
+    right: "18px",
   },
 };
 
@@ -924,11 +926,7 @@ class UserInterface extends Component<Props, State> {
                     <Paper
                       elevation={3}
                       className={classes.slicesSlider}
-                      style={{
-                        position: "absolute",
-                        top: "180px",
-                        right: "18px",
-                      }}
+                      style={{ position: "absolute" }}
                     >
                       <BaseSlider
                         value={this.state.sliceIndex}
