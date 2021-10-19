@@ -56,11 +56,11 @@ const useStyles = makeStyles(() =>
       background: "none",
     },
     subMenuCard: {
-      height: "80px",
       width: "285px",
+      height: "fit-content",
       marginLeft: "18px", // TODO other toolbars should use this approach
     },
-    brushSize: {
+    sliderName: {
       marginLeft: "10px",
       marginBottom: "-5px",
       paddingTop: "6px",
@@ -253,7 +253,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
           ))}
         </ButtonGroup>
         <Card className={classes.subMenuCard}>
-          <div className={classes.brushSize}>
+          <div className={classes.sliderName}>
             {paintbrush.brushType == "Paintbrush"
               ? "Brush Size"
               : "Eraser Size"}
@@ -270,7 +270,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
 
           {showTransparency && (
             <>
-              <div>
+              <div className={classes.sliderName}>Non-Active Annotation</div>
+              <div className={classes.baseSlider}>
                 <BaseSlider
                   value={paintbrush.annotationAlpha}
                   config={SLIDER_CONFIG[Sliders.annotationAlpha]}
@@ -278,7 +279,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                   showEndValues={true}
                 />
               </div>
-              <div>
+              <div className={classes.sliderName}>Active Annotation</div>
+              <div className={classes.baseSlider}>
                 <BaseSlider
                   value={paintbrush.annotationActiveAlpha}
                   config={SLIDER_CONFIG[Sliders.annotationActiveAlpha]}
