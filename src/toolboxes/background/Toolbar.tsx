@@ -59,18 +59,19 @@ const useStyles = makeStyles((theme: Theme) =>
     subMenu: {
       display: "flex",
       justifyContent: "space-between",
-      //   width: "136px",
-      height: "285px",
+      height: "fit-content",
       background: "none",
     },
     subMenuCard: {
       height: "fit-content",
+      width: "285",
       marginLeft: "18px", // TODO other toolbars should use this approach
     },
     baseSlider: {
-      width: "63px",
-      height: "auto",
+      width: "285px",
+      height: "65px",
       textAlign: "center",
+      display: "flex",
     },
     channelHeader: {
       backgroundColor: theme.palette.primary.main,
@@ -79,6 +80,11 @@ const useStyles = makeStyles((theme: Theme) =>
     channelInfo: {
       fontSize: "14px",
       fontWeight: 400,
+    },
+    sliderName: {
+      marginLeft: "10px",
+      marginBottom: "5px",
+      paddingTop: "6px",
     },
   })
 );
@@ -206,24 +212,28 @@ const Submenu = (props: SubmenuProps): ReactElement => {
         </ButtonGroup>
         <Card className={classes.subMenuCard}>
           {buttonClicked === "Brightness" && (
-            <div className={classes.baseSlider}>
-              <BaseSlider
-                value={background.brightness}
-                config={SLIDER_CONFIG[Sliders.brightness]}
-                onChange={() => changeBrightness}
-                showEndValues={false}
-              />
-            </div>
+            <>
+              <div className={classes.sliderName}>Brightness</div>
+              <div className={classes.baseSlider}>
+                <BaseSlider
+                  value={background.brightness}
+                  config={SLIDER_CONFIG[Sliders.brightness]}
+                  onChange={() => changeBrightness}
+                />
+              </div>
+            </>
           )}
           {buttonClicked === "Contrast" && (
-            <div className={classes.baseSlider}>
-              <BaseSlider
-                value={background.contrast}
-                config={SLIDER_CONFIG[Sliders.contrast]}
-                onChange={() => changeContrast}
-                showEndValues={false}
-              />
-            </div>
+            <>
+              <div className={classes.sliderName}>Contrast</div>
+              <div className={classes.baseSlider}>
+                <BaseSlider
+                  value={background.contrast}
+                  config={SLIDER_CONFIG[Sliders.contrast]}
+                  onChange={() => changeContrast}
+                />
+              </div>
+            </>
           )}
           {buttonClicked === "Channels" && props.channelControls && (
             <>
