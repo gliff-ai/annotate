@@ -494,7 +494,7 @@ class CanvasClass extends Component<Props, State> {
   };
 
   onMouseDown = (x: number, y: number): void => {
-    if (!this.sliceIndexMatch() || this.props.mode == Mode.select) return;
+    if (!this.sliceIndexMatch() || this.props.mode === Mode.select) return;
 
     const coordinates = this.props.annotationsObject.getSplineCoordinates();
 
