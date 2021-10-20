@@ -36,6 +36,7 @@ const useStyles = (sliderHeight?: string) =>
       marginLeft: "10px",
       width: "180px",
       height: sliderHeight || "194px",
+      marginTop: "10px",
     },
     maxSliderValue: {
       marginBottom: "18px",

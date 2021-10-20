@@ -62,9 +62,10 @@ const useStyles = makeStyles(() =>
       marginLeft: "18px", // TODO other toolbars should use this approach
     },
     sliderName: {
-      marginLeft: "10px",
-      marginBottom: "5px",
+      marginLeft: "12px",
+      marginBottom: "-2px",
       paddingTop: "6px",
+      fontWeight: 500,
     },
     divider: {
       margin: 0,
@@ -129,7 +130,6 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     } else {
       setShowTransparency(true);
     }
-
     return true;
   }
 
@@ -257,6 +257,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
             />
           ))}
         </ButtonGroup>
+
         <Card className={classes.subMenuCard}>
           {!showTransparency && (
             <>
