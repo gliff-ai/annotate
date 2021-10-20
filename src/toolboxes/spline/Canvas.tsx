@@ -549,7 +549,8 @@ class CanvasClass extends Component<Props, State> {
 
     if (
       this.props.activeToolbox === "Magic Spline" &&
-      this.numberOfMoves % 5 === 0 && this.isDrawing
+      this.numberOfMoves % 5 === 0 &&
+      this.isDrawing
     ) {
       // magic spline, every 5 moves add a new point
       // and snap it to the highest gradient point within 25 pixels:
@@ -563,7 +564,8 @@ class CanvasClass extends Component<Props, State> {
       );
     } else if (
       this.props.activeToolbox === "Lasso Spline" &&
-      this.numberOfMoves % 5 === 0 && this.isDrawing
+      this.numberOfMoves % 5 === 0 &&
+      this.isDrawing
     ) {
       // lasso spline, every 5 moves add a new point
       this.props.annotationsObject.addSplinePoint({
