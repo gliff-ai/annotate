@@ -771,7 +771,7 @@ class UserInterface extends Component<Props, State> {
           {saveAnnotationsCallback && (
             <IconButton
               tooltip={{ name: "Save Annotations" }}
-              icon={icons.download}
+              icon={icons.save}
               onMouseDown={() => {
                 this.setButtonClicked("Save Annotations");
                 this.saveAnnotations();
