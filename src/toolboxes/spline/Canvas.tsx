@@ -4,6 +4,7 @@ import { Toolboxes, Toolbox } from "@/Toolboxes";
 import { Mode } from "@/ui";
 import { Annotations } from "@/annotation";
 import { XYPoint, PositionAndSize } from "@/annotation/interfaces";
+import { Spline } from "@/toolboxes/spline";
 import { getRGBAString, palette } from "@/components/palette";
 import {
   BaseCanvas,
@@ -99,10 +100,12 @@ class CanvasClass extends Component<Props, State> {
   };
 
   drawSplineVector = (
-    splineVector: XYPoint[],
+    spline: Spline,
     isActive = false,
     color: string
   ): void => {
+    const splineVector = spline.coordinates;
+
     if (splineVector.length === 0) return;
 
     const { canvasContext: context } = this.baseCanvas;
@@ -161,7 +164,7 @@ class CanvasClass extends Component<Props, State> {
         );
         context.lineTo(nextPoint.x, nextPoint.y);
       }
-      if (this.props.annotationsObject.splineIsClosed()) {
+      if (spline.isClosed) {
         context.lineTo(firstPoint.x, firstPoint.y);
       }
       context.stroke();
@@ -217,7 +220,7 @@ class CanvasClass extends Component<Props, State> {
       .getAllSplines(this.props.sliceIndex)
       .forEach(([spline, i]) => {
         this.drawSplineVector(
-          spline.coordinates,
+          spline,
           i === activeAnnotationID,
           getRGBAString(palette[i % palette.length])
         );
