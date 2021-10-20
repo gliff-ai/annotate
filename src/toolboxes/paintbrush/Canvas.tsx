@@ -103,6 +103,8 @@ export class CanvasClass extends Component<Props, State> {
   componentDidUpdate(): void {
     // can't just initialize this canvas in the constructor because backgroundCanvas doesn't get
     // the correct width/height until canvasPositionAndSize is set via callback from elsewhere
+    if (!this.backgroundCanvas) return;
+
     this.tempCanvas = document.createElement("canvas");
     this.tempCtx = this.tempCanvas.getContext("2d");
     this.tempCanvas.width = this.backgroundCanvas.canvasContext.canvas.width;

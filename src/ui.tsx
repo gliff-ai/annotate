@@ -156,7 +156,7 @@ const styles = {
 };
 
 interface Props extends WithStyles<typeof styles> {
-  slicesData?: Array<Array<ImageBitmap>>;
+  slicesData?: ImageBitmap[][] | null;
   imageFileInfo?: ImageFileInfo;
   annotationsObject?: Annotations;
   presetLabels?: string[];
@@ -178,7 +178,7 @@ class UserInterface extends Component<Props, State> {
 
   private presetLabels: string[];
 
-  private slicesData: Array<Array<ImageBitmap>>;
+  private slicesData: ImageBitmap[][] | null;
 
   private imageFileInfo: ImageFileInfo | null;
 
