@@ -248,10 +248,6 @@ class UserInterface extends Component<Props, State> {
       prevProps.annotationsObject !== this.props.annotationsObject
     ) {
       this.annotationsObject = this.props.annotationsObject;
-      // Restore activeAnnotationID
-      this.annotationsObject.setActiveAnnotationID(
-        this.state.activeAnnotationID
-      );
       this.callRedraw();
     }
   };
