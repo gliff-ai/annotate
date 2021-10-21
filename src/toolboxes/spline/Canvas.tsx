@@ -208,6 +208,7 @@ class CanvasClass extends Component<Props, State> {
 
   drawAllSplines = (): void => {
     // Draw all the splines
+    if (!this.baseCanvas) return;
 
     // Clear all the splines:
     const { canvasContext: context } = this.baseCanvas;
