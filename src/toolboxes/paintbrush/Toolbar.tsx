@@ -4,6 +4,7 @@ import {
   ReactElement,
   MouseEvent,
   useState,
+  useEffect,
 } from "react";
 import {
   ButtonGroup,
@@ -29,10 +30,12 @@ interface SubmenuProps {
   anchorElement: HTMLButtonElement | null;
   onClose: (event: MouseEvent) => void;
   openSubmenu: () => void;
+  keepSubmenuOpen: boolean;
 }
 
 interface Props {
   buttonClicked: string;
+  keepSubmenuOpen: boolean;
   setButtonClicked: (buttonName: string) => void;
   activateToolbox: (activeToolbox: Toolbox) => void;
   handleOpen: (
@@ -84,6 +87,13 @@ interface Event extends CustomEvent {
 const Submenu = (props: SubmenuProps): ReactElement => {
   const [paintbrush, setPaintbrush] = usePaintbrushStore();
   const [showTransparency, setShowTransparency] = useState<boolean>(false);
+  const [openSubmenu, setOpenSubMenu] = useState<boolean>(
+    props.keepSubmenuOpen
+  );
+
+  useEffect(() => {
+    setOpenSubMenu(props.keepSubmenuOpen);
+  }, [props.keepSubmenuOpen]);
 
   const submenuEvents = [
     "selectBrush",
@@ -111,6 +121,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       ...paintbrush,
       brushType: "Paintbrush",
     });
+    setOpenSubMenu(true);
+    setShowTransparency(false);
 
     return true;
   }
@@ -120,6 +132,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       ...paintbrush,
       brushType: "Eraser",
     });
+    setOpenSubMenu(true);
+    setShowTransparency(false);
 
     return true;
   }
@@ -127,9 +141,14 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   function toggleShowTransparency() {
     if (showTransparency) {
       setShowTransparency(false);
+      setOpenSubMenu(!openSubmenu);
     } else {
       setShowTransparency(true);
     }
+    setPaintbrush({
+      ...paintbrush,
+      brushType: "",
+    });
     return true;
   }
 
@@ -257,47 +276,48 @@ const Submenu = (props: SubmenuProps): ReactElement => {
             />
           ))}
         </ButtonGroup>
+        {openSubmenu && (
+          <Card className={classes.subMenuCard}>
+            {!showTransparency && (
+              <>
+                <div className={classes.sliderName}>
+                  {paintbrush.brushType === "Paintbrush"
+                    ? "Brush Size"
+                    : "Eraser Size"}
+                </div>
+                <div className={classes.baseSlider}>
+                  <BaseSlider
+                    value={paintbrush.brushRadius * 2}
+                    config={SLIDER_CONFIG[Sliders.brushRadius]}
+                    onChange={() => changeBrushRadius}
+                  />
+                </div>
+              </>
+            )}
 
-        <Card className={classes.subMenuCard}>
-          {!showTransparency && (
-            <>
-              <div className={classes.sliderName}>
-                {paintbrush.brushType === "Paintbrush"
-                  ? "Brush Size"
-                  : "Eraser Size"}
-              </div>
-              <div className={classes.baseSlider}>
-                <BaseSlider
-                  value={paintbrush.brushRadius * 2}
-                  config={SLIDER_CONFIG[Sliders.brushRadius]}
-                  onChange={() => changeBrushRadius}
-                />
-              </div>
-            </>
-          )}
-
-          {showTransparency && (
-            <>
-              <div className={classes.sliderName}>Non-Active Annotation</div>
-              <div className={classes.baseSlider}>
-                <BaseSlider
-                  value={paintbrush.annotationAlpha}
-                  config={SLIDER_CONFIG[Sliders.annotationAlpha]}
-                  onChange={() => changeAnnotationTransparency}
-                />
-              </div>
-              <Divider className={classes.divider} />
-              <div className={classes.sliderName}>Active Annotation</div>
-              <div className={classes.baseSlider}>
-                <BaseSlider
-                  value={paintbrush.annotationActiveAlpha}
-                  config={SLIDER_CONFIG[Sliders.annotationActiveAlpha]}
-                  onChange={() => changeAnnotationTransparencyFocused}
-                />
-              </div>
-            </>
-          )}
-        </Card>
+            {showTransparency && (
+              <>
+                <div className={classes.sliderName}>Non-Active Annotation</div>
+                <div className={classes.baseSlider}>
+                  <BaseSlider
+                    value={paintbrush.annotationAlpha}
+                    config={SLIDER_CONFIG[Sliders.annotationAlpha]}
+                    onChange={() => changeAnnotationTransparency}
+                  />
+                </div>
+                <Divider className={classes.divider} />
+                <div className={classes.sliderName}>Active Annotation</div>
+                <div className={classes.baseSlider}>
+                  <BaseSlider
+                    value={paintbrush.annotationActiveAlpha}
+                    config={SLIDER_CONFIG[Sliders.annotationActiveAlpha]}
+                    onChange={() => changeAnnotationTransparencyFocused}
+                  />
+                </div>
+              </>
+            )}
+          </Card>
+        )}
       </Popover>
     </>
   );
@@ -341,6 +361,7 @@ class Toolbar extends Component<Props> {
         openSubmenu={this.openSubmenu}
         anchorElement={this.props.anchorElement}
         onClose={this.props.onClose}
+        keepSubmenuOpen={this.props.keepSubmenuOpen}
       />
     </>
   );
