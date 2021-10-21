@@ -46,6 +46,7 @@ export class Annotations {
     this.data = data || [];
     this.audit = audit || [];
     this.activeAnnotationID = 0;
+    this.initUndoRedo();
   }
 
   @log

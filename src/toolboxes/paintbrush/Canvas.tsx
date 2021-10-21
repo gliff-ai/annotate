@@ -448,7 +448,7 @@ export class CanvasClass extends Component<Props, State> {
       // Ensure the initial down position gets added to our line
       this.updateStroke(canvasX, canvasY);
 
-      // Draw cursor:
+      // Redraw cursor (it will be brighter now because this.isDrawing === true):
       this.drawCursor(canvasX, canvasY);
     } else if (this.props.mode === Mode.select) {
       // In select mode a single click allows to select a different spline annotation
@@ -475,7 +475,7 @@ export class CanvasClass extends Component<Props, State> {
       this.updateStroke(canvasX, canvasY);
     }
 
-    if (this.cursorCtx) {
+    if (this.cursorCtx && this.props.mode === Mode.draw) {
       this.drawCursor(canvasX, canvasY);
     }
   };
@@ -498,7 +498,7 @@ export class CanvasClass extends Component<Props, State> {
   };
 
   getCursor = (): Cursor => {
-    if (this.props.activeToolbox === Toolboxes.paintbrush) {
+    if (["Paintbrush", "Eraser"].includes(this.props.activeToolbox)) {
       return this.props.mode === Mode.draw ? "none" : "pointer";
     }
     return "none";

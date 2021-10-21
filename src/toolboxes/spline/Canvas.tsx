@@ -4,6 +4,7 @@ import { Toolboxes, Toolbox } from "@/Toolboxes";
 import { Mode } from "@/ui";
 import { Annotations } from "@/annotation";
 import { XYPoint, PositionAndSize } from "@/annotation/interfaces";
+import { Spline } from "@/toolboxes/spline";
 import { getRGBAString, palette } from "@/components/palette";
 import {
   BaseCanvas,
@@ -52,9 +53,9 @@ class CanvasClass extends Component<Props, State> {
 
   private selectedPointIndex: number;
 
-  private isMouseDown: boolean;
+  private isDrawing: boolean; // currently drawing magic or lasso spline
 
-  private dragPoint: XYPoint; // current position of dragged point
+  private dragPoint: XYPoint | null; // current position of dragged point, implies dragging if not null
 
   private gradientImage: ImageData;
 
@@ -63,8 +64,9 @@ class CanvasClass extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.selectedPointIndex = -1;
-    this.isMouseDown = false;
+    this.isDrawing = false;
     this.numberOfMoves = 0;
+    this.dragPoint = null;
     this.state = {
       canvasPositionAndSize: { top: 0, left: 0, width: 0, height: 0 },
     };
@@ -98,10 +100,12 @@ class CanvasClass extends Component<Props, State> {
   };
 
   drawSplineVector = (
-    splineVector: XYPoint[],
+    spline: Spline,
     isActive = false,
     color: string
   ): void => {
+    const splineVector = spline.coordinates;
+
     if (splineVector.length === 0) return;
 
     const { canvasContext: context } = this.baseCanvas;
@@ -123,7 +127,7 @@ class CanvasClass extends Component<Props, State> {
     if (splineVector.length > 1) {
       // Go to the first point
       let firstPoint: XYPoint;
-      if (isActive && this.selectedPointIndex === 0 && this.isMouseDown) {
+      if (isActive && this.selectedPointIndex === 0 && this.dragPoint) {
         firstPoint = this.dragPoint;
       } else {
         firstPoint = splineVector[0]; // eslint-disable-line prefer-destructuring
@@ -144,7 +148,7 @@ class CanvasClass extends Component<Props, State> {
       // Draw each point by taking our raw coordinates and applying the transform so they fit on our canvas
       for (const [idx, { x, y }] of splineVector.entries()) {
         let drawPoint: XYPoint;
-        if (isActive && this.isMouseDown && idx === this.selectedPointIndex) {
+        if (isActive && this.dragPoint && idx === this.selectedPointIndex) {
           // draw the point at the current mouse position if we're dragging it:
           drawPoint = this.dragPoint;
         } else {
@@ -160,7 +164,7 @@ class CanvasClass extends Component<Props, State> {
         );
         context.lineTo(nextPoint.x, nextPoint.y);
       }
-      if (this.props.annotationsObject.splineIsClosed()) {
+      if (spline.isClosed) {
         context.lineTo(firstPoint.x, firstPoint.y);
       }
       context.stroke();
@@ -170,7 +174,7 @@ class CanvasClass extends Component<Props, State> {
     context.beginPath();
     splineVector.forEach(({ x, y }, i) => {
       let drawPoint: XYPoint;
-      if (isActive && this.isMouseDown && i === this.selectedPointIndex) {
+      if (isActive && this.dragPoint && i === this.selectedPointIndex) {
         drawPoint = this.dragPoint;
       } else {
         drawPoint = { x, y };
@@ -216,7 +220,7 @@ class CanvasClass extends Component<Props, State> {
       .getAllSplines(this.props.sliceIndex)
       .forEach(([spline, i]) => {
         this.drawSplineVector(
-          spline.coordinates,
+          spline,
           i === activeAnnotationID,
           getRGBAString(palette[i % palette.length])
         );
@@ -285,9 +289,10 @@ class CanvasClass extends Component<Props, State> {
     // or add new point to a normal spline (Mode.draw and this.props.activeToolbox === "Spline")
     // or add TL or BR point to a rectangle spline (Mode.draw and this.props.activeToolbox === Tools.rectspline.name)
 
-    if (this.isMouseDown) {
+    if (this.isDrawing || this.dragPoint) {
       // turns out onClick still runs when releasing a drag, so we want to abort in that case:
-      this.isMouseDown = false;
+      this.isDrawing = false;
+      this.dragPoint = null;
       return;
     }
 
@@ -489,7 +494,7 @@ class CanvasClass extends Component<Props, State> {
   };
 
   onMouseDown = (x: number, y: number): void => {
-    if (!this.sliceIndexMatch()) return;
+    if (!this.sliceIndexMatch() || this.props.mode === Mode.select) return;
 
     const coordinates = this.props.annotationsObject.getSplineCoordinates();
 
@@ -509,19 +514,18 @@ class CanvasClass extends Component<Props, State> {
       }
       this.props.annotationsObject.addSplinePoint(clickPoint);
       this.snapToGradient(this.props.annotationsObject.getSplineLength() - 1);
-      this.isMouseDown = true;
+      this.isDrawing = true;
     } else if (this.props.activeToolbox === "Lasso Spline") {
       // lasso spline, add a new point but no snapping
       this.props.annotationsObject.addSplinePoint(clickPoint);
       this.selectedPointIndex =
         this.props.annotationsObject.getSplineLength() - 1;
-      this.isMouseDown = true;
+      this.isDrawing = true;
     } else {
       // normal spline, try and drag and drop existing nodes
       const nearPoint = this.clickNearPoint(clickPoint, coordinates);
       if (nearPoint !== -1) {
         this.selectedPointIndex = nearPoint;
-        this.isMouseDown = true;
         this.dragPoint = clickPoint;
       }
     }
@@ -529,7 +533,7 @@ class CanvasClass extends Component<Props, State> {
   };
 
   onMouseMove = (x: number, y: number): void => {
-    if (!this.isMouseDown) return;
+    if (!(this.isDrawing || this.dragPoint)) return;
 
     this.numberOfMoves += 1;
 
@@ -545,7 +549,8 @@ class CanvasClass extends Component<Props, State> {
 
     if (
       this.props.activeToolbox === "Magic Spline" &&
-      this.numberOfMoves % 5 === 0
+      this.numberOfMoves % 5 === 0 &&
+      this.isDrawing
     ) {
       // magic spline, every 5 moves add a new point
       // and snap it to the highest gradient point within 25 pixels:
@@ -559,7 +564,8 @@ class CanvasClass extends Component<Props, State> {
       );
     } else if (
       this.props.activeToolbox === "Lasso Spline" &&
-      this.numberOfMoves % 5 === 0
+      this.numberOfMoves % 5 === 0 &&
+      this.isDrawing
     ) {
       // lasso spline, every 5 moves add a new point
       this.props.annotationsObject.addSplinePoint({
@@ -579,7 +585,7 @@ class CanvasClass extends Component<Props, State> {
 
   onMouseUp = (): void => {
     // Works as part of drag and drop for points.
-    if (this.isMouseDown) {
+    if (this.dragPoint) {
       this.props.annotationsObject.updateSplinePoint(
         this.dragPoint.x,
         this.dragPoint.y,
