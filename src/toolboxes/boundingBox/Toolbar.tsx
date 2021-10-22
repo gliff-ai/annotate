@@ -1,8 +1,8 @@
 import { Component, ReactElement } from "react";
 import { IconButton, icons } from "@gliff-ai/style";
+import { ButtonGroup } from "@material-ui/core";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { getShortcut } from "@/keybindings";
-import { ButtonGroup } from "@material-ui/core";
 
 const ToolboxName: Toolbox = "boundingBox";
 
