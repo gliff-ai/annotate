@@ -44,7 +44,7 @@ const KeybindPopup = (): ReactElement => {
     const shortcut = getShortcut(event);
 
     return (
-      <Typography>
+      <Typography key={event}>
         {shortcut.shortcutSymbol
           ? `${shortcut.shortcutSymbol.toUpperCase()} + `
           : null}
