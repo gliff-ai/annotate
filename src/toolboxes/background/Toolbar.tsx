@@ -316,17 +316,19 @@ class Toolbar extends Component<Props> {
 
   render = (): ReactElement => (
     <>
-      <IconButton
-        tooltip={{
-          name: "Background Settings",
-        }}
-        icon={icons.backgroundSettings}
-        onClick={this.openSubmenu}
-        fill={this.props.buttonClicked === "Background Settings"}
-        setRefCallback={(ref) => {
-          this.refBackgroundSettingsPopover = ref;
-        }}
-      />
+      <ButtonGroup style={{ all: "revert" }}>
+        <IconButton
+          tooltip={{
+            name: "Background Settings",
+          }}
+          icon={icons.backgroundSettings}
+          onClick={this.openSubmenu}
+          fill={this.props.buttonClicked === "Background Settings"}
+          setRefCallback={(ref) => {
+            this.refBackgroundSettingsPopover = ref;
+          }}
+        />
+      </ButtonGroup>
 
       <Submenu
         isOpen={

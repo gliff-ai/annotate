@@ -813,6 +813,7 @@ class UserInterface extends Component<Props, State> {
             anchorElement={this.state.anchorElement}
             isTyping={this.isTyping}
           />
+
           <BoundingBoxToolbar
             buttonClicked={this.state.buttonClicked}
             setButtonClicked={this.setButtonClicked}
