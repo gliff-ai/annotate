@@ -2,10 +2,10 @@ const { keydownListener, getShortcut } = require("./index");
 
 global.navigator = { ...global.navigator, platform: "MacOS" };
 const bindings = {
-  KeyA: "test.Only A",
-  "cmdCtrl+KeyA": "test.Ctrl + A",
-  "cmdCtrl+shift+KeyA": "test.Ctrl + Shift + A",
-  Backspace: "test.backspace",
+  KeyA: ["test.Only A", ""],
+  "cmdCtrl+KeyA": ["test.Ctrl + A", ""],
+  "cmdCtrl+shift+KeyA": ["test.Ctrl + Shift + A", ""],
+  Backspace: ["test.backspace", ""],
 };
 
 test("Handles standard keys", (done: any): void => {

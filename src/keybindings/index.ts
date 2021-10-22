@@ -1,4 +1,5 @@
 import { keybindings, displayNames } from "./keybindings";
+import type { NamespacedMethod } from "./keybindings";
 
 const isMacLookup =
   navigator.platform.startsWith("mac") || navigator.platform.startsWith("Mac");
@@ -22,18 +23,18 @@ const keydownListener = (
   }
 
   if (keybindingsMap[code]) {
-    const [namespace, method] = keybindingsMap[code].split(".");
+    const [namespace, method] = keybindingsMap[code][0].split(".");
     document.dispatchEvent(new CustomEvent(method, { detail: namespace }));
   }
 };
 
 export function getShortcut(
-  value: string,
+  value: NamespacedMethod,
   bindings = keybindings,
   isMac = isMacLookup
 ): { shortcutSymbol?: string; shortcut?: string } {
   const [shortcut] =
-    Object.entries(bindings).find(([, v]) => v === value) || [];
+    Object.entries(bindings).find(([, v]) => v[0] === value) || [];
 
   if (!shortcut) return {};
 
