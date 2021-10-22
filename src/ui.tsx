@@ -120,16 +120,6 @@ const styles = {
     zIndex: 100,
     justifyContent: "space-between",
     position: "fixed" as const,
-    // Material doesn't seem to propogate styles to our toolbar IconButtons in the same way as regular IconButtons so force it like this..
-    "& > div > span > button": {
-      minWidth: "40px",
-      paddingLeft: "8px",
-      paddingRight: "8px",
-      [breakpoints.down("md")]: {
-        paddingLeft: "0px",
-        paddingRight: "0px",
-      },
-    },
   },
   bottomToolbars: {
     bottom: "18px",
