@@ -12,6 +12,7 @@ import {
   ThemeProvider,
   StylesProvider,
 } from "@material-ui/core";
+import createBreakpoints from "@material-ui/core/styles/createBreakpoints";
 import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
 import {
   theme,
@@ -36,6 +37,8 @@ import { LabelsSubmenu } from "@/toolboxes/labels";
 import { Download } from "@/download/UI";
 import { getShortcut, keydownListener } from "@/keybindings";
 import { BaseSlider, Config } from "@/components/BaseSlider";
+
+const breakpoints = createBreakpoints({});
 
 const logger = console;
 
@@ -117,6 +120,16 @@ const styles = {
     zIndex: 100,
     justifyContent: "space-between",
     position: "fixed" as const,
+    // Material doesn't seem to propogate styles to our toolbar IconButtons in the same way as regular IconButtons so force it like this..
+    "& > div > span > button": {
+      minWidth: "40px",
+      paddingLeft: "8px",
+      paddingRight: "8px",
+      [breakpoints.down("md")]: {
+        paddingLeft: "0px",
+        paddingRight: "0px",
+      },
+    },
   },
   bottomToolbars: {
     bottom: "18px",
@@ -760,7 +773,7 @@ class UserInterface extends Component<Props, State> {
 
     const leftToolbar = (
       <Toolbar className={classes.leftToolbar}>
-        <ButtonGroup size="small">
+        <ButtonGroup>
           {tools.map(({ icon, name, event, active, enabled }) => (
             <IconButton
               key={name}
