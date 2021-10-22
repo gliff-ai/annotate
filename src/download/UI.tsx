@@ -158,7 +158,7 @@ class DownloadUI extends Component<Props, State> {
     return (
       <>
         <IconButton
-          tooltip={{ name: "Save Annotations" }}
+          tooltip={{ name: "Download Annotations" }}
           onClick={this.handleOpen}
           icon={icons.download}
           tooltipPlacement="bottom"
