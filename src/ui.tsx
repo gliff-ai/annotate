@@ -12,7 +12,6 @@ import {
   ThemeProvider,
   StylesProvider,
 } from "@material-ui/core";
-import createBreakpoints from "@material-ui/core/styles/createBreakpoints";
 import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
 import {
   theme,
@@ -37,8 +36,6 @@ import { LabelsSubmenu } from "@/toolboxes/labels";
 import { Download } from "@/download/UI";
 import { getShortcut, keydownListener } from "@/keybindings";
 import { BaseSlider, Config } from "@/components/BaseSlider";
-
-const breakpoints = createBreakpoints({});
 
 const logger = console;
 
