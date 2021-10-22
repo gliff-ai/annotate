@@ -340,18 +340,20 @@ class Toolbar extends Component<Props> {
 
   render = (): ReactElement => (
     <>
-      <IconButton
-        tooltip={{
-          name: "Paintbush",
-          ...getShortcut("paintbrush.selectBrush"),
-        }}
-        icon={icons.brush}
-        onClick={this.openSubmenu}
-        fill={this.props.buttonClicked === "Paintbrush"}
-        setRefCallback={(ref: HTMLButtonElement) => {
-          this.refBrushPopover = ref;
-        }}
-      />
+      <ButtonGroup style={{ all: "revert" }}>
+        <IconButton
+          tooltip={{
+            name: "Paintbush",
+            ...getShortcut("paintbrush.selectBrush"),
+          }}
+          icon={icons.brush}
+          onClick={this.openSubmenu}
+          fill={this.props.buttonClicked === "Paintbrush"}
+          setRefCallback={(ref: HTMLButtonElement) => {
+            this.refBrushPopover = ref;
+          }}
+        />
+      </ButtonGroup>
 
       <Submenu
         isOpen={

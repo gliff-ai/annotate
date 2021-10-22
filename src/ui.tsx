@@ -599,12 +599,9 @@ class UserInterface extends Component<Props, State> {
     }, this.mixChannels);
   };
 
-  handleClose = () => {
+  handleClose = (): void => {
     this.setState({ anchorElement: null });
-
-    setTimeout(() => {
-      this.setState({ keepSubmenuOpen: false });
-    }, 4000);
+    this.setState({ keepSubmenuOpen: false });
   };
 
   handleOpen =
@@ -826,6 +823,7 @@ class UserInterface extends Component<Props, State> {
             anchorElement={this.state.anchorElement}
             isTyping={this.isTyping}
           />
+
           <BoundingBoxToolbar
             buttonClicked={this.state.buttonClicked}
             setButtonClicked={this.setButtonClicked}
