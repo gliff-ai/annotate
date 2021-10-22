@@ -689,8 +689,6 @@ class UserInterface extends Component<Props, State> {
         <Grid container direction="row">
           {uploadDownload}
         </Grid>
-
-        <KeybindPopup />
       </div>
     ) : (
       <AppBar position="fixed" className={classes.appbar}>
@@ -700,6 +698,7 @@ class UserInterface extends Component<Props, State> {
               <Logo />
             </Grid>
           </Grid>
+          <KeybindPopup />
 
           {uploadDownload}
         </Toolbar>

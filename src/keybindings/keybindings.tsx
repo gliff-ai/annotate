@@ -19,19 +19,23 @@ type NamespacedMethod = `${
 
 const unassigned = () => Symbol(null);
 
-// TODO: all of these!
+// TODO: Icons for backspace etc
 const displayNames = (
   isMac = false
 ): {
   [key: string]: string;
 } =>
   ({
-    Backspace: "&#x232b;",
+    Backspace: "Backspace",
+    Escape: "Esc",
     cmdCtrl: isMac ? "CMD" : "CTRL",
     altOption: isMac ? "OPT" : "ALT",
     Slash: "/",
+    Backslash: "\\",
     Equal: "=",
     Minus: "-",
+    ArrowLeft: "Left",
+    ArrowRight: "Right",
   } as Readonly<{
     [key: string]: string;
   }>);
@@ -83,9 +87,10 @@ const keybindings = {
 
   "cmdCtrl+Digit1": ["minimap.handleDrawerOpen", "Open minimap"],
   "cmdCtrl+Digit2": ["minimap.handleDrawerClose", "Close minimap"],
-  "cmdCtrl+KeyEquals": ["ui.incrementScale", "Zoom in"],
-  "cmdCtrl+KeyMinus": ["ui.decrementScale", "Zoom out"],
+  "cmdCtrl+Equal": ["ui.incrementScale", "Zoom in"],
+  "cmdCtrl+Minus": ["ui.decrementScale", "Zoom out"],
   "altOption+Digit0": ["ui.resetScaleAndPan", "Reset zoom and pan"],
+  F1: ["ui.openKeybinds", "Open shortcuts"],
 
   [unassigned()]: ["spline.changeSplineModeToEdit", ""],
 } as Readonly<{
