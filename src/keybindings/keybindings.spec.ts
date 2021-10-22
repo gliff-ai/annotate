@@ -53,7 +53,7 @@ test("Correctly gets shortcut keys", (): void => {
     shortcut: "A",
   });
   expect(getShortcut("test.backspace", bindings)).toEqual({
-    shortcut: "&#x232b;",
+    shortcut: "Backspace",
   });
 });
 
@@ -64,6 +64,6 @@ test("Correctly gets Mac shortcut keys", (): void => {
     shortcut: "A",
   });
   expect(getShortcut("test.backspace", bindings, true)).toEqual({
-    shortcut: "&#x232b;",
+    shortcut: "Backspace",
   });
 });
