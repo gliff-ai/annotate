@@ -80,6 +80,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     "selectBrush",
     "selectEraser",
     "toggleShowTransparency",
+    "fillBrush",
   ] as const;
 
   const classes = useStyles();

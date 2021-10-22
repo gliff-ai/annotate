@@ -37,34 +37,57 @@ const displayNames = (
   }>);
 
 const keybindings = {
-  Equal: ["ui.addAnnotation", ""],
-  Minus: ["ui.clearActiveAnnotation", ""],
-  KeyA: ["ui.toggleMode", ""],
-  KeyB: ["paintbrush.selectBrush", ""],
-  KeyE: ["paintbrush.selectEraser", ""],
-  KeyP: ["paintbrush.togglePixelView", ""],
-  KeyS: ["spline.selectSpline", ""],
-  KeyD: ["download.openDownloadDropdown", ""],
-  Backslash: ["ui.selectContrast", ""],
-  Slash: ["ui.selectBrightness", ""],
-  KeyC: ["ui.selectChannels", ""],
-  "cmdCtrl+Space": ["ui.selectAnnotationLabel", ""],
-  Backspace: ["spline.deleteSelectedPoint", ""],
-  Escape: ["spline.deselectPoint", ""],
-  "cmdCtrl+KeyS": ["ui.saveAnnotations", ""],
-  "cmdCtrl+KeyQ": ["spline.convertSpline", ""],
-  "cmdCtrl+KeyZ": ["ui.undo", ""],
-  "cmdCtrl+KeyY": ["ui.redo", ""],
-  "cmdCtrl+ArrowLeft": ["ui.previousAnnotation", ""],
-  "cmdCtrl+ArrowRight": ["ui.nextAnnotation", ""],
-  "altOption+Equal": ["minimap.handleDrawerOpen", ""],
-  "altOption+Minus": ["minimap.handleDrawerClose", ""],
-  "altOption+Digit1": ["ui.incrementScale", ""],
-  "altOption+Digit2": ["ui.decrementScale", ""],
-  "altOption+Digit3": ["ui.resetScaleAndPan", ""],
+  KeyA: ["ui.toggleMode", "Toggle select/draw mode"],
+
+  Equal: ["ui.addAnnotation", "Add new annotation"],
+  Minus: ["ui.clearActiveAnnotation", "Clear active annotation"],
+  "cmdCtrl+KeyS": ["ui.saveAnnotations", "Save annotations"],
+  "altOption+KeyL": ["ui.selectAnnotationLabel", "Show annotation labels"],
+
+  "cmdCtrl+KeyZ": ["ui.undo", "Undo last action"],
+  "cmdCtrl+KeyY": ["ui.redo", "Redo last undo"],
+
+  KeyB: ["paintbrush.selectBrush", "Select Brush tool"],
+  KeyE: ["paintbrush.selectEraser", "Select Brush Eraser tool"],
+  KeyF: ["paintbrush.fillBrush", "Fill active brush"],
+  KeyP: [
+    "paintbrush.togglePixelView",
+    "Convert vector brush strokes to pixels",
+  ],
+  KeyT: [
+    "paintbrush.toggleShowTransparency",
+    "Change paintbrush annotation transparency",
+  ],
+
+  KeyS: ["spline.selectSpline", "Select Spline tool"],
+  KeyL: ["spline.selectLassoSpline", "Select Lasso Spline tool"],
+  KeyO: ["spline.closeSpline", "Close active spline"],
+  "altOption+C": ["spline.convertSpline", "Convert Spline to paintbrush"],
+  Backspace: ["spline.deleteSelectedPoint", "Delete selected spline point"],
+  Escape: ["spline.deselectPoint", "Deselect spline point"],
+
+  KeyR: [
+    "boundingBox.selectBoundingBox",
+    "Select Retangular Bounding Box tool",
+  ],
+
+  Backslash: ["ui.selectContrast", "Open Contrast slider"],
+  Slash: ["ui.selectBrightness", "Open Brightness slider"],
+  KeyC: ["ui.selectChannels", "Open Channel selector"],
+
+  KeyD: ["download.openDownloadDropdown", "Download Annotations"],
+  // KeyU: ["download.openDownloadDropdown", "Upload images"], // TODO no method listener for this
+
+  "cmdCtrl+ArrowLeft": ["ui.previousAnnotation", "Select previous annotation"],
+  "cmdCtrl+ArrowRight": ["ui.nextAnnotation", "Select next annotation"],
+
+  "cmdCtrl+Digit1": ["minimap.handleDrawerOpen", "Open minimap"],
+  "cmdCtrl+Digit2": ["minimap.handleDrawerClose", "Close minimap"],
+  "cmdCtrl+KeyEquals": ["ui.incrementScale", "Zoom in"],
+  "cmdCtrl+KeyMinus": ["ui.decrementScale", "Zoom out"],
+  "altOption+Digit0": ["ui.resetScaleAndPan", "Reset zoom and pan"],
 
   [unassigned()]: ["spline.changeSplineModeToEdit", ""],
-  [unassigned()]: ["spline.closeSpline", ""],
 } as Readonly<{
   [key: string | symbol]: [NamespacedMethod, string];
 }>;
