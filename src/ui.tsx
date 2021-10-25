@@ -36,6 +36,7 @@ import { LabelsSubmenu } from "@/toolboxes/labels";
 import { Download } from "@/download/UI";
 import { getShortcut, keydownListener } from "@/keybindings";
 import { BaseSlider, Config } from "@/components/BaseSlider";
+import { KeybindPopup } from "./keybindings/KeybindPopup";
 
 const logger = console;
 
@@ -159,7 +160,7 @@ const styles = {
 };
 
 interface Props extends WithStyles<typeof styles> {
-  slicesData?: Array<Array<ImageBitmap>>;
+  slicesData?: ImageBitmap[][] | null;
   imageFileInfo?: ImageFileInfo;
   annotationsObject?: Annotations;
   presetLabels?: string[];
@@ -181,7 +182,7 @@ class UserInterface extends Component<Props, State> {
 
   private presetLabels: string[];
 
-  private slicesData: Array<Array<ImageBitmap>>;
+  private slicesData: ImageBitmap[][] | null;
 
   private imageFileInfo: ImageFileInfo | null;
 
@@ -704,6 +705,7 @@ class UserInterface extends Component<Props, State> {
               <Logo />
             </Grid>
           </Grid>
+          <KeybindPopup />
 
           {uploadDownload}
         </Toolbar>
@@ -757,7 +759,7 @@ class UserInterface extends Component<Props, State> {
 
     const leftToolbar = (
       <Toolbar className={classes.leftToolbar}>
-        <ButtonGroup size="small">
+        <ButtonGroup>
           {tools.map(({ icon, name, event, active, enabled }) => (
             <IconButton
               key={name}
@@ -778,7 +780,7 @@ class UserInterface extends Component<Props, State> {
           {saveAnnotationsCallback && (
             <IconButton
               tooltip={{ name: "Save Annotations" }}
-              icon={icons.download}
+              icon={icons.save}
               onMouseDown={() => {
                 this.setButtonClicked("Save Annotations");
                 this.saveAnnotations();
