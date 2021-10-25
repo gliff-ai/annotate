@@ -181,18 +181,21 @@ class Toolbar extends Component<Props> {
 
   render = (): ReactElement => (
     <>
-      <IconButton
-        tooltip={{
-          name: "Spline",
-          ...getShortcut("spline.selectSpline"),
-        }}
-        icon={icons.spline}
-        onClick={this.openSubmenu}
-        fill={this.props.buttonClicked === "Spline"}
-        setRefCallback={(ref: HTMLButtonElement) => {
-          this.refSplinePopover = ref;
-        }}
-      />
+      <ButtonGroup style={{ all: "revert" }}>
+        <IconButton
+          tooltip={{
+            name: "Spline",
+            ...getShortcut("spline.selectSpline"),
+          }}
+          icon={icons.spline}
+          onClick={this.openSubmenu}
+          fill={this.props.buttonClicked === "Spline"}
+          setRefCallback={(ref: HTMLButtonElement) => {
+            this.refSplinePopover = ref;
+          }}
+        />
+      </ButtonGroup>
+
       <Submenu
         isOpen={
           this.props.buttonClicked === "Spline" &&

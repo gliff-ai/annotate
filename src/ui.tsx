@@ -85,6 +85,7 @@ interface State {
   redraw: number;
   sliceIndex: number;
   channels: boolean[];
+  keepSubmenuOpen: boolean;
   anchorElement: HTMLButtonElement | null; // A HTML element. It's used to set the position of the popover menu https://material-ui.com/api/menu/#props
   buttonClicked: string;
   mode: Mode;
@@ -152,7 +153,9 @@ const styles = {
   },
   slicesSlider: {
     width: "63px",
-    height: "450px",
+    height: "390px",
+    top: "180px",
+    right: "18px",
   },
 };
 
@@ -204,6 +207,7 @@ class UserInterface extends Component<Props, State> {
       displayedImage: this.slicesData ? this.slicesData[0][0] : null,
       redraw: 0,
       anchorElement: null,
+      keepSubmenuOpen: true,
       buttonClicked: null,
       activeToolbox: Toolboxes.paintbrush,
       mode: Mode.draw,
@@ -583,7 +587,10 @@ class UserInterface extends Component<Props, State> {
     }, this.mixChannels);
   };
 
-  handleClose = (): void => this.setState({ anchorElement: null });
+  handleClose = (): void => {
+    this.setState({ anchorElement: null });
+    this.setState({ keepSubmenuOpen: false });
+  };
 
   handleOpen =
     (event?: React.MouseEvent) =>
@@ -752,7 +759,7 @@ class UserInterface extends Component<Props, State> {
 
     const leftToolbar = (
       <Toolbar className={classes.leftToolbar}>
-        <ButtonGroup size="small">
+        <ButtonGroup>
           {tools.map(({ icon, name, event, active, enabled }) => (
             <IconButton
               key={name}
@@ -792,6 +799,7 @@ class UserInterface extends Component<Props, State> {
             activateToolbox={this.activateToolbox}
             handleOpen={this.handleOpen}
             onClose={this.handleClose}
+            keepSubmenuOpen={this.state.keepSubmenuOpen}
             anchorElement={this.state.anchorElement}
             isTyping={this.isTyping}
           />
@@ -804,6 +812,7 @@ class UserInterface extends Component<Props, State> {
             anchorElement={this.state.anchorElement}
             isTyping={this.isTyping}
           />
+
           <BoundingBoxToolbar
             buttonClicked={this.state.buttonClicked}
             setButtonClicked={this.setButtonClicked}
@@ -922,11 +931,7 @@ class UserInterface extends Component<Props, State> {
                     <Paper
                       elevation={3}
                       className={classes.slicesSlider}
-                      style={{
-                        position: "absolute",
-                        top: "180px",
-                        right: "18px",
-                      }}
+                      style={{ position: "absolute" }}
                     >
                       <BaseSlider
                         value={this.state.sliceIndex}

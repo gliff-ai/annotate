@@ -1,5 +1,6 @@
 import { Component, ReactElement } from "react";
 import { IconButton, icons } from "@gliff-ai/style";
+import { ButtonGroup } from "@material-ui/core";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { getShortcut } from "@/keybindings";
 
@@ -45,15 +46,17 @@ class Toolbar extends Component<Props> {
 
   render = (): ReactElement => (
     <>
-      <IconButton
-        tooltip={{
-          name: "Rectangular Bounding Box",
-          ...getShortcut(`${ToolboxName}.selectBoundingBox`),
-        }}
-        icon={icons.boundingBox}
-        fill={this.props.buttonClicked === "Rectangular Bounding Box"}
-        onClick={this.selectBoundingBox}
-      />
+      <ButtonGroup style={{ all: "revert" }}>
+        <IconButton
+          tooltip={{
+            name: "Rectangular Bounding Box",
+            ...getShortcut(`${ToolboxName}.selectBoundingBox`),
+          }}
+          icon={icons.boundingBox}
+          fill={this.props.buttonClicked === "Rectangular Bounding Box"}
+          onClick={this.selectBoundingBox}
+        />
+      </ButtonGroup>
     </>
   );
 }

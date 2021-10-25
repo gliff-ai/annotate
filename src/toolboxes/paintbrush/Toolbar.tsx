@@ -4,11 +4,13 @@ import {
   ReactElement,
   MouseEvent,
   useState,
+  useEffect,
 } from "react";
 import {
   ButtonGroup,
   Card,
   createStyles,
+  Divider,
   makeStyles,
   Popover,
 } from "@material-ui/core";
@@ -28,10 +30,12 @@ interface SubmenuProps {
   anchorElement: HTMLButtonElement | null;
   onClose: (event: MouseEvent) => void;
   openSubmenu: () => void;
+  keepSubmenuOpen: boolean;
 }
 
 interface Props {
   buttonClicked: string;
+  keepSubmenuOpen: boolean;
   setButtonClicked: (buttonName: string) => void;
   activateToolbox: (activeToolbox: Toolbox) => void;
   handleOpen: (
@@ -45,9 +49,10 @@ interface Props {
 const useStyles = makeStyles(() =>
   createStyles({
     baseSlider: {
-      width: "63px",
-      height: "285px",
+      width: "285",
+      height: "65px",
       textAlign: "center",
+      display: "flex",
     },
     subMenu: {
       display: "flex",
@@ -55,12 +60,19 @@ const useStyles = makeStyles(() =>
       background: "none",
     },
     subMenuCard: {
-      height: "285px",
+      width: "285px",
+      height: "fit-content",
       marginLeft: "18px", // TODO other toolbars should use this approach
     },
-    baseSliderContainer: {
-      display: "flex",
-      flexDirection: "row",
+    sliderName: {
+      marginLeft: "12px",
+      marginBottom: "-2px",
+      paddingTop: "6px",
+      fontWeight: 500,
+    },
+    divider: {
+      margin: 0,
+      width: "100%",
     },
   })
 );
@@ -75,6 +87,13 @@ interface Event extends CustomEvent {
 const Submenu = (props: SubmenuProps): ReactElement => {
   const [paintbrush, setPaintbrush] = usePaintbrushStore();
   const [showTransparency, setShowTransparency] = useState<boolean>(false);
+  const [openSubmenu, setOpenSubMenu] = useState<boolean>(
+    props.keepSubmenuOpen
+  );
+
+  useEffect(() => {
+    setOpenSubMenu(props.keepSubmenuOpen);
+  }, [props.keepSubmenuOpen]);
 
   const submenuEvents = [
     "selectBrush",
@@ -103,6 +122,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       ...paintbrush,
       brushType: "Paintbrush",
     });
+    setOpenSubMenu(true);
+    setShowTransparency(false);
 
     return true;
   }
@@ -112,6 +133,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       ...paintbrush,
       brushType: "Eraser",
     });
+    setOpenSubMenu(true);
+    setShowTransparency(false);
 
     return true;
   }
@@ -119,10 +142,14 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   function toggleShowTransparency() {
     if (showTransparency) {
       setShowTransparency(false);
+      setOpenSubMenu(!openSubmenu);
     } else {
       setShowTransparency(true);
     }
-
+    setPaintbrush({
+      ...paintbrush,
+      brushType: "",
+    });
     return true;
   }
 
@@ -250,38 +277,48 @@ const Submenu = (props: SubmenuProps): ReactElement => {
             />
           ))}
         </ButtonGroup>
-        <Card className={classes.subMenuCard}>
-          <div className={classes.baseSliderContainer}>
-            <div className={classes.baseSlider}>
-              <BaseSlider
-                value={paintbrush.brushRadius * 2}
-                config={SLIDER_CONFIG[Sliders.brushRadius]}
-                onChange={() => changeBrushRadius}
-                showEndValues={false}
-              />
-            </div>
+        {openSubmenu && (
+          <Card className={classes.subMenuCard}>
+            {!showTransparency && (
+              <>
+                <div className={classes.sliderName}>
+                  {paintbrush.brushType === "Paintbrush"
+                    ? "Brush Size"
+                    : "Eraser Size"}
+                </div>
+                <div className={classes.baseSlider}>
+                  <BaseSlider
+                    value={paintbrush.brushRadius * 2}
+                    config={SLIDER_CONFIG[Sliders.brushRadius]}
+                    onChange={() => changeBrushRadius}
+                  />
+                </div>
+              </>
+            )}
+
             {showTransparency && (
               <>
+                <div className={classes.sliderName}>Non-Active Annotation</div>
                 <div className={classes.baseSlider}>
                   <BaseSlider
                     value={paintbrush.annotationAlpha}
                     config={SLIDER_CONFIG[Sliders.annotationAlpha]}
                     onChange={() => changeAnnotationTransparency}
-                    showEndValues={false}
                   />
                 </div>
+                <Divider className={classes.divider} />
+                <div className={classes.sliderName}>Active Annotation</div>
                 <div className={classes.baseSlider}>
                   <BaseSlider
                     value={paintbrush.annotationActiveAlpha}
                     config={SLIDER_CONFIG[Sliders.annotationActiveAlpha]}
                     onChange={() => changeAnnotationTransparencyFocused}
-                    showEndValues={false}
                   />
                 </div>
               </>
             )}
-          </div>
-        </Card>
+          </Card>
+        )}
       </Popover>
     </>
   );
@@ -304,18 +341,20 @@ class Toolbar extends Component<Props> {
 
   render = (): ReactElement => (
     <>
-      <IconButton
-        tooltip={{
-          name: "Paintbush",
-          ...getShortcut("paintbrush.selectBrush"),
-        }}
-        icon={icons.brush}
-        onClick={this.openSubmenu}
-        fill={this.props.buttonClicked === "Paintbrush"}
-        setRefCallback={(ref: HTMLButtonElement) => {
-          this.refBrushPopover = ref;
-        }}
-      />
+      <ButtonGroup style={{ all: "revert" }}>
+        <IconButton
+          tooltip={{
+            name: "Paintbush",
+            ...getShortcut("paintbrush.selectBrush"),
+          }}
+          icon={icons.brush}
+          onClick={this.openSubmenu}
+          fill={this.props.buttonClicked === "Paintbrush"}
+          setRefCallback={(ref: HTMLButtonElement) => {
+            this.refBrushPopover = ref;
+          }}
+        />
+      </ButtonGroup>
 
       <Submenu
         isOpen={
@@ -325,6 +364,7 @@ class Toolbar extends Component<Props> {
         openSubmenu={this.openSubmenu}
         anchorElement={this.props.anchorElement}
         onClose={this.props.onClose}
+        keepSubmenuOpen={this.props.keepSubmenuOpen}
       />
     </>
   );
