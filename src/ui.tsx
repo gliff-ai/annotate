@@ -36,6 +36,7 @@ import { LabelsSubmenu } from "@/toolboxes/labels";
 import { Download } from "@/download/UI";
 import { getShortcut, keydownListener } from "@/keybindings";
 import { BaseSlider, Config } from "@/components/BaseSlider";
+import { KeybindPopup } from "./keybindings/KeybindPopup";
 
 const logger = console;
 
@@ -697,6 +698,7 @@ class UserInterface extends Component<Props, State> {
               <Logo />
             </Grid>
           </Grid>
+          <KeybindPopup />
 
           {uploadDownload}
         </Toolbar>
