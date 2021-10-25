@@ -12,7 +12,7 @@ import {
   createStyles,
   Divider,
   makeStyles,
-  Popover,
+  Popper,
 } from "@material-ui/core";
 
 import { IconButton, icons } from "@gliff-ai/style";
@@ -253,11 +253,10 @@ const Submenu = (props: SubmenuProps): ReactElement => {
 
   return (
     <>
-      <Popover
+      <Popper
         open={props.isOpen}
         anchorEl={props.anchorElement}
-        onClose={props.onClose}
-        PaperProps={{ classes: { root: classes.subMenu } }}
+        placement="right"
       >
         <ButtonGroup
           orientation="vertical"
@@ -319,7 +318,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
             )}
           </Card>
         )}
-      </Popover>
+      </Popper>
     </>
   );
 };
