@@ -5,6 +5,7 @@ import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { getShortcut } from "@/keybindings";
 import { useSplineStore } from "./Store";
 import { useMountEffect } from "@/hooks/use-mountEffect";
+import { Popper } from "@material-ui/core";
 
 const events = ["selectSpline"] as const;
 
@@ -126,10 +127,10 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   });
 
   return (
-    <Popover
+    <Popper
       open={props.isOpen}
       anchorEl={props.anchorElement}
-      onClose={props.onClose}
+      placement="right"
     >
       <ButtonGroup size="small" id="spline-toolbar">
         {tools.map(({ icon, name, event, active }) => (
@@ -145,7 +146,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
           />
         ))}
       </ButtonGroup>
-    </Popover>
+    </Popper>
   );
 };
 interface Event extends CustomEvent {
