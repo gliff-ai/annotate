@@ -1,11 +1,10 @@
 import { Component, ReactElement, MouseEvent } from "react";
-import { ButtonGroup, Popover } from "@material-ui/core";
+import { ButtonGroup, Popper } from "@material-ui/core";
 import { IconButton, icons } from "@gliff-ai/style";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { getShortcut } from "@/keybindings";
 import { useSplineStore } from "./Store";
 import { useMountEffect } from "@/hooks/use-mountEffect";
-import { Popper } from "@material-ui/core";
 
 const events = ["selectSpline"] as const;
 
@@ -14,7 +13,6 @@ const ToolboxName: Toolbox = "spline";
 interface SubmenuProps {
   isOpen: boolean;
   anchorElement: HTMLButtonElement | null;
-  onClose: (event: MouseEvent) => void;
   openSubmenu: () => void;
 }
 
@@ -167,7 +165,6 @@ interface Props {
   handleOpen: (
     event?: MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
-  onClose: (event: MouseEvent) => void;
   anchorElement: HTMLButtonElement | null;
   isTyping: () => boolean;
 }
@@ -210,7 +207,6 @@ class Toolbar extends Component<Props> {
           Boolean(this.props.anchorElement)
         }
         anchorElement={this.props.anchorElement}
-        onClose={this.props.onClose}
         openSubmenu={this.openSubmenu}
       />
     </>

@@ -11,7 +11,6 @@ import {
   FormControlLabel,
   FormGroup,
   FormControl,
-  Popover,
   Card,
   makeStyles,
   createStyles,
@@ -19,6 +18,7 @@ import {
   CardHeader,
   CardContent,
   Typography,
+  Popper,
 } from "@material-ui/core";
 import SVG from "react-inlinesvg";
 
@@ -29,14 +29,12 @@ import { getShortcut } from "@/keybindings";
 import { useBackgroundStore } from "./Store";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { useMountEffect } from "@/hooks/use-mountEffect";
-import { Popper } from "@material-ui/core";
 
 const ToolboxName: Toolbox = "background";
 
 interface SubmenuProps {
   isOpen: boolean;
   anchorElement: HTMLButtonElement | null;
-  onClose: (event: MouseEvent) => void;
   channelControls: ReactElement[];
   openSubmenu: () => void;
 }
@@ -47,7 +45,6 @@ interface Props {
   handleOpen: (
     event?: MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
-  onClose: (event: MouseEvent) => void;
   anchorElement: HTMLButtonElement | null;
   isTyping: () => boolean;
   channels: boolean[];
@@ -344,7 +341,6 @@ class Toolbar extends Component<Props> {
         }
         openSubmenu={this.openSubmenu}
         anchorElement={this.props.anchorElement}
-        onClose={this.props.onClose}
         channelControls={this.channelControls}
       />
     </>

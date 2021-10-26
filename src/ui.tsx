@@ -795,7 +795,6 @@ class UserInterface extends Component<Props, State> {
             setButtonClicked={this.setButtonClicked}
             activateToolbox={this.activateToolbox}
             handleOpen={this.handleOpen}
-            onClose={this.handleClose}
             anchorElement={this.state.anchorElement}
             isTyping={this.isTyping}
           />
@@ -804,7 +803,6 @@ class UserInterface extends Component<Props, State> {
             setButtonClicked={this.setButtonClicked}
             activateToolbox={this.activateToolbox}
             handleOpen={this.handleOpen}
-            onClose={this.handleClose}
             anchorElement={this.state.anchorElement}
             isTyping={this.isTyping}
           />
@@ -819,7 +817,6 @@ class UserInterface extends Component<Props, State> {
             buttonClicked={this.state.buttonClicked}
             setButtonClicked={this.setButtonClicked}
             handleOpen={this.handleOpen}
-            onClose={this.handleClose}
             anchorElement={this.state.anchorElement}
             isTyping={this.isTyping}
             channels={this.state.channels}

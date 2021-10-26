@@ -28,7 +28,6 @@ import { useMountEffect } from "@/hooks/use-mountEffect";
 interface SubmenuProps {
   isOpen: boolean;
   anchorElement: HTMLButtonElement | null;
-  onClose: (event: MouseEvent) => void;
   openSubmenu: () => void;
 }
 
@@ -39,7 +38,6 @@ interface Props {
   handleOpen: (
     event?: MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
-  onClose: (event: MouseEvent) => void;
   anchorElement: HTMLButtonElement | null;
   isTyping: () => boolean;
 }
@@ -363,7 +361,6 @@ class Toolbar extends Component<Props> {
         }
         openSubmenu={this.openSubmenu}
         anchorElement={this.props.anchorElement}
-        onClose={this.props.onClose}
       />
     </>
   );
