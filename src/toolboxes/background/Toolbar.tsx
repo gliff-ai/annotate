@@ -202,6 +202,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
           orientation="vertical"
           size="small"
           id="background-settings-toolbar"
+          style={{ marginRight: "-10px" }}
         >
           {tools.map(({ icon, name, event, active }) => (
             <IconButton

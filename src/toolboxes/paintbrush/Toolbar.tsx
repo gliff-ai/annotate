@@ -87,13 +87,8 @@ interface Event extends CustomEvent {
 const Submenu = (props: SubmenuProps): ReactElement => {
   const [paintbrush, setPaintbrush] = usePaintbrushStore();
   const [showTransparency, setShowTransparency] = useState<boolean>(false);
-  const [openSubmenu, setOpenSubMenu] = useState<boolean>(
-    props.keepSubmenuOpen
-  );
 
-  useEffect(() => {
-    setOpenSubMenu(props.keepSubmenuOpen);
-  }, [props.keepSubmenuOpen]);
+  const [openSubmenu, setOpenSubMenu] = useState<boolean>(false);
 
   const submenuEvents = [
     "selectBrush",
