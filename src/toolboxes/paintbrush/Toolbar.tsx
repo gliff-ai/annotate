@@ -30,12 +30,10 @@ interface SubmenuProps {
   anchorElement: HTMLButtonElement | null;
   onClose: (event: MouseEvent) => void;
   openSubmenu: () => void;
-  keepSubmenuOpen: boolean;
 }
 
 interface Props {
   buttonClicked: string;
-  keepSubmenuOpen: boolean;
   setButtonClicked: (buttonName: string) => void;
   activateToolbox: (activeToolbox: Toolbox) => void;
   handleOpen: (
@@ -366,7 +364,6 @@ class Toolbar extends Component<Props> {
         openSubmenu={this.openSubmenu}
         anchorElement={this.props.anchorElement}
         onClose={this.props.onClose}
-        keepSubmenuOpen={this.props.keepSubmenuOpen}
       />
     </>
   );

@@ -85,7 +85,6 @@ interface State {
   redraw: number;
   sliceIndex: number;
   channels: boolean[];
-  keepSubmenuOpen: boolean;
   anchorElement: HTMLButtonElement | null; // A HTML element. It's used to set the position of the popover menu https://material-ui.com/api/menu/#props
   buttonClicked: string;
   mode: Mode;
@@ -207,7 +206,6 @@ class UserInterface extends Component<Props, State> {
       displayedImage: this.slicesData ? this.slicesData[0][0] : null,
       redraw: 0,
       anchorElement: null,
-      keepSubmenuOpen: true,
       buttonClicked: null,
       activeToolbox: Toolboxes.paintbrush,
       mode: Mode.draw,
@@ -589,7 +587,6 @@ class UserInterface extends Component<Props, State> {
 
   handleClose = (): void => {
     this.setState({ anchorElement: null });
-    this.setState({ keepSubmenuOpen: false });
   };
 
   handleOpen =
@@ -799,7 +796,6 @@ class UserInterface extends Component<Props, State> {
             activateToolbox={this.activateToolbox}
             handleOpen={this.handleOpen}
             onClose={this.handleClose}
-            keepSubmenuOpen={this.state.keepSubmenuOpen}
             anchorElement={this.state.anchorElement}
             isTyping={this.isTyping}
           />
