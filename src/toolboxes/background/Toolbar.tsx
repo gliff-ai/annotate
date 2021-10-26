@@ -191,6 +191,12 @@ const Submenu = (props: SubmenuProps): ReactElement => {
         anchorEl={props.anchorElement}
         placement="right-end"
         style={{ display: "flex" }}
+        modifiers={{
+          offset: {
+            enabled: true,
+            offset: "10, 10",
+          },
+        }}
       >
         <ButtonGroup
           orientation="vertical"

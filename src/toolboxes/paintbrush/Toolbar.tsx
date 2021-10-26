@@ -256,13 +256,20 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       <Popper
         open={props.isOpen}
         anchorEl={props.anchorElement}
-        placement="right-start"
-        style={{ display: "flex", left: "10px" }}
+        placement="right"
+        style={{ display: "flex" }}
+        modifiers={{
+          offset: {
+            enabled: true,
+            offset: "40, 10",
+          },
+        }}
       >
         <ButtonGroup
           orientation="vertical"
           size="small"
           id="paintbrush-toolbar"
+          style={{ marginRight: "-10px" }}
         >
           {tools.map(({ icon, name, event, active }) => (
             <IconButton

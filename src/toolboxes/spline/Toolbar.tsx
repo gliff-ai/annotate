@@ -130,8 +130,14 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     <Popper
       open={props.isOpen}
       anchorEl={props.anchorElement}
-      placement="right-end"
+      placement="right"
       style={{ display: "flex" }}
+      modifiers={{
+        offset: {
+          enabled: true,
+          offset: "10, 10",
+        },
+      }}
     >
       <ButtonGroup size="small" id="spline-toolbar">
         {tools.map(({ icon, name, event, active }) => (
