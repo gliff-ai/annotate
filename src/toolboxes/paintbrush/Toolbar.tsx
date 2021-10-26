@@ -256,7 +256,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       <Popper
         open={props.isOpen}
         anchorEl={props.anchorElement}
-        placement="right"
+        placement="right-start"
+        style={{ display: "flex", left: "10px" }}
       >
         <ButtonGroup
           orientation="vertical"

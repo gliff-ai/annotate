@@ -29,6 +29,7 @@ import { getShortcut } from "@/keybindings";
 import { useBackgroundStore } from "./Store";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { useMountEffect } from "@/hooks/use-mountEffect";
+import { Popper } from "@material-ui/core";
 
 const ToolboxName: Toolbox = "background";
 
@@ -185,12 +186,11 @@ const Submenu = (props: SubmenuProps): ReactElement => {
 
   return (
     <>
-      <Popover
+      <Popper
         open={props.isOpen}
         anchorEl={props.anchorElement}
-        onClose={props.onClose}
-        PaperProps={{ classes: { root: classes.subMenu } }}
-        elevation={0}
+        placement="right-end"
+        style={{ display: "flex" }}
       >
         <ButtonGroup
           orientation="vertical"
@@ -265,7 +265,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
             </>
           )}
         </Card>
-      </Popover>
+      </Popper>
     </>
   );
 };
