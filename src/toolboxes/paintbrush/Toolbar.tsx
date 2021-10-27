@@ -13,6 +13,7 @@ import {
   Divider,
   makeStyles,
   Popper,
+  ClickAwayListener,
 } from "@material-ui/core";
 
 import { IconButton, icons } from "@gliff-ai/style";
@@ -242,82 +243,93 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     },
   ];
 
+  const handleClickAway = () => {
+    setOpenSubMenu(false);
+  };
+
   return (
     <>
-      <Popper
-        open={props.isOpen}
-        anchorEl={props.anchorElement}
-        placement="right"
-        style={{ display: "flex" }}
-        modifiers={{
-          offset: {
-            enabled: true,
-            offset: "40, 10",
-          },
-        }}
-      >
-        <ButtonGroup
-          orientation="vertical"
-          size="small"
-          id="paintbrush-toolbar"
-          style={{ marginRight: "-10px" }}
+      <ClickAwayListener onClickAway={handleClickAway}>
+        <Popper
+          open={props.isOpen}
+          anchorEl={props.anchorElement}
+          placement="right"
+          style={{ display: "flex" }}
+          modifiers={{
+            offset: {
+              enabled: true,
+              offset: "40, 10",
+            },
+          }}
         >
-          {tools.map(({ icon, name, event, active }) => (
-            <IconButton
-              key={name}
-              icon={icon}
-              tooltip={{
-                name,
-                ...getShortcut(`${ToolboxName}.${event.name}`),
-              }}
-              onClick={event}
-              fill={active()}
-            />
-          ))}
-        </ButtonGroup>
-        {openSubmenu && (
-          <Card className={classes.subMenuCard}>
-            {!showTransparency && (
-              <>
-                <div className={classes.sliderName}>
-                  {paintbrush.brushType === "Paintbrush"
-                    ? "Brush Size"
-                    : "Eraser Size"}
-                </div>
-                <div className={classes.baseSlider}>
-                  <BaseSlider
-                    value={paintbrush.brushRadius * 2}
-                    config={SLIDER_CONFIG[Sliders.brushRadius]}
-                    onChange={() => changeBrushRadius}
-                  />
-                </div>
-              </>
-            )}
+          <ButtonGroup
+            orientation="vertical"
+            size="small"
+            id="paintbrush-toolbar"
+            style={{ marginRight: "-10px" }}
+          >
+            {tools.map(({ icon, name, event, active }) => (
+              <IconButton
+                key={name}
+                icon={icon}
+                tooltip={{
+                  name,
+                  ...getShortcut(`${ToolboxName}.${event.name}`),
+                }}
+                onClick={event}
+                fill={active()}
+              />
+            ))}
+          </ButtonGroup>
 
-            {showTransparency && (
-              <>
-                <div className={classes.sliderName}>Non-Active Annotation</div>
-                <div className={classes.baseSlider}>
-                  <BaseSlider
-                    value={paintbrush.annotationAlpha}
-                    config={SLIDER_CONFIG[Sliders.annotationAlpha]}
-                    onChange={() => changeAnnotationTransparency}
-                  />
-                </div>
-                <Divider className={classes.divider} />
-                <div className={classes.sliderName}>Active Annotation</div>
-                <div className={classes.baseSlider}>
-                  <BaseSlider
-                    value={paintbrush.annotationActiveAlpha}
-                    config={SLIDER_CONFIG[Sliders.annotationActiveAlpha]}
-                    onChange={() => changeAnnotationTransparencyFocused}
-                  />
-                </div>
-              </>
+          <>
+            {openSubmenu && (
+              <Card className={classes.subMenuCard}>
+                {!showTransparency && (
+                  <>
+                    <div className={classes.sliderName}>
+                      {paintbrush.brushType === "Paintbrush"
+                        ? "Brush Size"
+                        : "Eraser Size"}
+                    </div>
+                    <div className={classes.baseSlider}>
+                      <BaseSlider
+                        value={paintbrush.brushRadius * 2}
+                        config={SLIDER_CONFIG[Sliders.brushRadius]}
+                        onChange={() => changeBrushRadius}
+                      />
+                    </div>
+                  </>
+                )}
+
+                {showTransparency && (
+                  <>
+                    <div className={classes.sliderName}>
+                      Non-Active Annotation
+                    </div>
+                    <div className={classes.baseSlider}>
+                      <BaseSlider
+                        value={paintbrush.annotationAlpha}
+                        config={SLIDER_CONFIG[Sliders.annotationAlpha]}
+                        onChange={() => changeAnnotationTransparency}
+                      />
+                    </div>
+                    <Divider className={classes.divider} />
+                    <div className={classes.sliderName}>Active Annotation</div>
+                    <div className={classes.baseSlider}>
+                      <BaseSlider
+                        value={paintbrush.annotationActiveAlpha}
+                        config={SLIDER_CONFIG[Sliders.annotationActiveAlpha]}
+                        onChange={() => changeAnnotationTransparencyFocused}
+                      />
+                    </div>
+                  </>
+                )}
+              </Card>
             )}
-          </Card>
-        )}
-      </Popper>
+          </>
+        </Popper>
+      </ClickAwayListener>
     </>
   );
 };
