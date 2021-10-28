@@ -235,18 +235,20 @@ export class CanvasClass extends Component<Props, State> {
         .getAllAnnotations()
         .filter(({ toolbox }) => toolbox === Toolboxes.paintbrush)
         .forEach(({ brushStrokes }, annotationIndex) => {
-          brushStrokes.forEach(({ coordinates, brush }) => {
+          brushStrokes.forEach(({ coordinates, spaceTimeInfo, brush }) => {
             coordinates.forEach((point0, i) => {
-              img = drawCapsule(
-                point0,
-                i + 1 < coordinates.length ? coordinates[i + 1] : point0,
-                brush.radius,
-                img,
-                this.props.displayedImage.width,
-                annotationIndex,
-                brush.type,
-                4
-              );
+              if (spaceTimeInfo.z === this.props.sliceIndex) {
+                img = drawCapsule(
+                  point0,
+                  i + 1 < coordinates.length ? coordinates[i + 1] : point0,
+                  brush.radius,
+                  img,
+                  this.props.displayedImage.width,
+                  annotationIndex,
+                  brush.type,
+                  4
+                );
+              }
             });
           });
         });
