@@ -4,7 +4,6 @@ import {
   ReactElement,
   MouseEvent,
   useState,
-  useEffect,
 } from "react";
 import {
   ButtonGroup,
