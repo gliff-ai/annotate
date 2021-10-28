@@ -19,6 +19,7 @@ import {
   CardContent,
   Typography,
   Popper,
+  ClickAwayListener,
 } from "@material-ui/core";
 import SVG from "react-inlinesvg";
 
@@ -29,7 +30,6 @@ import { getShortcut } from "@/keybindings";
 import { useBackgroundStore } from "./Store";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { useMountEffect } from "@/hooks/use-mountEffect";
-import { ClickAwayListener } from "@material-ui/core";
 
 const ToolboxName: Toolbox = "background";
 

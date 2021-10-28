@@ -84,8 +84,8 @@ interface Event extends CustomEvent {
 const Submenu = (props: SubmenuProps): ReactElement => {
   const [paintbrush, setPaintbrush] = usePaintbrushStore();
   const [showTransparency, setShowTransparency] = useState<boolean>(false);
-
   const [openSubmenu, setOpenSubMenu] = useState<boolean>(false);
+  const [openSlider, setOpenSlider] = useState<boolean>(true);
 
   const submenuEvents = [
     "selectBrush",
@@ -110,6 +110,9 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   }
 
   function selectBrush() {
+    if (!openSlider) {
+      setOpenSlider(true);
+    }
     setPaintbrush({
       ...paintbrush,
       brushType: "Paintbrush",
@@ -121,6 +124,9 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   }
 
   function selectEraser() {
+    if (!openSlider) {
+      setOpenSlider(true);
+    }
     setPaintbrush({
       ...paintbrush,
       brushType: "Eraser",
@@ -132,12 +138,15 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   }
 
   function toggleShowTransparency() {
+    setOpenSubMenu(true);
     if (showTransparency) {
       setShowTransparency(false);
-      setOpenSubMenu(!openSubmenu);
+
+      setOpenSubMenu(false);
     } else {
       setShowTransparency(true);
     }
+    setOpenSlider(!openSlider);
     setPaintbrush({
       ...paintbrush,
       brushType: "",
@@ -285,7 +294,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
           <>
             {openSubmenu && (
               <Card className={classes.subMenuCard}>
-                {!showTransparency && (
+                {openSlider && (
                   <>
                     <div className={classes.sliderName}>
                       {paintbrush.brushType === "Paintbrush"
@@ -301,7 +310,6 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                     </div>
                   </>
                 )}
-
                 {showTransparency && (
                   <>
                     <div className={classes.sliderName}>
