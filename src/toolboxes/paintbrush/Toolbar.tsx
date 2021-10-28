@@ -365,7 +365,7 @@ class Toolbar extends Component<Props> {
       <ButtonGroup style={{ all: "revert" }}>
         <IconButton
           tooltip={{
-            name: "Paintbush",
+            name: "Paintbrush",
             ...getShortcut("paintbrush.selectBrush"),
           }}
           icon={icons.brush}
