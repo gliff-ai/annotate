@@ -459,19 +459,6 @@ export class CanvasClass extends Component<Props, State> {
         // Redraw the active annotation:
         this.drawAllStrokes(this.tempCtx, "active");
 
-        // Clear tempCanvas and draw the active annotation on it:
-        // this.clearCanvas(this.tempCtx);
-        // this.props.annotationsObject
-        //   .getActiveAnnotation()
-        //   .brushStrokes.forEach((brushstroke) => {
-        //     this.drawPoints(
-        //       brushstroke.coordinates,
-        //       brushstroke.brush,
-        //       false,
-        //       this.tempCtx
-        //     );
-        //   });
-
         // Copy tempCanvas onto interactionCanvas:
         this.clearCanvas(this.interactionCanvas.canvasContext);
         this.interactionCanvas.canvasContext.globalAlpha =

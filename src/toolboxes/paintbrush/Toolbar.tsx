@@ -31,6 +31,7 @@ interface SubmenuProps {
   onClose: (event: MouseEvent) => void;
   openSubmenu: () => void;
   keepSubmenuOpen: boolean;
+  is3D: boolean;
 }
 
 interface Props {
@@ -44,6 +45,7 @@ interface Props {
   onClose: (event: MouseEvent) => void;
   anchorElement: HTMLButtonElement | null;
   isTyping: () => boolean;
+  is3D: boolean;
 }
 
 const useStyles = makeStyles(() =>
@@ -237,36 +239,42 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       icon: icons.brush,
       event: selectBrush,
       active: () => paintbrush.brushType === "Paintbrush",
+      disabled: () => false,
     },
     {
       name: "Eraser",
       icon: icons.eraser,
       event: selectEraser,
       active: () => paintbrush.brushType === "Eraser",
+      disabled: () => false,
     },
     {
       name: "Use 3D brushstokes",
       icon: icons.brush,
       event: toggle3D,
       active: () => paintbrush.is3D,
+      disabled: () => !props.is3D,
     },
     {
       name: "Fill Active Paintbrush",
       icon: icons.fill,
       event: fillBrush,
       active: () => false,
+      disabled: () => false,
     },
     {
       name: "Annotation Transparency",
       icon: icons.annotationTransparency,
       event: toggleShowTransparency,
       active: () => showTransparency,
+      disabled: () => false,
     },
     {
       name: "Show strokes as pixels",
       icon: icons.convert,
       event: togglePixelView,
       active: () => paintbrush.pixelView,
+      disabled: () => false,
     },
   ];
 
@@ -283,7 +291,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
           size="small"
           id="paintbrush-toolbar"
         >
-          {tools.map(({ icon, name, event, active }) => (
+          {tools.map(({ icon, name, event, active, disabled }) => (
             <IconButton
               key={name}
               icon={icon}
@@ -293,6 +301,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
               }}
               onClick={event}
               fill={active()}
+              disabled={disabled()}
             />
           ))}
         </ButtonGroup>
@@ -384,6 +393,7 @@ class Toolbar extends Component<Props> {
         anchorElement={this.props.anchorElement}
         onClose={this.props.onClose}
         keepSubmenuOpen={this.props.keepSubmenuOpen}
+        is3D={this.props.is3D}
       />
     </>
   );
