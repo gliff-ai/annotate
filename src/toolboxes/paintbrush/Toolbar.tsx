@@ -165,6 +165,18 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     return true;
   }
 
+  function toggle3D() {
+    setPaintbrush({
+      ...paintbrush,
+      is3D: !paintbrush.is3D,
+    });
+    document.dispatchEvent(
+      new CustomEvent("toggle3D", { detail: Toolboxes.paintbrush })
+    );
+
+    return true;
+  }
+
   function changeAnnotationTransparency(
     _e: ChangeEvent,
     annotationAlpha: number
@@ -192,6 +204,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       selectBrush,
       selectEraser,
       toggleShowTransparency,
+      toggle3D,
       changeAnnotationTransparency,
       changeAnnotationTransparencyFocused,
     };
@@ -230,6 +243,12 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       icon: icons.eraser,
       event: selectEraser,
       active: () => paintbrush.brushType === "Eraser",
+    },
+    {
+      name: "Use 3D brushstokes",
+      icon: icons.brush,
+      event: toggle3D,
+      active: () => paintbrush.is3D,
     },
     {
       name: "Fill Active Paintbrush",
