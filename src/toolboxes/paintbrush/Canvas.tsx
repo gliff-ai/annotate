@@ -22,6 +22,7 @@ const mainColor = theme.palette.primary.main;
 
 interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   isActive: boolean;
+  is3D: boolean;
   activeToolbox: Toolbox | string;
   mode: Mode;
   annotationsObject: Annotations;
@@ -352,6 +353,7 @@ export class CanvasClass extends Component<Props, State> {
         color,
         radius,
         type: this.props.activeToolbox === "Paintbrush" ? "paint" : "erase",
+        is3D: this.props.is3D,
       },
     });
 
@@ -394,6 +396,7 @@ export class CanvasClass extends Component<Props, State> {
           color,
           radius: 1,
           type: "paint",
+          is3D: this.props.is3D,
         },
       };
 
@@ -607,7 +610,11 @@ export class CanvasClass extends Component<Props, State> {
 export const Canvas = (
   props: Omit<
     Props,
-    "brushRadius" | "isActive" | "annotationAlpha" | "annotationActiveAlpha"
+    | "brushRadius"
+    | "isActive"
+    | "annotationAlpha"
+    | "annotationActiveAlpha"
+    | "is3D"
   >
 ): ReactElement => {
   // we will overwrite props.activeToolbox, which will be paintbrush
@@ -619,11 +626,12 @@ export const Canvas = (
     activeToolbox = paintbrush.brushType;
     isActive = true;
   }
-  // we will also use the brushRadius that's in the store
 
+  // we also use the brushRadius and is3D that's in the store
   return (
     <CanvasClass
       isActive={isActive}
+      is3D={paintbrush.is3D}
       activeToolbox={activeToolbox}
       mode={props.mode}
       annotationsObject={props.annotationsObject}
