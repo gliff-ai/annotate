@@ -14,12 +14,11 @@ import {
 import { palette, getRGBAString } from "@/components/palette";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
 import { usePaintbrushStore } from "./Store";
-import { BrushStroke } from "./interfaces";
+import { Brush, BrushStroke } from "./interfaces";
 import { drawCapsule } from "@/download/DownloadAsTiff";
 import { getNewImageSizeAndDisplacement } from "@/toolboxes/background/drawImage";
 
 const mainColor = theme.palette.primary.main;
-// const secondaryColor = theme.palette.secondary.main;
 
 interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   isActive: boolean;
@@ -33,12 +32,6 @@ interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
   setActiveToolbox: (tool: Toolbox) => void;
-}
-
-interface Brush {
-  radius: number;
-  type: "paint" | "erase";
-  color: string; // rgb(a) string
 }
 
 interface State {
