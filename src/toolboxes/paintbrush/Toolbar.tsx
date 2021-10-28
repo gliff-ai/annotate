@@ -250,7 +250,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     },
     {
       name: "Use 3D brushstokes",
-      icon: icons.brush,
+      icon: icons.brush3D,
       event: toggle3D,
       active: () => paintbrush.is3D,
       disabled: () => !props.is3D,
