@@ -109,7 +109,7 @@ export class CanvasClass extends Component<Props, State> {
     }
 
     // Redraw if we change pan or zoom
-    this.drawAllStrokes();
+    this.drawAllStrokes(this.backgroundCanvas?.canvasContext);
   }
 
   componentWillUnmount(): void {
@@ -158,7 +158,8 @@ export class CanvasClass extends Component<Props, State> {
     brush: Brush,
     clearCanvas = true,
     context: CanvasRenderingContext2D,
-    isActive = true
+    isActive = true,
+    depthFactor = 0.0
   ): void => {
     const points = imagePoints.map((point): XYPoint => {
       const { x, y } = imageToCanvas(
@@ -175,7 +176,8 @@ export class CanvasClass extends Component<Props, State> {
     // Common setup:
     context.lineJoin = "round";
     context.lineCap = "round";
-    context.lineWidth = this.getCanvasBrushDiameter(brush.radius);
+    context.lineWidth =
+      (1 - depthFactor) * this.getCanvasBrushDiameter(brush.radius);
     context.globalAlpha = 1.0;
     // drawing strokes with alpha=1.0 ensures we don't see where separate strokes overlap
     // we _do_ see where strokes from separate annotations overlap, because annotations are drawn to the
@@ -216,10 +218,14 @@ export class CanvasClass extends Component<Props, State> {
     this.setState((oldstate) => ({ pixelView: !oldstate.pixelView }));
   };
 
-  drawAllStrokes = (skipActive = false): void => {
+  drawAllStrokes = (
+    context: CanvasRenderingContext2D,
+    drawWhich = "all"
+  ): void => {
     // Draw strokes on active layer whiles showing existing paintbrush layers
+    // drawWhich: "all" (default), "active", "inactive"
 
-    const context = this.backgroundCanvas?.canvasContext;
+    // const context = this.backgroundCanvas?.canvasContext;
     if (!context) return;
 
     // Clear paintbrush canvas
@@ -298,11 +304,39 @@ export class CanvasClass extends Component<Props, State> {
         .forEach((annotation, i) => {
           if (
             annotation.toolbox === Toolboxes.paintbrush &&
-            !(i === activeAnnotationID && skipActive)
+            !(i === activeAnnotationID && drawWhich === "inactive")
           ) {
             this.clearCanvas(this.tempCtx);
             annotation.brushStrokes.forEach((brushStrokes) => {
-              if (brushStrokes.spaceTimeInfo.z === this.props.sliceIndex) {
+              if (brushStrokes.brush.is3D) {
+                // if the brush is 3D, we need to draw all the out-of-slice contributions too
+                for (
+                  let r = -brushStrokes.brush.radius;
+                  r <= brushStrokes.brush.radius;
+                  r += 1
+                ) {
+                  // for each step of the radius
+                  if (
+                    this.props.sliceIndex <= brushStrokes.spaceTimeInfo.z + r &&
+                    this.props.sliceIndex >= brushStrokes.spaceTimeInfo.z - r
+                  ) {
+                    // if the current slice is inside the 3D range of a brushstroke, draw it
+                    this.drawPoints(
+                      brushStrokes.coordinates,
+                      brushStrokes.brush,
+                      false,
+                      this.tempCtx,
+                      i === activeAnnotationID,
+                      Math.abs(
+                        this.props.sliceIndex - brushStrokes.spaceTimeInfo.z
+                      ) / brushStrokes.brush.radius
+                    );
+                  }
+                }
+              } else if (
+                this.props.sliceIndex === brushStrokes.spaceTimeInfo.z
+              ) {
+                // if the brush is 2D, we can just draw it on the current slice
                 this.drawPoints(
                   brushStrokes.coordinates,
                   brushStrokes.brush,
@@ -362,7 +396,7 @@ export class CanvasClass extends Component<Props, State> {
     // Reset points array
     this.points.length = 0;
 
-    this.drawAllStrokes();
+    this.drawAllStrokes(this.backgroundCanvas?.canvasContext);
     const context = this.interactionCanvas.canvasContext;
     this.clearCanvas(context);
   };
@@ -405,7 +439,7 @@ export class CanvasClass extends Component<Props, State> {
       this.props.annotationsObject.addBrushStroke(brushStroke);
     }
 
-    this.drawAllStrokes();
+    this.drawAllStrokes(this.backgroundCanvas?.canvasContext);
   };
 
   /* *** Mouse events *** */
@@ -420,21 +454,23 @@ export class CanvasClass extends Component<Props, State> {
         // there as we add to this.points
 
         // Redraw everything except the active annotation:
-        this.drawAllStrokes(true);
+        this.drawAllStrokes(this.backgroundCanvas?.canvasContext, "inactive");
+
+        // Redraw the active annotation:
+        this.drawAllStrokes(this.tempCtx, "active");
 
         // Clear tempCanvas and draw the active annotation on it:
-        this.clearCanvas(this.tempCtx);
-        this.props.annotationsObject
-          .getActiveAnnotation()
-          .brushStrokes.forEach((brushstroke) => {
-            this.drawPoints(
-              brushstroke.coordinates,
-              brushstroke.brush,
-              false,
-              this.tempCtx,
-              true
-            );
-          });
+        // this.clearCanvas(this.tempCtx);
+        // this.props.annotationsObject
+        //   .getActiveAnnotation()
+        //   .brushStrokes.forEach((brushstroke) => {
+        //     this.drawPoints(
+        //       brushstroke.coordinates,
+        //       brushstroke.brush,
+        //       false,
+        //       this.tempCtx
+        //     );
+        //   });
 
         // Copy tempCanvas onto interactionCanvas:
         this.clearCanvas(this.interactionCanvas.canvasContext);
@@ -491,7 +527,7 @@ export class CanvasClass extends Component<Props, State> {
       this.isDrawing = false;
 
       this.saveLine(this.props.brushRadius);
-      this.drawAllStrokes();
+      this.drawAllStrokes(this.backgroundCanvas?.canvasContext);
 
       this.drawCursor(canvasX, canvasY);
     }
