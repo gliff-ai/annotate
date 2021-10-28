@@ -258,7 +258,11 @@ const Submenu = (props: SubmenuProps): ReactElement => {
 
   return (
     <>
-      <ClickAwayListener onClickAway={handleClickAway}>
+      <ClickAwayListener
+        mouseEvent="onMouseDown"
+        touchEvent="onTouchStart"
+        onClickAway={handleClickAway}
+      >
         <Popper
           open={props.isOpen}
           anchorEl={props.anchorElement}
