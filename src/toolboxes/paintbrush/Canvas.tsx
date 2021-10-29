@@ -223,7 +223,6 @@ export class CanvasClass extends Component<Props, State> {
     // Draw strokes on active layer whiles showing existing paintbrush layers
     // drawWhich: "all" (default), "active", "inactive"
 
-    // const context = this.backgroundCanvas?.canvasContext;
     if (!context) return;
 
     // Clear paintbrush canvas
