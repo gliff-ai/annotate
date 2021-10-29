@@ -158,8 +158,7 @@ export class CanvasClass extends Component<Props, State> {
     brush: Brush,
     clearCanvas = true,
     context: CanvasRenderingContext2D,
-    isActive = true,
-    depthFactor = 0.0
+    isActive = true
   ): void => {
     const points = imagePoints.map((point): XYPoint => {
       const { x, y } = imageToCanvas(
@@ -176,8 +175,7 @@ export class CanvasClass extends Component<Props, State> {
     // Common setup:
     context.lineJoin = "round";
     context.lineCap = "round";
-    context.lineWidth =
-      (1 - depthFactor) * this.getCanvasBrushDiameter(brush.radius);
+    context.lineWidth = this.getCanvasBrushDiameter(brush.radius);
     context.globalAlpha = 1.0;
     // drawing strokes with alpha=1.0 ensures we don't see where separate strokes overlap
     // we _do_ see where strokes from separate annotations overlap, because annotations are drawn to the
@@ -309,30 +307,21 @@ export class CanvasClass extends Component<Props, State> {
             this.clearCanvas(this.tempCtx);
             annotation.brushStrokes.forEach((brushStrokes) => {
               if (brushStrokes.brush.is3D) {
-                // if the brush is 3D, we need to draw all the out-of-slice contributions too
-                for (
-                  let r = -brushStrokes.brush.radius;
-                  r <= brushStrokes.brush.radius;
-                  r += 1
-                ) {
-                  // for each step of the radius
-                  if (
-                    this.props.sliceIndex <= brushStrokes.spaceTimeInfo.z + r &&
-                    this.props.sliceIndex >= brushStrokes.spaceTimeInfo.z - r
-                  ) {
-                    // if the current slice is inside the 3D range of a brushstroke, draw it
-                    this.drawPoints(
-                      brushStrokes.coordinates,
-                      brushStrokes.brush,
-                      false,
-                      this.tempCtx,
-                      i === activeAnnotationID,
-                      Math.abs(
-                        this.props.sliceIndex - brushStrokes.spaceTimeInfo.z
-                      ) / brushStrokes.brush.radius
-                    );
-                  }
-                }
+                // calculate squared radius in this slice using Pythagoras' theorem:
+                const r2 =
+                  brushStrokes.brush.radius ** 2 -
+                  (this.props.sliceIndex - brushStrokes.spaceTimeInfo.z) ** 2;
+                if (r2 < 1) return; // draw nothing and go to the next brushstroke if the computed radius is < 1 in this slice
+                this.drawPoints(
+                  brushStrokes.coordinates,
+                  {
+                    ...brushStrokes.brush,
+                    radius: Math.sqrt(r2),
+                  },
+                  false,
+                  this.tempCtx,
+                  i === activeAnnotationID
+                );
               } else if (
                 this.props.sliceIndex === brushStrokes.spaceTimeInfo.z
               ) {
