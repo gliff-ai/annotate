@@ -29,6 +29,7 @@ interface SubmenuProps {
   isOpen: boolean;
   anchorElement: HTMLButtonElement | null;
   openSubmenu: () => void;
+  is3D: boolean;
 }
 
 interface Props {
@@ -40,6 +41,7 @@ interface Props {
   ) => (anchorElement?: HTMLButtonElement) => void;
   anchorElement: HTMLButtonElement | null;
   isTyping: () => boolean;
+  is3D: boolean;
 }
 
 const useStyles = makeStyles(() =>
@@ -165,6 +167,18 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     return true;
   }
 
+  function toggle3D() {
+    setPaintbrush({
+      ...paintbrush,
+      is3D: !paintbrush.is3D,
+    });
+    document.dispatchEvent(
+      new CustomEvent("toggle3D", { detail: Toolboxes.paintbrush })
+    );
+
+    return true;
+  }
+
   function changeAnnotationTransparency(
     _e: ChangeEvent,
     annotationAlpha: number
@@ -192,6 +206,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       selectBrush,
       selectEraser,
       toggleShowTransparency,
+      toggle3D,
       changeAnnotationTransparency,
       changeAnnotationTransparencyFocused,
     };
@@ -224,30 +239,42 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       icon: icons.brush,
       event: selectBrush,
       active: () => paintbrush.brushType === "Paintbrush",
+      disabled: () => false,
     },
     {
       name: "Eraser",
       icon: icons.eraser,
       event: selectEraser,
       active: () => paintbrush.brushType === "Eraser",
+      disabled: () => false,
+    },
+    {
+      name: "Use 3D brushstokes",
+      icon: icons.brush3D,
+      event: toggle3D,
+      active: () => paintbrush.is3D,
+      disabled: () => !props.is3D,
     },
     {
       name: "Fill Active Paintbrush",
       icon: icons.fill,
       event: fillBrush,
       active: () => false,
+      disabled: () => false,
     },
     {
       name: "Annotation Transparency",
       icon: icons.annotationTransparency,
       event: toggleShowTransparency,
       active: () => showTransparency,
+      disabled: () => false,
     },
     {
       name: "Show strokes as pixels",
       icon: icons.convert,
       event: togglePixelView,
       active: () => paintbrush.pixelView,
+      disabled: () => false,
     },
   ];
 
@@ -280,7 +307,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
             id="paintbrush-toolbar"
             style={{ marginRight: "-10px" }}
           >
-            {tools.map(({ icon, name, event, active }) => (
+            {tools.map(({ icon, name, event, active, disabled }) => (
               <IconButton
                 key={name}
                 icon={icon}
@@ -290,6 +317,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                 }}
                 onClick={event}
                 fill={active()}
+                disabled={disabled()}
               />
             ))}
           </ButtonGroup>
@@ -384,6 +412,7 @@ class Toolbar extends Component<Props> {
         }
         openSubmenu={this.openSubmenu}
         anchorElement={this.props.anchorElement}
+        is3D={this.props.is3D}
       />
     </>
   );

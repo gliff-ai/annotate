@@ -797,6 +797,7 @@ class UserInterface extends Component<Props, State> {
             handleOpen={this.handleOpen}
             anchorElement={this.state.anchorElement}
             isTyping={this.isTyping}
+            is3D={this.slicesData?.length > 1}
           />
           <SplineToolbar
             buttonClicked={this.state.buttonClicked}

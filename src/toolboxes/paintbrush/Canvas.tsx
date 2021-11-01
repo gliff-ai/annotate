@@ -14,15 +14,15 @@ import {
 import { palette, getRGBAString } from "@/components/palette";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
 import { usePaintbrushStore } from "./Store";
-import { BrushStroke } from "./interfaces";
+import { Brush, BrushStroke } from "./interfaces";
 import { drawCapsule } from "@/download/DownloadAsTiff";
 import { getNewImageSizeAndDisplacement } from "@/toolboxes/background/drawImage";
 
 const mainColor = theme.palette.primary.main;
-// const secondaryColor = theme.palette.secondary.main;
 
 interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   isActive: boolean;
+  is3D: boolean;
   activeToolbox: Toolbox | string;
   mode: Mode;
   annotationsObject: Annotations;
@@ -33,12 +33,6 @@ interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
   setActiveToolbox: (tool: Toolbox) => void;
-}
-
-interface Brush {
-  radius: number;
-  type: "paint" | "erase";
-  color: string; // rgb(a) string
 }
 
 interface State {
@@ -115,7 +109,7 @@ export class CanvasClass extends Component<Props, State> {
     }
 
     // Redraw if we change pan or zoom
-    this.drawAllStrokes();
+    this.drawAllStrokes(this.backgroundCanvas?.canvasContext);
   }
 
   componentWillUnmount(): void {
@@ -222,10 +216,13 @@ export class CanvasClass extends Component<Props, State> {
     this.setState((oldstate) => ({ pixelView: !oldstate.pixelView }));
   };
 
-  drawAllStrokes = (skipActive = false): void => {
+  drawAllStrokes = (
+    context: CanvasRenderingContext2D,
+    drawWhich = "all"
+  ): void => {
     // Draw strokes on active layer whiles showing existing paintbrush layers
+    // drawWhich: "all" (default), "active", "inactive"
 
-    const context = this.backgroundCanvas?.canvasContext;
     if (!context) return;
 
     // Clear paintbrush canvas
@@ -241,18 +238,20 @@ export class CanvasClass extends Component<Props, State> {
         .getAllAnnotations()
         .filter(({ toolbox }) => toolbox === Toolboxes.paintbrush)
         .forEach(({ brushStrokes }, annotationIndex) => {
-          brushStrokes.forEach(({ coordinates, brush }) => {
+          brushStrokes.forEach(({ coordinates, spaceTimeInfo, brush }) => {
             coordinates.forEach((point0, i) => {
-              img = drawCapsule(
-                point0,
-                i + 1 < coordinates.length ? coordinates[i + 1] : point0,
-                brush.radius,
-                img,
-                this.props.displayedImage.width,
-                annotationIndex,
-                brush.type,
-                4
-              );
+              if (spaceTimeInfo.z === this.props.sliceIndex) {
+                img = drawCapsule(
+                  point0,
+                  i + 1 < coordinates.length ? coordinates[i + 1] : point0,
+                  brush.radius,
+                  img,
+                  this.props.displayedImage.width,
+                  annotationIndex,
+                  brush.type,
+                  4
+                );
+              }
             });
           });
         });
@@ -302,11 +301,30 @@ export class CanvasClass extends Component<Props, State> {
         .forEach((annotation, i) => {
           if (
             annotation.toolbox === Toolboxes.paintbrush &&
-            !(i === activeAnnotationID && skipActive)
+            !(i === activeAnnotationID && drawWhich === "inactive")
           ) {
             this.clearCanvas(this.tempCtx);
             annotation.brushStrokes.forEach((brushStrokes) => {
-              if (brushStrokes.spaceTimeInfo.z === this.props.sliceIndex) {
+              if (brushStrokes.brush.is3D) {
+                // calculate squared radius in this slice using Pythagoras' theorem:
+                const r2 =
+                  brushStrokes.brush.radius ** 2 -
+                  (this.props.sliceIndex - brushStrokes.spaceTimeInfo.z) ** 2;
+                if (r2 < 1) return; // draw nothing and go to the next brushstroke if the computed radius is < 1 in this slice
+                this.drawPoints(
+                  brushStrokes.coordinates,
+                  {
+                    ...brushStrokes.brush,
+                    radius: Math.sqrt(r2),
+                  },
+                  false,
+                  this.tempCtx,
+                  i === activeAnnotationID
+                );
+              } else if (
+                this.props.sliceIndex === brushStrokes.spaceTimeInfo.z
+              ) {
+                // if the brush is 2D, we can just draw it on the current slice
                 this.drawPoints(
                   brushStrokes.coordinates,
                   brushStrokes.brush,
@@ -359,13 +377,14 @@ export class CanvasClass extends Component<Props, State> {
         color,
         radius,
         type: this.props.activeToolbox === "Paintbrush" ? "paint" : "erase",
+        is3D: this.props.is3D,
       },
     });
 
     // Reset points array
     this.points.length = 0;
 
-    this.drawAllStrokes();
+    this.drawAllStrokes(this.backgroundCanvas?.canvasContext);
     const context = this.interactionCanvas.canvasContext;
     this.clearCanvas(context);
   };
@@ -401,13 +420,14 @@ export class CanvasClass extends Component<Props, State> {
           color,
           radius: 1,
           type: "paint",
+          is3D: this.props.is3D,
         },
       };
 
       this.props.annotationsObject.addBrushStroke(brushStroke);
     }
 
-    this.drawAllStrokes();
+    this.drawAllStrokes(this.backgroundCanvas?.canvasContext);
   };
 
   /* *** Mouse events *** */
@@ -422,21 +442,10 @@ export class CanvasClass extends Component<Props, State> {
         // there as we add to this.points
 
         // Redraw everything except the active annotation:
-        this.drawAllStrokes(true);
+        this.drawAllStrokes(this.backgroundCanvas?.canvasContext, "inactive");
 
-        // Clear tempCanvas and draw the active annotation on it:
-        this.clearCanvas(this.tempCtx);
-        this.props.annotationsObject
-          .getActiveAnnotation()
-          .brushStrokes.forEach((brushstroke) => {
-            this.drawPoints(
-              brushstroke.coordinates,
-              brushstroke.brush,
-              false,
-              this.tempCtx,
-              true
-            );
-          });
+        // Redraw the active annotation:
+        this.drawAllStrokes(this.tempCtx, "active");
 
         // Copy tempCanvas onto interactionCanvas:
         this.clearCanvas(this.interactionCanvas.canvasContext);
@@ -493,7 +502,7 @@ export class CanvasClass extends Component<Props, State> {
       this.isDrawing = false;
 
       this.saveLine(this.props.brushRadius);
-      this.drawAllStrokes();
+      this.drawAllStrokes(this.backgroundCanvas?.canvasContext);
 
       this.drawCursor(canvasX, canvasY);
     }
@@ -614,7 +623,11 @@ export class CanvasClass extends Component<Props, State> {
 export const Canvas = (
   props: Omit<
     Props,
-    "brushRadius" | "isActive" | "annotationAlpha" | "annotationActiveAlpha"
+    | "brushRadius"
+    | "isActive"
+    | "annotationAlpha"
+    | "annotationActiveAlpha"
+    | "is3D"
   >
 ): ReactElement => {
   // we will overwrite props.activeToolbox, which will be paintbrush
@@ -626,11 +639,12 @@ export const Canvas = (
     activeToolbox = paintbrush.brushType;
     isActive = true;
   }
-  // we will also use the brushRadius that's in the store
 
+  // we also use the brushRadius and is3D that's in the store
   return (
     <CanvasClass
       isActive={isActive}
+      is3D={paintbrush.is3D}
       activeToolbox={activeToolbox}
       mode={props.mode}
       annotationsObject={props.annotationsObject}
