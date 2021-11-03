@@ -51,6 +51,7 @@ const useStyles = makeStyles(() =>
       height: "65px",
       textAlign: "center",
       display: "flex",
+      marginBottom: "6px",
     },
     subMenu: {
       display: "flex",

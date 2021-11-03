@@ -73,6 +73,7 @@ const useStyles = makeStyles((theme: Theme) =>
       height: "65px",
       textAlign: "center",
       display: "flex",
+      marginBottom: "6px",
     },
     channelHeader: {
       backgroundColor: theme.palette.primary.main,
@@ -214,18 +215,24 @@ const Submenu = (props: SubmenuProps): ReactElement => {
             id="background-settings-toolbar"
             style={{ marginRight: "-10px" }}
           >
-            {tools.filter(({name})=>browser !== "safari" || !(name === 'Contrast' || name === 'Brightness')).map(({ icon, name, event, active }) => (
-              <IconButton
-                key={name}
-                icon={icon}
-                tooltip={{
-                  name,
-                  ...getShortcut(`${ToolboxName}.${event.name}`),
-                }}
-                onClick={event}
-                fill={active()}
-              />
-            ))}
+            {tools
+              .filter(
+                ({ name }) =>
+                  browser !== "safari" ||
+                  !(name === "Contrast" || name === "Brightness")
+              )
+              .map(({ icon, name, event, active }) => (
+                <IconButton
+                  key={name}
+                  icon={icon}
+                  tooltip={{
+                    name,
+                    ...getShortcut(`${ToolboxName}.${event.name}`),
+                  }}
+                  onClick={event}
+                  fill={active()}
+                />
+              ))}
           </ButtonGroup>
           <Card className={classes.subMenuCard}>
             {buttonClicked === "Brightness" && (
@@ -240,7 +247,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                 </div>
               </>
             )}
-            
+
             {buttonClicked === "Contrast" && (
               <>
                 <div className={classes.sliderName}>Contrast</div>
