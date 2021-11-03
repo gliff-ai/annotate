@@ -11,7 +11,6 @@ import {
   FormControlLabel,
   FormGroup,
   FormControl,
-  Popover,
   Card,
   makeStyles,
   createStyles,
@@ -20,24 +19,27 @@ import {
   CardContent,
   Button,
   Typography,
+  Popper,
+  ClickAwayListener,
 } from "@material-ui/core";
 import SVG from "react-inlinesvg";
 
-import { BaseIconButton } from "@gliff-ai/style";
+import { IconButton, icons } from "@gliff-ai/style";
 import { BaseSlider } from "@/components/BaseSlider";
-import { Toolboxes } from "@/Toolboxes";
-import { imgSrc } from "@/imgSrc";
-
-import { Tools } from "./Toolbox";
+import { Toolbox, Toolboxes } from "@/Toolboxes";
+import { getShortcut } from "@/keybindings";
 import { useBackgroundStore } from "./Store";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { detect } from "detect-browser";
+import { useMountEffect } from "@/hooks/use-mountEffect";
+
+const ToolboxName: Toolbox = "background";
 
 interface SubmenuProps {
   isOpen: boolean;
   anchorElement: HTMLButtonElement | null;
-  onClose: (event: MouseEvent) => void;
   channelControls: ReactElement[];
+  openSubmenu: () => void;
 }
 
 interface Props {
@@ -46,7 +48,6 @@ interface Props {
   handleOpen: (
     event?: MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
-  onClose: (event: MouseEvent) => void;
   anchorElement: HTMLButtonElement | null;
   isTyping: () => boolean;
   channels: boolean[];
@@ -59,18 +60,19 @@ const useStyles = makeStyles((theme: Theme) =>
     subMenu: {
       display: "flex",
       justifyContent: "space-between",
-      //   width: "136px",
-      height: "285px",
+      height: "fit-content",
       background: "none",
     },
     subMenuCard: {
       height: "fit-content",
+      width: "285",
       marginLeft: "18px", // TODO other toolbars should use this approach
     },
     baseSlider: {
-      width: "63px",
-      height: "auto",
+      width: "285px",
+      height: "65px",
       textAlign: "center",
+      display: "flex",
     },
     channelHeader: {
       backgroundColor: theme.palette.primary.main,
@@ -80,6 +82,11 @@ const useStyles = makeStyles((theme: Theme) =>
       fontSize: "14px",
       fontWeight: 400,
     },
+    sliderName: {
+      marginLeft: "10px",
+      marginBottom: "5px",
+      paddingTop: "6px",
+    },
   })
 );
 
@@ -88,8 +95,19 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   const [buttonClicked, setButtonClicked] = useState(null as string);
   const classes = useStyles();
 
+  const submenuEvents = [
+    "selectContrast",
+    "selectBrightness",
+    "selectChannels",
+  ] as const;
+
+  interface Event extends CustomEvent {
+    type: typeof submenuEvents[number];
+  }
+
   function selectBrightness() {
-    setButtonClicked(Tools.brightness.name);
+    setButtonClicked("Brightness");
+    return true;
   }
 
   function changeBrightness(
@@ -103,7 +121,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   }
 
   function selectContrast() {
-    setButtonClicked(Tools.contrast.name);
+    setButtonClicked("Contrast");
+    return true;
   }
 
   function changeContrast(e: ChangeEvent, value: number) {
@@ -114,110 +133,162 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   }
 
   function selectChannels() {
-    setButtonClicked(Tools.channels.name);
+    setButtonClicked("Channels");
+    return true;
   }
+
+  const tools = [
+    {
+      name: "Contrast",
+      icon: icons.contrast,
+      active: () => buttonClicked === "Contrast",
+      event: selectContrast,
+    },
+    {
+      name: "Brightness",
+      icon: icons.brightness,
+      active: () => buttonClicked === "Brightness",
+      event: selectBrightness,
+    },
+    {
+      name: "Channels",
+      icon: icons.channels,
+      active: () => buttonClicked === "Channels",
+      event: selectChannels,
+    },
+  ];
+
+  useMountEffect(() => {
+    const submenuEventFunctions = {
+      selectContrast,
+      selectBrightness,
+      selectChannels,
+    };
+
+    const handleEvent = (event: Event): void => {
+      if (event.detail === Toolboxes.background) {
+        // If the function we call returns true, also open the popup
+        const popup = submenuEventFunctions[event.type]?.call(this) as boolean;
+        if (popup) {
+          props.openSubmenu();
+        }
+      }
+    };
+
+    for (const event of submenuEvents) {
+      document.addEventListener(event, handleEvent);
+    }
+
+    // Specify how to clean up after this effect:
+    return function cleanup() {
+      for (const event of submenuEvents) {
+        document.removeEventListener(event, handleEvent);
+      }
+    };
+  });
+
+  const handleClickAway = () => {
+    setButtonClicked("");
+  };
 
   const browser = detect().name;
 
   return (
     <>
-      <Popover
-        open={props.isOpen}
-        anchorEl={props.anchorElement}
-        onClose={props.onClose}
-        PaperProps={{ classes: { root: classes.subMenu } }}
-        elevation={0}
-      >
-        <ButtonGroup
-          orientation="vertical"
-          size="small"
-          id="background-settings-toolbar"
-          style={{ height: "fit-content" }}
+      <ClickAwayListener onClickAway={handleClickAway}>
+        <Popper
+          open={props.isOpen}
+          anchorEl={props.anchorElement}
+          placement="right-end"
+          style={{ display: "flex" }}
+          modifiers={{
+            offset: {
+              enabled: true,
+              offset: "10, 10",
+            },
+          }}
         >
-          <BaseIconButton
-            tooltip={Tools.channels}
-            onClick={() => selectChannels()}
-            fill={buttonClicked === Tools.channels.name}
-          />
-          {browser !== "safari"
-            ? [
-                <BaseIconButton
-                  tooltip={Tools.brightness}
-                  onClick={() => selectBrightness()}
-                  fill={buttonClicked === Tools.brightness.name}
-                  key={1}
-                />,
-
-                <BaseIconButton
-                  tooltip={Tools.contrast}
-                  onClick={() => selectContrast()}
-                  fill={buttonClicked === Tools.contrast.name}
-                  key={2}
-                />,
-              ]
-            : null}
-        </ButtonGroup>
-        <Card className={classes.subMenuCard}>
-          {buttonClicked === Tools.brightness.name && (
-            <div className={classes.baseSlider}>
-              <BaseSlider
-                value={background.brightness}
-                config={SLIDER_CONFIG[Sliders.brightness]}
-                onChange={() => changeBrightness}
-                showEndValues={false}
+          <ButtonGroup
+            orientation="vertical"
+            size="small"
+            id="background-settings-toolbar"
+            style={{ marginRight: "-10px" }}
+          >
+            {tools.filter(({name})=>browser !== "safari" || !(name === 'Contrast' || name === 'Brightness')).map(({ icon, name, event, active }) => (
+              <IconButton
+                key={name}
+                icon={icon}
+                tooltip={{
+                  name,
+                  ...getShortcut(`${ToolboxName}.${event.name}`),
+                }}
+                onClick={event}
+                fill={active()}
               />
-            </div>
-          )}
-          {buttonClicked === Tools.contrast.name && (
-            <div className={classes.baseSlider}>
-              <BaseSlider
-                value={background.contrast}
-                config={SLIDER_CONFIG[Sliders.contrast]}
-                onChange={() => changeContrast}
-                showEndValues={false}
-              />
-            </div>
-          )}
-          {buttonClicked === Tools.channels.name && props.channelControls && (
-            <>
-              <CardHeader
-                className={classes.channelHeader}
-                title={
-                  <Typography style={{ fontWeight: 500 }}>Channel</Typography>
-                }
-              />
-              <CardContent>
-                <FormControl component="fieldset">
-                  <FormGroup aria-label="position">
-                    {props.channelControls.map((control, i) => (
-                      <FormControlLabel
-                        key={`C${i + 1}`}
-                        value="top"
-                        control={control}
-                        label={
-                          <Typography className={classes.channelInfo}>
-                            {`Channel ${i + 1}`}
-                          </Typography>
-                        }
-                        labelPlacement="end"
-                      />
-                    ))}
-                  </FormGroup>
-                </FormControl>
-              </CardContent>
-            </>
-          )}
-        </Card>
-      </Popover>
+            ))}
+          </ButtonGroup>
+          <Card className={classes.subMenuCard}>
+            {buttonClicked === "Brightness" && (
+              <>
+                <div className={classes.sliderName}>Brightness</div>
+                <div className={classes.baseSlider}>
+                  <BaseSlider
+                    value={background.brightness}
+                    config={SLIDER_CONFIG[Sliders.brightness]}
+                    onChange={() => changeBrightness}
+                  />
+                </div>
+              </>
+            )}
+            
+            {buttonClicked === "Contrast" && (
+              <>
+                <div className={classes.sliderName}>Contrast</div>
+                <div className={classes.baseSlider}>
+                  <BaseSlider
+                    value={background.contrast}
+                    config={SLIDER_CONFIG[Sliders.contrast]}
+                    onChange={() => changeContrast}
+                  />
+                </div>
+              </>
+            )}
+            {buttonClicked === "Channels" && props.channelControls && (
+              <>
+                <CardHeader
+                  className={classes.channelHeader}
+                  title={
+                    <Typography style={{ fontWeight: 500 }}>Channel</Typography>
+                  }
+                />
+                <CardContent>
+                  <FormControl component="fieldset">
+                    <FormGroup aria-label="position">
+                      {props.channelControls.map((control, i) => (
+                        <FormControlLabel
+                          key={`C${i + 1}`}
+                          value="top"
+                          control={control}
+                          label={
+                            <Typography className={classes.channelInfo}>
+                              {`Channel ${i + 1}`}
+                            </Typography>
+                          }
+                          labelPlacement="end"
+                        />
+                      ))}
+                    </FormGroup>
+                  </FormControl>
+                </CardContent>
+              </>
+            )}
+          </Card>
+        </Popper>
+      </ClickAwayListener>
     </>
   );
 };
 
-const events = ["selectBackgroundSettings"] as const;
-
-interface Event extends CustomEvent {
-  type: typeof events[number];
-}
 class Toolbar extends Component<Props> {
   private refBackgroundSettingsPopover: HTMLButtonElement;
 
@@ -229,44 +300,23 @@ class Toolbar extends Component<Props> {
     this.refBackgroundSettingsPopover = null;
   }
 
-  componentDidMount = (): void => {
-    for (const event of events) {
-      document.addEventListener(event, this.handleEvent);
-    }
-    this.updateChannelChoices();
-  };
-
   componentDidUpdate = (): void => {
     this.updateChannelChoices();
-  };
-
-  componentWillUnmount(): void {
-    for (const event of events) {
-      document.removeEventListener(event, this.handleEvent);
-    }
-  }
-
-  handleEvent = (event: Event): void => {
-    if (event.detail === Toolboxes.background) {
-      this[event.type]?.call(this);
-    }
   };
 
   updateChannelChoices = (): void => {
     // Update channel controls when a new image is uploaded.
     const untickedIcon = (
-      <SVG
-        src={imgSrc("not-selected-tickbox-icon")}
-        width="18px"
-        height="auto"
-      />
+      <SVG src={icons.notSelectedTickbox} width="18px" height="auto" />
     );
     const tickedIcon = (
-      <SVG src={imgSrc("selected-tickbox-icon")} width="18px" height="auto" />
+      <SVG src={icons.selectedTickbox} width="18px" height="auto" />
     );
     this.channelControls = this.props.channels.map((channel, i) => (
       <Checkbox
         // className={classes.checkbox}
+        // eslint-disable-next-line react/no-array-index-key
+        key={i}
         checked={channel}
         icon={untickedIcon}
         checkedIcon={tickedIcon}
@@ -277,33 +327,39 @@ class Toolbar extends Component<Props> {
     ));
   };
 
-  selectBackgroundSettings = (): void => {
+  openSubmenu = (): void => {
     if (this.props.isTyping()) return;
     this.props.handleOpen()(this.refBackgroundSettingsPopover);
-    this.props.setButtonClicked(Tools.backgroundSettings.name);
+    this.props.setButtonClicked("Background Settings");
   };
 
   render = (): ReactElement => (
     <>
-      <BaseIconButton
-        tooltip={Tools.backgroundSettings}
-        onClick={this.selectBackgroundSettings}
-        fill={this.props.buttonClicked === Tools.backgroundSettings.name}
-        setRefCallback={(ref) => {
-          this.refBackgroundSettingsPopover = ref;
-        }}
-      />
+      <ButtonGroup style={{ all: "revert" }}>
+        <IconButton
+          tooltip={{
+            name: "Background Settings",
+          }}
+          icon={icons.backgroundSettings}
+          onClick={this.openSubmenu}
+          fill={this.props.buttonClicked === "Background Settings"}
+          setRefCallback={(ref) => {
+            this.refBackgroundSettingsPopover = ref;
+          }}
+        />
+      </ButtonGroup>
+
       <Submenu
         isOpen={
-          this.props.buttonClicked === Tools.backgroundSettings.name &&
+          this.props.buttonClicked === "Background Settings" &&
           Boolean(this.props.anchorElement)
         }
+        openSubmenu={this.openSubmenu}
         anchorElement={this.props.anchorElement}
-        onClose={this.props.onClose}
         channelControls={this.channelControls}
       />
     </>
   );
 }
 
-export { Toolbar };
+export { Toolbar, ToolboxName };

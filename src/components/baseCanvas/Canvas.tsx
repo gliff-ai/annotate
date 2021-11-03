@@ -1,5 +1,4 @@
 import { Component, ReactNode, MouseEvent } from "react";
-import DragAndPinchHooks from "../DragAndPinchHooks";
 
 import { XYPoint, PositionAndSize } from "@/annotation/interfaces";
 import { theme } from "@gliff-ai/style";
@@ -29,7 +28,7 @@ export interface Props {
   displayedImage?: ImageBitmap;
 }
 
- class BaseCanvas extends Component<Props> {
+export class BaseCanvas extends Component<Props> {
   private canvas: HTMLCanvasElement;
 
   private canvasContainer: HTMLDivElement;
@@ -208,9 +207,3 @@ export interface Props {
     </div>
   );
 }
-export DragAndPinchHooks(BaseCanvas)
-
-
-
-                                
-                                

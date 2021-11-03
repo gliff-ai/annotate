@@ -1,12 +1,11 @@
 import { ReactElement, MouseEvent, Component } from "react";
 import { Menu, MenuItem, withStyles, WithStyles } from "@material-ui/core";
 import { ImageFileInfo } from "@gliff-ai/upload";
-import { BaseIconButton } from "@gliff-ai/style";
+import { IconButton, icons } from "@gliff-ai/style";
 import { keydownListener } from "@/keybindings";
 import { Annotations } from "@/annotation";
-import { downloadPaintbrushAsTiff } from "@/download/DownloadAsTiff";
-import { downloadAnnotationsAsJson } from "@/download/DownloadAsJson";
-import { Tools } from "@/tooltips";
+import { downloadPaintbrushAsTiff } from "./DownloadAsTiff";
+import { downloadAnnotationsAsJson } from "./DownloadAsJson";
 import { Toolboxes } from "@/Toolboxes";
 
 const styles = {
@@ -59,10 +58,12 @@ type ItemMenu = {
   text: string;
   onClick: () => void;
 };
+
 interface State {
   anchorEl: HTMLButtonElement | null;
   menuItems: ItemMenu[];
 }
+
 class DownloadUI extends Component<Props, State> {
   refDownloadPopover: HTMLButtonElement | null;
 
@@ -156,13 +157,12 @@ class DownloadUI extends Component<Props, State> {
     const { classes } = this.props;
     return (
       <>
-        <BaseIconButton
-          tooltip={Tools.download}
+        <IconButton
+          tooltip={{ name: "Download Annotations" }}
           onClick={this.handleOpen}
-          fill={false}
-          hasAvatar={false}
+          icon={icons.download}
           tooltipPlacement="bottom"
-          buttonSize="medium"
+          size="medium"
           setRefCallback={(ref) => {
             this.refDownloadPopover = ref;
           }}

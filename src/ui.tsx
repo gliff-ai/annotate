@@ -13,7 +13,13 @@ import {
   StylesProvider,
 } from "@material-ui/core";
 import { UploadImage, ImageFileInfo } from "@gliff-ai/upload";
-import { theme, BaseIconButton, generateClassName } from "@gliff-ai/style";
+import {
+  theme,
+  Logo,
+  IconButton,
+  icons,
+  generateClassName,
+} from "@gliff-ai/style";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
@@ -28,10 +34,9 @@ import { BoundingBoxCanvas, BoundingBoxToolbar } from "@/toolboxes/boundingBox";
 import { PaintbrushCanvas, PaintbrushToolbar } from "@/toolboxes/paintbrush";
 import { LabelsSubmenu } from "@/toolboxes/labels";
 import { Download } from "@/download/UI";
-import { keydownListener } from "@/keybindings";
-import { Tools } from "@/tooltips";
+import { getShortcut, keydownListener } from "@/keybindings";
 import { BaseSlider, Config } from "@/components/BaseSlider";
-import { imgSrc } from "./imgSrc";
+import { KeybindPopup } from "./keybindings/KeybindPopup";
 
 const logger = console;
 
@@ -153,23 +158,14 @@ const styles = {
   },
   slicesSlider: {
     width: "63px",
-    height: "450px",
-  },
-  tooltip: {
-    backgroundColor: "#FFFFFF",
-    border: "1px solid #dadde9",
-    opacity: "1",
-    marginTop: "30px",
-    marginLeft: "0px",
-    fontSize: "17px",
-    letterSpacing: 0,
-    color: "#2B2F3A",
-    fontWeight: 400,
+    height: "390px",
+    top: "180px",
+    right: "18px",
   },
 };
 
 interface Props extends WithStyles<typeof styles> {
-  slicesData?: Array<Array<ImageBitmap>>;
+  slicesData?: ImageBitmap[][] | null;
   imageFileInfo?: ImageFileInfo;
   annotationsObject?: Annotations;
   presetLabels?: string[];
@@ -191,7 +187,7 @@ class UserInterface extends Component<Props, State> {
 
   private presetLabels: string[];
 
-  private slicesData: Array<Array<ImageBitmap>>;
+  private slicesData: ImageBitmap[][] | null;
 
   private imageFileInfo: ImageFileInfo | null;
 
@@ -257,10 +253,6 @@ class UserInterface extends Component<Props, State> {
       prevProps.annotationsObject !== this.props.annotationsObject
     ) {
       this.annotationsObject = this.props.annotationsObject;
-      // Restore activeAnnotationID
-      this.annotationsObject.setActiveAnnotationID(
-        this.state.activeAnnotationID
-      );
       this.callRedraw();
     }
   };
@@ -520,7 +512,7 @@ class UserInterface extends Component<Props, State> {
     // Select draw mode and re-activate last used toolbox
     this.setState((prevState) => ({
       mode: Mode.draw,
-      buttonClicked: Tools[prevState.activeToolbox].name,
+      buttonClicked: prevState.activeToolbox,
     }));
   };
 
@@ -529,7 +521,7 @@ class UserInterface extends Component<Props, State> {
     if (this.isTyping()) return;
 
     if (this.state.mode === Mode.draw) {
-      this.setState({ mode: Mode.select, buttonClicked: Tools.select.name });
+      this.setState({ mode: Mode.select, buttonClicked: "Select" });
     } else {
       this.selectDrawMode();
     }
@@ -599,7 +591,9 @@ class UserInterface extends Component<Props, State> {
     }, this.mixChannels);
   };
 
-  handleClose = (): void => this.setState({ anchorElement: null });
+  handleClose = (): void => {
+    this.setState({ anchorElement: null });
+  };
 
   handleOpen =
     (event?: React.MouseEvent) =>
@@ -620,25 +614,25 @@ class UserInterface extends Component<Props, State> {
   // TODO: find a way to pass parameters in keybindings and get rid of code duplication
   selectContrast = (): void => {
     if (this.isTyping()) return;
-    this.handleOpen()(this.refBtnsPopovers[Tools.contrast.name]);
-    this.setButtonClicked(Tools.contrast.name);
+    this.handleOpen()(this.refBtnsPopovers.Contrast);
+    this.setButtonClicked("Contrast");
   };
 
   selectBrightness = (): void => {
     if (this.isTyping()) return;
-    this.handleOpen()(this.refBtnsPopovers[Tools.brightness.name]);
-    this.setButtonClicked(Tools.brightness.name);
+    this.handleOpen()(this.refBtnsPopovers.Brightness);
+    this.setButtonClicked("Brightness");
   };
 
   selectChannels = (): void => {
     if (this.isTyping()) return;
-    this.handleOpen()(this.refBtnsPopovers[Tools.channels.name]);
-    this.setButtonClicked(Tools.channels.name);
+    this.handleOpen()(this.refBtnsPopovers.Channels);
+    this.setButtonClicked("Channels");
   };
 
   selectAnnotationLabel = (): void => {
-    this.handleOpen()(this.refBtnsPopovers[Tools.labels.name]);
-    this.setButtonClicked(Tools.labels.name);
+    this.handleOpen()(this.refBtnsPopovers["Annotation Label"]);
+    this.setButtonClicked("Annotation Label");
   };
 
   saveAnnotations = (): void => {
@@ -648,20 +642,20 @@ class UserInterface extends Component<Props, State> {
 
   undo = (): void => {
     this.callRedraw();
-    this.setButtonClicked(Tools.undo.name);
+    this.setButtonClicked("Undo");
     this.annotationsObject.undo();
   };
 
   redo = (): void => {
     this.callRedraw();
-    this.setButtonClicked(Tools.redo.name);
+    this.setButtonClicked("Redo");
     this.annotationsObject.redo();
   };
 
   isTyping = (): boolean =>
     // Added to prevent single-key shortcuts that are also valid text input
     // to get triggered during text input.
-    this.refBtnsPopovers[Tools.labels.name] === this.state.anchorElement;
+    this.refBtnsPopovers.Labels === this.state.anchorElement;
 
   render = (): ReactNode => {
     const { classes, showAppBar, saveAnnotationsCallback } = this.props;
@@ -673,12 +667,12 @@ class UserInterface extends Component<Props, State> {
             <UploadImage
               setUploadedImage={this.setUploadedImage}
               spanElement={
-                <BaseIconButton
-                  tooltip={Tools.upload}
+                <IconButton
+                  tooltip={{ name: "Upload Images" }}
+                  icon={icons.upload}
                   fill={false}
-                  hasAvatar={false}
                   tooltipPlacement="bottom"
-                  buttonSize="medium"
+                  size="medium"
                   component="span"
                 />
               }
@@ -711,77 +705,95 @@ class UserInterface extends Component<Props, State> {
         <Toolbar>
           <Grid container direction="row">
             <Grid item className={classes.iconbutton}>
-              <img
-                src={imgSrc("gliff-master-black")}
-                width="79px"
-                height="60px"
-                alt="gliff logo"
-              />
+              <Logo />
             </Grid>
           </Grid>
+          <KeybindPopup />
 
           {uploadDownload}
         </Toolbar>
       </AppBar>
     );
 
+    const tools = [
+      {
+        name: "Select",
+        icon: icons.select,
+        event: "toggleMode",
+        active: () => this.state.buttonClicked === "Select",
+        enabled: () => true,
+      },
+      {
+        name: "Add New Annotation",
+        icon: icons.addAnnotation,
+        event: "addAnnotation",
+        active: () => false, // TODO: add feedback when this is clicked
+        enabled: () => true,
+      },
+      {
+        name: "Clear Annotation",
+        icon: icons.deleteAnnotation,
+        event: "clearActiveAnnotation",
+        active: () => false, // TODO: add feedback when this is clicked
+        enabled: () => true,
+      },
+      {
+        name: "Annotation Label",
+        icon: icons.annotationLabel,
+        event: "selectAnnotationLabel",
+        active: () => this.state.buttonClicked === "Annotation Label",
+        enabled: () => true,
+      },
+      {
+        name: "Undo last action",
+        icon: icons.undo,
+        event: "undo",
+        active: () => false,
+        enabled: () => this.state.buttonClicked === "Undo last action",
+      },
+      {
+        name: "Redo last action",
+        icon: icons.redo,
+        event: "redo",
+        active: () => false,
+        enabled: () => this.state.buttonClicked === "Redo last action",
+      },
+    ] as const;
+
     const leftToolbar = (
       <Toolbar className={classes.leftToolbar}>
-        <ButtonGroup size="small">
-          <BaseIconButton
-            tooltip={Tools.select}
-            onClick={this.toggleMode}
-            fill={this.state.buttonClicked === Tools.select.name}
-          />
-          <BaseIconButton
-            tooltip={Tools.addNewAnnotation}
-            onMouseDown={() => {
-              this.setButtonClicked(Tools.addNewAnnotation.name);
-              this.addAnnotation();
-            }}
-            onMouseUp={this.selectDrawMode}
-            fill={this.state.buttonClicked === Tools.addNewAnnotation.name}
-          />
-          <BaseIconButton
-            tooltip={Tools.clearAnnotation}
-            onMouseDown={() => {
-              this.setButtonClicked(Tools.clearAnnotation.name);
-              this.clearActiveAnnotation();
-            }}
-            onMouseUp={this.selectDrawMode}
-            fill={this.state.buttonClicked === Tools.clearAnnotation.name}
-          />
+        <ButtonGroup>
+          {tools.map(({ icon, name, event, active, enabled }) => (
+            <IconButton
+              key={name}
+              icon={icon}
+              tooltip={{
+                name,
+                ...getShortcut(`ui.${event}`),
+              }}
+              onClick={this[event]}
+              fill={active()}
+              setRefCallback={(ref: HTMLButtonElement) => {
+                this.refBtnsPopovers[name] = ref;
+              }}
+              disabled={!enabled()}
+            />
+          ))}
 
           {saveAnnotationsCallback && (
-            <BaseIconButton
-              tooltip={Tools.save}
+            <IconButton
+              tooltip={{ name: "Save Annotations" }}
+              icon={icons.save}
               onMouseDown={() => {
-                this.setButtonClicked(Tools.save.name);
+                this.setButtonClicked("Save Annotations");
                 this.saveAnnotations();
               }}
               onMouseUp={this.selectDrawMode}
-              fill={this.state.buttonClicked === Tools.save.name}
+              fill={this.state.buttonClicked === "Save Annotations"}
             />
           )}
-          <BaseIconButton
-            tooltip={Tools.labels}
-            onClick={this.selectAnnotationLabel}
-            fill={this.state.buttonClicked === Tools.labels.name}
-            setRefCallback={(ref) => {
-              this.refBtnsPopovers[Tools.labels.name] = ref;
-            }}
-          />
+
           {this.props.trustedServiceButtonToolbar}
-          <BaseIconButton
-            tooltip={Tools.undo}
-            onClick={this.undo}
-            fill={this.state.buttonClicked === Tools.undo.name}
-          />
-          <BaseIconButton
-            tooltip={Tools.redo}
-            onClick={this.redo}
-            fill={this.state.buttonClicked === Tools.redo.name}
-          />
         </ButtonGroup>
         <ButtonGroup>
           <PaintbrushToolbar
@@ -789,19 +801,19 @@ class UserInterface extends Component<Props, State> {
             setButtonClicked={this.setButtonClicked}
             activateToolbox={this.activateToolbox}
             handleOpen={this.handleOpen}
-            onClose={this.handleClose}
             anchorElement={this.state.anchorElement}
             isTyping={this.isTyping}
+            is3D={this.slicesData?.length > 1}
           />
           <SplineToolbar
             buttonClicked={this.state.buttonClicked}
             setButtonClicked={this.setButtonClicked}
             activateToolbox={this.activateToolbox}
             handleOpen={this.handleOpen}
-            onClose={this.handleClose}
             anchorElement={this.state.anchorElement}
             isTyping={this.isTyping}
           />
+
           <BoundingBoxToolbar
             buttonClicked={this.state.buttonClicked}
             setButtonClicked={this.setButtonClicked}
@@ -812,7 +824,6 @@ class UserInterface extends Component<Props, State> {
             buttonClicked={this.state.buttonClicked}
             setButtonClicked={this.setButtonClicked}
             handleOpen={this.handleOpen}
-            onClose={this.handleClose}
             anchorElement={this.state.anchorElement}
             isTyping={this.isTyping}
             channels={this.state.channels}
@@ -920,11 +931,7 @@ class UserInterface extends Component<Props, State> {
                     <Paper
                       elevation={3}
                       className={classes.slicesSlider}
-                      style={{
-                        position: "absolute",
-                        top: "180px",
-                        right: "18px",
-                      }}
+                      style={{ position: "absolute" }}
                     >
                       <BaseSlider
                         value={this.state.sliceIndex}

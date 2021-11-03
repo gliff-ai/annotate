@@ -15,7 +15,6 @@ interface Props {
   config: Config;
   onChange: (arg0: string) => (arg1: ChangeEvent, arg2: number) => void;
   sliderHeight?: string;
-  showEndValues?: boolean;
 }
 
 function getAriaValueText(value: number): string {
@@ -29,16 +28,15 @@ const useStyles = (sliderHeight?: string) =>
       height: "42px",
       border: "1px solid #02FFAD",
       borderRadius: "9px",
-      margin: "auto",
       textAlign: "center",
       padding: "10px 0",
-      marginTop: "10px",
-      marginBottom: "20px",
+      margin: "10px 20px 20px 10px",
     },
     slider: {
-      textAlign: "center",
+      marginLeft: "10px",
+      width: "180px",
       height: sliderHeight || "194px",
-      marginBottom: "18px",
+      marginTop: "10px",
     },
     maxSliderValue: {
       marginBottom: "18px",
@@ -50,20 +48,27 @@ export const BaseSlider = ({
   config,
   onChange,
   sliderHeight,
-  showEndValues,
 }: Props): ReactElement => {
   const classes = useStyles(sliderHeight)();
+
+  const marks = [
+    {
+      value: Number(`${config.min}`),
+      label: `${config.min}`,
+    },
+    {
+      value: Number(`${config.max}`),
+      label: `${config.max}`,
+    },
+  ];
 
   return (
     <>
       <div className={classes.value}>{`${value}`}</div>
       <div className={classes.slider}>
-        <div className={classes.maxSliderValue}>
-          {showEndValues ? `${config.max}${config.unit}` : null}
-        </div>
         <Slider
           color="primary"
-          orientation="vertical"
+          orientation={config.name === "slices" ? "vertical" : "horizontal"}
           value={value}
           onChange={onChange(config.name)}
           aria-labelledby={config.id}
@@ -71,8 +76,8 @@ export const BaseSlider = ({
           min={config.min}
           max={config.max}
           getAriaValueText={getAriaValueText}
+          marks={marks}
         />
-        <div>{showEndValues ? `${config.min}${config.unit}` : null}</div>
       </div>
     </>
   );
@@ -80,5 +85,4 @@ export const BaseSlider = ({
 
 BaseSlider.defaultProps = {
   sliderHeight: null,
-  showEndValues: true,
 };

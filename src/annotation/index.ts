@@ -46,6 +46,7 @@ export class Annotations {
     this.data = data || [];
     this.audit = audit || [];
     this.activeAnnotationID = 0;
+    this.initUndoRedo();
   }
 
   @log
@@ -484,7 +485,7 @@ export class Annotations {
     this.data[this.activeAnnotationID].spline?.spaceTimeInfo;
 
   @log
-  convertSplineToPaintbrush(radius: number): void {
+  convertSplineToPaintbrush(radius: number, is3D = false): void {
     const coordinates = this.getSplineCoordinates();
     const color = this.getActiveAnnotationColor(); // FIXME always green
     const labels = this.getLabels();
@@ -501,6 +502,7 @@ export class Annotations {
         radius,
         type: "paint",
         color,
+        is3D,
       },
     };
     this.deleteActiveAnnotation();
