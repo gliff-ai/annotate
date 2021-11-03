@@ -497,7 +497,6 @@ class CanvasClass extends Component<Props, State> {
   onMouseDownOrTouchStart = (x: number, y: number): void => {
     if (!this.sliceIndexMatch() || this.props.mode === Mode.select) return;
 
-
     const coordinates = this.props.annotationsObject.getSplineCoordinates();
 
     const clickPoint = canvasToImage(
@@ -534,10 +533,8 @@ class CanvasClass extends Component<Props, State> {
     this.drawAllSplines();
   };
 
-
   onMouseMoveOrTouchMove = (x: number, y: number): void => {
     if (!(this.isDrawing || this.dragPoint)) return;
-
 
     this.numberOfMoves += 1;
 
