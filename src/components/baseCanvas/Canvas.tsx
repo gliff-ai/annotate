@@ -17,6 +17,7 @@ export interface Props {
   onMouseDown?: (x: number, y: number) => void;
   onMouseMove?: (x: number, y: number) => void;
   onMouseUp?: (x: number, y: number) => void;
+  onMouseLeave?: (x: number, y: number) => void;
   onContextMenu?: (x: number, y: number) => void;
   canvasPositionAndSize: PositionAndSize;
   setCanvasPositionAndSize?: (canvasPositionAndSize: PositionAndSize) => void;
@@ -122,6 +123,14 @@ export class BaseCanvas extends Component<Props> {
     }
   };
 
+  onMouseLeaveHandler = (e: MouseEvent): void => {
+    const { x, y } = this.windowToCanvas(e);
+
+    if (this.props.onMouseLeave) {
+      this.props.onMouseLeave(x, y);
+    }
+  };
+
   onContextMenuHandler = (e: MouseEvent): void => {
     const { x, y } = this.windowToCanvas(e);
 
@@ -155,6 +164,7 @@ export class BaseCanvas extends Component<Props> {
         onMouseDown={this.onMouseDownHandler}
         onMouseMove={this.onMouseMoveHandler}
         onMouseUp={this.onMouseUpHandler}
+        onMouseLeave={this.onMouseLeaveHandler}
         key={this.props.name}
         id={`${this.props.name}-canvas`}
         ref={(canvas) => {

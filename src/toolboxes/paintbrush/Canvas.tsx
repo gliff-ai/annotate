@@ -508,6 +508,19 @@ export class CanvasClass extends Component<Props, State> {
     }
   };
 
+  onMouseLeave = (canvasX: number, canvasY: number): void => {
+    if (this.props.mode === Mode.draw) {
+      // End painting & save painting
+
+      // Stop drawing & save the drawn line
+      this.isDrawing = false;
+
+      this.saveLine(this.props.brushRadius);
+
+      this.drawCursor(canvasX, canvasY);
+    }
+  };
+
   getCursor = (): Cursor => {
     if (["Paintbrush", "Eraser"].includes(this.props.activeToolbox)) {
       return this.props.mode === Mode.draw ? "none" : "pointer";
@@ -589,6 +602,7 @@ export class CanvasClass extends Component<Props, State> {
             onMouseDown={this.onMouseDown}
             onMouseMove={this.onMouseMove}
             onMouseUp={this.onMouseUp}
+            onMouseLeave={this.onMouseLeave}
             cursor={this.getCursor()}
             ref={(interactionCanvas) => {
               this.interactionCanvas = interactionCanvas;
