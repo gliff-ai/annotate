@@ -17,12 +17,12 @@ import {
   Theme,
   CardHeader,
   CardContent,
-  Button,
   Typography,
   Popper,
   ClickAwayListener,
 } from "@material-ui/core";
 import SVG from "react-inlinesvg";
+import { detect } from "detect-browser";
 
 import { IconButton, icons } from "@gliff-ai/style";
 import { BaseSlider } from "@/components/BaseSlider";
@@ -30,7 +30,6 @@ import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { getShortcut } from "@/keybindings";
 import { useBackgroundStore } from "./Store";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
-import { detect } from "detect-browser";
 import { useMountEffect } from "@/hooks/use-mountEffect";
 
 const ToolboxName: Toolbox = "background";
