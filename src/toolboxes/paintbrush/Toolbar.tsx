@@ -249,7 +249,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       disabled: () => false,
     },
     {
-      name: "Use 3D brushstokes",
+      name: "Use 3D brushstrokes",
       icon: icons.brush3D,
       event: toggle3D,
       active: () => paintbrush.is3D,
