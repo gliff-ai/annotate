@@ -131,6 +131,13 @@ class Minimap extends Component<Props, State> {
     }
   }
 
+  componentDidUpdate = (prevProps: Props, preState: State): void => {
+    if (preState.isOpen !== this.state.isOpen) {
+      /* eslint-disable react/no-did-update-set-state */
+      this.setState({ transition: true });
+    }
+  };
+
   handleEvent = (event: Event): void => {
     if (event.detail === "minimap") {
       this[event.type]?.call(this);
@@ -138,15 +145,11 @@ class Minimap extends Component<Props, State> {
   };
 
   handleDrawerClose = () => {
-    this.setState({ isOpen: false });
-    setTimeout(() => {
-      this.setState({ transition: true });
-    }, 2000);
+    this.setState({ isOpen: false, transition: false });
   };
 
   handleDrawerOpen = () => {
-    this.setState({ isOpen: true });
-    this.setState({ transition: false });
+    this.setState({ isOpen: true, transition: false });
   };
 
   render = (): ReactElement => {
@@ -173,88 +176,87 @@ class Minimap extends Component<Props, State> {
       },
     ] as const;
 
+    console.log(this.state.isOpen);
+
     return (
       <div
         className={this.props.classes.minimap}
         style={{
-          position: "fixed",
+          position: "absolute",
+          right: 0,
+          bottom: 0,
         }}
       >
-        <Slide in={this.state.isOpen} direction="up" timeout={1000}>
-          <Card
-            className={this.props.classes.minimapCard}
-            style={{ position: "relative" }}
-          >
-            <div className={this.props.classes.baseIconButton}>
-              {tools.map(({ icon, name, event }) => (
-                <IconButton
-                  key={name}
-                  icon={icon}
-                  tooltip={{
-                    name,
-                    ...getShortcut(
-                      `${ToolboxName}.${
-                        typeof event === "string" ? event : event.name
-                      }`
-                    ),
-                  }}
-                  onClick={() => {
-                    this.props.setButtonClicked(name);
-                    if (typeof event === "string") {
-                      this.props[event]();
-                    } else {
-                      event();
-                    }
-                  }}
-                  fill={this.props.buttonClicked === name}
-                  tooltipPlacement="top"
-                />
-              ))}
-            </div>
-            <Divider className={this.props.classes.divider} />
-            {/* Background canvas for the minimap */}
-            {this.props.displayedImage && (
-              <div
-                className={this.props.classes.canvasCard}
-                style={{ position: "relative" }}
-              >
-                <BackgroundCanvas
-                  scaleAndPan={{ x: 0, y: 0, scale: 1 }}
-                  displayedImage={this.props.displayedImage}
-                  canvasPositionAndSize={this.props.minimapPositionAndSize}
-                  setCanvasPositionAndSize={
-                    this.props.setMinimapPositionAndSize
-                  }
-                />
-                <MinimapCanvas
-                  displayedImage={this.props.displayedImage}
-                  scaleAndPan={this.props.scaleAndPan}
-                  setScaleAndPan={this.props.setScaleAndPan}
-                  canvasPositionAndSize={this.props.viewportPositionAndSize}
-                  minimapPositionAndSize={this.props.minimapPositionAndSize}
-                  setMinimapPositionAndSize={
-                    this.props.setMinimapPositionAndSize
-                  }
-                  canvasContainerColour={this.props.canvasContainerColour}
-                />
-              </div>
-            )}
-          </Card>
-        </Slide>
-
-        {!this.state.isOpen ? (
+        {this.state.isOpen ? (
           <Slide
             in={this.state.transition}
             direction="up"
-            timeout={{ enter: 1000 }}
+            timeout={{ enter: 750 }}
           >
-            <Card
-              className={this.props.classes.mimimapToggle}
-              style={{
-                position: "relative",
-                textAlign: "center",
-              }}
-            >
+            <Card className={this.props.classes.minimapCard}>
+              <div className={this.props.classes.baseIconButton}>
+                {tools.map(({ icon, name, event }) => (
+                  <IconButton
+                    key={name}
+                    icon={icon}
+                    tooltip={{
+                      name,
+                      ...getShortcut(
+                        `${ToolboxName}.${
+                          typeof event === "string" ? event : event.name
+                        }`
+                      ),
+                    }}
+                    onClick={() => {
+                      this.props.setButtonClicked(name);
+                      if (typeof event === "string") {
+                        this.props[event]();
+                      } else {
+                        event();
+                      }
+                    }}
+                    fill={this.props.buttonClicked === name}
+                    tooltipPlacement="top"
+                  />
+                ))}
+              </div>
+              <Divider className={this.props.classes.divider} />
+              {/* Background canvas for the minimap */}
+              {this.props.displayedImage && (
+                <div
+                  className={this.props.classes.canvasCard}
+                  style={{ position: "relative" }}
+                >
+                  <BackgroundCanvas
+                    scaleAndPan={{ x: 0, y: 0, scale: 1 }}
+                    displayedImage={this.props.displayedImage}
+                    canvasPositionAndSize={this.props.minimapPositionAndSize}
+                    setCanvasPositionAndSize={
+                      this.props.setMinimapPositionAndSize
+                    }
+                  />
+                  <MinimapCanvas
+                    displayedImage={this.props.displayedImage}
+                    scaleAndPan={this.props.scaleAndPan}
+                    setScaleAndPan={this.props.setScaleAndPan}
+                    canvasPositionAndSize={this.props.viewportPositionAndSize}
+                    minimapPositionAndSize={this.props.minimapPositionAndSize}
+                    setMinimapPositionAndSize={
+                      this.props.setMinimapPositionAndSize
+                    }
+                    canvasContainerColour={this.props.canvasContainerColour}
+                  />
+                </div>
+              )}
+            </Card>
+          </Slide>
+        ) : (
+          <Slide
+            in={this.state.transition}
+            direction="up"
+            timeout={{ enter: 750 }}
+          >
+            <Card className={this.props.classes.mimimapToggle}>
               <IconButton
                 icon={icons.maximise}
                 tooltip={{
@@ -274,7 +276,7 @@ class Minimap extends Component<Props, State> {
               />
             </Card>
           </Slide>
-        ) : null}
+        )}
       </div>
     );
   };
