@@ -165,8 +165,6 @@ class Minimap extends Component<Props, State> {
       },
     ] as const;
 
-    console.log(this.state.isOpen);
-
     return (
       <div
         style={{
