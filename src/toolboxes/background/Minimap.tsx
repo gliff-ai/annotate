@@ -14,12 +14,6 @@ import { getShortcut } from "@/keybindings";
 import { Toolbox } from "@/Toolboxes";
 
 const styles = {
-  minimap: {
-    right: "250px",
-    bottom: "0",
-    marginTop: "30px",
-    zIndex: 100,
-  },
   minimapCard: {
     width: "344px",
     height: "255px",
@@ -52,13 +46,8 @@ const styles = {
     height: "200px",
   },
   mimimapToggle: {
-    width: "61px",
-    height: "53px",
-    left: "540px",
     borderRadius: "10px 0 0 0",
-    paddingBottom: "58px",
   },
-
   miniMapToolTipAvatar: {
     backgroundColor: theme.palette.primary.main,
     color: "#2B2F3A",
@@ -180,7 +169,6 @@ class Minimap extends Component<Props, State> {
 
     return (
       <div
-        className={this.props.classes.minimap}
         style={{
           position: "absolute",
           right: 0,
