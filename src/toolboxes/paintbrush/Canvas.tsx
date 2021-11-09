@@ -430,7 +430,7 @@ export class CanvasClass extends Component<Props, State> {
     this.drawAllStrokes(this.backgroundCanvas?.canvasContext);
   };
 
-  /* *** Mouse events *** */
+  /* *** Mouse/Touch events *** */
   onMouseDown = (canvasX: number, canvasY: number): void => {
     if (this.props.mode === Mode.draw) {
       // Start drawing

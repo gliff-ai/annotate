@@ -487,9 +487,8 @@ export class CanvasClass extends Component<Props, State> {
     this.drawAllBoundingBoxes();
   };
 
-  onMouseDown = (x: number, y: number): void => {
+  onMouseDownOrTouchStart = (x: number, y: number): void => {
     if (!this.sliceIndexMatch()) return;
-
     const boundingBoxCoordinates =
       this.props.annotationsObject.getBoundingBoxCoordinates();
 
@@ -516,7 +515,7 @@ export class CanvasClass extends Component<Props, State> {
     this.drawAllBoundingBoxes();
   };
 
-  onMouseMove = (x: number, y: number): void => {
+  onMouseMoveOrTouchMove = (x: number, y: number): void => {
     if (!this.isMouseDown) return;
 
     // Replace update the coordinates for the point dragged
@@ -584,7 +583,7 @@ export class CanvasClass extends Component<Props, State> {
     this.drawAllBoundingBoxes();
   };
 
-  onMouseUp = (): void => {
+  onMouseUpOrTouchEnd = (): void => {
     // Works as part of drag and drop for points.
     if (this.isMouseDown) {
       this.props.annotationsObject.updateBoundingBoxCoordinates(
@@ -636,9 +635,12 @@ export class CanvasClass extends Component<Props, State> {
       <div style={{ pointerEvents: this.isActive() ? "auto" : "none" }}>
         <BaseCanvas
           onClick={this.onClick}
-          onMouseDown={this.onMouseDown}
-          onMouseMove={this.onMouseMove}
-          onMouseUp={this.onMouseUp}
+          onMouseDown={this.onMouseDownOrTouchStart}
+          onTouchStart={this.onMouseDownOrTouchStart}
+          onMouseMove={this.onMouseMoveOrTouchMove}
+          onTouchMove={this.onMouseMoveOrTouchMove}
+          onMouseUp={this.onMouseUpOrTouchEnd}
+          onTouchEnd={this.onMouseUpOrTouchEnd}
           cursor={this.getCursor()}
           ref={(baseCanvas) => {
             this.baseCanvas = baseCanvas;

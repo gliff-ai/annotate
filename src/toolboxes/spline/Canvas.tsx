@@ -494,7 +494,7 @@ class CanvasClass extends Component<Props, State> {
     this.props.annotationsObject.updateSplinePoint(bestX, bestY, idx);
   };
 
-  onMouseDown = (x: number, y: number): void => {
+  onMouseDownOrTouchStart = (x: number, y: number): void => {
     if (!this.sliceIndexMatch() || this.props.mode === Mode.select) return;
 
     const coordinates = this.props.annotationsObject.getSplineCoordinates();
@@ -533,7 +533,7 @@ class CanvasClass extends Component<Props, State> {
     this.drawAllSplines();
   };
 
-  onMouseMove = (x: number, y: number): void => {
+  onMouseMoveOrTouchMove = (x: number, y: number): void => {
     if (!(this.isDrawing || this.dragPoint)) return;
 
     this.numberOfMoves += 1;
@@ -584,7 +584,7 @@ class CanvasClass extends Component<Props, State> {
     this.drawAllSplines();
   };
 
-  onMouseUp = (): void => {
+  onMouseUpOrTouchEnd = (): void => {
     // Works as part of drag and drop for points.
     if (this.dragPoint) {
       this.props.annotationsObject.updateSplinePoint(
@@ -665,9 +665,12 @@ class CanvasClass extends Component<Props, State> {
       <div style={{ pointerEvents: this.isActive() ? "auto" : "none" }}>
         <BaseCanvas
           onClick={this.onClick}
-          onMouseDown={this.onMouseDown}
-          onMouseMove={this.onMouseMove}
-          onMouseUp={this.onMouseUp}
+          onMouseDown={this.onMouseDownOrTouchStart}
+          onTouchStart={this.onMouseDownOrTouchStart}
+          onMouseMove={this.onMouseMoveOrTouchMove}
+          onTouchMove={this.onMouseMoveOrTouchMove}
+          onMouseUp={this.onMouseUpOrTouchEnd}
+          onTouchEnd={this.onMouseUpOrTouchEnd}
           cursor={this.getCursor()}
           ref={(baseCanvas) => {
             if (baseCanvas) {

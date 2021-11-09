@@ -22,6 +22,7 @@ import {
   ClickAwayListener,
 } from "@material-ui/core";
 import SVG from "react-inlinesvg";
+import { detect } from "detect-browser";
 
 import { IconButton, icons } from "@gliff-ai/style";
 import { BaseSlider } from "@/components/BaseSlider";
@@ -71,6 +72,7 @@ const useStyles = makeStyles((theme: Theme) =>
       height: "65px",
       textAlign: "center",
       display: "flex",
+      marginBottom: "6px",
     },
     channelHeader: {
       backgroundColor: theme.palette.primary.main,
@@ -108,7 +110,10 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     return true;
   }
 
-  function changeBrightness(e: ChangeEvent, value: number) {
+  function changeBrightness(
+    e: ChangeEvent | MouseEvent | React.TouchEvent,
+    value: number
+  ) {
     setBackground({
       brightness: value,
       contrast: background.contrast,
@@ -185,6 +190,9 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   const handleClickAway = () => {
     setButtonClicked("");
   };
+
+  const browser = detect().name;
+
   return (
     <>
       <ClickAwayListener onClickAway={handleClickAway}>
@@ -206,18 +214,24 @@ const Submenu = (props: SubmenuProps): ReactElement => {
             id="background-settings-toolbar"
             style={{ marginRight: "-10px" }}
           >
-            {tools.map(({ icon, name, event, active }) => (
-              <IconButton
-                key={name}
-                icon={icon}
-                tooltip={{
-                  name,
-                  ...getShortcut(`${ToolboxName}.${event.name}`),
-                }}
-                onClick={event}
-                fill={active()}
-              />
-            ))}
+            {tools
+              .filter(
+                ({ name }) =>
+                  browser !== "safari" ||
+                  !(name === "Contrast" || name === "Brightness")
+              )
+              .map(({ icon, name, event, active }) => (
+                <IconButton
+                  key={name}
+                  icon={icon}
+                  tooltip={{
+                    name,
+                    ...getShortcut(`${ToolboxName}.${event.name}`),
+                  }}
+                  onClick={event}
+                  fill={active()}
+                />
+              ))}
           </ButtonGroup>
           <Card className={classes.subMenuCard}>
             {buttonClicked === "Brightness" && (
@@ -232,6 +246,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                 </div>
               </>
             )}
+
             {buttonClicked === "Contrast" && (
               <>
                 <div className={classes.sliderName}>Contrast</div>

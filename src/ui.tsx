@@ -117,7 +117,13 @@ const styles = {
     zIndex: 100,
     justifyContent: "space-between",
     position: "fixed" as const,
+    "& $button": {
+      [theme.breakpoints.down("md")]: {
+        margin: "0px",
+      },
+    },
   },
+
   bottomToolbars: {
     bottom: "18px",
     left: "18px",
