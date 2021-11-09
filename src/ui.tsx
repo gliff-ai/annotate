@@ -887,7 +887,7 @@ class UserInterface extends Component<Props, State> {
                     activeToolbox={this.state.activeToolbox}
                     mode={this.state.mode}
                     setMode={(mode: Mode) => {
-                      this.setState({ mode });
+                      this.setState(() => ({ mode, buttonClicked: null }));
                     }}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
@@ -905,7 +905,7 @@ class UserInterface extends Component<Props, State> {
                     activeToolbox={this.state.activeToolbox}
                     mode={this.state.mode}
                     setMode={(mode: Mode) => {
-                      this.setState({ mode });
+                      this.setState(() => ({ mode, buttonClicked: null }));
                     }}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
@@ -923,7 +923,7 @@ class UserInterface extends Component<Props, State> {
                     activeToolbox={this.state.activeToolbox}
                     mode={this.state.mode}
                     setMode={(mode: Mode) => {
-                      this.setState({ mode });
+                      this.setState(() => ({ mode, buttonClicked: null }));
                     }}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
