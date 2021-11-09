@@ -714,7 +714,7 @@ class UserInterface extends Component<Props, State> {
 
     const tools = [
       {
-        name: "Select",
+        name: "Select Annotation",
         icon: icons.select,
         event: "toggleMode",
         active: () => this.state.buttonClicked === "Select",
