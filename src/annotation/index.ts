@@ -607,12 +607,14 @@ export class Annotations {
       setUIActiveAnnotationID(selectedBrushStroke);
       setActiveToolbox(Toolboxes.paintbrush);
       return selectedBrushStroke;
-    } else if (selectedSpline !== null) {
+    }
+    if (selectedSpline !== null) {
       this.setActiveAnnotationID(selectedSpline);
       setUIActiveAnnotationID(selectedSpline);
       setActiveToolbox(Toolboxes.spline);
       return selectedSpline
-    } else if (
+    }
+    if (
       selectedBoundingBox !== null &&
       selectedBoundingBox !== this.getActiveAnnotationID()
     ) {
