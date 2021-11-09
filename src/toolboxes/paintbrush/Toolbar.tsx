@@ -4,7 +4,6 @@ import {
   ReactElement,
   MouseEvent,
   useState,
-  useEffect,
 } from "react";
 import {
   ButtonGroup,
@@ -12,7 +11,8 @@ import {
   createStyles,
   Divider,
   makeStyles,
-  Popover,
+  Popper,
+  ClickAwayListener,
 } from "@material-ui/core";
 
 import { IconButton, icons } from "@gliff-ai/style";
@@ -28,22 +28,20 @@ import { useMountEffect } from "@/hooks/use-mountEffect";
 interface SubmenuProps {
   isOpen: boolean;
   anchorElement: HTMLButtonElement | null;
-  onClose: (event: MouseEvent) => void;
   openSubmenu: () => void;
-  keepSubmenuOpen: boolean;
+  is3D: boolean;
 }
 
 interface Props {
   buttonClicked: string;
-  keepSubmenuOpen: boolean;
   setButtonClicked: (buttonName: string) => void;
   activateToolbox: (activeToolbox: Toolbox) => void;
   handleOpen: (
     event?: MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
-  onClose: (event: MouseEvent) => void;
   anchorElement: HTMLButtonElement | null;
   isTyping: () => boolean;
+  is3D: boolean;
 }
 
 const useStyles = makeStyles(() =>
@@ -53,6 +51,7 @@ const useStyles = makeStyles(() =>
       height: "65px",
       textAlign: "center",
       display: "flex",
+      marginBottom: "6px",
     },
     subMenu: {
       display: "flex",
@@ -87,13 +86,8 @@ interface Event extends CustomEvent {
 const Submenu = (props: SubmenuProps): ReactElement => {
   const [paintbrush, setPaintbrush] = usePaintbrushStore();
   const [showTransparency, setShowTransparency] = useState<boolean>(false);
-  const [openSubmenu, setOpenSubMenu] = useState<boolean>(
-    props.keepSubmenuOpen
-  );
-
-  useEffect(() => {
-    setOpenSubMenu(props.keepSubmenuOpen);
-  }, [props.keepSubmenuOpen]);
+  const [openSubmenu, setOpenSubMenu] = useState<boolean>(false);
+  const [openSlider, setOpenSlider] = useState<boolean>(true);
 
   const submenuEvents = [
     "selectBrush",
@@ -118,6 +112,9 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   }
 
   function selectBrush() {
+    if (!openSlider) {
+      setOpenSlider(true);
+    }
     setPaintbrush({
       ...paintbrush,
       brushType: "Paintbrush",
@@ -129,6 +126,9 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   }
 
   function selectEraser() {
+    if (!openSlider) {
+      setOpenSlider(true);
+    }
     setPaintbrush({
       ...paintbrush,
       brushType: "Eraser",
@@ -140,12 +140,15 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   }
 
   function toggleShowTransparency() {
+    setOpenSubMenu(true);
     if (showTransparency) {
       setShowTransparency(false);
-      setOpenSubMenu(!openSubmenu);
+
+      setOpenSubMenu(false);
     } else {
       setShowTransparency(true);
     }
+    setOpenSlider(!openSlider);
     setPaintbrush({
       ...paintbrush,
       brushType: "",
@@ -160,6 +163,18 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     });
     document.dispatchEvent(
       new CustomEvent("togglePixelView", { detail: Toolboxes.paintbrush })
+    );
+
+    return true;
+  }
+
+  function toggle3D() {
+    setPaintbrush({
+      ...paintbrush,
+      is3D: !paintbrush.is3D,
+    });
+    document.dispatchEvent(
+      new CustomEvent("toggle3D", { detail: Toolboxes.paintbrush })
     );
 
     return true;
@@ -192,6 +207,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       selectBrush,
       selectEraser,
       toggleShowTransparency,
+      toggle3D,
       changeAnnotationTransparency,
       changeAnnotationTransparencyFocused,
     };
@@ -224,102 +240,136 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       icon: icons.brush,
       event: selectBrush,
       active: () => paintbrush.brushType === "Paintbrush",
+      disabled: () => false,
     },
     {
       name: "Eraser",
       icon: icons.eraser,
       event: selectEraser,
       active: () => paintbrush.brushType === "Eraser",
+      disabled: () => false,
+    },
+    {
+      name: "Use 3D brushstrokes",
+      icon: icons.brush3D,
+      event: toggle3D,
+      active: () => paintbrush.is3D,
+      disabled: () => !props.is3D,
     },
     {
       name: "Fill Active Paintbrush",
       icon: icons.fill,
       event: fillBrush,
       active: () => false,
+      disabled: () => false,
     },
     {
       name: "Annotation Transparency",
       icon: icons.annotationTransparency,
       event: toggleShowTransparency,
       active: () => showTransparency,
+      disabled: () => false,
     },
     {
       name: "Show strokes as pixels",
       icon: icons.convert,
       event: togglePixelView,
       active: () => paintbrush.pixelView,
+      disabled: () => false,
     },
   ];
 
+  const handleClickAway = () => {
+    setOpenSubMenu(false);
+  };
+
   return (
     <>
-      <Popover
-        open={props.isOpen}
-        anchorEl={props.anchorElement}
-        onClose={props.onClose}
-        PaperProps={{ classes: { root: classes.subMenu } }}
+      <ClickAwayListener
+        mouseEvent="onMouseDown"
+        touchEvent="onTouchStart"
+        onClickAway={handleClickAway}
       >
-        <ButtonGroup
-          orientation="vertical"
-          size="small"
-          id="paintbrush-toolbar"
+        <Popper
+          open={props.isOpen}
+          anchorEl={props.anchorElement}
+          placement="right"
+          style={{ display: "flex" }}
+          modifiers={{
+            offset: {
+              enabled: true,
+              offset: "40, 10",
+            },
+          }}
         >
-          {tools.map(({ icon, name, event, active }) => (
-            <IconButton
-              key={name}
-              icon={icon}
-              tooltip={{
-                name,
-                ...getShortcut(`${ToolboxName}.${event.name}`),
-              }}
-              onClick={event}
-              fill={active()}
-            />
-          ))}
-        </ButtonGroup>
-        {openSubmenu && (
-          <Card className={classes.subMenuCard}>
-            {!showTransparency && (
-              <>
-                <div className={classes.sliderName}>
-                  {paintbrush.brushType === "Paintbrush"
-                    ? "Brush Size"
-                    : "Eraser Size"}
-                </div>
-                <div className={classes.baseSlider}>
-                  <BaseSlider
-                    value={paintbrush.brushRadius * 2}
-                    config={SLIDER_CONFIG[Sliders.brushRadius]}
-                    onChange={() => changeBrushRadius}
-                  />
-                </div>
-              </>
-            )}
+          <ButtonGroup
+            orientation="vertical"
+            size="small"
+            id="paintbrush-toolbar"
+            style={{ marginRight: "-10px" }}
+          >
+            {tools.map(({ icon, name, event, active, disabled }) => (
+              <IconButton
+                key={name}
+                icon={icon}
+                tooltip={{
+                  name,
+                  ...getShortcut(`${ToolboxName}.${event.name}`),
+                }}
+                onClick={event}
+                fill={active()}
+                disabled={disabled()}
+              />
+            ))}
+          </ButtonGroup>
 
-            {showTransparency && (
-              <>
-                <div className={classes.sliderName}>Non-Active Annotation</div>
-                <div className={classes.baseSlider}>
-                  <BaseSlider
-                    value={paintbrush.annotationAlpha}
-                    config={SLIDER_CONFIG[Sliders.annotationAlpha]}
-                    onChange={() => changeAnnotationTransparency}
-                  />
-                </div>
-                <Divider className={classes.divider} />
-                <div className={classes.sliderName}>Active Annotation</div>
-                <div className={classes.baseSlider}>
-                  <BaseSlider
-                    value={paintbrush.annotationActiveAlpha}
-                    config={SLIDER_CONFIG[Sliders.annotationActiveAlpha]}
-                    onChange={() => changeAnnotationTransparencyFocused}
-                  />
-                </div>
-              </>
+          <>
+            {openSubmenu && (
+              <Card className={classes.subMenuCard}>
+                {openSlider && (
+                  <>
+                    <div className={classes.sliderName}>
+                      {paintbrush.brushType === "Paintbrush"
+                        ? "Brush Size"
+                        : "Eraser Size"}
+                    </div>
+                    <div className={classes.baseSlider}>
+                      <BaseSlider
+                        value={paintbrush.brushRadius * 2}
+                        config={SLIDER_CONFIG[Sliders.brushRadius]}
+                        onChange={() => changeBrushRadius}
+                      />
+                    </div>
+                  </>
+                )}
+                {showTransparency && (
+                  <>
+                    <div className={classes.sliderName}>
+                      Non-Active Annotation
+                    </div>
+                    <div className={classes.baseSlider}>
+                      <BaseSlider
+                        value={paintbrush.annotationAlpha}
+                        config={SLIDER_CONFIG[Sliders.annotationAlpha]}
+                        onChange={() => changeAnnotationTransparency}
+                      />
+                    </div>
+                    <Divider className={classes.divider} />
+                    <div className={classes.sliderName}>Active Annotation</div>
+                    <div className={classes.baseSlider}>
+                      <BaseSlider
+                        value={paintbrush.annotationActiveAlpha}
+                        config={SLIDER_CONFIG[Sliders.annotationActiveAlpha]}
+                        onChange={() => changeAnnotationTransparencyFocused}
+                      />
+                    </div>
+                  </>
+                )}
+              </Card>
             )}
-          </Card>
-        )}
-      </Popover>
+          </>
+        </Popper>
+      </ClickAwayListener>
     </>
   );
 };
@@ -344,7 +394,7 @@ class Toolbar extends Component<Props> {
       <ButtonGroup style={{ all: "revert" }}>
         <IconButton
           tooltip={{
-            name: "Paintbush",
+            name: "Paintbrush",
             ...getShortcut("paintbrush.selectBrush"),
           }}
           icon={icons.brush}
@@ -363,8 +413,7 @@ class Toolbar extends Component<Props> {
         }
         openSubmenu={this.openSubmenu}
         anchorElement={this.props.anchorElement}
-        onClose={this.props.onClose}
-        keepSubmenuOpen={this.props.keepSubmenuOpen}
+        is3D={this.props.is3D}
       />
     </>
   );

@@ -1,4 +1,5 @@
 import { Component, ReactNode, MouseEvent } from "react";
+
 import { XYPoint, PositionAndSize } from "@/annotation/interfaces";
 
 export interface Props {
@@ -15,6 +16,9 @@ export interface Props {
   cursor?: "crosshair" | "move" | "pointer" | "none" | "not-allowed";
   onClick?: (x: number, y: number, isCTRL?: boolean) => void;
   onMouseDown?: (x: number, y: number) => void;
+  onTouchStart?: (x: number, y: number) => void;
+  onTouchMove?: (x: number, y: number) => void;
+  onTouchEnd?: (x: number, y: number) => void;
   onMouseMove?: (x: number, y: number) => void;
   onMouseUp?: (x: number, y: number) => void;
   onContextMenu?: (x: number, y: number) => void;
@@ -81,7 +85,7 @@ export class BaseCanvas extends Component<Props> {
     this.canvasObserver.unobserve(this.canvasContainer);
   };
 
-  windowToCanvas = (e: MouseEvent): XYPoint => {
+  windowToCanvas = (e: Partial<MouseEvent>): XYPoint => {
     // returns the mouse coordinates from e, transformed from window to canvas space
     const x = e.clientX - this.canvas.getBoundingClientRect().left;
     const y = e.clientY - this.canvas.getBoundingClientRect().top;
@@ -106,6 +110,17 @@ export class BaseCanvas extends Component<Props> {
     }
   };
 
+  onTouchStartHandler = (e: React.TouchEvent<HTMLCanvasElement>): void => {
+    const { x, y } = this.windowToCanvas({
+      clientX: e.touches[0].clientX,
+      clientY: e.touches[0].clientY,
+    });
+
+    if (this.props.onMouseDown) {
+      this.props.onMouseDown(x, y);
+    }
+  };
+
   onMouseMoveHandler = (e: MouseEvent): void => {
     const { x, y } = this.windowToCanvas(e);
 
@@ -114,9 +129,29 @@ export class BaseCanvas extends Component<Props> {
     }
   };
 
+  onTouchMovehandler = (e: React.TouchEvent<HTMLCanvasElement>): void => {
+    const { x, y } = this.windowToCanvas({
+      clientX: e.touches[0].clientX,
+      clientY: e.touches[0].clientY,
+    });
+    if (this.props.onMouseMove) {
+      this.props.onMouseMove(x, y);
+    }
+  };
+
   onMouseUpHandler = (e: MouseEvent): void => {
     const { x, y } = this.windowToCanvas(e);
 
+    if (this.props.onMouseUp) {
+      this.props.onMouseUp(x, y);
+    }
+  };
+
+  onTouchEndHandler = (e: React.TouchEvent<HTMLCanvasElement>): void => {
+    const { x, y } = this.windowToCanvas({
+      clientX: e.changedTouches[0].clientX,
+      clientY: e.changedTouches[0].clientY,
+    });
     if (this.props.onMouseUp) {
       this.props.onMouseUp(x, y);
     }
@@ -153,8 +188,11 @@ export class BaseCanvas extends Component<Props> {
         style={{ pointerEvents: "inherit" }}
         onClick={this.onClickHandler}
         onMouseDown={this.onMouseDownHandler}
+        onTouchStart={this.onTouchStartHandler}
         onMouseMove={this.onMouseMoveHandler}
+        onTouchMove={this.onTouchMovehandler}
         onMouseUp={this.onMouseUpHandler}
+        onTouchEnd={this.onTouchEndHandler}
         key={this.props.name}
         id={`${this.props.name}-canvas`}
         ref={(canvas) => {

@@ -11,7 +11,6 @@ import {
   FormControlLabel,
   FormGroup,
   FormControl,
-  Popover,
   Card,
   makeStyles,
   createStyles,
@@ -19,8 +18,11 @@ import {
   CardHeader,
   CardContent,
   Typography,
+  Popper,
+  ClickAwayListener,
 } from "@material-ui/core";
 import SVG from "react-inlinesvg";
+import { detect } from "detect-browser";
 
 import { IconButton, icons } from "@gliff-ai/style";
 import { BaseSlider } from "@/components/BaseSlider";
@@ -35,7 +37,6 @@ const ToolboxName: Toolbox = "background";
 interface SubmenuProps {
   isOpen: boolean;
   anchorElement: HTMLButtonElement | null;
-  onClose: (event: MouseEvent) => void;
   channelControls: ReactElement[];
   openSubmenu: () => void;
 }
@@ -46,7 +47,6 @@ interface Props {
   handleOpen: (
     event?: MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
-  onClose: (event: MouseEvent) => void;
   anchorElement: HTMLButtonElement | null;
   isTyping: () => boolean;
   channels: boolean[];
@@ -72,6 +72,7 @@ const useStyles = makeStyles((theme: Theme) =>
       height: "65px",
       textAlign: "center",
       display: "flex",
+      marginBottom: "6px",
     },
     channelHeader: {
       backgroundColor: theme.palette.primary.main,
@@ -109,7 +110,10 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     return true;
   }
 
-  function changeBrightness(e: ChangeEvent, value: number) {
+  function changeBrightness(
+    e: ChangeEvent | MouseEvent | React.TouchEvent,
+    value: number
+  ) {
     setBackground({
       brightness: value,
       contrast: background.contrast,
@@ -183,89 +187,110 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     };
   });
 
+  const handleClickAway = () => {
+    setButtonClicked("");
+  };
+
+  const browser = detect().name;
+
   return (
     <>
-      <Popover
-        open={props.isOpen}
-        anchorEl={props.anchorElement}
-        onClose={props.onClose}
-        PaperProps={{ classes: { root: classes.subMenu } }}
-        elevation={0}
-      >
-        <ButtonGroup
-          orientation="vertical"
-          size="small"
-          id="background-settings-toolbar"
+      <ClickAwayListener onClickAway={handleClickAway}>
+        <Popper
+          open={props.isOpen}
+          anchorEl={props.anchorElement}
+          placement="right-end"
+          style={{ display: "flex" }}
+          modifiers={{
+            offset: {
+              enabled: true,
+              offset: "10, 10",
+            },
+          }}
         >
-          {tools.map(({ icon, name, event, active }) => (
-            <IconButton
-              key={name}
-              icon={icon}
-              tooltip={{
-                name,
-                ...getShortcut(`${ToolboxName}.${event.name}`),
-              }}
-              onClick={event}
-              fill={active()}
-            />
-          ))}
-        </ButtonGroup>
-        <Card className={classes.subMenuCard}>
-          {buttonClicked === "Brightness" && (
-            <>
-              <div className={classes.sliderName}>Brightness</div>
-              <div className={classes.baseSlider}>
-                <BaseSlider
-                  value={background.brightness}
-                  config={SLIDER_CONFIG[Sliders.brightness]}
-                  onChange={() => changeBrightness}
+          <ButtonGroup
+            orientation="vertical"
+            size="small"
+            id="background-settings-toolbar"
+            style={{ marginRight: "-10px" }}
+          >
+            {tools
+              .filter(
+                ({ name }) =>
+                  browser !== "safari" ||
+                  !(name === "Contrast" || name === "Brightness")
+              )
+              .map(({ icon, name, event, active }) => (
+                <IconButton
+                  key={name}
+                  icon={icon}
+                  tooltip={{
+                    name,
+                    ...getShortcut(`${ToolboxName}.${event.name}`),
+                  }}
+                  onClick={event}
+                  fill={active()}
                 />
-              </div>
-            </>
-          )}
-          {buttonClicked === "Contrast" && (
-            <>
-              <div className={classes.sliderName}>Contrast</div>
-              <div className={classes.baseSlider}>
-                <BaseSlider
-                  value={background.contrast}
-                  config={SLIDER_CONFIG[Sliders.contrast]}
-                  onChange={() => changeContrast}
+              ))}
+          </ButtonGroup>
+          <Card className={classes.subMenuCard}>
+            {buttonClicked === "Brightness" && (
+              <>
+                <div className={classes.sliderName}>Brightness</div>
+                <div className={classes.baseSlider}>
+                  <BaseSlider
+                    value={background.brightness}
+                    config={SLIDER_CONFIG[Sliders.brightness]}
+                    onChange={() => changeBrightness}
+                  />
+                </div>
+              </>
+            )}
+
+            {buttonClicked === "Contrast" && (
+              <>
+                <div className={classes.sliderName}>Contrast</div>
+                <div className={classes.baseSlider}>
+                  <BaseSlider
+                    value={background.contrast}
+                    config={SLIDER_CONFIG[Sliders.contrast]}
+                    onChange={() => changeContrast}
+                  />
+                </div>
+              </>
+            )}
+            {buttonClicked === "Channels" && props.channelControls && (
+              <>
+                <CardHeader
+                  className={classes.channelHeader}
+                  title={
+                    <Typography style={{ fontWeight: 500 }}>Channel</Typography>
+                  }
                 />
-              </div>
-            </>
-          )}
-          {buttonClicked === "Channels" && props.channelControls && (
-            <>
-              <CardHeader
-                className={classes.channelHeader}
-                title={
-                  <Typography style={{ fontWeight: 500 }}>Channel</Typography>
-                }
-              />
-              <CardContent>
-                <FormControl component="fieldset">
-                  <FormGroup aria-label="position">
-                    {props.channelControls.map((control, i) => (
-                      <FormControlLabel
-                        key={`C${i + 1}`}
-                        value="top"
-                        control={control}
-                        label={
-                          <Typography className={classes.channelInfo}>
-                            {`Channel ${i + 1}`}
-                          </Typography>
-                        }
-                        labelPlacement="end"
-                      />
-                    ))}
-                  </FormGroup>
-                </FormControl>
-              </CardContent>
-            </>
-          )}
-        </Card>
-      </Popover>
+                <CardContent>
+                  <FormControl component="fieldset">
+                    <FormGroup aria-label="position">
+                      {props.channelControls.map((control, i) => (
+                        <FormControlLabel
+                          key={`C${i + 1}`}
+                          value="top"
+                          control={control}
+                          label={
+                            <Typography className={classes.channelInfo}>
+                              {`Channel ${i + 1}`}
+                            </Typography>
+                          }
+                          labelPlacement="end"
+                        />
+                      ))}
+                    </FormGroup>
+                  </FormControl>
+                </CardContent>
+              </>
+            )}
+          </Card>
+        </Popper>
+      </ClickAwayListener>
     </>
   );
 };
@@ -337,7 +362,6 @@ class Toolbar extends Component<Props> {
         }
         openSubmenu={this.openSubmenu}
         anchorElement={this.props.anchorElement}
-        onClose={this.props.onClose}
         channelControls={this.channelControls}
       />
     </>

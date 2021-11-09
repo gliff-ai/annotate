@@ -85,7 +85,6 @@ interface State {
   redraw: number;
   sliceIndex: number;
   channels: boolean[];
-  keepSubmenuOpen: boolean;
   anchorElement: HTMLButtonElement | null; // A HTML element. It's used to set the position of the popover menu https://material-ui.com/api/menu/#props
   buttonClicked: string;
   mode: Mode;
@@ -118,7 +117,13 @@ const styles = {
     zIndex: 100,
     justifyContent: "space-between",
     position: "fixed" as const,
+    "& $button": {
+      [theme.breakpoints.down("md")]: {
+        margin: "0px",
+      },
+    },
   },
+
   bottomToolbars: {
     bottom: "18px",
     left: "18px",
@@ -207,7 +212,6 @@ class UserInterface extends Component<Props, State> {
       displayedImage: this.slicesData ? this.slicesData[0][0] : null,
       redraw: 0,
       anchorElement: null,
-      keepSubmenuOpen: true,
       buttonClicked: null,
       activeToolbox: Toolboxes.paintbrush,
       mode: Mode.draw,
@@ -589,7 +593,6 @@ class UserInterface extends Component<Props, State> {
 
   handleClose = (): void => {
     this.setState({ anchorElement: null });
-    this.setState({ keepSubmenuOpen: false });
   };
 
   handleOpen =
@@ -798,17 +801,15 @@ class UserInterface extends Component<Props, State> {
             setButtonClicked={this.setButtonClicked}
             activateToolbox={this.activateToolbox}
             handleOpen={this.handleOpen}
-            onClose={this.handleClose}
-            keepSubmenuOpen={this.state.keepSubmenuOpen}
             anchorElement={this.state.anchorElement}
             isTyping={this.isTyping}
+            is3D={this.slicesData?.length > 1}
           />
           <SplineToolbar
             buttonClicked={this.state.buttonClicked}
             setButtonClicked={this.setButtonClicked}
             activateToolbox={this.activateToolbox}
             handleOpen={this.handleOpen}
-            onClose={this.handleClose}
             anchorElement={this.state.anchorElement}
             isTyping={this.isTyping}
           />
@@ -823,7 +824,6 @@ class UserInterface extends Component<Props, State> {
             buttonClicked={this.state.buttonClicked}
             setButtonClicked={this.setButtonClicked}
             handleOpen={this.handleOpen}
-            onClose={this.handleClose}
             anchorElement={this.state.anchorElement}
             isTyping={this.isTyping}
             channels={this.state.channels}
