@@ -612,7 +612,7 @@ export class Annotations {
       this.setActiveAnnotationID(selectedSpline);
       setUIActiveAnnotationID(selectedSpline);
       setActiveToolbox(Toolboxes.spline);
-      return selectedSpline
+      return selectedSpline;
     }
     if (
       selectedBoundingBox !== null &&
