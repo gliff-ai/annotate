@@ -295,7 +295,6 @@ class CanvasClass extends Component<Props, State> {
       // turns out onClick still runs when releasing a drag, so we want to abort in that case:
       this.isDrawing = false;
       this.dragPoint = null;
-      console.log(this.isDrawing, this.dragPoint)
       return;
     }
 
@@ -309,7 +308,6 @@ class CanvasClass extends Component<Props, State> {
       this.state.canvasPositionAndSize
     );
 
-    console.log("click")
     if (this.props.mode === Mode.select) {
       // In select mode a single click allows to select a different spline annotation
       const selectedAnnotationID = this.props.annotationsObject.clickSelect(
@@ -320,9 +318,7 @@ class CanvasClass extends Component<Props, State> {
         this.props.setActiveToolbox
       );
 
-      console.log(selectedAnnotationID)
       if (selectedAnnotationID !== null) {
-        console.log("hello")
         this.props.setMode(Mode.draw);
       }
     }
