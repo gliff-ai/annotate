@@ -18,6 +18,7 @@ import { useSplineStore } from "./Store";
 interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   activeToolbox: Toolbox | string;
   mode: Mode;
+  setMode: (mode: Mode) => void;
   annotationsObject: Annotations;
   redraw: number;
   sliceIndex: number;
@@ -294,6 +295,7 @@ class CanvasClass extends Component<Props, State> {
       // turns out onClick still runs when releasing a drag, so we want to abort in that case:
       this.isDrawing = false;
       this.dragPoint = null;
+      console.log(this.isDrawing, this.dragPoint)
       return;
     }
 
@@ -307,15 +309,22 @@ class CanvasClass extends Component<Props, State> {
       this.state.canvasPositionAndSize
     );
 
+    console.log("click")
     if (this.props.mode === Mode.select) {
       // In select mode a single click allows to select a different spline annotation
-      this.props.annotationsObject.clickSelect(
+      const selectedAnnotationID = this.props.annotationsObject.clickSelect(
         imageX,
         imageY,
         this.props.sliceIndex,
         this.props.setUIActiveAnnotationID,
         this.props.setActiveToolbox
       );
+
+      console.log(selectedAnnotationID)
+      if (selectedAnnotationID !== null) {
+        console.log("hello")
+        this.props.setMode(Mode.draw);
+      }
     }
 
     // if no spline tool is turned on then do nothing
@@ -696,6 +705,7 @@ export const Canvas = (props: Props): ReactElement => {
     <CanvasClass
       activeToolbox={activeToolbox}
       mode={props.mode}
+      setMode={props.setMode}
       annotationsObject={props.annotationsObject}
       displayedImage={props.displayedImage}
       scaleAndPan={props.scaleAndPan}

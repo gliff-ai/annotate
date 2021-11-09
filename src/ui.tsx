@@ -886,6 +886,7 @@ class UserInterface extends Component<Props, State> {
                     scaleAndPan={this.state.scaleAndPan}
                     activeToolbox={this.state.activeToolbox}
                     mode={this.state.mode}
+                    setMode={(mode: Mode) => { this.setState({ mode: mode })}}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
                     redraw={this.state.redraw}
@@ -901,6 +902,7 @@ class UserInterface extends Component<Props, State> {
                     scaleAndPan={this.state.scaleAndPan}
                     activeToolbox={this.state.activeToolbox}
                     mode={this.state.mode}
+                    setMode={(mode: Mode) => { this.setState({ mode: mode })}}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
                     redraw={this.state.redraw}
@@ -916,6 +918,7 @@ class UserInterface extends Component<Props, State> {
                     scaleAndPan={this.state.scaleAndPan}
                     activeToolbox={this.state.activeToolbox}
                     mode={this.state.mode}
+                    setMode={(mode: Mode) => { this.setState({ mode: mode })}}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
                     redraw={this.state.redraw}

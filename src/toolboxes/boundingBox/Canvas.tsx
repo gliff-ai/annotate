@@ -30,6 +30,7 @@ type SelectedCorners =
 interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   activeToolbox: Toolbox;
   mode: Mode;
+  setMode: (mode: Mode) => void;
   annotationsObject: Annotations;
   redraw: number;
   sliceIndex: number;
@@ -372,42 +373,17 @@ export class CanvasClass extends Component<Props, State> {
     );
 
     if (this.props.mode === Mode.select) {
-      // In select mode a single click allows to select a different spline annotation
-      // DEVNOTE this is currently duplicated in each toolbox!
-      const selectedBoundingBox =
-        this.props.annotationsObject.clickNearBoundingBox(
-          imageX,
-          imageY,
-          this.props.sliceIndex
-        );
-      const selectedSpline = this.props.annotationsObject.clickNearSpline(
+      // In select mode a single click allows to select a different annotation
+      const selectedAnnotationID = this.props.annotationsObject.clickSelect(
         imageX,
         imageY,
-        this.props.sliceIndex
+        this.props.sliceIndex,
+        this.props.setUIActiveAnnotationID,
+        this.props.setActiveToolbox
       );
-      const selectedBrushStroke =
-        this.props.annotationsObject.clickNearBrushStroke(
-          imageX,
-          imageY,
-          this.props.sliceIndex
-        );
 
-      if (
-        selectedBoundingBox !== null &&
-        selectedBoundingBox !==
-          this.props.annotationsObject.getActiveAnnotationID()
-      ) {
-        this.props.annotationsObject.setActiveAnnotationID(selectedBoundingBox);
-        this.props.setUIActiveAnnotationID(selectedBoundingBox);
-        this.props.setActiveToolbox(Toolboxes.boundingBox);
-      } else if (selectedSpline !== null) {
-        this.props.annotationsObject.setActiveAnnotationID(selectedSpline);
-        this.props.setUIActiveAnnotationID(selectedSpline);
-        this.props.setActiveToolbox(Toolboxes.spline);
-      } else if (selectedBrushStroke !== null) {
-        this.props.annotationsObject.setActiveAnnotationID(selectedBrushStroke);
-        this.props.setUIActiveAnnotationID(selectedBrushStroke);
-        this.props.setActiveToolbox(Toolboxes.paintbrush);
+      if (selectedAnnotationID !== null) {
+        this.props.setMode(Mode.draw);
       }
     }
 
@@ -656,6 +632,7 @@ export const Canvas = (props: Props): ReactElement => (
   <CanvasClass
     activeToolbox={props.activeToolbox}
     mode={props.mode}
+    setMode={props.setMode}
     annotationsObject={props.annotationsObject}
     displayedImage={props.displayedImage}
     scaleAndPan={props.scaleAndPan}
