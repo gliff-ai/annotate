@@ -518,8 +518,7 @@ class CanvasClass extends Component<Props, State> {
     if (nearPoint !== -1) {
       this.selectedPointIndex = nearPoint;
       this.dragPoint = clickPoint;
-    }
-    else if (this.props.activeToolbox === "Magic Spline") {
+    } else if (this.props.activeToolbox === "Magic Spline") {
       // magic spline, add a new point and snap it to the highest gradient point within 25 pixels:
       if (this.gradientImage === undefined) {
         this.gradientImage = calculateSobel(this.props.displayedImage);
