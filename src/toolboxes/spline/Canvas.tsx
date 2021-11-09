@@ -517,7 +517,13 @@ class CanvasClass extends Component<Props, State> {
       this.state.canvasPositionAndSize
     );
 
-    if (this.props.activeToolbox === "Magic Spline") {
+    // try and drag and drop existing nodes
+    const nearPoint = this.clickNearPoint(clickPoint, coordinates);
+    if (nearPoint !== -1) {
+      this.selectedPointIndex = nearPoint;
+      this.dragPoint = clickPoint;
+    }
+    else if (this.props.activeToolbox === "Magic Spline") {
       // magic spline, add a new point and snap it to the highest gradient point within 25 pixels:
       if (this.gradientImage === undefined) {
         this.gradientImage = calculateSobel(this.props.displayedImage);
@@ -531,14 +537,8 @@ class CanvasClass extends Component<Props, State> {
       this.selectedPointIndex =
         this.props.annotationsObject.getSplineLength() - 1;
       this.isDrawing = true;
-    } else {
-      // normal spline, try and drag and drop existing nodes
-      const nearPoint = this.clickNearPoint(clickPoint, coordinates);
-      if (nearPoint !== -1) {
-        this.selectedPointIndex = nearPoint;
-        this.dragPoint = clickPoint;
-      }
     }
+
     this.drawAllSplines();
   };
 
