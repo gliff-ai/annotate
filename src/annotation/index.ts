@@ -590,7 +590,7 @@ export class Annotations {
     sliceIndex: number,
     setUIActiveAnnotationID: (id: number) => void,
     setActiveToolbox: (toolbox: Toolbox) => void
-  ): void => {
+  ): number => {
     const selectedBoundingBox = this.clickNearBoundingBox(
       imageX,
       imageY,
@@ -607,18 +607,25 @@ export class Annotations {
       this.setActiveAnnotationID(selectedBrushStroke);
       setUIActiveAnnotationID(selectedBrushStroke);
       setActiveToolbox(Toolboxes.paintbrush);
-    } else if (selectedSpline !== null) {
+      return selectedBrushStroke;
+    }
+    if (selectedSpline !== null) {
       this.setActiveAnnotationID(selectedSpline);
       setUIActiveAnnotationID(selectedSpline);
       setActiveToolbox(Toolboxes.spline);
-    } else if (
+      return selectedSpline;
+    }
+    if (
       selectedBoundingBox !== null &&
       selectedBoundingBox !== this.getActiveAnnotationID()
     ) {
       this.setActiveAnnotationID(selectedBoundingBox);
       setUIActiveAnnotationID(selectedBoundingBox);
       setActiveToolbox(Toolboxes.boundingBox);
+      return selectedBoundingBox;
     }
+
+    return null;
   };
 
   @log

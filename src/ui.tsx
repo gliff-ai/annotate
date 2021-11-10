@@ -717,7 +717,7 @@ class UserInterface extends Component<Props, State> {
 
     const tools = [
       {
-        name: "Select",
+        name: "Select Annotation",
         icon: icons.select,
         event: "toggleMode",
         active: () => this.state.buttonClicked === "Select",
@@ -886,6 +886,9 @@ class UserInterface extends Component<Props, State> {
                     scaleAndPan={this.state.scaleAndPan}
                     activeToolbox={this.state.activeToolbox}
                     mode={this.state.mode}
+                    setMode={(mode: Mode) => {
+                      this.setState(() => ({ mode, buttonClicked: null }));
+                    }}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
                     redraw={this.state.redraw}
@@ -901,6 +904,9 @@ class UserInterface extends Component<Props, State> {
                     scaleAndPan={this.state.scaleAndPan}
                     activeToolbox={this.state.activeToolbox}
                     mode={this.state.mode}
+                    setMode={(mode: Mode) => {
+                      this.setState(() => ({ mode, buttonClicked: null }));
+                    }}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
                     redraw={this.state.redraw}
@@ -916,6 +922,9 @@ class UserInterface extends Component<Props, State> {
                     scaleAndPan={this.state.scaleAndPan}
                     activeToolbox={this.state.activeToolbox}
                     mode={this.state.mode}
+                    setMode={(mode: Mode) => {
+                      this.setState(() => ({ mode, buttonClicked: null }));
+                    }}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
                     redraw={this.state.redraw}

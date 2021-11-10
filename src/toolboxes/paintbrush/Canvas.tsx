@@ -25,6 +25,7 @@ interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   is3D: boolean;
   activeToolbox: Toolbox | string;
   mode: Mode;
+  setMode: (mode: Mode) => void;
   annotationsObject: Annotations;
   brushRadius: number;
   annotationActiveAlpha: number;
@@ -471,13 +472,17 @@ export class CanvasClass extends Component<Props, State> {
         this.props.scaleAndPan,
         this.state.canvasPositionAndSize
       );
-      this.props.annotationsObject.clickSelect(
+      const selectedAnnotationID = this.props.annotationsObject.clickSelect(
         imageX,
         imageY,
         this.props.sliceIndex,
         this.props.setUIActiveAnnotationID,
         this.props.setActiveToolbox
       );
+
+      if (selectedAnnotationID !== null) {
+        this.props.setMode(Mode.draw);
+      }
     }
   };
 
@@ -647,6 +652,7 @@ export const Canvas = (
       is3D={paintbrush.is3D}
       activeToolbox={activeToolbox}
       mode={props.mode}
+      setMode={props.setMode}
       annotationsObject={props.annotationsObject}
       displayedImage={props.displayedImage}
       scaleAndPan={props.scaleAndPan}

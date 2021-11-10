@@ -18,6 +18,7 @@ import { useSplineStore } from "./Store";
 interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   activeToolbox: Toolbox | string;
   mode: Mode;
+  setMode: (mode: Mode) => void;
   annotationsObject: Annotations;
   redraw: number;
   sliceIndex: number;
@@ -309,13 +310,17 @@ class CanvasClass extends Component<Props, State> {
 
     if (this.props.mode === Mode.select) {
       // In select mode a single click allows to select a different spline annotation
-      this.props.annotationsObject.clickSelect(
+      const selectedAnnotationID = this.props.annotationsObject.clickSelect(
         imageX,
         imageY,
         this.props.sliceIndex,
         this.props.setUIActiveAnnotationID,
         this.props.setActiveToolbox
       );
+
+      if (selectedAnnotationID !== null) {
+        this.props.setMode(Mode.draw);
+      }
     }
 
     // if no spline tool is turned on then do nothing
@@ -508,7 +513,12 @@ class CanvasClass extends Component<Props, State> {
       this.state.canvasPositionAndSize
     );
 
-    if (this.props.activeToolbox === "Magic Spline") {
+    // try and drag and drop existing nodes
+    const nearPoint = this.clickNearPoint(clickPoint, coordinates);
+    if (nearPoint !== -1) {
+      this.selectedPointIndex = nearPoint;
+      this.dragPoint = clickPoint;
+    } else if (this.props.activeToolbox === "Magic Spline") {
       // magic spline, add a new point and snap it to the highest gradient point within 25 pixels:
       if (this.gradientImage === undefined) {
         this.gradientImage = calculateSobel(this.props.displayedImage);
@@ -522,14 +532,8 @@ class CanvasClass extends Component<Props, State> {
       this.selectedPointIndex =
         this.props.annotationsObject.getSplineLength() - 1;
       this.isDrawing = true;
-    } else {
-      // normal spline, try and drag and drop existing nodes
-      const nearPoint = this.clickNearPoint(clickPoint, coordinates);
-      if (nearPoint !== -1) {
-        this.selectedPointIndex = nearPoint;
-        this.dragPoint = clickPoint;
-      }
     }
+
     this.drawAllSplines();
   };
 
@@ -699,6 +703,7 @@ export const Canvas = (props: Props): ReactElement => {
     <CanvasClass
       activeToolbox={activeToolbox}
       mode={props.mode}
+      setMode={props.setMode}
       annotationsObject={props.annotationsObject}
       displayedImage={props.displayedImage}
       scaleAndPan={props.scaleAndPan}
