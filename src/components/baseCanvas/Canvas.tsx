@@ -181,7 +181,6 @@ export class BaseCanvas extends Component<Props> {
         left: this.props.canvasPositionAndSize.left,
         bottom: "0px",
         position: "absolute",
-        marginTop: "30px",
       }}
     >
       <canvas
