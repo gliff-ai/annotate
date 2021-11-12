@@ -823,7 +823,6 @@ class UserInterface extends Component<Props, State> {
             isTyping={this.isTyping}
           />
           <BackgroundToolbar
-            active={this.state.activeToolbox === "background"}
             handleOpen={this.handleOpen}
             anchorElement={this.state.anchorElement}
             isTyping={this.isTyping}
