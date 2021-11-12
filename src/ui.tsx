@@ -195,7 +195,10 @@ class UserInterface extends Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
+
     this.annotationsObject = this.props.annotationsObject || new Annotations();
+    this.annotationsObject.giveRedrawCallback(this.callRedraw)
+
     this.slicesData = this.props.slicesData || null;
 
     this.state = {
@@ -749,14 +752,14 @@ class UserInterface extends Component<Props, State> {
         icon: icons.undo,
         event: "undo",
         active: () => false,
-        enabled: () => this.state.buttonClicked === "Undo last action",
+        enabled: () => this.annotationsObject.canUndo(),
       },
       {
         name: "Redo last action",
         icon: icons.redo,
         event: "redo",
         active: () => false,
-        enabled: () => this.state.buttonClicked === "Redo last action",
+        enabled: () => this.annotationsObject.canRedo(),
       },
     ] as const;
 

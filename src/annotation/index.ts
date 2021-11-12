@@ -42,6 +42,8 @@ export class Annotations {
 
   private redoData: UndoRedo[];
 
+  private redrawUI: () => void;
+
   constructor(data?: Annotation[], audit?: AuditAction[]) {
     this.data = data || [];
     this.audit = audit || [];
@@ -688,6 +690,9 @@ export class Annotations {
   private initUndoRedo = () => {
     this.undoData = [];
     this.redoData = [];
+    if (this.redrawUI !== undefined) {
+      this.redrawUI();
+    }
   };
 
   private updateUndoRedoActions = (method: string, args: unknown): void => {
@@ -698,6 +703,7 @@ export class Annotations {
       },
       redoAction: this.audit[this.audit.length - 1],
     });
+    this.redrawUI();
   };
 
   private applyAction = (
@@ -715,6 +721,7 @@ export class Annotations {
       const undoRedo = this.undoData.pop();
       this.applyAction(undoRedo.undoAction, false);
       this.redoData.push(undoRedo);
+      this.redrawUI();
     }
     return canUndoRedo;
   }
@@ -725,7 +732,14 @@ export class Annotations {
       const undoRedo = this.redoData.pop();
       this.applyAction(undoRedo.redoAction, false);
       this.undoData.push(undoRedo);
+      this.redrawUI();
     }
     return canUndoRedo;
+  }
+
+  giveRedrawCallback(callback: () => void) {
+    // gives the object a callback for redrawing the ANNOTATE UserInterface
+    // this is sometimes needed to update the states of the Undo/Redo buttons
+    this.redrawUI = callback;
   }
 }

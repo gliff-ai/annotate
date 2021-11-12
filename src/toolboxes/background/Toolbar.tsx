@@ -338,7 +338,6 @@ class Toolbar extends Component<Props> {
   };
 
   render = (): ReactElement => {
-    console.log("background", this.props.anchorElement, this.refBackgroundSettingsPopover, this.props.anchorElement === this.refBackgroundSettingsPopover)
     return (
       <>
         <ButtonGroup style={{ all: "revert" }}>
