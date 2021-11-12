@@ -150,8 +150,6 @@ const styles = {
   },
   appbar: {
     backgroundColor: "#fafafa",
-    height: "90px",
-    paddingTop: "9px",
   },
   canvasGrid: {
     width: "100%",
@@ -170,7 +168,7 @@ interface Props extends WithStyles<typeof styles> {
   annotationsObject?: Annotations;
   presetLabels?: string[];
   saveAnnotationsCallback?: (annotationsObject: Annotations) => void;
-  showAppBar: boolean;
+  showAppBar?: boolean;
   setIsLoading?: (isLoading: boolean) => void;
   trustedServiceButtonToolbar?: ReactElement | null;
   isUserOwner?: boolean;
@@ -857,111 +855,110 @@ class UserInterface extends Component<Props, State> {
               maxWidth={false}
               style={{
                 backgroundColor: this.getRGBAforCanvasContainerColour(),
+                margin: 0,
               }}
             >
               {appBar}
               {leftToolbar}
-              <Grid
-                container
-                spacing={0}
-                justifyContent="center"
-                wrap="nowrap"
-                className={classes.mainGrid}
+              <div
+                style={{
+                  display: "block",
+                  position: "absolute",
+                  bottom: 0,
+                  width: "100%",
+                  // the height of the canvas container is 100% of the parent minus the height of the app bar
+                  // when the app bar is displayed and 100% otherwise.
+                  height: showAppBar ? "calc(100% - 85px)" : "100%",
+                }}
               >
-                <Grid
-                  item
-                  className={classes.canvasGrid}
-                  style={{ position: "relative" }}
-                >
-                  <BackgroundCanvas
-                    scaleAndPan={this.state.scaleAndPan}
-                    displayedImage={this.state.displayedImage}
-                    canvasPositionAndSize={this.state.viewportPositionAndSize}
-                    setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                    setCanvasContainerColourCallback={(canvasContainerColour) =>
-                      this.setState({ canvasContainerColour })
-                    }
-                  />
-                  <SplineCanvas
-                    scaleAndPan={this.state.scaleAndPan}
-                    activeToolbox={this.state.activeToolbox}
-                    mode={this.state.mode}
-                    setMode={(mode: Mode) => {
-                      this.setState(() => ({ mode, buttonClicked: null }));
-                    }}
-                    annotationsObject={this.annotationsObject}
-                    displayedImage={this.state.displayedImage}
-                    redraw={this.state.redraw}
-                    sliceIndex={this.state.sliceIndex}
-                    setUIActiveAnnotationID={(id) => {
-                      this.setState({ activeAnnotationID: id });
-                    }}
-                    setActiveToolbox={(tool: Toolbox) => {
-                      this.setState({ activeToolbox: tool });
-                    }}
-                  />
-                  <BoundingBoxCanvas
-                    scaleAndPan={this.state.scaleAndPan}
-                    activeToolbox={this.state.activeToolbox}
-                    mode={this.state.mode}
-                    setMode={(mode: Mode) => {
-                      this.setState(() => ({ mode, buttonClicked: null }));
-                    }}
-                    annotationsObject={this.annotationsObject}
-                    displayedImage={this.state.displayedImage}
-                    redraw={this.state.redraw}
-                    sliceIndex={this.state.sliceIndex}
-                    setUIActiveAnnotationID={(id) => {
-                      this.setState({ activeAnnotationID: id });
-                    }}
-                    setActiveToolbox={(tool: Toolbox) => {
-                      this.setState({ activeToolbox: tool });
-                    }}
-                  />
-                  <PaintbrushCanvas
-                    scaleAndPan={this.state.scaleAndPan}
-                    activeToolbox={this.state.activeToolbox}
-                    mode={this.state.mode}
-                    setMode={(mode: Mode) => {
-                      this.setState(() => ({ mode, buttonClicked: null }));
-                    }}
-                    annotationsObject={this.annotationsObject}
-                    displayedImage={this.state.displayedImage}
-                    redraw={this.state.redraw}
-                    sliceIndex={this.state.sliceIndex}
-                    setUIActiveAnnotationID={(id) => {
-                      this.setState({ activeAnnotationID: id });
-                    }}
-                    setActiveToolbox={(tool: Toolbox) => {
-                      this.setState({ activeToolbox: tool });
-                    }}
-                  />
-                  {this.slicesData?.length > 1 && (
-                    <Paper
-                      elevation={3}
-                      className={classes.slicesSlider}
-                      style={{ position: "absolute" }}
-                    >
-                      <BaseSlider
-                        value={this.state.sliceIndex}
-                        config={
-                          {
-                            name: "slices",
-                            id: "slices-slider",
-                            initial: 1,
-                            step: 1,
-                            min: 0,
-                            max: this.slicesData.length - 1,
-                            unit: "",
-                          } as Config
-                        }
-                        onChange={() => this.changeSlice}
-                        sliderHeight="300px"
-                      />
-                    </Paper>
-                  )}
-                </Grid>
-              </Grid>
+                <BackgroundCanvas
+                  scaleAndPan={this.state.scaleAndPan}
+                  displayedImage={this.state.displayedImage}
+                  canvasPositionAndSize={this.state.viewportPositionAndSize}
+                  setCanvasPositionAndSize={this.setViewportPositionAndSize}
+                  setCanvasContainerColourCallback={(canvasContainerColour) =>
+                    this.setState({ canvasContainerColour })
+                  }
+                />
+                <SplineCanvas
+                  scaleAndPan={this.state.scaleAndPan}
+                  activeToolbox={this.state.activeToolbox}
+                  mode={this.state.mode}
+                  setMode={(mode: Mode) => {
+                    this.setState(() => ({ mode, buttonClicked: null }));
+                  }}
+                  annotationsObject={this.annotationsObject}
+                  displayedImage={this.state.displayedImage}
+                  redraw={this.state.redraw}
+                  sliceIndex={this.state.sliceIndex}
+                  setUIActiveAnnotationID={(id) => {
+                    this.setState({ activeAnnotationID: id });
+                  }}
+                  setActiveToolbox={(tool: Toolbox) => {
+                    this.setState({ activeToolbox: tool });
+                  }}
+                />
+                <BoundingBoxCanvas
+                  scaleAndPan={this.state.scaleAndPan}
+                  activeToolbox={this.state.activeToolbox}
+                  mode={this.state.mode}
+                  setMode={(mode: Mode) => {
+                    this.setState(() => ({ mode, buttonClicked: null }));
+                  }}
+                  annotationsObject={this.annotationsObject}
+                  displayedImage={this.state.displayedImage}
+                  redraw={this.state.redraw}
+                  sliceIndex={this.state.sliceIndex}
+                  setUIActiveAnnotationID={(id) => {
+                    this.setState({ activeAnnotationID: id });
+                  }}
+                  setActiveToolbox={(tool: Toolbox) => {
+                    this.setState({ activeToolbox: tool });
+                  }}
+                />
+                <PaintbrushCanvas
+                  scaleAndPan={this.state.scaleAndPan}
+                  activeToolbox={this.state.activeToolbox}
+                  mode={this.state.mode}
+                  setMode={(mode: Mode) => {
+                    this.setState(() => ({ mode, buttonClicked: null }));
+                  }}
+                  annotationsObject={this.annotationsObject}
+                  displayedImage={this.state.displayedImage}
+                  redraw={this.state.redraw}
+                  sliceIndex={this.state.sliceIndex}
+                  setUIActiveAnnotationID={(id) => {
+                    this.setState({ activeAnnotationID: id });
+                  }}
+                  setActiveToolbox={(tool: Toolbox) => {
+                    this.setState({ activeToolbox: tool });
+                  }}
+                />
+                {this.slicesData?.length > 1 && (
+                  <Paper
+                    elevation={3}
+                    className={classes.slicesSlider}
+                    style={{ position: "absolute" }}
+                  >
+                    <BaseSlider
+                      value={this.state.sliceIndex}
+                      config={
+                        {
+                          name: "slices",
+                          id: "slices-slider",
+                          initial: 1,
+                          step: 1,
+                          min: 0,
+                          max: this.slicesData.length - 1,
+                          unit: "",
+                        } as Config
+                      }
+                      onChange={() => this.changeSlice}
+                      sliderHeight="300px"
+                    />
+                  </Paper>
+                )}
+              </div>
             </Container>
             <Minimap
               buttonClicked={this.state.buttonClicked}
