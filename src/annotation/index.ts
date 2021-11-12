@@ -737,7 +737,7 @@ export class Annotations {
     return canUndoRedo;
   }
 
-  giveRedrawCallback(callback: () => void) {
+  giveRedrawCallback(callback: () => void): void {
     // gives the object a callback for redrawing the ANNOTATE UserInterface
     // this is sometimes needed to update the states of the Undo/Redo buttons
     this.redrawUI = callback;

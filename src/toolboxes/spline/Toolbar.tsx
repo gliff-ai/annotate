@@ -201,9 +201,7 @@ class Toolbar extends Component<Props> {
       </ButtonGroup>
 
       <Submenu
-        isOpen={
-          Boolean(this.props.anchorElement === this.refSplinePopover)
-        }
+        isOpen={Boolean(this.props.anchorElement === this.refSplinePopover)}
         anchorElement={this.props.anchorElement}
         openSubmenu={this.openSubmenu}
       />

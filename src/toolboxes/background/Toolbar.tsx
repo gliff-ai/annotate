@@ -337,34 +337,34 @@ class Toolbar extends Component<Props> {
     this.props.handleOpen()(this.refBackgroundSettingsPopover);
   };
 
-  render = (): ReactElement => {
-    return (
-      <>
-        <ButtonGroup style={{ all: "revert" }}>
-          <IconButton
-            tooltip={{
-              name: "Background Settings",
-            }}
-            icon={icons.backgroundSettings}
-            onClick={this.openSubmenu}
-            fill={Boolean(this.props.anchorElement === this.refBackgroundSettingsPopover)}
-            setRefCallback={(ref) => {
-              this.refBackgroundSettingsPopover = ref;
-            }}
-          />
-        </ButtonGroup>
-
-        <Submenu
-          isOpen={
-            Boolean(this.props.anchorElement === this.refBackgroundSettingsPopover)
-          }
-          openSubmenu={this.openSubmenu}
-          anchorElement={this.props.anchorElement}
-          channelControls={this.channelControls}
+  render = (): ReactElement => (
+    <>
+      <ButtonGroup style={{ all: "revert" }}>
+        <IconButton
+          tooltip={{
+            name: "Background Settings",
+          }}
+          icon={icons.backgroundSettings}
+          onClick={this.openSubmenu}
+          fill={Boolean(
+            this.props.anchorElement === this.refBackgroundSettingsPopover
+          )}
+          setRefCallback={(ref) => {
+            this.refBackgroundSettingsPopover = ref;
+          }}
         />
-      </>
-    );
-  }
+      </ButtonGroup>
+
+      <Submenu
+        isOpen={Boolean(
+          this.props.anchorElement === this.refBackgroundSettingsPopover
+        )}
+        openSubmenu={this.openSubmenu}
+        anchorElement={this.props.anchorElement}
+        channelControls={this.channelControls}
+      />
+    </>
+  );
 }
 
 export { Toolbar, ToolboxName };

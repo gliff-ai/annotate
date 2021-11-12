@@ -387,35 +387,31 @@ class Toolbar extends Component<Props> {
     this.props.activateToolbox(ToolboxName);
   };
 
-  render = (): ReactElement => {
-    return (
-      <>
-        <ButtonGroup style={{ all: "revert" }}>
-          <IconButton
-            tooltip={{
-              name: "Paintbrush",
-              ...getShortcut("paintbrush.selectBrush"),
-            }}
-            icon={icons.brush}
-            onClick={this.openSubmenu}
-            fill={this.props.active}
-            setRefCallback={(ref: HTMLButtonElement) => {
-              this.refBrushPopover = ref;
-            }}
-          />
-        </ButtonGroup>
-
-        <Submenu
-          isOpen={
-            Boolean(this.props.anchorElement === this.refBrushPopover)
-          }
-          openSubmenu={this.openSubmenu}
-          anchorElement={this.props.anchorElement}
-          is3D={this.props.is3D}
+  render = (): ReactElement => (
+    <>
+      <ButtonGroup style={{ all: "revert" }}>
+        <IconButton
+          tooltip={{
+            name: "Paintbrush",
+            ...getShortcut("paintbrush.selectBrush"),
+          }}
+          icon={icons.brush}
+          onClick={this.openSubmenu}
+          fill={this.props.active}
+          setRefCallback={(ref: HTMLButtonElement) => {
+            this.refBrushPopover = ref;
+          }}
         />
-      </>
-    );
-  }
+      </ButtonGroup>
+
+      <Submenu
+        isOpen={Boolean(this.props.anchorElement === this.refBrushPopover)}
+        openSubmenu={this.openSubmenu}
+        anchorElement={this.props.anchorElement}
+        is3D={this.props.is3D}
+      />
+    </>
+  );
 }
 
 export { Toolbar, ToolboxName };

@@ -197,7 +197,7 @@ class UserInterface extends Component<Props, State> {
     super(props);
 
     this.annotationsObject = this.props.annotationsObject || new Annotations();
-    this.annotationsObject.giveRedrawCallback(this.callRedraw)
+    this.annotationsObject.giveRedrawCallback(this.callRedraw);
 
     this.slicesData = this.props.slicesData || null;
 
@@ -744,7 +744,8 @@ class UserInterface extends Component<Props, State> {
         name: "Annotation Label",
         icon: icons.annotationLabel,
         event: "selectAnnotationLabel",
-        active: () => this.state.anchorElement === this.refBtnsPopovers["Annotation Label"],
+        active: () =>
+          this.state.anchorElement === this.refBtnsPopovers["Annotation Label"],
         enabled: () => true,
       },
       {
@@ -834,7 +835,8 @@ class UserInterface extends Component<Props, State> {
 
         <LabelsSubmenu
           isOpen={
-            this.state.anchorElement === this.refBtnsPopovers["Annotation Label"]
+            this.state.anchorElement ===
+            this.refBtnsPopovers["Annotation Label"]
           }
           anchorElement={this.state.anchorElement}
           onClose={this.handleClose}
