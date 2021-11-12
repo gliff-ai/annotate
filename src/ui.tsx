@@ -720,7 +720,7 @@ class UserInterface extends Component<Props, State> {
         name: "Select Annotation",
         icon: icons.select,
         event: "toggleMode",
-        active: () => this.state.buttonClicked === "Select",
+        active: () => this.state.mode === Mode.select,
         enabled: () => true,
       },
       {
