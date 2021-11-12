@@ -85,7 +85,7 @@ interface State {
   redraw: number;
   sliceIndex: number;
   channels: boolean[];
-  anchorElement: HTMLButtonElement | null; // A HTML element. It specifies which button has its submenu open, and serves as anchorEl for that submenu: https://material-ui.com/api/menu/#props
+  activeSubmenuAnchor: HTMLButtonElement | null; // A HTML element. It specifies which button has its submenu open, and serves as anchorEl for that submenu: https://material-ui.com/api/menu/#props
   buttonClicked: string;
   mode: Mode;
   canvasContainerColour: number[];
@@ -212,7 +212,7 @@ class UserInterface extends Component<Props, State> {
       channels: [true],
       displayedImage: this.slicesData ? this.slicesData[0][0] : null,
       redraw: 0,
-      anchorElement: null,
+      activeSubmenuAnchor: null,
       buttonClicked: null,
       activeToolbox: Toolboxes.paintbrush,
       mode: Mode.draw,
@@ -593,17 +593,17 @@ class UserInterface extends Component<Props, State> {
   };
 
   handleClose = (): void => {
-    this.setState({ anchorElement: null });
+    this.setState({ activeSubmenuAnchor: null });
   };
 
   handleOpen =
     (event?: React.MouseEvent) =>
-    (anchorElement?: HTMLButtonElement): void => {
-      if (anchorElement !== undefined) {
-        this.setState({ anchorElement });
+    (activeSubmenuAnchor?: HTMLButtonElement): void => {
+      if (activeSubmenuAnchor !== undefined) {
+        this.setState({ activeSubmenuAnchor });
       } else if (event) {
         this.setState({
-          anchorElement: event.currentTarget as HTMLButtonElement,
+          activeSubmenuAnchor: event.currentTarget as HTMLButtonElement,
         });
       }
     };
@@ -656,7 +656,7 @@ class UserInterface extends Component<Props, State> {
   isTyping = (): boolean =>
     // Added to prevent single-key shortcuts that are also valid text input
     // to get triggered during text input.
-    this.refBtnsPopovers.Labels === this.state.anchorElement;
+    this.refBtnsPopovers.Labels === this.state.activeSubmenuAnchor;
 
   render = (): ReactNode => {
     const { classes, showAppBar, saveAnnotationsCallback } = this.props;
@@ -743,7 +743,8 @@ class UserInterface extends Component<Props, State> {
         icon: icons.annotationLabel,
         event: "selectAnnotationLabel",
         active: () =>
-          this.state.anchorElement === this.refBtnsPopovers["Annotation Label"],
+          this.state.activeSubmenuAnchor ===
+          this.refBtnsPopovers["Annotation Label"],
         enabled: () => true,
       },
       {
@@ -802,7 +803,7 @@ class UserInterface extends Component<Props, State> {
             active={this.state.activeToolbox === "paintbrush"}
             activateToolbox={this.activateToolbox}
             handleOpen={this.handleOpen}
-            anchorElement={this.state.anchorElement}
+            anchorElement={this.state.activeSubmenuAnchor}
             isTyping={this.isTyping}
             is3D={this.slicesData?.length > 1}
           />
@@ -810,7 +811,7 @@ class UserInterface extends Component<Props, State> {
             active={this.state.activeToolbox === "spline"}
             activateToolbox={this.activateToolbox}
             handleOpen={this.handleOpen}
-            anchorElement={this.state.anchorElement}
+            anchorElement={this.state.activeSubmenuAnchor}
             isTyping={this.isTyping}
           />
 
@@ -822,7 +823,7 @@ class UserInterface extends Component<Props, State> {
           />
           <BackgroundToolbar
             handleOpen={this.handleOpen}
-            anchorElement={this.state.anchorElement}
+            anchorElement={this.state.activeSubmenuAnchor}
             isTyping={this.isTyping}
             channels={this.state.channels}
             toggleChannelAtIndex={this.toggleChannelAtIndex}
@@ -832,10 +833,10 @@ class UserInterface extends Component<Props, State> {
 
         <LabelsSubmenu
           isOpen={
-            this.state.anchorElement ===
+            this.state.activeSubmenuAnchor ===
             this.refBtnsPopovers["Annotation Label"]
           }
-          anchorElement={this.state.anchorElement}
+          anchorElement={this.state.activeSubmenuAnchor}
           onClose={this.handleClose}
           annotationsObject={this.annotationsObject}
           presetLabels={this.presetLabels}
