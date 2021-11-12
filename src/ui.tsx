@@ -598,7 +598,7 @@ class UserInterface extends Component<Props, State> {
   handleOpen =
     (event?: React.MouseEvent) =>
     (anchorElement?: HTMLButtonElement): void => {
-      if (anchorElement) {
+      if (anchorElement !== undefined) {
         this.setState({ anchorElement });
       } else if (event) {
         this.setState({
@@ -797,8 +797,7 @@ class UserInterface extends Component<Props, State> {
         </ButtonGroup>
         <ButtonGroup>
           <PaintbrushToolbar
-            buttonClicked={this.state.buttonClicked}
-            setButtonClicked={this.setButtonClicked}
+            active={this.state.activeToolbox === "paintbrush"}
             activateToolbox={this.activateToolbox}
             handleOpen={this.handleOpen}
             anchorElement={this.state.anchorElement}
@@ -806,8 +805,7 @@ class UserInterface extends Component<Props, State> {
             is3D={this.slicesData?.length > 1}
           />
           <SplineToolbar
-            buttonClicked={this.state.buttonClicked}
-            setButtonClicked={this.setButtonClicked}
+            active={this.state.activeToolbox === "spline"}
             activateToolbox={this.activateToolbox}
             handleOpen={this.handleOpen}
             anchorElement={this.state.anchorElement}
@@ -815,14 +813,13 @@ class UserInterface extends Component<Props, State> {
           />
 
           <BoundingBoxToolbar
-            buttonClicked={this.state.buttonClicked}
-            setButtonClicked={this.setButtonClicked}
+            active={this.state.activeToolbox === "boundingBox"}
             activateToolbox={this.activateToolbox}
+            handleOpen={this.handleOpen}
             isTyping={this.isTyping}
           />
           <BackgroundToolbar
-            buttonClicked={this.state.buttonClicked}
-            setButtonClicked={this.setButtonClicked}
+            active={this.state.activeToolbox === "background"}
             handleOpen={this.handleOpen}
             anchorElement={this.state.anchorElement}
             isTyping={this.isTyping}

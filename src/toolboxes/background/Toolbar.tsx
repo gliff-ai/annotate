@@ -42,8 +42,7 @@ interface SubmenuProps {
 }
 
 interface Props {
-  buttonClicked: string;
-  setButtonClicked: (buttonName: string) => void;
+  active: boolean; // toolbox is active
   handleOpen: (
     event?: MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
@@ -336,36 +335,37 @@ class Toolbar extends Component<Props> {
   openSubmenu = (): void => {
     if (this.props.isTyping()) return;
     this.props.handleOpen()(this.refBackgroundSettingsPopover);
-    this.props.setButtonClicked("Background Settings");
   };
 
-  render = (): ReactElement => (
-    <>
-      <ButtonGroup style={{ all: "revert" }}>
-        <IconButton
-          tooltip={{
-            name: "Background Settings",
-          }}
-          icon={icons.backgroundSettings}
-          onClick={this.openSubmenu}
-          fill={this.props.buttonClicked === "Background Settings"}
-          setRefCallback={(ref) => {
-            this.refBackgroundSettingsPopover = ref;
-          }}
-        />
-      </ButtonGroup>
+  render = (): ReactElement => {
+    console.log("background", this.props.anchorElement, this.refBackgroundSettingsPopover, this.props.anchorElement === this.refBackgroundSettingsPopover)
+    return (
+      <>
+        <ButtonGroup style={{ all: "revert" }}>
+          <IconButton
+            tooltip={{
+              name: "Background Settings",
+            }}
+            icon={icons.backgroundSettings}
+            onClick={this.openSubmenu}
+            fill={Boolean(this.props.anchorElement === this.refBackgroundSettingsPopover)}
+            setRefCallback={(ref) => {
+              this.refBackgroundSettingsPopover = ref;
+            }}
+          />
+        </ButtonGroup>
 
-      <Submenu
-        isOpen={
-          this.props.buttonClicked === "Background Settings" &&
-          Boolean(this.props.anchorElement)
-        }
-        openSubmenu={this.openSubmenu}
-        anchorElement={this.props.anchorElement}
-        channelControls={this.channelControls}
-      />
-    </>
-  );
+        <Submenu
+          isOpen={
+            Boolean(this.props.anchorElement === this.refBackgroundSettingsPopover)
+          }
+          openSubmenu={this.openSubmenu}
+          anchorElement={this.props.anchorElement}
+          channelControls={this.channelControls}
+        />
+      </>
+    );
+  }
 }
 
 export { Toolbar, ToolboxName };

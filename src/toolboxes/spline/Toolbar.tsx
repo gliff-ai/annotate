@@ -154,13 +154,13 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     </Popper>
   );
 };
+
 interface Event extends CustomEvent {
   type: typeof events[number];
 }
 
 interface Props {
-  buttonClicked: string;
-  setButtonClicked: (buttonName: string) => void;
+  active: boolean; // toolbox is active
   activateToolbox: (activeToolbox: Toolbox) => void;
   handleOpen: (
     event?: MouseEvent
@@ -180,7 +180,6 @@ class Toolbar extends Component<Props> {
   openSubmenu = (): void => {
     if (this.props.isTyping()) return;
     this.props.handleOpen()(this.refSplinePopover);
-    this.props.setButtonClicked("Spline");
     this.props.activateToolbox(ToolboxName);
   };
 
@@ -194,7 +193,7 @@ class Toolbar extends Component<Props> {
           }}
           icon={icons.spline}
           onClick={this.openSubmenu}
-          fill={this.props.buttonClicked === "Spline"}
+          fill={this.props.active}
           setRefCallback={(ref: HTMLButtonElement) => {
             this.refSplinePopover = ref;
           }}
@@ -203,8 +202,7 @@ class Toolbar extends Component<Props> {
 
       <Submenu
         isOpen={
-          this.props.buttonClicked === "Spline" &&
-          Boolean(this.props.anchorElement)
+          Boolean(this.props.anchorElement === this.refSplinePopover)
         }
         anchorElement={this.props.anchorElement}
         openSubmenu={this.openSubmenu}
