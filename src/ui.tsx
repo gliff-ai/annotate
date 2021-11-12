@@ -744,7 +744,7 @@ class UserInterface extends Component<Props, State> {
         name: "Annotation Label",
         icon: icons.annotationLabel,
         event: "selectAnnotationLabel",
-        active: () => this.state.buttonClicked === "Annotation Label",
+        active: () => this.state.anchorElement === this.refBtnsPopovers["Annotation Label"],
         enabled: () => true,
       },
       {
@@ -834,8 +834,7 @@ class UserInterface extends Component<Props, State> {
 
         <LabelsSubmenu
           isOpen={
-            this.state.buttonClicked === "Annotation Label" &&
-            Boolean(this.state.anchorElement)
+            this.state.anchorElement === this.refBtnsPopovers["Annotation Label"]
           }
           anchorElement={this.state.anchorElement}
           onClose={this.handleClose}
