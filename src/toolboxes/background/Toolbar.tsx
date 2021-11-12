@@ -42,7 +42,6 @@ interface SubmenuProps {
 }
 
 interface Props {
-  active: boolean; // toolbox is active
   handleOpen: (
     event?: MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
