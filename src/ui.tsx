@@ -85,7 +85,7 @@ interface State {
   redraw: number;
   sliceIndex: number;
   channels: boolean[];
-  anchorElement: HTMLButtonElement | null; // A HTML element. It's used to set the position of the popover menu https://material-ui.com/api/menu/#props
+  anchorElement: HTMLButtonElement | null; // A HTML element. It specifies which button has its submenu open, and serves as anchorEl for that submenu: https://material-ui.com/api/menu/#props
   buttonClicked: string;
   mode: Mode;
   canvasContainerColour: number[];
