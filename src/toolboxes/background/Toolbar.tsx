@@ -42,8 +42,6 @@ interface SubmenuProps {
 }
 
 interface Props {
-  buttonClicked: string;
-  setButtonClicked: (buttonName: string) => void;
   handleOpen: (
     event?: MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
@@ -336,7 +334,6 @@ class Toolbar extends Component<Props> {
   openSubmenu = (): void => {
     if (this.props.isTyping()) return;
     this.props.handleOpen()(this.refBackgroundSettingsPopover);
-    this.props.setButtonClicked("Background Settings");
   };
 
   render = (): ReactElement => (
@@ -348,7 +345,9 @@ class Toolbar extends Component<Props> {
           }}
           icon={icons.backgroundSettings}
           onClick={this.openSubmenu}
-          fill={this.props.buttonClicked === "Background Settings"}
+          fill={Boolean(
+            this.props.anchorElement === this.refBackgroundSettingsPopover
+          )}
           setRefCallback={(ref) => {
             this.refBackgroundSettingsPopover = ref;
           }}
@@ -356,10 +355,9 @@ class Toolbar extends Component<Props> {
       </ButtonGroup>
 
       <Submenu
-        isOpen={
-          this.props.buttonClicked === "Background Settings" &&
-          Boolean(this.props.anchorElement)
-        }
+        isOpen={Boolean(
+          this.props.anchorElement === this.refBackgroundSettingsPopover
+        )}
         openSubmenu={this.openSubmenu}
         anchorElement={this.props.anchorElement}
         channelControls={this.channelControls}

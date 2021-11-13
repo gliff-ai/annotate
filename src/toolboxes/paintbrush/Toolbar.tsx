@@ -33,8 +33,7 @@ interface SubmenuProps {
 }
 
 interface Props {
-  buttonClicked: string;
-  setButtonClicked: (buttonName: string) => void;
+  active: boolean; // toolbox is active
   activateToolbox: (activeToolbox: Toolbox) => void;
   handleOpen: (
     event?: MouseEvent
@@ -385,7 +384,6 @@ class Toolbar extends Component<Props> {
   openSubmenu = (): void => {
     if (this.props.isTyping()) return;
     this.props.handleOpen()(this.refBrushPopover);
-    this.props.setButtonClicked("Paintbrush");
     this.props.activateToolbox(ToolboxName);
   };
 
@@ -399,7 +397,7 @@ class Toolbar extends Component<Props> {
           }}
           icon={icons.brush}
           onClick={this.openSubmenu}
-          fill={this.props.buttonClicked === "Paintbrush"}
+          fill={this.props.active}
           setRefCallback={(ref: HTMLButtonElement) => {
             this.refBrushPopover = ref;
           }}
@@ -407,10 +405,7 @@ class Toolbar extends Component<Props> {
       </ButtonGroup>
 
       <Submenu
-        isOpen={
-          this.props.buttonClicked === "Paintbrush" &&
-          Boolean(this.props.anchorElement)
-        }
+        isOpen={Boolean(this.props.anchorElement === this.refBrushPopover)}
         openSubmenu={this.openSubmenu}
         anchorElement={this.props.anchorElement}
         is3D={this.props.is3D}
