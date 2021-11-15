@@ -743,14 +743,14 @@ class UserInterface extends Component<Props, State> {
         enabled: () => true,
       },
       {
-        name: "Undo last action",
+        name: "Undo Last Action",
         icon: icons.undo,
         event: "undo",
         active: () => false,
         enabled: () => this.annotationsObject.canUndo(),
       },
       {
-        name: "Redo last action",
+        name: "Redo Last Action",
         icon: icons.redo,
         event: "redo",
         active: () => false,
