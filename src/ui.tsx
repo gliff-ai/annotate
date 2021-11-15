@@ -194,7 +194,6 @@ class UserInterface extends Component<Props, State> {
     super(props);
 
     this.annotationsObject = this.props.annotationsObject || new Annotations();
-    this.annotationsObject.giveRedrawCallback(this.callRedraw);
 
     this.slicesData = this.props.slicesData || null;
 
@@ -219,7 +218,6 @@ class UserInterface extends Component<Props, State> {
       presetLabels: this.props.presetLabels || [],
     };
 
-    this.annotationsObject.addAnnotation(this.state.activeToolbox);
     this.imageFileInfo = this.props.imageFileInfo || null;
     this.refBtnsPopovers = {};
   }
@@ -232,6 +230,9 @@ class UserInterface extends Component<Props, State> {
       document.addEventListener(event, this.handleEvent);
     }
     this.mixChannels();
+
+    this.annotationsObject.giveRedrawCallback(this.callRedraw);
+    this.annotationsObject.addAnnotation(this.state.activeToolbox);
   }
 
   componentDidUpdate = (prevProps: Props): void => {
