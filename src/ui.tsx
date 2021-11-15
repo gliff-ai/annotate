@@ -89,6 +89,7 @@ interface State {
   buttonClicked: string;
   mode: Mode;
   canvasContainerColour: number[];
+  presetLabels: string[];
 }
 
 const styles = {
@@ -183,8 +184,6 @@ class UserInterface extends Component<Props, State> {
 
   annotationsObject: Annotations;
 
-  private presetLabels: string[];
-
   private slicesData: ImageBitmap[][] | null;
 
   private imageFileInfo: ImageFileInfo | null;
@@ -217,10 +216,10 @@ class UserInterface extends Component<Props, State> {
       activeToolbox: Toolboxes.paintbrush,
       mode: Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
+      presetLabels: this.props.presetLabels || [],
     };
 
     this.annotationsObject.addAnnotation(this.state.activeToolbox);
-    this.presetLabels = this.props.presetLabels || [];
     this.imageFileInfo = this.props.imageFileInfo || null;
     this.refBtnsPopovers = {};
   }
@@ -280,8 +279,10 @@ class UserInterface extends Component<Props, State> {
     function onlyUnique(value: string, index: number, self: string[]) {
       return self.indexOf(value) === index;
     }
-    this.presetLabels.push(label);
-    this.presetLabels = this.presetLabels.filter(onlyUnique);
+    this.setState(({ presetLabels }) => {
+      presetLabels.push(label);
+      return { presetLabels: presetLabels.filter(onlyUnique) };
+    });
   };
 
   setViewportPositionAndSize = (
@@ -834,7 +835,7 @@ class UserInterface extends Component<Props, State> {
           anchorElement={this.state.activeSubmenuAnchor}
           onClose={this.handleClose}
           annotationsObject={this.annotationsObject}
-          presetLabels={this.presetLabels}
+          presetLabels={this.state.presetLabels}
           updatePresetLabels={this.updatePresetLabels}
           activeAnnotationID={this.state.activeAnnotationID}
         />
