@@ -265,7 +265,7 @@ class UserInterface extends Component<Props, State> {
   }
 
   handleEvent = (event: Event): void => {
-    if (event.detail === "ui") {
+    if (event.detail === "ui" && !this.isTyping()) {
       this[event.type]?.call(this);
     }
   };
@@ -519,8 +519,6 @@ class UserInterface extends Component<Props, State> {
 
   toggleMode = (): void => {
     // Toggle between draw and select mode.
-    if (this.isTyping()) return;
-
     if (this.state.mode === Mode.draw) {
       this.setState({ mode: Mode.select, buttonClicked: "Select" });
     } else {
@@ -614,19 +612,16 @@ class UserInterface extends Component<Props, State> {
   // Functions of type select<ToolTip.name>, added for use in keybindings and OnClick events
   // TODO: find a way to pass parameters in keybindings and get rid of code duplication
   selectContrast = (): void => {
-    if (this.isTyping()) return;
     this.handleOpen()(this.refBtnsPopovers.Contrast);
     this.setButtonClicked("Contrast");
   };
 
   selectBrightness = (): void => {
-    if (this.isTyping()) return;
     this.handleOpen()(this.refBtnsPopovers.Brightness);
     this.setButtonClicked("Brightness");
   };
 
   selectChannels = (): void => {
-    if (this.isTyping()) return;
     this.handleOpen()(this.refBtnsPopovers.Channels);
     this.setButtonClicked("Channels");
   };
@@ -656,7 +651,7 @@ class UserInterface extends Component<Props, State> {
   isTyping = (): boolean =>
     // Added to prevent single-key shortcuts that are also valid text input
     // to get triggered during text input.
-    this.refBtnsPopovers.Labels === this.state.activeSubmenuAnchor;
+    this.refBtnsPopovers["Annotation Label"] === this.state.activeSubmenuAnchor;
 
   render = (): ReactNode => {
     const { classes, showAppBar, saveAnnotationsCallback } = this.props;
@@ -898,6 +893,7 @@ class UserInterface extends Component<Props, State> {
                   setActiveToolbox={(tool: Toolbox) => {
                     this.setState({ activeToolbox: tool });
                   }}
+                  isTyping={this.isTyping}
                 />
                 <BoundingBoxCanvas
                   scaleAndPan={this.state.scaleAndPan}
@@ -934,6 +930,7 @@ class UserInterface extends Component<Props, State> {
                   setActiveToolbox={(tool: Toolbox) => {
                     this.setState({ activeToolbox: tool });
                   }}
+                  isTyping={this.isTyping}
                 />
                 {this.slicesData?.length > 1 && (
                   <Paper
