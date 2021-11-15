@@ -21,9 +21,9 @@ module.exports = {
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   transformIgnorePatterns: [
-    // the package three contains ES6 modules, so it needs to be transpiled, so tell jest to ignore everything in node_modules except three
+    // any package that contains ES6 modules needs to be transpiled, so tell jest to ignore everything in node_modules except ES6 modules
     // (would ignore everything in node_modules by default: https://jestjs.io/docs/en/configuration.html#transformignorepatterns-arraystring )
-    "/node_modules/(?!three)/", // would normally be "/node_modules/"
+    "/node_modules/(?!@gliff-ai/*)", // default is "/node_modules/"
     "\\.pnp\\.[^\\/]+$", // unchanged from default
   ],
 
@@ -33,6 +33,7 @@ module.exports = {
   },
 
   transform: {
+    "^.+\\.(jsx|js)$": "babel-jest",
     "^.+\\.(ts|tsx)$": "ts-jest",
   },
 };
