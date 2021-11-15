@@ -48,8 +48,8 @@ const keybindings = {
   "cmdCtrl+KeyS": ["ui.saveAnnotations", "Save annotations"],
   "altOption+KeyL": ["ui.selectAnnotationLabel", "Show annotation labels"],
 
-  "cmdCtrl+KeyZ": ["ui.undo", "Undo last action"],
-  "cmdCtrl+KeyY": ["ui.redo", "Redo last undo"],
+  "cmdCtrl+KeyZ": ["ui.undo", "Undo Last Action"],
+  "cmdCtrl+KeyY": ["ui.redo", "Redo Last Undo"],
 
   KeyB: ["paintbrush.selectBrush", "Select Brush tool"],
   KeyE: ["paintbrush.selectEraser", "Select Brush Eraser tool"],

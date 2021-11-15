@@ -99,13 +99,12 @@ class DownloadUI extends Component<Props, State> {
   };
 
   handleEvent = (event: Event): void => {
-    if (event.detail === "download") {
+    if (event.detail === "download" && !this.props.isTyping()) {
       this[event.type]?.call(this);
     }
   };
 
   openDownloadDropdown = (): void => {
-    if (this.props.isTyping()) return;
     this.setState({ anchorEl: this.refDownloadPopover });
   };
 

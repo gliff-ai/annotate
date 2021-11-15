@@ -26,8 +26,6 @@ const keydownListener = (
     const [namespace, method] = keybindingsMap[code][0].split(".");
 
     document.dispatchEvent(new CustomEvent(method, { detail: namespace }));
-
-    event.preventDefault();
   }
 };
 
