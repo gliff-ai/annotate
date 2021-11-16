@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "@gliff-ai/slpf": "^1.1.2",
-    "@gliff-ai/upload": "^0.3.3",
+    "@gliff-ai/upload": "^1.0.1",
     "@use-gesture/react": "^10.1.1",
     "detect-browser": "^5.2.1",
     "react-inlinesvg": "^2.3.0",
