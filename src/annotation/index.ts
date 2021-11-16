@@ -1,4 +1,4 @@
-import { Toolbox, Toolboxes } from "@/Toolboxes";
+import { Toolbox, Toolboxes } from "../Toolboxes";
 import { BoundingBox, BoundingBoxCoordinates } from "@/toolboxes/boundingBox";
 import { BrushStroke } from "@/toolboxes/paintbrush";
 import { Spline } from "@/toolboxes/spline";

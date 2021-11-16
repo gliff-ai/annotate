@@ -6,7 +6,6 @@ import {
   useEffect,
   useCallback,
 } from "react";
-
 import {
   Avatar,
   Chip,
@@ -18,11 +17,8 @@ import {
   makeStyles,
   Typography,
 } from "@material-ui/core";
-
 import SVG from "react-inlinesvg";
-
 import { theme, icons } from "@gliff-ai/style";
-
 import { Annotations } from "@/annotation";
 
 export interface Props {
@@ -141,12 +137,13 @@ export const Labels: FunctionComponent<Props> = ({
       <Divider className={classes.divider} />
       {assignedLabels.map((label) => (
         <Chip
-          key={`chip-add-${label}`}
+          key={`chip-delete-${label}`}
           avatar={
             <Avatar
               variant="circular"
               style={{ cursor: "pointer" }}
               onClick={handleRemoveLabel(label)}
+              data-testid={`delete-${label}`}
             >
               <SVG
                 src={icons.removeLabel}
@@ -169,6 +166,7 @@ export const Labels: FunctionComponent<Props> = ({
               variant="circular"
               style={{ cursor: "pointer" }}
               onClick={handleAddLabel(label)}
+              data-testid={`add-${label}`}
             >
               <SVG
                 src={icons.add}
