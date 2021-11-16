@@ -30,6 +30,7 @@ module.exports = {
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   moduleNameMapper: {
     "\\.s?css$": "<rootDir>/src/testUtils/cssmock.js", // allows Jest to not die when importing a module that imports CSS
+    "@/(.*)": "<rootDir>/src/$1",
   },
 
   transform: {

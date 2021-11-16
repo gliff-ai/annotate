@@ -1,5 +1,5 @@
 import { render, fireEvent, screen } from "@testing-library/react";
-import { Annotations } from "../../annotation";
+import { Annotations } from "@/annotation";
 import { Labels } from "./Labels";
 
 let annotationsObject: Annotations;
