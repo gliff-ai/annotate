@@ -34,6 +34,7 @@ interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
   setActiveToolbox: (tool: Toolbox) => void;
+  isTyping: () => boolean;
 }
 
 interface State {
@@ -539,7 +540,7 @@ export class CanvasClass extends Component<Props, State> {
   };
 
   handleEvent = (event: Event): void => {
-    if ((event.detail as string).includes(this.name)) {
+    if ((event.detail as string).includes(this.name) && this.props.isTyping()) {
       this[event.type]?.call(this);
     }
   };
@@ -663,6 +664,7 @@ export const Canvas = (
       sliceIndex={props.sliceIndex}
       setUIActiveAnnotationID={props.setUIActiveAnnotationID}
       setActiveToolbox={props.setActiveToolbox}
+      isTyping={props.isTyping}
     />
   );
 };

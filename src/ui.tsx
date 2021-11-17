@@ -89,6 +89,7 @@ interface State {
   buttonClicked: string;
   mode: Mode;
   canvasContainerColour: number[];
+  presetLabels: string[];
 }
 
 const styles = {
@@ -183,8 +184,6 @@ class UserInterface extends Component<Props, State> {
 
   annotationsObject: Annotations;
 
-  private presetLabels: string[];
-
   private slicesData: ImageBitmap[][] | null;
 
   private imageFileInfo: ImageFileInfo | null;
@@ -195,7 +194,6 @@ class UserInterface extends Component<Props, State> {
     super(props);
 
     this.annotationsObject = this.props.annotationsObject || new Annotations();
-    this.annotationsObject.giveRedrawCallback(this.callRedraw);
 
     this.slicesData = this.props.slicesData || null;
 
@@ -217,10 +215,9 @@ class UserInterface extends Component<Props, State> {
       activeToolbox: Toolboxes.paintbrush,
       mode: Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
+      presetLabels: this.props.presetLabels || [],
     };
 
-    this.annotationsObject.addAnnotation(this.state.activeToolbox);
-    this.presetLabels = this.props.presetLabels || [];
     this.imageFileInfo = this.props.imageFileInfo || null;
     this.refBtnsPopovers = {};
   }
@@ -233,6 +230,9 @@ class UserInterface extends Component<Props, State> {
       document.addEventListener(event, this.handleEvent);
     }
     this.mixChannels();
+
+    this.annotationsObject.giveRedrawCallback(this.callRedraw);
+    this.annotationsObject.addAnnotation(this.state.activeToolbox);
   }
 
   componentDidUpdate = (prevProps: Props): void => {
@@ -265,7 +265,7 @@ class UserInterface extends Component<Props, State> {
   }
 
   handleEvent = (event: Event): void => {
-    if (event.detail === "ui") {
+    if (event.detail === "ui" && !this.isTyping()) {
       this[event.type]?.call(this);
     }
   };
@@ -280,8 +280,10 @@ class UserInterface extends Component<Props, State> {
     function onlyUnique(value: string, index: number, self: string[]) {
       return self.indexOf(value) === index;
     }
-    this.presetLabels.push(label);
-    this.presetLabels = this.presetLabels.filter(onlyUnique);
+    this.setState(({ presetLabels }) => {
+      presetLabels.push(label);
+      return { presetLabels: presetLabels.filter(onlyUnique) };
+    });
   };
 
   setViewportPositionAndSize = (
@@ -519,8 +521,6 @@ class UserInterface extends Component<Props, State> {
 
   toggleMode = (): void => {
     // Toggle between draw and select mode.
-    if (this.isTyping()) return;
-
     if (this.state.mode === Mode.draw) {
       this.setState({ mode: Mode.select, buttonClicked: "Select" });
     } else {
@@ -614,19 +614,16 @@ class UserInterface extends Component<Props, State> {
   // Functions of type select<ToolTip.name>, added for use in keybindings and OnClick events
   // TODO: find a way to pass parameters in keybindings and get rid of code duplication
   selectContrast = (): void => {
-    if (this.isTyping()) return;
     this.handleOpen()(this.refBtnsPopovers.Contrast);
     this.setButtonClicked("Contrast");
   };
 
   selectBrightness = (): void => {
-    if (this.isTyping()) return;
     this.handleOpen()(this.refBtnsPopovers.Brightness);
     this.setButtonClicked("Brightness");
   };
 
   selectChannels = (): void => {
-    if (this.isTyping()) return;
     this.handleOpen()(this.refBtnsPopovers.Channels);
     this.setButtonClicked("Channels");
   };
@@ -656,7 +653,7 @@ class UserInterface extends Component<Props, State> {
   isTyping = (): boolean =>
     // Added to prevent single-key shortcuts that are also valid text input
     // to get triggered during text input.
-    this.refBtnsPopovers.Labels === this.state.activeSubmenuAnchor;
+    this.refBtnsPopovers["Annotation Label"] === this.state.activeSubmenuAnchor;
 
   render = (): ReactNode => {
     const { classes, showAppBar, saveAnnotationsCallback } = this.props;
@@ -748,14 +745,14 @@ class UserInterface extends Component<Props, State> {
         enabled: () => true,
       },
       {
-        name: "Undo last action",
+        name: "Undo Last Action",
         icon: icons.undo,
         event: "undo",
         active: () => false,
         enabled: () => this.annotationsObject.canUndo(),
       },
       {
-        name: "Redo last action",
+        name: "Redo Last Action",
         icon: icons.redo,
         event: "redo",
         active: () => false,
@@ -839,7 +836,7 @@ class UserInterface extends Component<Props, State> {
           anchorElement={this.state.activeSubmenuAnchor}
           onClose={this.handleClose}
           annotationsObject={this.annotationsObject}
-          presetLabels={this.presetLabels}
+          presetLabels={this.state.presetLabels}
           updatePresetLabels={this.updatePresetLabels}
           activeAnnotationID={this.state.activeAnnotationID}
         />
@@ -898,6 +895,7 @@ class UserInterface extends Component<Props, State> {
                   setActiveToolbox={(tool: Toolbox) => {
                     this.setState({ activeToolbox: tool });
                   }}
+                  isTyping={this.isTyping}
                 />
                 <BoundingBoxCanvas
                   scaleAndPan={this.state.scaleAndPan}
@@ -934,6 +932,7 @@ class UserInterface extends Component<Props, State> {
                   setActiveToolbox={(tool: Toolbox) => {
                     this.setState({ activeToolbox: tool });
                   }}
+                  isTyping={this.isTyping}
                 />
                 {this.slicesData?.length > 1 && (
                   <Paper

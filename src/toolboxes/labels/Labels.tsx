@@ -6,7 +6,6 @@ import {
   useEffect,
   useCallback,
 } from "react";
-
 import {
   Avatar,
   Chip,
@@ -18,11 +17,8 @@ import {
   makeStyles,
   Typography,
 } from "@material-ui/core";
-
 import SVG from "react-inlinesvg";
-
 import { theme, icons } from "@gliff-ai/style";
-
 import { Annotations } from "@/annotation";
 
 export interface Props {
@@ -53,9 +49,12 @@ const useStyles = makeStyles(() =>
       color: theme.palette.text.secondary,
       borderColor: theme.palette.text.secondary,
     },
-
+    addButton: {
+      position: "absolute",
+      right: "18px",
+    },
     divider: {
-      width: "97%",
+      width: "90%",
       marginTop: "inherit",
       marginLeft: "-1%",
     },
@@ -90,10 +89,7 @@ export const Labels: FunctionComponent<Props> = ({
   function handleNewLabelChange(
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ): void {
-    // Handle the input of a new label.
-    const { value } = event.target; // TODO: add input validation
-
-    setNewLabel(value);
+    setNewLabel(event.target.value);
   }
 
   const updateAllLabels = useCallback(() => {
@@ -124,13 +120,13 @@ export const Labels: FunctionComponent<Props> = ({
   return (
     <>
       <InputBase
-        placeholder="Add new label..."
+        className={classes.inputBase}
+        placeholder="New Label"
         value={newLabel}
         onChange={(e) => handleNewLabelChange(e)}
-        className={classes.inputBase}
       />
-
       <IconButton
+        className={classes.addButton}
         type="submit"
         aria-label="add-new-label"
         onClick={handleAddLabel(newLabel)}
@@ -141,12 +137,13 @@ export const Labels: FunctionComponent<Props> = ({
       <Divider className={classes.divider} />
       {assignedLabels.map((label) => (
         <Chip
-          key={`chip-add-${label}`}
+          key={`chip-delete-${label}`}
           avatar={
             <Avatar
               variant="circular"
               style={{ cursor: "pointer" }}
               onClick={handleRemoveLabel(label)}
+              data-testid={`delete-${label}`}
             >
               <SVG
                 src={icons.removeLabel}
@@ -169,6 +166,7 @@ export const Labels: FunctionComponent<Props> = ({
               variant="circular"
               style={{ cursor: "pointer" }}
               onClick={handleAddLabel(label)}
+              data-testid={`add-${label}`}
             >
               <SVG
                 src={icons.add}
