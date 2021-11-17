@@ -765,6 +765,7 @@ class UserInterface extends Component<Props, State> {
         <ButtonGroup>
           {tools.map(({ icon, name, event, active, enabled }) => (
             <IconButton
+              id={name === "Add New Annotation" ? "id-new-annotation" : null}
               key={name}
               icon={icon}
               tooltip={{

@@ -197,6 +197,7 @@ class Toolbar extends Component<Props> {
           setRefCallback={(ref: HTMLButtonElement) => {
             this.refSplinePopover = ref;
           }}
+          id="id-spline-toolbox"
         />
       </ButtonGroup>
 
