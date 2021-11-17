@@ -20,6 +20,7 @@
     "build:example": "vite build",
     "test": "jest --coverage --passWithNoTests",
     "test:visual": "npx percy snapshot snapshots.yml",
+    "test:e2e": "percy exec -- jest -c jest.e2e.config.js --no-colors",
     "dev": "vite --host"
   },
   "license": "AGPL-3.0-only",
