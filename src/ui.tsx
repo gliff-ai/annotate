@@ -254,6 +254,7 @@ class UserInterface extends Component<Props, State> {
       prevProps.annotationsObject !== this.props.annotationsObject
     ) {
       this.annotationsObject = this.props.annotationsObject;
+      this.annotationsObject.giveRedrawCallback(this.callRedraw);
       this.callRedraw();
     }
   };
@@ -457,6 +458,7 @@ class UserInterface extends Component<Props, State> {
     // Otherwise the props for annotationsObject will update after the uplaoed image has been stored.
     if (!this.props.annotationsObject) {
       this.annotationsObject = new Annotations();
+      this.annotationsObject.giveRedrawCallback(this.callRedraw);
       this.annotationsObject.addAnnotation(this.state.activeToolbox);
     }
 
