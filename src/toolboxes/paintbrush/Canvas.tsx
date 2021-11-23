@@ -540,7 +540,7 @@ export class CanvasClass extends Component<Props, State> {
   };
 
   handleEvent = (event: Event): void => {
-    if ((event.detail as string).includes(this.name) && this.props.isTyping()) {
+    if ((event.detail as string).includes(this.name) && !this.props.isTyping()) {
       this[event.type]?.call(this);
     }
   };
