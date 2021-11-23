@@ -57,6 +57,7 @@ class Toolbar extends Component<Props> {
           icon={icons.boundingBox}
           fill={this.props.active}
           onClick={this.selectBoundingBox}
+          id="id-bounding-box"
         />
       </ButtonGroup>
     </>
