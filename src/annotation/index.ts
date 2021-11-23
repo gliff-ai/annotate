@@ -703,7 +703,9 @@ export class Annotations {
       },
       redoAction: this.audit[this.audit.length - 1],
     });
-    this.redrawUI();
+    if (this.redrawUI !== undefined) {
+      this.redrawUI();
+    }
   };
 
   private applyAction = (
@@ -721,7 +723,9 @@ export class Annotations {
       const undoRedo = this.undoData.pop();
       this.applyAction(undoRedo.undoAction, false);
       this.redoData.push(undoRedo);
-      this.redrawUI();
+      if (this.redrawUI !== undefined) {
+        this.redrawUI();
+      }
     }
     return canUndoRedo;
   }
@@ -732,7 +736,9 @@ export class Annotations {
       const undoRedo = this.redoData.pop();
       this.applyAction(undoRedo.redoAction, false);
       this.undoData.push(undoRedo);
-      this.redrawUI();
+      if (this.redrawUI !== undefined) {
+        this.redrawUI();
+      }
     }
     return canUndoRedo;
   }
