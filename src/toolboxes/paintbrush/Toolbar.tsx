@@ -92,7 +92,6 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     "selectBrush",
     "selectEraser",
     "toggleShowTransparency",
-    "fillBrush",
   ] as const;
 
   const classes = useStyles();
@@ -202,7 +201,6 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   useMountEffect(() => {
     const submenuEventFunctions = {
       changeBrushRadius,
-      fillBrush,
       selectBrush,
       selectEraser,
       toggleShowTransparency,
