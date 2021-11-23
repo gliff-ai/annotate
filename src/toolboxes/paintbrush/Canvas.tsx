@@ -498,7 +498,7 @@ export class CanvasClass extends Component<Props, State> {
   };
 
   onMouseUp = (canvasX: number, canvasY: number): void => {
-    if (this.props.mode === Mode.draw) {
+    if (this.props.mode === Mode.draw && this.isDrawing) {
       // End painting & save painting
 
       // Draw to this end pos
