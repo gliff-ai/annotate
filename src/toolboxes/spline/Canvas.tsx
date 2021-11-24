@@ -409,9 +409,9 @@ class CanvasClass extends Component<Props, State> {
     // Returns true if successful, false otherwise
 
     if (
-      this.props.activeToolbox !== "Spline" &&
+      (this.props.activeToolbox !== "Spline" &&
       this.props.activeToolbox !== "Lasso Spline" &&
-      this.props.activeToolbox !== "Magic Spline"
+      this.props.activeToolbox !== "Magic Spline") || this.props.annotationsObject.getSplineCoordinates().length === 0
     )
       return false;
 
