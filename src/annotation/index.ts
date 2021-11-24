@@ -642,11 +642,17 @@ export class Annotations {
   }
 
   @log
-  addBrushStrokeMulti(newBrushStrokes: BrushStroke[], addToUndoRedo = true): void {
+  addBrushStrokeMulti(
+    newBrushStrokes: BrushStroke[],
+    addToUndoRedo = true
+  ): void {
     if (this.data[this.activeAnnotationID].toolbox === Toolboxes.paintbrush) {
-      this.data[this.activeAnnotationID].brushStrokes = this.data[this.activeAnnotationID].brushStrokes.concat(newBrushStrokes);
+      this.data[this.activeAnnotationID].brushStrokes =
+        this.data[this.activeAnnotationID].brushStrokes.concat(newBrushStrokes);
       if (addToUndoRedo) {
-        this.updateUndoRedoActions("deleteBrushStrokes", [newBrushStrokes.length]);
+        this.updateUndoRedoActions("deleteBrushStrokes", [
+          newBrushStrokes.length,
+        ]);
         this.redoData = [];
       }
     }
@@ -657,7 +663,9 @@ export class Annotations {
   private deleteBrushStrokes(n: number, addToUndoRedo = true): void {
     // deletes the n most recent brush strokes. only used when undoing addBrushStroke(Multi), hence it's private
     if (this.data[this.activeAnnotationID].toolbox === Toolboxes.paintbrush) {
-      this.data[this.activeAnnotationID].brushStrokes.splice(this.data[this.activeAnnotationID].brushStrokes.length - n);
+      this.data[this.activeAnnotationID].brushStrokes.splice(
+        this.data[this.activeAnnotationID].brushStrokes.length - n
+      );
     }
   }
 

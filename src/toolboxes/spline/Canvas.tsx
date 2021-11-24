@@ -410,8 +410,9 @@ class CanvasClass extends Component<Props, State> {
 
     if (
       (this.props.activeToolbox !== "Spline" &&
-      this.props.activeToolbox !== "Lasso Spline" &&
-      this.props.activeToolbox !== "Magic Spline") || this.props.annotationsObject.getSplineCoordinates().length === 0
+        this.props.activeToolbox !== "Lasso Spline" &&
+        this.props.activeToolbox !== "Magic Spline") ||
+      this.props.annotationsObject.getSplineCoordinates().length === 0
     )
       return false;
 
@@ -522,7 +523,10 @@ class CanvasClass extends Component<Props, State> {
     if (nearPoint !== -1) {
       this.selectedPointIndex = nearPoint;
       this.dragPoint = clickPoint;
-    } else if (this.props.activeToolbox === "Magic Spline" && !this.props.annotationsObject.splineIsClosed()) {
+    } else if (
+      this.props.activeToolbox === "Magic Spline" &&
+      !this.props.annotationsObject.splineIsClosed()
+    ) {
       // magic spline, add a new point and snap it to the highest gradient point within 25 pixels:
       if (this.gradientImage === undefined) {
         this.gradientImage = calculateSobel(this.props.displayedImage);
@@ -530,7 +534,10 @@ class CanvasClass extends Component<Props, State> {
       this.props.annotationsObject.addSplinePoint(clickPoint);
       this.snapToGradient(this.props.annotationsObject.getSplineLength() - 1);
       this.isDrawing = true;
-    } else if (this.props.activeToolbox === "Lasso Spline" && !this.props.annotationsObject.splineIsClosed()) {
+    } else if (
+      this.props.activeToolbox === "Lasso Spline" &&
+      !this.props.annotationsObject.splineIsClosed()
+    ) {
       // lasso spline, add a new point but no snapping
       this.props.annotationsObject.addSplinePoint(clickPoint);
       this.selectedPointIndex =
