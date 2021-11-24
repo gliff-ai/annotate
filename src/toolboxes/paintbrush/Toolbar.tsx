@@ -318,7 +318,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                 onClick={event}
                 fill={active()}
                 disabled={disabled()}
-                id={"id-" + name.toLowerCase().replace(/ /g, "-")}
+                id={`id-${name.toLowerCase().replace(/ /g, "-")}`}
               />
             ))}
           </ButtonGroup>

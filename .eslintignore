@@ -8,3 +8,5 @@ webpack*.js
 *.spec.ts
 
 coverage/
+
+src/__tests__/e2e

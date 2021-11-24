@@ -14,7 +14,7 @@ import {
 import { palette, getRGBAString } from "@/components/palette";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
 import { usePaintbrushStore } from "./Store";
-import { Brush, BrushStroke } from "./interfaces";
+import { Brush } from "./interfaces";
 import { drawCapsule } from "@/download/DownloadAsTiff";
 import { getNewImageSizeAndDisplacement } from "@/toolboxes/background/drawImage";
 
