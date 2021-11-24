@@ -69,12 +69,6 @@ wrapper(() => {
 
       await sleep(100); // seems the next actions will execute before the above JS events have been processed if we don't wait a bit
 
-      // draw bounding box:
-      await clickById(driver, "id-add-new-annotation");
-      await clickById(driver, "id-bounding-box");
-      driver.executeScript(makeEventJS("boundingBox-canvas", "click", 150, 450));
-      driver.executeScript(makeEventJS("boundingBox-canvas", "click", 300, 550));
-
       // select tool:
       await clickById(driver, "id-select-annotation");
       driver.executeScript(makeEventJS("boundingBox-canvas", "click", 250, 200));
@@ -112,6 +106,12 @@ wrapper(() => {
       drawPentagon(driver, 550, 550);
       await clickById(driver, "id-close-active-spline");
       await clickById(driver, "id-convert-spline-to-paintbrush");
+
+      // draw bounding box:
+      await clickById(driver, "id-add-new-annotation");
+      await clickById(driver, "id-bounding-box");
+      driver.executeScript(makeEventJS("boundingBox-canvas", "click", 150, 450));
+      driver.executeScript(makeEventJS("boundingBox-canvas", "click", 300, 550));
       
       await percySnapshot(driver, "paintbrush-splodge");
     });
