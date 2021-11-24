@@ -29,6 +29,10 @@ async function clickById(driver, id) {
   await el.click();
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 wrapper(() => {
   describe("webdriver", () => {
     test("paintbrush-splodge", async (driver, percySnapshot) => {
@@ -58,7 +62,12 @@ wrapper(() => {
       for (let i = 0; i < 40; i += 1) {
         driver.executeScript(makeEventJS("spline-canvas", "mousemove", 650, 150 + 7*i))
       }
-      driver.executeScript(makeEventJS("spline-canvas", "mouseup", 650, 350));
+      driver.executeScript(makeEventJS("spline-canvas", "mouseup", 650, 400));
+      // IRL, a click event is generated after a mouseup event, and our code knows to ignore it because isDrawing/dragPoint will still be set
+      // we have to simulate that click event here, so that onClick unsets them, otherwise the next click event will be ignored:
+      driver.executeScript(makeEventJS("spline-canvas", "click", 650, 400));
+
+      await sleep(100); // seems the next actions will execute before the above JS events have been processed if we don't wait a bit
 
       // draw bounding box:
       await clickById(driver, "id-add-new-annotation");
@@ -86,8 +95,23 @@ wrapper(() => {
       driver.executeScript(makeEventJS("paintbrush-interaction-canvas", "mousedown", 250, 300));
       driver.executeScript(makeEventJS("paintbrush-interaction-canvas", "mouseup", 250, 300));
 
-
-
+      // fill brush:
+      await clickById(driver, "id-add-new-annotation");
+      await clickById(driver, "id-paintbrush");
+      driver.executeScript(makeEventJS("paintbrush-interaction-canvas", "mousedown", 350, 500));
+      driver.executeScript(makeEventJS("paintbrush-interaction-canvas", "mousemove", 350, 600));
+      driver.executeScript(makeEventJS("paintbrush-interaction-canvas", "mousemove", 450, 600));
+      driver.executeScript(makeEventJS("paintbrush-interaction-canvas", "mousemove", 450, 500));
+      driver.executeScript(makeEventJS("paintbrush-interaction-canvas", "mouseup", 450, 500));
+      await clickById(driver, "id-fill-active-paintbrush");
+      
+      // spline to paintbrush:
+      await clickById(driver, "id-add-new-annotation");
+      await clickById(driver, "id-spline-toolbox");
+      await clickById(driver, "id-spline"); // switch from lasso spline to regular spline
+      drawPentagon(driver, 550, 550);
+      await clickById(driver, "id-close-active-spline");
+      await clickById(driver, "id-convert-spline-to-paintbrush");
       
       await percySnapshot(driver, "paintbrush-splodge");
     });
