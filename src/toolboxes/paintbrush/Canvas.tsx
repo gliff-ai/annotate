@@ -413,21 +413,32 @@ export class CanvasClass extends Component<Props, State> {
         ]
       );
 
-    for (let i = 0; i < linesToFill.length; i += 1) {
-      const coordinates = linesToFill[i];
-      const brushStroke: BrushStroke = {
-        coordinates,
-        spaceTimeInfo: { z: this.props.sliceIndex, t: 0 },
-        brush: {
-          color,
-          radius: 1,
-          type: "paint",
-          is3D: this.props.is3D,
-        },
-      };
+    // for (let i = 0; i < linesToFill.length; i += 1) {
+    //   const coordinates = linesToFill[i];
+    //   const brushStroke: BrushStroke = {
+    //     coordinates,
+    //     spaceTimeInfo: { z: this.props.sliceIndex, t: 0 },
+    //     brush: {
+    //       color,
+    //       radius: 1,
+    //       type: "paint",
+    //       is3D: this.props.is3D,
+    //     },
+    //   };
 
-      this.props.annotationsObject.addBrushStroke(brushStroke);
-    }
+    //   this.props.annotationsObject.addBrushStroke(brushStroke);
+    // }
+
+    this.props.annotationsObject.addBrushStrokeMulti(linesToFill.map((line: XYPoint[]) => ({
+      coordinates: line,
+      spaceTimeInfo: { z: this.props.sliceIndex, t: 0 },
+      brush: {
+        color,
+        radius: 1,
+        type: "paint",
+        is3D: this.props.is3D,
+      },
+    })))
 
     this.drawAllStrokes(this.backgroundCanvas?.canvasContext);
   };
