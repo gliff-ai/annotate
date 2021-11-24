@@ -124,6 +124,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     };
   });
 
+  if (props.anchorElement === null) return null;
+
   return (
     <Popper
       open={props.isOpen}

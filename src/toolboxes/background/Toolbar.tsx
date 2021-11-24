@@ -191,6 +191,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
 
   const browser = detect().name;
 
+  if (props.anchorElement === null) return null;
+
   return (
     <>
       <ClickAwayListener onClickAway={handleClickAway}>

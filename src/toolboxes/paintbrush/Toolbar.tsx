@@ -280,6 +280,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     setOpenSubMenu(false);
   };
 
+  if (props.anchorElement === null) return null;
+
   return (
     <>
       <ClickAwayListener
