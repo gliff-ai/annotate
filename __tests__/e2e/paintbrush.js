@@ -6,7 +6,7 @@ const { wrapper, test, webdriver } =
 
 const { TARGET_URL = "http://localhost:3000" } = process.env;
 
-function sleep(ms = 500) {
+function sleep(ms = 600) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
