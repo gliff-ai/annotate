@@ -4,7 +4,7 @@ const { By } = require("selenium-webdriver");
 const { wrapper, test, webdriver } =
   require("@gliff-ai/jest-browserstack-automate")("Annotate");
 
-const { TARGET_URL = "http://bs-local.com:8080/" } = process.env;
+const { TARGET_URL = "http://localhost:3000" } = process.env;
 
 function makeEventJS(el, eventType, clientX, clientY) {
   return `var el = document.getElementById("${el}");

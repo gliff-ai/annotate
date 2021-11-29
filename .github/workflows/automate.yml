@@ -27,7 +27,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16
-          
+
       - name: 'Building web application to be tested'
         run: npm i
 
@@ -39,6 +39,6 @@ jobs:
       - run: sleep 10
 
       - name: 'Running test on BrowserStack'  # Invokes the actual test script that would run on BrowserStack browsers
-        run: npm run test:e2e
+        run: TARGET_URL=http://bs-local.com:8080/ npm run test:e2e
         env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
