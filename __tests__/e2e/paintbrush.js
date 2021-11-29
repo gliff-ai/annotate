@@ -4,6 +4,8 @@ const { By } = require("selenium-webdriver");
 const { wrapper, test, webdriver } =
   require("@gliff-ai/jest-browserstack-automate")("Annotate");
 
+const { TARGET_URL = "http://bs-local.com:8080/" } = process.env;
+
 function makeEventJS(el, eventType, clientX, clientY) {
   return `var el = document.getElementById("${el}");
          el.dispatchEvent(new MouseEvent("${eventType}", { clientX: ${clientX}, clientY: ${clientY}, bubbles: true }));`;
@@ -42,7 +44,7 @@ function sleep(ms) {
 wrapper(() => {
   describe("webdriver", () => {
     test("paintbrush-splodge", async (driver, percySnapshot) => {
-      await driver.get("http://127.0.0.1:3000/");
+      await driver.get(TARGET_URL);
       await driver.wait(until.titleIs("gliff.ai ANNOTATE"), 3000);
 
       // draw brushstrokes:

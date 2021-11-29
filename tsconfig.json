@@ -28,6 +28,7 @@
     "typings/**/*.ts"
   ],
   "exclude": [
-    "src/**/*_.tsx"
+    "src/**/*_.tsx",
+    "__tests__/*"
   ]
 }
