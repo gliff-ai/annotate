@@ -211,6 +211,8 @@ wrapper(() => {
         try {
           await driver.get(TARGET_URL);
 
+          driver.manage().window().maximize();
+
           await driver.wait(until.titleIs("gliff.ai ANNOTATE"), 3000);
 
           await clickById(driver, "id-add-new-annotation");
