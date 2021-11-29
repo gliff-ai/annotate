@@ -51,8 +51,25 @@ async function clickById(driver, id) {
   await sleep();
 }
 
+// moves the mouse to points[0] and then drags to all of the points
+const dragBetweenPoints = (actions, points) => {
+  const mouse = actions.mouse();
+
+  const [[originX, originY], ...remainingPoints] = points.map(([x, y]) => [
+    Math.floor(x),
+    Math.floor(y),
+  ]);
+
+  actions.pause(mouse).move({ x: originX, y: originY, duration: 10 });
+
+  remainingPoints.forEach(([x, y]) => {
+    actions.press().move({ x, y, duration: 100 }).release();
+  });
+
+  actions.perform();
+};
 wrapper(() => {
-  describe("webdriver", () => {
+  describe("Percy complex screenshot", () => {
     test(
       "paintbrush-splodge",
       async (driver, percySnapshot) => {
@@ -182,6 +199,143 @@ wrapper(() => {
         );
         await sleep();
         await percySnapshot(driver, "paintbrush-splodge");
+      },
+      120000
+    );
+  });
+
+  describe.only("Percy complex screenshot", () => {
+    test(
+      "complex paintbrush",
+      async (driver, percySnapshot) => {
+        try {
+          await driver.get(TARGET_URL);
+
+          await driver.wait(until.titleIs("gliff.ai ANNOTATE"), 3000);
+
+          await clickById(driver, "id-add-new-annotation");
+
+          const actions = driver.actions({ async: true });
+          const kb = actions.keyboard();
+
+          //
+          // // a square
+          // dragBetweenPoints(actions, [
+          //   [100, 100],
+          //   [150, 100],
+          //   [150, 150],
+          //   [100, 150],
+          //   [100, 100],
+          // ]);
+
+          dragBetweenPoints(actions, [
+            [535, 1024],
+            [489, 1016],
+            [445, 1007],
+            [398, 1013],
+            [352, 1008],
+            [307, 993],
+            [267, 969],
+            [234, 935],
+            [217, 892],
+            [232, 848],
+            [274, 832],
+            [319, 845],
+            [359, 870],
+            [394, 902],
+            [424, 938],
+            [457, 972],
+            [498, 959],
+            [537, 933],
+            [574, 903],
+            [605, 867],
+            [612, 830],
+            [570, 810],
+            [524, 800],
+            [477, 796],
+            [430, 788],
+            [386, 774],
+            [340, 787],
+            [294, 796],
+            [247, 791],
+            [214, 760],
+            [207, 713],
+            [221, 669],
+            [252, 634],
+            [284, 602],
+            [305, 560],
+            [340, 529],
+            [385, 526],
+            [400, 566],
+            [365, 596],
+            [323, 617],
+            [304, 652],
+            [323, 695],
+            [355, 729],
+            [396, 747],
+            [441, 733],
+            [487, 721],
+            [534, 714],
+            [580, 718],
+            [622, 740],
+            [649, 778],
+            [651, 824],
+            [669, 866],
+            [673, 912],
+            [658, 956],
+            [626, 991],
+            [585, 1014],
+            [539, 1023],
+            [530, 1000],
+            [577, 992],
+            [617, 969],
+            [644, 931],
+            [650, 884],
+            [630, 871],
+            [601, 908],
+            [566, 940],
+            [528, 967],
+            [270, 856],
+            [240, 886],
+            [258, 928],
+            [294, 959],
+            [336, 980],
+            [382, 989],
+            [429, 987],
+            [409, 957],
+            [380, 920],
+            [345, 888],
+            [305, 864],
+            [506, 775],
+            [553, 781],
+            [598, 795],
+            [630, 802],
+            [610, 761],
+            [569, 739],
+            [522, 738],
+            [476, 748],
+            [431, 761],
+            [465, 771],
+            [265, 654],
+            [236, 691],
+            [232, 737],
+            [260, 771],
+            [307, 771],
+            [353, 760],
+            [323, 733],
+            [295, 695],
+            [280, 650],
+            [334, 563],
+            [315, 595],
+            [357, 574],
+            [367, 544],
+          ]);
+
+          await sleep(10000);
+        } catch (e) {
+          console.log("caught");
+          console.log(e);
+        }
       },
       120000
     );
