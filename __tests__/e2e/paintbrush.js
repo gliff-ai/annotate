@@ -47,7 +47,7 @@ async function clickById(driver, id) {
   await sleep();
 }
 
-function sleep(ms = 100) {
+function sleep(ms = 200) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
