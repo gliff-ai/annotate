@@ -635,7 +635,24 @@ export class Annotations {
     if (this.data[this.activeAnnotationID].toolbox === Toolboxes.paintbrush) {
       this.data[this.activeAnnotationID].brushStrokes.push(newBrushStroke);
       if (addToUndoRedo) {
-        this.updateUndoRedoActions("deleteBrushStroke", []);
+        this.updateUndoRedoActions("deleteBrushStrokes", [1]);
+        this.redoData = [];
+      }
+    }
+  }
+
+  @log
+  addBrushStrokeMulti(
+    newBrushStrokes: BrushStroke[],
+    addToUndoRedo = true
+  ): void {
+    if (this.data[this.activeAnnotationID].toolbox === Toolboxes.paintbrush) {
+      this.data[this.activeAnnotationID].brushStrokes =
+        this.data[this.activeAnnotationID].brushStrokes.concat(newBrushStrokes);
+      if (addToUndoRedo) {
+        this.updateUndoRedoActions("deleteBrushStrokes", [
+          newBrushStrokes.length,
+        ]);
         this.redoData = [];
       }
     }
@@ -643,10 +660,12 @@ export class Annotations {
 
   @log
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private deleteBrushStroke(addToUndoRedo = true): void {
-    // deletes the most recent brush stroke. only used when undoing addBrushStroke, hence it's private
+  private deleteBrushStrokes(n: number, addToUndoRedo = true): void {
+    // deletes the n most recent brush strokes. only used when undoing addBrushStroke(Multi), hence it's private
     if (this.data[this.activeAnnotationID].toolbox === Toolboxes.paintbrush) {
-      this.data[this.activeAnnotationID].brushStrokes.pop();
+      this.data[this.activeAnnotationID].brushStrokes.splice(
+        this.data[this.activeAnnotationID].brushStrokes.length - n
+      );
     }
   }
 

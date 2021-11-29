@@ -124,6 +124,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     };
   });
 
+  if (props.anchorElement === null) return null;
+
   return (
     <Popper
       open={props.isOpen}
@@ -148,6 +150,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
             }}
             onClick={event}
             fill={active()}
+            id={`id-${name.toLowerCase().replace(/ /g, "-")}`}
           />
         ))}
       </ButtonGroup>
@@ -197,6 +200,7 @@ class Toolbar extends Component<Props> {
           setRefCallback={(ref: HTMLButtonElement) => {
             this.refSplinePopover = ref;
           }}
+          id="id-spline-toolbox"
         />
       </ButtonGroup>
 
