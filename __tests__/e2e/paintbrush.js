@@ -78,12 +78,13 @@ wrapper(() => {
       await clickById(driver, "id-lasso-spline");
 
       driver.executeScript(makeEventJS("spline-canvas", "mousedown", 650, 150));
+      await sleep();
       for (let i = 0; i < 40; i += 1) {
         driver.executeScript(
           makeEventJS("spline-canvas", "mousemove", 650, 150 + 7 * i)
         );
 
-        await sleep();
+        await sleep(500);
       }
       driver.executeScript(makeEventJS("spline-canvas", "mouseup", 650, 400));
       await sleep();
