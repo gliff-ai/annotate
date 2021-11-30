@@ -5,10 +5,6 @@ const { wrapper, test, webdriver } =
 
 const { TARGET_URL = "http://localhost:3000" } = process.env;
 
-function sleep(ms = 600) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 function makeEventJS(el, eventType, clientX, clientY) {
   return `var el = document.getElementById("${el}");
          el.dispatchEvent(new MouseEvent("${eventType}", { clientX: ${clientX}, clientY: ${clientY}, bubbles: true }));`;
@@ -50,29 +46,14 @@ async function clickById(driver, id) {
   await sleep();
 }
 
-// moves the mouse to points[0] and then drags to all of the points
-const dragBetweenPoints = (actions, origin, points, relative = false) => {
-  const mouse = actions.mouse();
-
-  const [originX, originY] = origin;
-
-  actions.pause(mouse).move({ x: originX, y: originY, duration: 10 });
-
-  points.forEach(([x, y]) => {
-    actions
-      .press()
-      .move({ x, y, origin: relative ? Origin.POINTER : Origin.VIEWPORT })
-      .release();
-  });
-
-  actions.perform();
-};
 wrapper(() => {
   describe("Percy complex screenshot", () => {
     test(
       "paintbrush-splodge",
       async (driver, percySnapshot) => {
         await driver.get(TARGET_URL);
+        driver.manage().window().maximize();
+
         await driver.wait(until.titleIs("gliff.ai ANNOTATE"), 3000);
 
         // draw brushstrokes:
@@ -198,149 +179,6 @@ wrapper(() => {
         );
         await sleep();
         await percySnapshot(driver, "paintbrush-splodge");
-      },
-      120000
-    );
-  });
-
-  describe.only("Percy complex screenshot", () => {
-    test(
-      "complex paintbrush",
-      async (driver, percySnapshot) => {
-        try {
-          await driver.get(TARGET_URL);
-
-          driver.manage().window().maximize();
-
-          await driver.wait(until.titleIs("gliff.ai ANNOTATE"), 3000);
-
-          await clickById(driver, "id-add-new-annotation");
-
-          const actions = driver.actions({ async: true });
-          const kb = actions.keyboard();
-
-          //
-          // // a square
-          dragBetweenPoints(
-            actions,
-            [100, 100],
-            [
-              [50, 0],
-              [0, 50],
-              [-50, 0],
-              [0, -50],
-            ],
-            true
-          );
-
-          // dragBetweenPoints(actions, [
-          //   [468, 896],
-          //   [428, 889],
-          //   [389, 881],
-          //   [349, 887],
-          //   [308, 882],
-          //   [269, 869],
-          //   [234, 848],
-          //   [205, 818],
-          //   [190, 780],
-          //   [203, 742],
-          //   [240, 728],
-          //   [279, 739],
-          //   [314, 761],
-          //   [345, 789],
-          //   [371, 821],
-          //   [400, 850],
-          //   [436, 839],
-          //   [470, 816],
-          //   [502, 790],
-          //   [529, 759],
-          //   [536, 726],
-          //   [499, 708],
-          //   [458, 700],
-          //   [417, 697],
-          //   [377, 690],
-          //   [337, 678],
-          //   [298, 689],
-          //   [257, 696],
-          //   [216, 692],
-          //   [187, 665],
-          //   [181, 624],
-          //   [193, 585],
-          //   [220, 554],
-          //   [248, 527],
-          //   [267, 490],
-          //   [297, 463],
-          //   [337, 460],
-          //   [350, 495],
-          //   [319, 522],
-          //   [282, 540],
-          //   [266, 571],
-          //   [282, 608],
-          //   [311, 638],
-          //   [347, 653],
-          //   [386, 641],
-          //   [426, 631],
-          //   [467, 625],
-          //   [508, 628],
-          //   [544, 647],
-          //   [568, 680],
-          //   [570, 721],
-          //   [585, 757],
-          //   [589, 798],
-          //   [575, 837],
-          //   [548, 867],
-          //   [512, 887],
-          //   [472, 895],
-          //   [464, 875],
-          //   [504, 868],
-          //   [540, 848],
-          //   [564, 814],
-          //   [568, 774],
-          //   [552, 762],
-          //   [526, 794],
-          //   [496, 822],
-          //   [462, 846],
-          //   [236, 749],
-          //   [210, 775],
-          //   [226, 812],
-          //   [257, 839],
-          //   [294, 857],
-          //   [334, 866],
-          //   [375, 863],
-          //   [358, 837],
-          //   [332, 805],
-          //   [302, 777],
-          //   [267, 756],
-          //   [442, 678],
-          //   [483, 683],
-          //   [523, 695],
-          //   [551, 702],
-          //   [534, 666],
-          //   [498, 647],
-          //   [457, 646],
-          //   [416, 654],
-          //   [377, 665],
-          //   [406, 675],
-          //   [232, 572],
-          //   [207, 604],
-          //   [203, 645],
-          //   [228, 675],
-          //   [269, 674],
-          //   [309, 665],
-          //   [283, 641],
-          //   [258, 608],
-          //   [245, 569],
-          //   [292, 493],
-          //   [275, 521],
-          //   [312, 502],
-          //   [321, 476],
-          // ]);
-
-          await sleep(10000);
-        } catch (e) {
-          console.log("caught");
-          console.log(e);
-        }
       },
       120000
     );
