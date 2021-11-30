@@ -1,4 +1,5 @@
-const { until, Origin, By } = require("selenium-webdriver");
+const { until, By } = require("selenium-webdriver");
+const { sleep } = require("./helpers");
 
 const { wrapper, test, webdriver } =
   require("@gliff-ai/jest-browserstack-automate")("Annotate");

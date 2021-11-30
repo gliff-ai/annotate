@@ -1,3 +1,5 @@
+const { Origin } = require("selenium-webdriver");
+
 const sleep = (ms = 600) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // moves the mouse to origin and then drags to all of the points
