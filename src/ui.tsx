@@ -774,6 +774,7 @@ class UserInterface extends Component<Props, State> {
         <ButtonGroup>
           {tools.map(({ icon, name, event, active, enabled }) => (
             <IconButton
+              id={`id-${name.toLowerCase().replace(/ /g, "-")}`}
               key={name}
               icon={icon}
               tooltip={{

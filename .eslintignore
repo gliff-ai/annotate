@@ -1,5 +1,6 @@
 # don't ever lint node_modules
 node_modules
+
 # don't lint build output
 dist
 
@@ -8,3 +9,5 @@ webpack*.js
 *.spec.ts
 
 coverage/
+
+__tests__/e2e

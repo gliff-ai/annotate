@@ -48,7 +48,7 @@ jobs:
         run: npm run test
   publish:
     name: Publish
-    needs: test
+    needs: Test
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
