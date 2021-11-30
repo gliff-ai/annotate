@@ -172,7 +172,7 @@ const styles = {
 interface Props extends WithStyles<typeof styles> {
   slicesData?: ImageBitmap[][] | null;
   imageFileInfo?: ImageFileInfo;
-  annotationsObject?: Annotations;
+  annotationsObject?: Annotations | null;
   presetLabels?: string[];
   saveAnnotationsCallback?: (annotationsObject: Annotations) => void;
   showAppBar?: boolean;
@@ -185,6 +185,7 @@ class UserInterface extends Component<Props, State> {
   static defaultProps = {
     showAppBar: true,
     trustedServiceButtonToolbar: null,
+    annotationsObject: null,
     userAccess: UserAccess.Collaborator,
   } as Pick<Props, "showAppBar">;
 
