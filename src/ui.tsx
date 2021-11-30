@@ -264,6 +264,7 @@ class UserInterface extends Component<Props, State> {
       this.callRedraw();
     } else if (this.props.annotationsObject === undefined) {
       this.annotationsObject = new Annotations();
+      this.annotationsObject.addAnnotation(this.state.activeToolbox);
     }
   };
 
