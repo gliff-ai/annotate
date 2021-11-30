@@ -262,6 +262,8 @@ class UserInterface extends Component<Props, State> {
       this.annotationsObject = this.props.annotationsObject;
       this.annotationsObject.giveRedrawCallback(this.callRedraw);
       this.callRedraw();
+    } else {
+      this.annotationsObject = new Annotations();
     }
   };
 
