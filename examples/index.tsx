@@ -1,3 +1,4 @@
+import { UserAccess } from "@/ui";
 import ReactDOM from "react-dom";
 import { UserInterface } from "../src";
 import loadImage from "./autoload";
@@ -8,7 +9,7 @@ loadImage("./zebrafish-heart.jpg").then(
       <UserInterface
         slicesData={slicesData}
         imageFileInfo={imageFileInfo}
-        isUserOwner={true}
+        userAccess={UserAccess.Owner}
       />,
       document.getElementById("react-container")
     );
