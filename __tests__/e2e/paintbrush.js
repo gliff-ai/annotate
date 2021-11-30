@@ -1,14 +1,10 @@
-const { until } = require("selenium-webdriver");
-const { By } = require("selenium-webdriver");
+const { until, By } = require("selenium-webdriver");
+const { sleep } = require("./helpers");
 
 const { wrapper, test, webdriver } =
   require("@gliff-ai/jest-browserstack-automate")("Annotate");
 
 const { TARGET_URL = "http://localhost:3000" } = process.env;
-
-function sleep(ms = 600) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 function makeEventJS(el, eventType, clientX, clientY) {
   return `var el = document.getElementById("${el}");
@@ -52,11 +48,13 @@ async function clickById(driver, id) {
 }
 
 wrapper(() => {
-  describe("webdriver", () => {
+  describe("Percy complex screenshot", () => {
     test(
       "paintbrush-splodge",
       async (driver, percySnapshot) => {
         await driver.get(TARGET_URL);
+        driver.manage().window().maximize();
+
         await driver.wait(until.titleIs("gliff.ai ANNOTATE"), 3000);
 
         // draw brushstrokes:
