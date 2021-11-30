@@ -117,12 +117,9 @@ class CanvasClass extends Component<Props, State> {
     const lineWidth = isActive ? 2 : 1;
     context.lineWidth = lineWidth;
 
-    if (isActive) {
-      // Lines
-      context.strokeStyle = mainColor;
-    } else {
-      context.strokeStyle = color;
-    }
+    // Lines
+    context.strokeStyle = isActive ? mainColor : color;
+
     // Squares
     context.fillStyle = secondaryColor;
 

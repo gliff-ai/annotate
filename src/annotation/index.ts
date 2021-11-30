@@ -100,10 +100,15 @@ export class Annotations {
   getActiveAnnotationColor = (): string =>
     this.data[this.activeAnnotationID].brushStrokes[0]?.brush.color;
 
-  isActiveAnnotationEmpty = (): boolean =>
-    // Check whether the active annotation object contains any annotations.
-    this.data[this.activeAnnotationID].spline.coordinates.length === 0 &&
-    this.data[this.activeAnnotationID].brushStrokes.length === 0;
+  isActiveAnnotationEmpty = (): boolean => {
+    const { spline, brushStrokes, boundingBox } =
+      this.data[this.activeAnnotationID];
+    return (
+      spline.coordinates.length === 0 &&
+      brushStrokes.length === 0 &&
+      boundingBox.coordinates.topLeft.x === null
+    );
+  };
 
   getAllAnnotations = (): Annotation[] =>
     JSON.parse(JSON.stringify(this.data)) as Annotation[]; // deep copy to ensure no modification without audit logging
