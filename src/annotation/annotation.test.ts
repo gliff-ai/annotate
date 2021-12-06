@@ -1,5 +1,6 @@
 import { Annotations } from "@/annotation";
 import { BrushStroke } from "@/toolboxes/paintbrush";
+import { Annotation } from "..";
 
 let annotationsObject: Annotations;
 
@@ -22,41 +23,43 @@ const brushStrokes: BrushStroke[] = [{
         type: "erase",
         is3D: false,
     },
-}];
+    }
+];
+
+let blankAnnotation: Annotation;
 
 describe("Undo/Redo tests", () => {
     beforeEach(() => {
         annotationsObject = new Annotations();
         annotationsObject.addAnnotation("paintbrush");
+        blankAnnotation = annotationsObject.getAllAnnotations()[0];
     })
 
     test("undo paintbrush and eraser", () => {
-        let color = annotationsObject.getActiveAnnotationColor();
         annotationsObject.addBrushStroke(brushStrokes[0]);
         annotationsObject.addBrushStroke(brushStrokes[1]);
         annotationsObject.undo();
         const canUndoRedo = annotationsObject.undo();
         expect(canUndoRedo).toStrictEqual({ undo: false, redo: true });
         const annotations = annotationsObject.getAllAnnotations();
-        expect(annotations === []);
+        expect(annotations).toStrictEqual([blankAnnotation]);
     });
 
     test("undo addBrushStrokeMulti", () => {
-        let color = annotationsObject.getActiveAnnotationColor();
         annotationsObject.addBrushStrokeMulti(brushStrokes);
         const canUndoRedo = annotationsObject.undo();
         expect(canUndoRedo).toStrictEqual({ undo: false, redo: true });
         const annotations = annotationsObject.getAllAnnotations();
-        expect(annotations === []);
+        expect(annotations).toStrictEqual([blankAnnotation]);
     });
     
     test("undo clearBrushStrokes", () => {
-        let color = annotationsObject.getActiveAnnotationColor();
         annotationsObject.addBrushStrokeMulti(brushStrokes);
         annotationsObject.clearBrushStrokes();
         const canUndoRedo = annotationsObject.undo();
         expect(canUndoRedo).toStrictEqual({ undo: true, redo: true });
         const annotations = annotationsObject.getAllAnnotations();
-        expect(annotations === []);
+        expect(annotations.length).toBe(1);
+        expect(annotations[0].brushStrokes.length).toBe(2);
     });
 })
