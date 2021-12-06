@@ -745,7 +745,7 @@ export class Annotations {
       this.redoData.push(undoRedo);
       this.redrawUI?.();
     }
-    return canUndoRedo;
+    return this.canUndoRedo();
   }
 
   redo(): CanUndoRedo {
@@ -756,7 +756,7 @@ export class Annotations {
       this.undoData.push(undoRedo);
       this.redrawUI?.();
     }
-    return canUndoRedo;
+    return this.canUndoRedo();
   }
 
   giveRedrawCallback(callback: () => void): void {
