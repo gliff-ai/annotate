@@ -307,4 +307,19 @@ describe("Undo/Redo bounding box tests", () => {
       blankCoords
     );
   });
+
+  test("setBoundingBoxTimeInfo / undo / redo", () => {
+    annotationsObject.setBoundingBoxTimeInfo(2, 3);
+    expect(
+      annotationsObject.getBoundingBoxForActiveAnnotation().spaceTimeInfo
+    ).toStrictEqual({ z: 2, t: 3 });
+    annotationsObject.undo();
+    expect(
+      annotationsObject.getBoundingBoxForActiveAnnotation().spaceTimeInfo
+    ).toStrictEqual({ z: 0, t: 0 });
+    annotationsObject.redo();
+    expect(
+      annotationsObject.getBoundingBoxForActiveAnnotation().spaceTimeInfo
+    ).toStrictEqual({ z: 2, t: 3 });
+  });
 });
