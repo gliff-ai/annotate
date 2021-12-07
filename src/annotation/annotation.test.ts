@@ -234,4 +234,26 @@ describe("Undo/Redo spline tests", () => {
     annotationsObject.redo();
     expect(annotationsObject.splineIsClosed()).toBe(true);
   });
+
+  test("click select spline / undo / redo", () => {
+    // add a brushstroke annotation:
+    annotationsObject.addAnnotation("paintbrush");
+    annotationsObject.addBrushStroke(brushStrokes[0]);
+
+    // "click-select" the spline at the midpoint of its first edge:
+    annotationsObject.clickSelect(
+      (spline.coordinates[0].x + spline.coordinates[0].x) / 2,
+      (spline.coordinates[1].y + spline.coordinates[1].y) / 2,
+      0,
+      (id: number) => {},
+      (toolbox: string) => {}
+    );
+    expect(annotationsObject.getActiveAnnotationID()).toBe(0);
+
+    // test undo/redo:
+    annotationsObject.undo();
+    expect(annotationsObject.getActiveAnnotationID()).toBe(1);
+    annotationsObject.redo();
+    expect(annotationsObject.getActiveAnnotationID()).toBe(0);
+  });
 });
