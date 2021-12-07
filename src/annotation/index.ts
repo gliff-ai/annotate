@@ -232,8 +232,8 @@ export class Annotations {
     const { z: prevZ, t: prevT } =
       this.data[this.activeAnnotationID].boundingBox.spaceTimeInfo;
     this.data[this.activeAnnotationID].boundingBox.spaceTimeInfo = {
-      z: z || prevZ,
-      t: t || prevT,
+      z: z !== undefined ? z : prevZ,
+      t: t !== undefined ? t : prevT,
     };
     if (addToUndoRedo) {
       this.updateUndoRedoActions("setBoundingBoxTimeInfo", [oldZT.z, oldZT.t]);
