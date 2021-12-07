@@ -143,9 +143,7 @@ describe("Undo/Redo spline tests", () => {
     annotationsObject = new Annotations();
     annotationsObject.addAnnotation("spline");
     blankAnnotation = annotationsObject.getAllAnnotations()[0];
-  });
 
-  test("undo addSplinePoint and deleteSplinePoint", () => {
     // draw a spline:
     spline.coordinates.forEach((point: XYPoint) => {
       annotationsObject.addSplinePoint(point);
@@ -156,7 +154,9 @@ describe("Undo/Redo spline tests", () => {
     expect(annotationsObject.getSplineCoordinates()).toStrictEqual(
       spline.coordinates
     );
+  });
 
+  test("undo addSplinePoint and deleteSplinePoint", () => {
     // delete spline points:
     [2, 1, 0].forEach((i) => {
       annotationsObject.deleteSplinePoint(i);
@@ -182,11 +182,6 @@ describe("Undo/Redo spline tests", () => {
   });
 
   test("undo updateSplinePoint", () => {
-    // draw a spline:
-    spline.coordinates.forEach((point: XYPoint) => {
-      annotationsObject.addSplinePoint(point);
-    });
-
     // move point 0:
     annotationsObject.updateSplinePoint(55, 255, 0);
 
@@ -204,11 +199,6 @@ describe("Undo/Redo spline tests", () => {
   });
 
   test("undo insertSplinePoint", () => {
-    // draw a spline:
-    spline.coordinates.forEach((point: XYPoint) => {
-      annotationsObject.addSplinePoint(point);
-    });
-
     // insert spline point:
     annotationsObject.insertSplinePoint(1, { x: 250, y: 250 });
 
@@ -226,16 +216,22 @@ describe("Undo/Redo spline tests", () => {
   });
 
   test("setSplineSpaceTimeInfo", () => {
-    // draw a spline:
-    spline.coordinates.forEach((point: XYPoint) => {
-      annotationsObject.addSplinePoint(point);
-    });
-
     annotationsObject.setSplineSpaceTimeInfo(2, 3);
 
     expect(annotationsObject.getSplineSpaceTimeInfo()).toStrictEqual({
       z: 2,
       t: 3,
     });
+  });
+
+  test("setSplineClosed / undo", () => {
+    annotationsObject.setSplineClosed(true);
+    expect(annotationsObject.splineIsClosed()).toBe(true);
+
+    annotationsObject.undo();
+    expect(annotationsObject.splineIsClosed()).toBe(false);
+
+    annotationsObject.redo();
+    expect(annotationsObject.splineIsClosed()).toBe(true);
   });
 });
