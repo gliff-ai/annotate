@@ -376,7 +376,7 @@ export class Annotations {
     const point = this.data[this.activeAnnotationID].spline.coordinates.splice(
       idx,
       1
-    );
+    )[0];
     if (addToUndoRedo) {
       this.updateUndoRedoActions("insertSplinePoint", [idx, point]);
       this.redoData = [];
