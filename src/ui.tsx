@@ -52,6 +52,12 @@ interface Event extends CustomEvent {
   type: typeof events[number];
 }
 
+export enum UserAccess {
+  Owner = "owner",
+  Member = "member",
+  Collaborator = "collaborator",
+}
+
 // Here we define the methods that are exposed to be called by keyboard shortcuts
 export const events = [
   "nextAnnotation",
@@ -172,14 +178,14 @@ interface Props extends WithStyles<typeof styles> {
   showAppBar?: boolean;
   setIsLoading?: (isLoading: boolean) => void;
   trustedServiceButtonToolbar?: ReactElement | null;
-  isUserOwner?: boolean;
+  userAccess?: UserAccess;
 }
 
 class UserInterface extends Component<Props, State> {
   static defaultProps = {
     showAppBar: true,
     trustedServiceButtonToolbar: null,
-    isUserOwner: false,
+    userAccess: UserAccess.Collaborator,
   } as Pick<Props, "showAppBar">;
 
   annotationsObject: Annotations;
@@ -254,6 +260,7 @@ class UserInterface extends Component<Props, State> {
       prevProps.annotationsObject !== this.props.annotationsObject
     ) {
       this.annotationsObject = this.props.annotationsObject;
+      this.annotationsObject.giveRedrawCallback(this.callRedraw);
       this.callRedraw();
     }
   };
@@ -441,7 +448,7 @@ class UserInterface extends Component<Props, State> {
     imageFileInfo: ImageFileInfo[],
     slicesData: ImageBitmap[][][]
   ): void => {
-    if (!this.props.isUserOwner) return;
+    if (this.props.userAccess === UserAccess.Collaborator) return;
 
     [this.imageFileInfo] = imageFileInfo; // the Upload component passes arrays of images/metadata even when multiple=false, as it is in ANNOTATE but not CURATE
     [this.slicesData] = slicesData;
@@ -457,6 +464,7 @@ class UserInterface extends Component<Props, State> {
     // Otherwise the props for annotationsObject will update after the uplaoed image has been stored.
     if (!this.props.annotationsObject) {
       this.annotationsObject = new Annotations();
+      this.annotationsObject.giveRedrawCallback(this.callRedraw);
       this.annotationsObject.addAnnotation(this.state.activeToolbox);
     }
 
@@ -660,7 +668,8 @@ class UserInterface extends Component<Props, State> {
 
     const uploadDownload = (
       <>
-        {this.props.isUserOwner && (
+        {(this.props.userAccess === UserAccess.Owner ||
+          this.props.userAccess === UserAccess.Member) && (
           <Grid item>
             <UploadImage
               setUploadedImage={this.setUploadedImage}
@@ -765,6 +774,7 @@ class UserInterface extends Component<Props, State> {
         <ButtonGroup>
           {tools.map(({ icon, name, event, active, enabled }) => (
             <IconButton
+              id={`id-${name.toLowerCase().replace(/ /g, "-")}`}
               key={name}
               icon={icon}
               tooltip={{

@@ -117,12 +117,9 @@ class CanvasClass extends Component<Props, State> {
     const lineWidth = isActive ? 2 : 1;
     context.lineWidth = lineWidth;
 
-    if (isActive) {
-      // Lines
-      context.strokeStyle = mainColor;
-    } else {
-      context.strokeStyle = color;
-    }
+    // Lines
+    context.strokeStyle = isActive ? mainColor : color;
+
     // Squares
     context.fillStyle = secondaryColor;
 
@@ -409,9 +406,10 @@ class CanvasClass extends Component<Props, State> {
     // Returns true if successful, false otherwise
 
     if (
-      this.props.activeToolbox !== "Spline" &&
-      this.props.activeToolbox !== "Lasso Spline" &&
-      this.props.activeToolbox !== "Magic Spline"
+      (this.props.activeToolbox !== "Spline" &&
+        this.props.activeToolbox !== "Lasso Spline" &&
+        this.props.activeToolbox !== "Magic Spline") ||
+      this.props.annotationsObject.getSplineCoordinates().length === 0
     )
       return false;
 
@@ -522,7 +520,10 @@ class CanvasClass extends Component<Props, State> {
     if (nearPoint !== -1) {
       this.selectedPointIndex = nearPoint;
       this.dragPoint = clickPoint;
-    } else if (this.props.activeToolbox === "Magic Spline") {
+    } else if (
+      this.props.activeToolbox === "Magic Spline" &&
+      !this.props.annotationsObject.splineIsClosed()
+    ) {
       // magic spline, add a new point and snap it to the highest gradient point within 25 pixels:
       if (this.gradientImage === undefined) {
         this.gradientImage = calculateSobel(this.props.displayedImage);
@@ -530,7 +531,10 @@ class CanvasClass extends Component<Props, State> {
       this.props.annotationsObject.addSplinePoint(clickPoint);
       this.snapToGradient(this.props.annotationsObject.getSplineLength() - 1);
       this.isDrawing = true;
-    } else if (this.props.activeToolbox === "Lasso Spline") {
+    } else if (
+      this.props.activeToolbox === "Lasso Spline" &&
+      !this.props.annotationsObject.splineIsClosed()
+    ) {
       // lasso spline, add a new point but no snapping
       this.props.annotationsObject.addSplinePoint(clickPoint);
       this.selectedPointIndex =

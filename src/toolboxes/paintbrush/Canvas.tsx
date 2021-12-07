@@ -14,7 +14,7 @@ import {
 import { palette, getRGBAString } from "@/components/palette";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
 import { usePaintbrushStore } from "./Store";
-import { Brush, BrushStroke } from "./interfaces";
+import { Brush } from "./interfaces";
 import { drawCapsule } from "@/download/DownloadAsTiff";
 import { getNewImageSizeAndDisplacement } from "@/toolboxes/background/drawImage";
 
@@ -413,10 +413,9 @@ export class CanvasClass extends Component<Props, State> {
         ]
       );
 
-    for (let i = 0; i < linesToFill.length; i += 1) {
-      const coordinates = linesToFill[i];
-      const brushStroke: BrushStroke = {
-        coordinates,
+    this.props.annotationsObject.addBrushStrokeMulti(
+      linesToFill.map((line: XYPoint[]) => ({
+        coordinates: line,
         spaceTimeInfo: { z: this.props.sliceIndex, t: 0 },
         brush: {
           color,
@@ -424,10 +423,8 @@ export class CanvasClass extends Component<Props, State> {
           type: "paint",
           is3D: this.props.is3D,
         },
-      };
-
-      this.props.annotationsObject.addBrushStroke(brushStroke);
-    }
+      }))
+    );
 
     this.drawAllStrokes(this.backgroundCanvas?.canvasContext);
   };
@@ -498,7 +495,7 @@ export class CanvasClass extends Component<Props, State> {
   };
 
   onMouseUp = (canvasX: number, canvasY: number): void => {
-    if (this.props.mode === Mode.draw) {
+    if (this.props.mode === Mode.draw && this.isDrawing) {
       // End painting & save painting
 
       // Draw to this end pos
@@ -540,7 +537,10 @@ export class CanvasClass extends Component<Props, State> {
   };
 
   handleEvent = (event: Event): void => {
-    if ((event.detail as string).includes(this.name) && this.props.isTyping()) {
+    if (
+      (event.detail as string).includes(this.name) &&
+      !this.props.isTyping()
+    ) {
       this[event.type]?.call(this);
     }
   };

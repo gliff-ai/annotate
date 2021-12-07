@@ -13,7 +13,9 @@
     "declaration": true,
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": [
+        "src/*"
+      ]
     },
     "experimentalDecorators": true,
   },
@@ -25,5 +27,8 @@
     "test/**/*.ts",
     "typings/**/*.ts"
   ],
-  "exclude": ["src/**/*_.tsx"]
+  "exclude": [
+    "src/**/*_.tsx",
+    "__tests__/*"
+  ]
 }
