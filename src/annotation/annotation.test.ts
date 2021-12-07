@@ -4,6 +4,7 @@ import { Annotation } from "..";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { Spline } from "@/toolboxes/spline";
 import { XYPoint } from "./interfaces";
+import { BoundingBoxCoordinates } from "@/toolboxes/boundingBox";
 
 let annotationsObject: Annotations;
 
@@ -255,5 +256,55 @@ describe("Undo/Redo spline tests", () => {
     expect(annotationsObject.getActiveAnnotationID()).toBe(1);
     annotationsObject.redo();
     expect(annotationsObject.getActiveAnnotationID()).toBe(0);
+  });
+});
+
+describe("Undo/Redo bounding box tests", () => {
+  beforeEach(() => {
+    annotationsObject.addAnnotation("boundingBox", undefined, undefined, {
+      coordinates: {
+        topLeft: { x: 100, y: 100 },
+        bottomRight: { x: 200, y: 200 },
+      },
+      spaceTimeInfo: { z: 0, t: 0 },
+    });
+  });
+
+  test("updateBoundingBoxCoordinates / undo / redo", () => {
+    const newCoords = {
+      topLeft: { x: 100, y: 100 },
+      bottomRight: { x: 150, y: 150 },
+    };
+    annotationsObject.updateBoundingBoxCoordinates(newCoords);
+    expect(annotationsObject.getBoundingBoxCoordinates()).toStrictEqual(
+      newCoords
+    );
+    annotationsObject.undo();
+    expect(annotationsObject.getBoundingBoxCoordinates()).toStrictEqual({
+      topLeft: { x: 100, y: 100 },
+      bottomRight: { x: 200, y: 200 },
+    });
+    annotationsObject.redo();
+    expect(annotationsObject.getBoundingBoxCoordinates()).toStrictEqual(
+      newCoords
+    );
+  });
+
+  test("clearBoundingBoxCoordinates / undo / redo", () => {
+    const oldBB = annotationsObject.getAllBoundingBoxes(0);
+    const blankCoords: BoundingBoxCoordinates = {
+      topLeft: null,
+      bottomRight: null,
+    };
+    annotationsObject.clearBoundingBoxCoordinates();
+    expect(annotationsObject.getBoundingBoxCoordinates()).toStrictEqual(
+      blankCoords
+    );
+    annotationsObject.undo();
+    expect(annotationsObject.getAllBoundingBoxes(0)).toStrictEqual(oldBB);
+    annotationsObject.redo();
+    expect(annotationsObject.getBoundingBoxCoordinates()).toStrictEqual(
+      blankCoords
+    );
   });
 });
