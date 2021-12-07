@@ -1,6 +1,7 @@
 import { Annotations } from "@/annotation";
 import { BrushStroke } from "@/toolboxes/paintbrush";
 import { Annotation } from "..";
+import { Toolbox, Toolboxes } from "@/Toolboxes";
 
 let annotationsObject: Annotations;
 
@@ -62,4 +63,32 @@ describe("Undo/Redo tests", () => {
         expect(annotations.length).toBe(1);
         expect(annotations[0].brushStrokes.length).toBe(2);
     });
+
+    test("undo click-select", () => {
+        // make first brushstroke:
+        annotationsObject.addBrushStroke(brushStrokes[0]);
+        // make new annotation with brushstroke in different position:
+        annotationsObject.addAnnotation("paintbrush", undefined, undefined, undefined, [{
+            coordinates: [{ x: 300, y: 100 }, { x: 500, y: 200 }, { x: 500, y: 100 }],
+            spaceTimeInfo: { z: 0, t: 0 },
+            brush: {
+                color: undefined,
+                radius: 20,
+                type: "paint",
+                is3D: false,
+            },
+        }]);
+        // click-select first annotation:
+        let id = annotationsObject.clickSelect(110, 110, 0, (id: number) => { }, (toolbox: Toolbox) => { });
+        expect(id).toBe(0);
+        // click-select second annotation:
+        id = annotationsObject.clickSelect(310, 110, 0, (id: number) => { }, (toolbox: Toolbox) => { });
+        expect(id).toBe(1);
+
+        // undo both selections:
+        annotationsObject.undo();
+        expect(annotationsObject.getActiveAnnotationID()).toBe(0);
+        annotationsObject.undo();
+        expect(annotationsObject.getActiveAnnotationID()).toBe(1);
+    })
 })
