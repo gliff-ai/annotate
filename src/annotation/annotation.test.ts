@@ -135,4 +135,22 @@ describe("Undo/Redo spline tests", () => {
         }
         expect(annotationsObject.getSplineCoordinates()).toStrictEqual([]);
     });
+
+    test("undo updateSplinePoint", () => {
+        // draw a spline:
+        spline.coordinates.forEach((point: XYPoint) => {
+            annotationsObject.addSplinePoint(point);
+        });
+
+        // move point 0:
+        annotationsObject.updateSplinePoint(55, 255, 0);
+
+        expect(annotationsObject.getSplineCoordinates()[0]).toStrictEqual({ x: 55, y: 255 });
+
+        // undo:
+        annotationsObject.undo();
+
+        expect(annotationsObject.getAllAnnotations()[0].spline).toStrictEqual(spline);
+    }
+    )
 })
