@@ -2,6 +2,8 @@ import { Annotations } from "@/annotation";
 import { BrushStroke } from "@/toolboxes/paintbrush";
 import { Annotation } from "..";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
+import { Spline } from "@/toolboxes/spline";
+import { XYPoint } from "./interfaces";
 
 let annotationsObject: Annotations;
 
@@ -27,9 +29,15 @@ const brushStrokes: BrushStroke[] = [{
     }
 ];
 
+const spline: Spline = {
+    coordinates: [{ x: 100, y: 300 }, { x: 200, y: 300 }, { x: 100, y: 400 }],
+    spaceTimeInfo: { z: 0, t: 0 },
+    isClosed: false,
+}
+
 let blankAnnotation: Annotation;
 
-describe("Undo/Redo tests", () => {
+describe("Undo/Redo paintbrush tests", () => {
     beforeEach(() => {
         annotationsObject = new Annotations();
         annotationsObject.addAnnotation("paintbrush");
@@ -90,5 +98,41 @@ describe("Undo/Redo tests", () => {
         expect(annotationsObject.getActiveAnnotationID()).toBe(0);
         annotationsObject.undo();
         expect(annotationsObject.getActiveAnnotationID()).toBe(1);
+    });
+})
+
+describe("Undo/Redo spline tests", () => {
+    beforeEach(() => {
+        annotationsObject = new Annotations();
+        annotationsObject.addAnnotation("spline");
+        blankAnnotation = annotationsObject.getAllAnnotations()[0];
     })
+
+    test("undo addSplinePoint and deleteSplinePoint", () => {
+        // draw a spline:
+        spline.coordinates.forEach((point: XYPoint) => {
+            annotationsObject.addSplinePoint(point);
+        })
+        expect(annotationsObject.getActiveAnnotation().spline).toStrictEqual(spline);
+        expect(annotationsObject.getSplineCoordinates()).toStrictEqual(spline.coordinates);
+
+        // delete spline points:
+        [2,1,0].forEach((i) => {
+            annotationsObject.deleteSplinePoint(i);
+        })
+        expect(annotationsObject.getSplineCoordinates()).toStrictEqual([]);
+
+        // undo deleteSplinePoint:
+        for (let i = 0; i < 3; i += 1) {
+            annotationsObject.undo();
+        }
+        expect(annotationsObject.getActiveAnnotation().spline).toStrictEqual(spline);
+        expect(annotationsObject.getSplineCoordinates()).toStrictEqual(spline.coordinates);
+
+        // undo addSplinePoint:
+        for (let i = 0; i < 3; i += 1) {
+            annotationsObject.undo();
+        }
+        expect(annotationsObject.getSplineCoordinates()).toStrictEqual([]);
+    });
 })
