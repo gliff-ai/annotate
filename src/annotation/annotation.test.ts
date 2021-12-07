@@ -217,9 +217,25 @@ describe("Undo/Redo spline tests", () => {
         .concat([{ x: 250, y: 250 }])
         .concat(spline.coordinates.slice(1, 3))
     );
-      
-      annotationsObject.undo()
 
-      expect(annotationsObject.getAllAnnotations()[0].spline).toStrictEqual(spline)
+    annotationsObject.undo();
+
+    expect(annotationsObject.getAllAnnotations()[0].spline).toStrictEqual(
+      spline
+    );
+  });
+
+  test("setSplineSpaceTimeInfo", () => {
+    // draw a spline:
+    spline.coordinates.forEach((point: XYPoint) => {
+      annotationsObject.addSplinePoint(point);
+    });
+
+    annotationsObject.setSplineSpaceTimeInfo(2, 3);
+
+    expect(annotationsObject.getSplineSpaceTimeInfo()).toStrictEqual({
+      z: 2,
+      t: 3,
+    });
   });
 });
