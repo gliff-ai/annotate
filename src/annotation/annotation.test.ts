@@ -202,4 +202,24 @@ describe("Undo/Redo spline tests", () => {
       spline
     );
   });
+
+  test("undo insertSplinePoint", () => {
+    // draw a spline:
+    spline.coordinates.forEach((point: XYPoint) => {
+      annotationsObject.addSplinePoint(point);
+    });
+
+    // insert spline point:
+    annotationsObject.insertSplinePoint(1, { x: 250, y: 250 });
+
+    expect(annotationsObject.getSplineCoordinates()).toStrictEqual(
+      [spline.coordinates[0]]
+        .concat([{ x: 250, y: 250 }])
+        .concat(spline.coordinates.slice(1, 3))
+    );
+      
+      annotationsObject.undo()
+
+      expect(annotationsObject.getAllAnnotations()[0].spline).toStrictEqual(spline)
+  });
 });
