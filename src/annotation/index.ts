@@ -42,6 +42,8 @@ export class Annotations {
 
   private redoData: UndoRedo[];
 
+  private redrawUI: () => void;
+
   constructor(data?: Annotation[], audit?: AuditAction[]) {
     this.data = data || [];
     this.audit = audit || [];
@@ -590,7 +592,7 @@ export class Annotations {
     sliceIndex: number,
     setUIActiveAnnotationID: (id: number) => void,
     setActiveToolbox: (toolbox: Toolbox) => void
-  ): void => {
+  ): number => {
     const selectedBoundingBox = this.clickNearBoundingBox(
       imageX,
       imageY,
@@ -607,18 +609,25 @@ export class Annotations {
       this.setActiveAnnotationID(selectedBrushStroke);
       setUIActiveAnnotationID(selectedBrushStroke);
       setActiveToolbox(Toolboxes.paintbrush);
-    } else if (selectedSpline !== null) {
+      return selectedBrushStroke;
+    }
+    if (selectedSpline !== null) {
       this.setActiveAnnotationID(selectedSpline);
       setUIActiveAnnotationID(selectedSpline);
       setActiveToolbox(Toolboxes.spline);
-    } else if (
+      return selectedSpline;
+    }
+    if (
       selectedBoundingBox !== null &&
       selectedBoundingBox !== this.getActiveAnnotationID()
     ) {
       this.setActiveAnnotationID(selectedBoundingBox);
       setUIActiveAnnotationID(selectedBoundingBox);
       setActiveToolbox(Toolboxes.boundingBox);
+      return selectedBoundingBox;
     }
+
+    return null;
   };
 
   @log
@@ -681,6 +690,9 @@ export class Annotations {
   private initUndoRedo = () => {
     this.undoData = [];
     this.redoData = [];
+    if (this.redrawUI !== undefined) {
+      this.redrawUI();
+    }
   };
 
   private updateUndoRedoActions = (method: string, args: unknown): void => {
@@ -691,6 +703,7 @@ export class Annotations {
       },
       redoAction: this.audit[this.audit.length - 1],
     });
+    this.redrawUI();
   };
 
   private applyAction = (
@@ -708,6 +721,7 @@ export class Annotations {
       const undoRedo = this.undoData.pop();
       this.applyAction(undoRedo.undoAction, false);
       this.redoData.push(undoRedo);
+      this.redrawUI();
     }
     return canUndoRedo;
   }
@@ -718,7 +732,14 @@ export class Annotations {
       const undoRedo = this.redoData.pop();
       this.applyAction(undoRedo.redoAction, false);
       this.undoData.push(undoRedo);
+      this.redrawUI();
     }
     return canUndoRedo;
+  }
+
+  giveRedrawCallback(callback: () => void): void {
+    // gives the object a callback for redrawing the ANNOTATE UserInterface
+    // this is sometimes needed to update the states of the Undo/Redo buttons
+    this.redrawUI = callback;
   }
 }
