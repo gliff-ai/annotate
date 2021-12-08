@@ -1,7 +1,7 @@
 import { Annotations } from "@/annotation";
 import { BrushStroke } from "@/toolboxes/paintbrush";
 import { Annotation } from "..";
-import { Toolbox, Toolboxes } from "@/Toolboxes";
+import { Toolbox } from "@/Toolboxes";
 import { Spline } from "@/toolboxes/spline";
 import { XYPoint } from "./interfaces";
 import { BoundingBoxCoordinates } from "@/toolboxes/boundingBox";
@@ -55,7 +55,7 @@ describe("Undo/Redo paintbrush tests", () => {
   beforeEach(() => {
     annotationsObject = new Annotations();
     annotationsObject.addAnnotation("paintbrush");
-    blankAnnotation = annotationsObject.getAllAnnotations()[0];
+    [blankAnnotation] = annotationsObject.getAllAnnotations();
   });
 
   test("addBrushStroke / undo / redo", () => {
@@ -167,8 +167,8 @@ describe("Undo/Redo paintbrush tests", () => {
       110,
       110,
       0,
-      (id: number) => {},
-      (toolbox: Toolbox) => {}
+      (id_: number) => {}, // eslint-disable-line @typescript-eslint/no-unused-vars
+      (toolbox: Toolbox) => {} // eslint-disable-line @typescript-eslint/no-unused-vars
     );
     expect(id).toBe(0);
     // click-select second annotation:
@@ -176,8 +176,8 @@ describe("Undo/Redo paintbrush tests", () => {
       310,
       110,
       0,
-      (id: number) => {},
-      (toolbox: Toolbox) => {}
+      (id_: number) => {}, // eslint-disable-line @typescript-eslint/no-unused-vars
+      (toolbox: Toolbox) => {} // eslint-disable-line @typescript-eslint/no-unused-vars
     );
     expect(id).toBe(1);
 
@@ -199,7 +199,7 @@ describe("Undo/Redo spline tests", () => {
   beforeEach(() => {
     annotationsObject = new Annotations();
     annotationsObject.addAnnotation("spline");
-    blankAnnotation = annotationsObject.getAllAnnotations()[0];
+    [blankAnnotation] = annotationsObject.getAllAnnotations();
 
     // draw a spline:
     spline.coordinates.forEach((point: XYPoint) => {
@@ -325,8 +325,8 @@ describe("Undo/Redo spline tests", () => {
       (spline.coordinates[0].x + spline.coordinates[0].x) / 2,
       (spline.coordinates[1].y + spline.coordinates[1].y) / 2,
       0,
-      (id: number) => {},
-      (toolbox: string) => {}
+      (id: number) => {}, // eslint-disable-line @typescript-eslint/no-unused-vars
+      (toolbox: string) => {} // eslint-disable-line @typescript-eslint/no-unused-vars
     );
     expect(annotationsObject.getActiveAnnotationID()).toBe(0);
 
@@ -419,8 +419,8 @@ describe("Undo/Redo bounding box tests", () => {
       100,
       200,
       0,
-      (id: number) => {},
-      (toolbox: Toolbox) => {}
+      (id: number) => {}, // eslint-disable-line @typescript-eslint/no-unused-vars
+      (toolbox: Toolbox) => {} // eslint-disable-line @typescript-eslint/no-unused-vars
     );
     expect(annotationsObject.getActiveAnnotationID()).toBe(0);
 
