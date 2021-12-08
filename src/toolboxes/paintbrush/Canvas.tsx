@@ -302,7 +302,7 @@ export class CanvasClass extends Component<Props, State> {
         .getAllAnnotations()
         .forEach((annotation, i) => {
           if (
-            annotation.toolbox === Toolboxes.paintbrush && 
+            annotation.toolbox === Toolboxes.paintbrush &&
             !(i === activeAnnotationID && drawWhich === "inactive") &&
             !(i !== activeAnnotationID && drawWhich === "active")
           ) {
