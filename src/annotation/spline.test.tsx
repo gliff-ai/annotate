@@ -22,8 +22,8 @@ describe("Convert Splines to Paintbrush", () => {
     expect(brustrokesCord).toEqual([{ x: 2, y: 5 }]);
   });
 
-  //Should we be testing 3D? We're passing in 3D to convertSplineToPaintbrush but it doesn't seem to be doing anything
-  //We only set radius to 0.5 when converting splines to paintbrush should this be the default number?
+  // Should we be testing 3D? We're passing in 3D to convertSplineToPaintbrush but it doesn't seem to be doing anything
+  // We only set radius to 0.5 when converting splines to paintbrush should this be the default number?
 
   test("test closespline", () => {
     annotationsObject.addSplinePoint({ x: 1, y: 1 }, false);
