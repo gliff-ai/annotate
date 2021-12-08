@@ -320,10 +320,12 @@ describe("Undo/Redo spline tests", () => {
     annotationsObject.addAnnotation("paintbrush");
     annotationsObject.addBrushStroke(brushStrokes[0]);
 
+    expect(annotationsObject.getActiveAnnotationID()).toBe(1);
+
     // "click-select" the spline at the midpoint of its first edge:
     annotationsObject.clickSelect(
-      (spline.coordinates[0].x + spline.coordinates[0].x) / 2,
-      (spline.coordinates[1].y + spline.coordinates[1].y) / 2,
+      (spline.coordinates[0].x + spline.coordinates[1].x) / 2,
+      (spline.coordinates[0].y + spline.coordinates[1].y) / 2,
       0,
       (id: number) => {}, // eslint-disable-line @typescript-eslint/no-unused-vars
       (toolbox: string) => {} // eslint-disable-line @typescript-eslint/no-unused-vars
