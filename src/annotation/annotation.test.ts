@@ -261,6 +261,7 @@ describe("Undo/Redo spline tests", () => {
 
 describe("Undo/Redo bounding box tests", () => {
   beforeEach(() => {
+    annotationsObject = new Annotations();
     annotationsObject.addAnnotation("boundingBox", undefined, undefined, {
       coordinates: {
         topLeft: { x: 100, y: 100 },
@@ -321,5 +322,33 @@ describe("Undo/Redo bounding box tests", () => {
     expect(
       annotationsObject.getBoundingBoxForActiveAnnotation().spaceTimeInfo
     ).toStrictEqual({ z: 2, t: 3 });
+  });
+
+  test("clickSelect boundingBox / undo / redo", () => {
+    // add a brushstroke annotation:
+    annotationsObject.addAnnotation(
+      "paintbrush",
+      undefined,
+      undefined,
+      undefined,
+      [brushStrokes[0]]
+    );
+    expect(annotationsObject.getActiveAnnotationID()).toBe(1);
+
+    // click-select the boundingBox (bottom-left corner, which shouldn't overlap with the brushstroke):
+    annotationsObject.clickSelect(
+      100,
+      200,
+      0,
+      (id: number) => {},
+      (toolbox: Toolbox) => {}
+    );
+    expect(annotationsObject.getActiveAnnotationID()).toBe(0);
+
+    // test undo / redo:
+    annotationsObject.undo();
+    expect(annotationsObject.getActiveAnnotationID()).toBe(1);
+    annotationsObject.redo();
+    expect(annotationsObject.getActiveAnnotationID()).toBe(0);
   });
 });
