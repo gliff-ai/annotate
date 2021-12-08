@@ -53,7 +53,9 @@ wrapper(() => {
       "paintbrush-splodge",
       async (driver, percySnapshot) => {
         await driver.get(TARGET_URL);
-        driver.manage().window().maximize();
+        try {
+          driver.manage().window().maximize();
+        } catch (ignore) {}
 
         await driver.wait(until.titleIs("gliff.ai ANNOTATE"), 3000);
 
