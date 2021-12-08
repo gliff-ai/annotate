@@ -149,40 +149,55 @@ describe("Undo/Redo spline tests", () => {
     spline.coordinates.forEach((point: XYPoint) => {
       annotationsObject.addSplinePoint(point);
     });
+  });
+
+  test("addSplinePoint / undo / redo", () => {
+    // addSplinePoint is called in beforeEach, we test that it worked here:
     expect(annotationsObject.getActiveAnnotation().spline).toStrictEqual(
       spline
     );
     expect(annotationsObject.getSplineCoordinates()).toStrictEqual(
       spline.coordinates
     );
+
+    // hit undo three times, should undo the addSplinePoint calls from beforeEach:
+    for (let i = 0; i < 3; i += 1) {
+      annotationsObject.undo();
+    }
+    expect(annotationsObject.getSplineCoordinates()).toStrictEqual([]);
+
+    // test redo:
+    for (let i = 0; i < 3; i += 1) {
+      annotationsObject.redo();
+    }
+    expect(annotationsObject.getSplineCoordinates()).toStrictEqual(
+      spline.coordinates
+    );
   });
 
-  test("undo addSplinePoint and deleteSplinePoint", () => {
+  test("deleteSplinePoint / undo / redo", () => {
     // delete spline points:
     [2, 1, 0].forEach((i) => {
       annotationsObject.deleteSplinePoint(i);
     });
     expect(annotationsObject.getSplineCoordinates()).toStrictEqual([]);
 
-    // undo deleteSplinePoint:
+    // hit undo three times, should undo the deletions:
     for (let i = 0; i < 3; i += 1) {
       annotationsObject.undo();
     }
     expect(annotationsObject.getActiveAnnotation().spline).toStrictEqual(
       spline
     );
-    expect(annotationsObject.getSplineCoordinates()).toStrictEqual(
-      spline.coordinates
-    );
 
-    // undo addSplinePoint:
+    // test redo:
     for (let i = 0; i < 3; i += 1) {
-      annotationsObject.undo();
+      annotationsObject.redo();
     }
     expect(annotationsObject.getSplineCoordinates()).toStrictEqual([]);
   });
 
-  test("undo updateSplinePoint", () => {
+  test("updateSplinePoint / undo / redo", () => {
     // move point 0:
     annotationsObject.updateSplinePoint(55, 255, 0);
 
@@ -191,29 +206,37 @@ describe("Undo/Redo spline tests", () => {
       y: 255,
     });
 
-    // undo:
     annotationsObject.undo();
 
     expect(annotationsObject.getAllAnnotations()[0].spline).toStrictEqual(
       spline
     );
+
+    annotationsObject.redo();
+    expect(annotationsObject.getSplineCoordinates()[0]).toStrictEqual({
+      x: 55,
+      y: 255,
+    });
   });
 
-  test("undo insertSplinePoint", () => {
+  test("insertSplinePoint / undo / redo", () => {
     // insert spline point:
     annotationsObject.insertSplinePoint(1, { x: 250, y: 250 });
 
-    expect(annotationsObject.getSplineCoordinates()).toStrictEqual(
-      [spline.coordinates[0]]
-        .concat([{ x: 250, y: 250 }])
-        .concat(spline.coordinates.slice(1, 3))
-    );
+    const newCoords = [spline.coordinates[0]]
+      .concat([{ x: 250, y: 250 }])
+      .concat(spline.coordinates.slice(1, 3));
+
+    expect(annotationsObject.getSplineCoordinates()).toStrictEqual(newCoords);
 
     annotationsObject.undo();
 
     expect(annotationsObject.getAllAnnotations()[0].spline).toStrictEqual(
       spline
     );
+
+    annotationsObject.redo();
+    expect(annotationsObject.getSplineCoordinates()).toStrictEqual(newCoords);
   });
 
   test("setSplineSpaceTimeInfo", () => {
@@ -225,7 +248,7 @@ describe("Undo/Redo spline tests", () => {
     });
   });
 
-  test("setSplineClosed / undo", () => {
+  test("setSplineClosed / undo / redo", () => {
     annotationsObject.setSplineClosed(true);
     expect(annotationsObject.splineIsClosed()).toBe(true);
 
