@@ -54,8 +54,9 @@ wrapper(() => {
       async (driver, percySnapshot) => {
         await driver.get(TARGET_URL);
 
-        if ((await driver.getCapabilities()).browser !== "ipad")
-          driver.manage().window().maximize();
+        // Breaks Ipad Safari?
+        // if ((await driver.getCapabilities()).browser !== "ipad")
+        //   driver.manage().window().maximize();
 
         await driver.wait(until.titleIs("gliff.ai ANNOTATE"), 10000);
 
