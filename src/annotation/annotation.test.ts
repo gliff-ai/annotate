@@ -17,7 +17,7 @@ const brushStrokes: BrushStroke[] = [
     ],
     spaceTimeInfo: { z: 0, t: 0 },
     brush: {
-      color: undefined,
+      color: "#FF0000FF",
       radius: 20,
       type: "paint",
       is3D: false,
@@ -31,7 +31,7 @@ const brushStrokes: BrushStroke[] = [
     ],
     spaceTimeInfo: { z: 0, t: 0 },
     brush: {
-      color: undefined,
+      color: "#FF0000FF",
       radius: 20,
       type: "erase",
       is3D: false,
@@ -58,38 +58,88 @@ describe("Undo/Redo paintbrush tests", () => {
     blankAnnotation = annotationsObject.getAllAnnotations()[0];
   });
 
-  test("undo paintbrush and eraser", () => {
+  test("addBrushStroke / undo / redo", () => {
     annotationsObject.addBrushStroke(brushStrokes[0]);
     annotationsObject.addBrushStroke(brushStrokes[1]);
+    expect(annotationsObject.getAllAnnotations()[0].brushStrokes.length).toBe(
+      2
+    );
+
     annotationsObject.undo();
+    expect(annotationsObject.getAllAnnotations()[0].brushStrokes.length).toBe(
+      1
+    );
     const canUndoRedo = annotationsObject.undo();
+    expect(annotationsObject.getAllAnnotations()[0].brushStrokes.length).toBe(
+      0
+    );
     expect(canUndoRedo).toStrictEqual({ undo: false, redo: true });
-    const annotations = annotationsObject.getAllAnnotations();
-    expect(annotations).toStrictEqual([blankAnnotation]);
+    expect(annotationsObject.getAllAnnotations()).toStrictEqual([
+      blankAnnotation,
+    ]);
+
+    annotationsObject.redo();
+    expect(annotationsObject.getAllAnnotations()[0].brushStrokes.length).toBe(
+      1
+    );
+    annotationsObject.redo();
+    expect(annotationsObject.getAllAnnotations()[0].brushStrokes.length).toBe(
+      2
+    );
   });
 
-  test("undo addBrushStrokeMulti", () => {
+  test("addBrushStrokeMulti / undo / redo", () => {
     annotationsObject.addBrushStrokeMulti(brushStrokes);
+    expect(annotationsObject.getAllAnnotations()[0].brushStrokes).toStrictEqual(
+      brushStrokes
+    );
+
     const canUndoRedo = annotationsObject.undo();
     expect(canUndoRedo).toStrictEqual({ undo: false, redo: true });
-    const annotations = annotationsObject.getAllAnnotations();
-    expect(annotations).toStrictEqual([blankAnnotation]);
+    expect(annotationsObject.getAllAnnotations()).toStrictEqual([
+      blankAnnotation,
+    ]);
+
+    annotationsObject.redo();
+    expect(annotationsObject.getBrushStrokeCoordinates(0)).toStrictEqual(
+      brushStrokes[0].coordinates
+    );
+    expect(annotationsObject.getBrushStrokeCoordinates(1)).toStrictEqual(
+      brushStrokes[1].coordinates
+    );
   });
 
-  test("undo clearBrushStrokes", () => {
+  test("clearBrushStrokes / undo / redo", () => {
     annotationsObject.addBrushStrokeMulti(brushStrokes);
+    expect(annotationsObject.getAllAnnotations().length).toBe(1);
+    expect(annotationsObject.getAllAnnotations()[0].brushStrokes.length).toBe(
+      2
+    );
+
     annotationsObject.clearBrushStrokes();
-    const canUndoRedo = annotationsObject.undo();
+    expect(annotationsObject.getAllAnnotations()[0].brushStrokes).toStrictEqual(
+      []
+    );
+
+    // test undo:
+    let canUndoRedo = annotationsObject.undo();
     expect(canUndoRedo).toStrictEqual({ undo: true, redo: true });
     const annotations = annotationsObject.getAllAnnotations();
     expect(annotations.length).toBe(1);
     expect(annotations[0].brushStrokes.length).toBe(2);
+
+    // test redo:
+    canUndoRedo = annotationsObject.redo();
+    expect(canUndoRedo).toStrictEqual({ undo: true, redo: false });
+    expect(annotationsObject.getAllAnnotations()[0].brushStrokes).toStrictEqual(
+      []
+    );
   });
 
-  test("undo click-select", () => {
+  test("clickSelect / undo / redo", () => {
     // make first brushstroke:
     annotationsObject.addBrushStroke(brushStrokes[0]);
-    // make new annotation with brushstroke in different position:
+    // make a new annotation with brushstroke in different position:
     annotationsObject.addAnnotation(
       "paintbrush",
       undefined,
@@ -135,6 +185,12 @@ describe("Undo/Redo paintbrush tests", () => {
     annotationsObject.undo();
     expect(annotationsObject.getActiveAnnotationID()).toBe(0);
     annotationsObject.undo();
+    expect(annotationsObject.getActiveAnnotationID()).toBe(1);
+
+    // redo both selections:
+    annotationsObject.redo();
+    expect(annotationsObject.getActiveAnnotationID()).toBe(0);
+    annotationsObject.redo();
     expect(annotationsObject.getActiveAnnotationID()).toBe(1);
   });
 });
