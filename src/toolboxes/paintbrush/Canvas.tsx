@@ -303,7 +303,8 @@ export class CanvasClass extends Component<Props, State> {
         .forEach((annotation, i) => {
           if (
             annotation.toolbox === Toolboxes.paintbrush &&
-            !(i === activeAnnotationID && drawWhich === "inactive")
+            !(i === activeAnnotationID && drawWhich === "inactive") &&
+            !(i !== activeAnnotationID && drawWhich === "active")
           ) {
             this.clearCanvas(this.tempCtx);
             annotation.brushStrokes.forEach((brushStrokes) => {
@@ -444,15 +445,7 @@ export class CanvasClass extends Component<Props, State> {
         this.drawAllStrokes(this.backgroundCanvas?.canvasContext, "inactive");
 
         // Redraw the active annotation:
-        this.drawAllStrokes(this.tempCtx, "active");
-
-        // Copy tempCanvas onto interactionCanvas:
-        this.clearCanvas(this.interactionCanvas.canvasContext);
-        this.interactionCanvas.canvasContext.globalAlpha =
-          this.props.annotationActiveAlpha;
-        this.interactionCanvas.canvasContext.globalCompositeOperation =
-          "source-over";
-        this.interactionCanvas.canvasContext.drawImage(this.tempCanvas, 0, 0);
+        this.drawAllStrokes(this.interactionCanvas.canvasContext, "active");
       }
 
       // Ensure the initial down position gets added to our line
