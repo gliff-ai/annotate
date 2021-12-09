@@ -11,6 +11,9 @@ import {
   CanUndoRedo,
   UndoRedoAction,
 } from "./interfaces";
+import { palette, getRGBAString } from "@/components/palette";
+import simplify from "simplify-js";
+import { slpfLines } from "@gliff-ai/slpf";
 
 interface Descriptor extends Omit<PropertyDescriptor, "value"> {
   // Ideally this would be the methods of Annotations
@@ -517,6 +520,38 @@ export class Annotations {
     this.addBrushStroke(brushStroke);
   }
 
+  @log
+  fillBrush(sliceIndex: number, is3D: boolean, addToUndoRedo = true): void {
+    // Treat the current paintbrush item as a closed polygon and fill
+    // Simplifying the line for computational efficiency
+    const strokeCoordinates = this.getBrushStrokeCoordinates();
+
+    // simplify
+    // TODO pick tolerance more cleverly
+    const simplifiedCoordinates = simplify(strokeCoordinates, 10, true);
+
+    const linesToFill: XYPoint[][] = slpfLines(simplifiedCoordinates);
+
+    let color = this.getActiveAnnotationColor();
+    // Do we already have a colour for this layer?
+    color =
+      color ||
+      getRGBAString(palette[this.getActiveAnnotationID() % palette.length]);
+
+    this.addBrushStrokeMulti(
+      linesToFill.map((line: XYPoint[]) => ({
+        coordinates: line,
+        spaceTimeInfo: { z: sliceIndex, t: 0 },
+        brush: {
+          color,
+          radius: 1,
+          type: "paint",
+          is3D,
+        },
+      }))
+    );
+  }
+
   // AUDIT
   addAudit(method: string, args: unknown): void {
     this.audit.push({
@@ -646,8 +681,7 @@ export class Annotations {
     }
   }
 
-  @log
-  addBrushStrokeMulti(
+  private addBrushStrokeMulti(
     newBrushStrokes: BrushStroke[],
     addToUndoRedo = true
   ): void {
