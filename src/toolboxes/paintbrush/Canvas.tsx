@@ -1,6 +1,4 @@
 import { ReactNode, Component, ReactElement } from "react";
-import simplify from "simplify-js";
-import { slpfLines } from "@gliff-ai/slpf";
 import { theme } from "@gliff-ai/style";
 import { Mode } from "@/ui";
 import { Annotations } from "@/annotation";
