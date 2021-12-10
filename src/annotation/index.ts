@@ -1,3 +1,5 @@
+import simplify from "simplify-js";
+import { slpfLines } from "@gliff-ai/slpf";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { BoundingBox, BoundingBoxCoordinates } from "@/toolboxes/boundingBox";
 import { BrushStroke } from "@/toolboxes/paintbrush";
@@ -12,8 +14,6 @@ import {
   UndoRedoAction,
 } from "./interfaces";
 import { palette, getRGBAString } from "@/components/palette";
-import simplify from "simplify-js";
-import { slpfLines } from "@gliff-ai/slpf";
 
 interface Descriptor extends Omit<PropertyDescriptor, "value"> {
   // Ideally this would be the methods of Annotations
