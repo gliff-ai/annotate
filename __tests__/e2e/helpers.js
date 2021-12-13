@@ -16,10 +16,11 @@ const dragBetweenPoints = (actions, origin, points, relative = false) => {
   actions.move({ x: originX, y: originY, duration: 10 }).press();
 
   points.forEach(([x, y]) => {
-    actions.move({ x, y, origin: relative ? Origin.POINTER : Origin.VIEWPORT });
+    actions.move({ x, y, origin: relative ? Origin.POINTER : Origin.VIEWPORT});
   });
 
   actions.release().perform();
+  actions.clear();
 };
 
 const clickMouseAtPoint = (actions, [x, y], relative = false) => {
@@ -28,6 +29,7 @@ const clickMouseAtPoint = (actions, [x, y], relative = false) => {
     .click();
 
   actions.perform();
+  actions.clear();
 };
 
 const drawPentagon = (actions, [cx, cy]) => {
