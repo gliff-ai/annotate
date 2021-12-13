@@ -82,6 +82,8 @@ wrapper(() => {
         await clickById(driver, "id-bounding-box");
         await clickMouseAtPoint(actions, [150, 450]);
         await clickMouseAtPoint(actions, [300, 550]);
+
+        // upload snapshot to Percy:
         await percySnapshot(driver, "paintbrush-splodge");
       }
     );
