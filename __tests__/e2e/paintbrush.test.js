@@ -29,17 +29,17 @@ wrapper(() => {
         await clickById(driver, "id-add-new-annotation");
         dragBetweenPoints(actions, [150, 300], [[350, 300]]);
 
-        // draw splines:
+        // regular splines:
         await clickById(driver, "id-add-new-annotation");
         await clickById(driver, "id-spline-toolbox");
         await drawPentagon(actions, [500, 200]); // open spline
         await clickById(driver, "id-add-new-annotation");
         await drawPentagon(actions, [500, 400]); // closed spline
         await clickById(driver, "id-close-active-spline");
+
         // lasso spline:
         await clickById(driver, "id-add-new-annotation");
         await clickById(driver, "id-lasso-spline");
-
         actions.move({ x: 650, y: 150, duration: 10 }).press();
         const points = [...Array(40)].map((_, i) => ([650, Math.floor(150 + 250 * i / 40)]));
         points.forEach(([x, y]) => { actions.move({ x, y }) });
@@ -83,8 +83,7 @@ wrapper(() => {
         await clickMouseAtPoint(actions, [150, 450]);
         await clickMouseAtPoint(actions, [300, 550]);
         await percySnapshot(driver, "paintbrush-splodge");
-      },
-      120000
+      }
     );
   });
 });
