@@ -1,51 +1,10 @@
 const { until, By, Origin } = require("selenium-webdriver");
-const { sleep, dragBetweenPoints, drawPentagon, clickMouseAtPoint } = require("./helpers");
-
+const { sleep, dragBetweenPoints, drawPentagon, clickMouseAtPoint, clickById } = require("./helpers");
 const { wrapper, test, webdriver } =
   require("@gliff-ai/jest-browserstack-automate")("Annotate");
 
 const { TARGET_URL = "http://localhost:3000" } = process.env;
 
-function makeEventJS(el, eventType, clientX, clientY) {
-  return `var el = document.getElementById("${el}");
-         el.dispatchEvent(new MouseEvent("${eventType}", { clientX: ${clientX}, clientY: ${clientY}, bubbles: true }));`;
-}
-
-async function drawStroke(driver, start, end) {
-  driver.executeScript(
-    makeEventJS("paintbrush-interaction-canvas", "mousedown", start.x, start.y)
-  );
-
-  await sleep();
-  driver.executeScript(
-    makeEventJS("paintbrush-interaction-canvas", "mousemove", end.x, end.y)
-  );
-
-  await sleep();
-  driver.executeScript(
-    makeEventJS("paintbrush-interaction-canvas", "mouseup", end.x, end.y)
-  );
-
-  await sleep();
-}
-
-// async function drawPentagon(driver, cx, cy) {
-//   // draws five spline points in a pentagon centred on (cx, cy) (but doesn't close it)
-//   for (let i = 0; i < 5; i += 1) {
-//     const x = cx + 50 * Math.cos((i * 2 * Math.PI) / 5);
-//     const y = cy + 50 * Math.sin((i * 2 * Math.PI) / 5);
-//     driver.executeScript(makeEventJS("spline-canvas", "click", x, y));
-
-//     await sleep();
-//   }
-// }
-
-async function clickById(driver, id) {
-  const el = await driver.findElement(By.id(id));
-  await el.click();
-
-  // await sleep();
-}
 
 wrapper(() => {
   describe("Percy complex screenshot", () => {
@@ -80,23 +39,6 @@ wrapper(() => {
         // lasso spline:
         await clickById(driver, "id-add-new-annotation");
         await clickById(driver, "id-lasso-spline");
-
-        // driver.executeScript(
-        //   makeEventJS("spline-canvas", "mousedown", 650, 150)
-        // );
-        // await sleep();
-        // for (let i = 0; i < 20; i += 1) {
-        //   driver.executeScript(
-        //     makeEventJS("spline-canvas", "mousemove", 650, 150 + 14 * i)
-        //   );
-
-        //   await sleep(1000);
-        // }
-        // driver.executeScript(makeEventJS("spline-canvas", "mouseup", 650, 400));
-        // await sleep();
-        // // IRL, a click event is generated after a mouseup event, and our code knows to ignore it because isDrawing/dragPoint will still be set
-        // // we have to simulate that click event here, so that onClick unsets them, otherwise the next click event will be ignored:
-        // driver.executeScript(makeEventJS("spline-canvas", "click", 650, 400));
 
         actions.move({ x: 650, y: 150, duration: 10 }).press();
         const points = [...Array(40)].map((_, i) => ([650, Math.floor(150 + 250 * i / 40)]));

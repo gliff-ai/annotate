@@ -1,4 +1,4 @@
-const { Origin } = require("selenium-webdriver");
+const { Origin, By } = require("selenium-webdriver");
 
 const sleep = (ms = 600) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -41,4 +41,9 @@ const drawPentagon = (actions, [cx, cy]) => {
   }
 };
 
-export { sleep, clickMouseAtPoint, dragBetweenPoints, drawPentagon };
+async function clickById(driver, id) {
+  const el = await driver.findElement(By.id(id));
+  await el.click();
+}
+
+export { sleep, clickMouseAtPoint, dragBetweenPoints, drawPentagon, clickById };
