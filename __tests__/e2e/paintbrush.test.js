@@ -1,5 +1,5 @@
 const { until, By, Origin } = require("selenium-webdriver");
-const { sleep, dragBetweenPoints, drawPentagon, clickMouseAtPoint, clickById } = require("./helpers");
+const { dragBetweenPoints, drawPentagon, clickMouseAtPoint, clickById } = require("./helpers");
 const { wrapper, test, webdriver } =
   require("@gliff-ai/jest-browserstack-automate")("Annotate");
 
@@ -46,13 +46,9 @@ wrapper(() => {
         await actions.release().perform();
         actions.clear();
 
-        await sleep(100); // seems the next actions will execute before the above JS events have been processed if we don't wait a bit
-
         // test select tool:
         await clickById(driver, "id-select-annotation");
         await clickMouseAtPoint(actions, [250, 200]);
-
-        await sleep();
 
         // eraser:
         await clickById(driver, "id-paintbrush-toolbox"); // open paintbrush toolbox submenu
