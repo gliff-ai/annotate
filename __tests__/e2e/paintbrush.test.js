@@ -85,7 +85,7 @@ wrapper(() => {
 
         // upload snapshot to Percy:
         await percySnapshot(driver, "paintbrush-splodge");
-      }
-    );
+      },
+    300000);
   });
 });
