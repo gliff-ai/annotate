@@ -23,13 +23,15 @@ const dragBetweenPoints = (actions, origin, points, relative = false) => {
   actions.clear();
 };
 
-const clickMouseAtPoint = (actions, [x, y], relative = false) => {
+const clickMouseAtPoint = (actions, [x, y], relative = false, perform=true) => {
   actions
     .move({ x, y, origin: relative ? Origin.POINTER : Origin.VIEWPORT })
     .click();
 
-  actions.perform();
-  actions.clear();
+  if (perform) {
+    actions.perform();
+    actions.clear();
+  }
 };
 
 const drawPentagon = (actions, [cx, cy]) => {
@@ -37,8 +39,10 @@ const drawPentagon = (actions, [cx, cy]) => {
   for (let i = 0; i < 5; i += 1) {
     const x = Math.floor(cx + 50 * Math.cos((i * 2 * Math.PI) / 5));
     const y = Math.floor(cy + 50 * Math.sin((i * 2 * Math.PI) / 5));
-    clickMouseAtPoint(actions, [x, y]);
+    clickMouseAtPoint(actions, [x, y], false, false);
   }
+  actions.perform();
+  actions.clear();
 };
 
 async function clickById(driver, id) {
