@@ -1,0 +1,20 @@
+name: automatically add to project board
+on: [issues, pull_request]
+jobs:
+  add_to_project_board:
+    runs-on: ubuntu-latest
+    steps:
+      - name: add issue to project board
+        uses: docker://takanabe/github-actions-automate-projects:v0.0.1
+        if: github.event_name == 'issues' && github.event.action == 'opened'
+        env:
+          GITHUB_TOKEN: ${{ secrets.DEPENDENCY_ROBOT_PAT }}
+          GITHUB_PROJECT_URL: https://github.com/orgs/gliff-ai/projects/10
+          GITHUB_PROJECT_COLUMN_NAME: To do
+      - name: add PR to project board
+        uses: docker://takanabe/github-actions-automate-projects:v0.0.1
+        if: github.event_name == 'pull_request' && github.event.action == 'opened'
+        env:
+          GITHUB_TOKEN: ${{ secrets.DEPENDENCY_ROBOT_PAT }}
+          GITHUB_PROJECT_URL: https://github.com/orgs/gliff-ai/projects/10
+          GITHUB_PROJECT_COLUMN_NAME: Review in progress

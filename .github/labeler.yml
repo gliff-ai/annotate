@@ -1,0 +1,26 @@
+version: v1
+
+labels:
+  - label: "enhancement"
+    sync: true
+    matcher:
+      title: "^feat: .*"
+      commits: "^feat: .*"
+
+  - label: "bug"
+    sync: true
+    matcher:
+      title: "^fix: .*"
+      commits: "^fix: .*"
+
+  - label: "dependencies"
+    sync: true
+    matcher:
+      title: "^build.*"
+      commits: "^build.*"
+
+  - label: "test"
+    sync: true
+    matcher:
+      title: "^test: .*"
+      commits: "^test: .*"
