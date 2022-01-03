@@ -77,7 +77,7 @@ GitHub Actions should only be included under the `.github/workflows` path.
 
 We welcome all contributors and any contributions on this project through the likes of feedback on or suggesting features and enhancements, raising bug problems, reporting on security vulnerabilities, reviewing code, requesting or creating tests, user testing etc. to ensure gliff.ai can help enable the best and biggest positive impact possible. 
 
-Sounds good and want to contribute to the project? 🧑‍💻
+Sounds good and want to contribute to the project? 🧑‍💻 \
 Please check the [gliff.ai Contribution Guide]((https://github.com/gliff-ai/.github/blob/main/CONTRIBUTING.md)) 👋 before you get started. Don’t forget the [gliff.ai Code of Conduct]((https://github.com/gliff-ai/.github/blob/main/CODE_OF_CONDUCT.md)) ⚠️ and  [gliff.ai Security Policy]((https://github.com/gliff-ai/.github/blob/main/SECURITY.md)) 🔒 too!
 
 A big thank you from the entire gliff.ai team to these fellow contributors ([emoji key](https://allcontributors.org/docs/en/emoji-key)): \
