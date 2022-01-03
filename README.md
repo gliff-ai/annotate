@@ -4,7 +4,7 @@
 
 👋 **Welcome in!** 👋
 
-&nbsp;
+&nbsp;  
 This repository contains the Open Source code for gliff.ai’s ANNOTATE product. 
 
 ANNOTATE aims to allow domain experts to easily and efficiently annotate multidimensional images - embedding their knowledge - for the purposes of developing imaging AI products. ANNOTATE is just one part of gliff.ai’s growing privacy-preserving MLOps (Machine Learning Operations) platform. When the full gliff.ai platform is used, ANNOTATE provides just one step in developing high-quality and auditable datasets that satisfy any relevant regulatory frameworks which enables our users to build world-changing and trustworthy AI models and products.
