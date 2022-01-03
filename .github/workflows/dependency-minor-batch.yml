@@ -1,7 +1,7 @@
 name: scheduled batch of minor/patch updates
 on:
   schedule:
-    - cron: "00 06 * * 5"
+    - cron: "00 * * * *"
 
 jobs:
   Update:
