@@ -1,7 +1,7 @@
 name: scheduled batch of minor/patch updates
 on:
   schedule:
-    - cron: "00 * * * *"
+    - cron: "00,20,40 * * * *"
 
 jobs:
   Update:
@@ -12,7 +12,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.ROBOT_PAT }}
-          ref: staging
       - name: create branch for updates
         run: |
           git checkout -B dependencies
