@@ -14,8 +14,8 @@ jobs:
           token: ${{ secrets.ROBOT_PAT }}
       - name: create branch for updates
         run: |
-          git fetch --all
           git checkout -B dependencies
+          git pull --ff-only
           git push --set-upstream origin dependencies
       - name: setup node
         uses: actions/setup-node@v1
