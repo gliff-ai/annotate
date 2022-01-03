@@ -15,7 +15,7 @@ jobs:
       - name: create branch for updates
         run: |
           git fetch --all
-          git branch -B --set-upstream-to=origin/dependencies dependencies
+          git branch --set-upstream-to=origin/dependencies dependencies
           git checkout dependencies
           git pull --ff-only
           git push --set-upstream origin dependencies
