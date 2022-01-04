@@ -12,11 +12,12 @@ jobs:
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.ROBOT_PAT }}
+      - name: set current date as env variable
+        run: echo "DATE::$(date +'%Y-%m-%d')" >> $GITHUB_ENV
       - name: create branch for updates
         run: |
-          ISO8601 = `date --iso-8601=date`
-          git checkout -B $ISO8601-dependencies
-          git push --set-upstream origin $ISO8601-dependencies
+          git checkout -B $DATE-dependencies
+          git push --set-upstream origin $DATE-dependencies
       - name: setup node
         uses: actions/setup-node@v1
         with:
