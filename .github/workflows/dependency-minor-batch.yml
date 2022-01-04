@@ -14,7 +14,7 @@ jobs:
           token: ${{ secrets.ROBOT_PAT }}
       - name: create branch for updates
         run: |
-          ISO8601 = `date -iso-8601=date`
+          ISO8601 = `date --iso-8601=date`
           git checkout -B $ISO8601-dependencies
           git push --set-upstream origin $ISO8601-dependencies
       - name: setup node
