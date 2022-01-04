@@ -6,8 +6,7 @@ const {
   clickById,
 } = require("./helpers");
 const { wrapper, test, webdriver } =
-  require("@gliff-ai/jest-browserstack-automate")(
-    "Annotate",
+  require("@gliff-ai/jest-browserstack-automate")("Annotate", [
     {
       browserName: "Chrome",
       browser_version: "latest",
@@ -31,8 +30,8 @@ const { wrapper, test, webdriver } =
       browser_version: "latest",
       os: "Windows",
       os_version: "10",
-    }
-  );
+    },
+  ]);
 
 const { TARGET_URL = "http://localhost:3000" } = process.env;
 
