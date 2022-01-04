@@ -49,7 +49,7 @@ jobs:
         uses: tretuna/sync-branches@1.4.0
         with:
           GITHUB_TOKEN: ${{ secrets.ROBOT_PAT }}
-          FROM_BRANCH: "dependencies"
+          FROM_BRANCH: "$(date +'%Y-%m-%d')-dependencies"
           TO_BRANCH: "staging"
           PULL_REQUEST_TITLE: "build(deps): apply minor and patch dependency updates"
           CONTENT_COMPARISON: true
@@ -57,4 +57,4 @@ jobs:
       - name: delete branch if failed
         if: ${{ failure() }}
         run: |
-          git branch -D dependencies
+          git branch -D $(date +'%Y-%m-%d')-dependencies
