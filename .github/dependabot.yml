@@ -5,10 +5,10 @@ updates:
     schedule:
       interval: "weekly"
     reviewers:
-      - "gliff-ai/techteam"
+      - "gliff-ai/frontend"
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
     reviewers:
-      - "gliff-ai/techteam"
+      - "gliff-ai/frontend"
