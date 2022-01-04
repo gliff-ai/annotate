@@ -1,10 +1,14 @@
 const { until, By, Origin } = require("selenium-webdriver");
-const { dragBetweenPoints, drawPentagon, clickMouseAtPoint, clickById } = require("./helpers");
+const {
+  dragBetweenPoints,
+  drawPentagon,
+  clickMouseAtPoint,
+  clickById,
+} = require("./helpers");
 const { wrapper, test, webdriver } =
   require("@gliff-ai/jest-browserstack-automate")("Annotate");
 
 const { TARGET_URL = "http://localhost:3000" } = process.env;
-
 
 wrapper(() => {
   describe("Percy complex screenshot", () => {
@@ -21,6 +25,7 @@ wrapper(() => {
 
         // draw brushstrokes:
         let actions = driver.actions();
+
         dragBetweenPoints(actions, [200, 200], [[200, 400]]);
         await clickById(driver, "id-add-new-annotation");
         dragBetweenPoints(actions, [250, 200], [[250, 400]]);
@@ -41,8 +46,13 @@ wrapper(() => {
         await clickById(driver, "id-add-new-annotation");
         await clickById(driver, "id-lasso-spline");
         actions.move({ x: 650, y: 150, duration: 10 }).press();
-        const points = [...Array(40)].map((_, i) => ([650, Math.floor(150 + 250 * i / 40)]));
-        points.forEach(([x, y]) => { actions.move({ x, y }) });
+        const points = [...Array(40)].map((_, i) => [
+          650,
+          Math.floor(150 + (250 * i) / 40),
+        ]);
+        points.forEach(([x, y]) => {
+          actions.move({ x, y });
+        });
         await actions.release().perform();
         actions.clear();
 
@@ -56,7 +66,7 @@ wrapper(() => {
 
         // erase part of active annotation
         await clickMouseAtPoint(actions, [250, 200]);
-        
+
         // try to erase part of inactive annotation (should fail)
         await clickMouseAtPoint(actions, [300, 200]);
 
@@ -66,7 +76,15 @@ wrapper(() => {
         // fill brush:
         await clickById(driver, "id-add-new-annotation");
         await clickById(driver, "id-paintbrush");
-        await dragBetweenPoints(actions, [350, 500], [[350, 600], [450, 600], [450, 500]]);
+        await dragBetweenPoints(
+          actions,
+          [350, 500],
+          [
+            [350, 600],
+            [450, 600],
+            [450, 500],
+          ]
+        );
         await clickById(driver, "id-fill-active-paintbrush");
 
         // spline to paintbrush:
@@ -86,6 +104,7 @@ wrapper(() => {
         // upload snapshot to Percy:
         await percySnapshot(driver, "paintbrush-splodge");
       },
-    300000);
+      300000
+    );
   });
 });
