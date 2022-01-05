@@ -1,4 +1,5 @@
 name: scheduled batch of minor/patch updates
+on:
   push:
     branches:
       - test_sync_branches
