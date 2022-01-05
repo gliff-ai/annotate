@@ -1,0 +1,63 @@
+name: scheduled batch of minor/patch updates
+on:
+  schedule:
+    - cron: "00,20,40 * * * *"
+
+jobs:
+  Update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.ROBOT_PAT }}
+      - name: create env variable for branch name
+        run: |
+          echo "BRANCH_NAME=$(date +'%Y-%m-%d')-dependencies" >> $GITHUB_ENV
+      - name: create branch for updates
+        run: |
+          git checkout -B ${{ env.BRANCH_NAME }}
+          git push --set-upstream origin ${{ env.BRANCH_NAME }}
+      - name: setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+      - name: update node dependencies
+        run: |
+          npm update --dev
+      - name: commit updates
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_options: "-am --allow-empty"
+          commit_message: "build(deps): update minor node dependencies"
+          commit_user_name: gliff-ai-robot
+          commit_user_email: chas+noteG@gliff.ai
+      - name: lint and format
+        if: steps.auto-commit-action.outputs.changes_detected == 'true'
+        run: |
+          npm i -g eslint prettier
+          npm run lint
+          npm run format
+      - name: commit updates
+        if: steps.auto-commit-action.outputs.changes_detected == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_options: "-am --allow-empty"
+          commit_message: "chore: lint and format"
+          commit_user_name: gliff-ai-robot
+          commit_user_email: chas+noteG@gliff.ai
+      - name: open Pull Request
+        id: pull
+        uses: tretuna/sync-branches@1.4.0
+        with:
+          GITHUB_TOKEN: ${{ secrets.ROBOT_PAT }}
+          FROM_BRANCH: "${{ env.BRANCH_NAME }}"
+          TO_BRANCH: "staging"
+          PULL_REQUEST_TITLE: "build(deps): apply minor and patch dependency updates"
+          CONTENT_COMPARISON: true
+          TEAM_REVIEWERS: '["gliff-ai/frontend"]'
+      - name: delete branch if failed
+        if: ${{ failure() }}
+        run: |
+          git branch -D "{{ env.BRANCH_NAME }}

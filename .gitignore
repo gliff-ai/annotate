@@ -3,4 +3,5 @@ dist/
 coverage
 .vscode/
 .DS_Store
+.env
 examples/.DS_Store
