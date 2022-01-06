@@ -4,28 +4,9 @@ const { sleep } = require("./helpers");
 const { wrapper, test, webdriver } =
   require("@gliff-ai/jest-browserstack-automate")("Annotate", [
     {
-      browserName: "Chrome",
-      browser_version: "latest",
-      os: "OS X",
-      os_version: "Big Sur",
-    },
-    {
-      browserName: "Chrome",
-      browser_version: "latest",
-      os: "Windows",
-      os_version: "10",
-    },
-    {
+      device: "iPad 8th",
+      real_mobile: "true",
       browserName: "Safari",
-      browser_version: "latest",
-      os: "OS X",
-      os_version: "Big Sur",
-    },
-    {
-      browserName: "Edge",
-      browser_version: "latest",
-      os: "Windows",
-      os_version: "10",
     },
   ]);
 
