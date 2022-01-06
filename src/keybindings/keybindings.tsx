@@ -89,6 +89,11 @@ const keybindings = {
   "cmdCtrl+Digit2": ["minimap.handleDrawerClose", "Close minimap"],
   "cmdCtrl+Equal": ["ui.incrementScale", "Zoom in"],
   "cmdCtrl+Minus": ["ui.decrementScale", "Zoom out"],
+
+  // Duplicates for NumPad keys
+  "cmdCtrl+Add": ["ui.incrementScale", "Zoom in"],
+  "cmdCtrl+Subtract": ["ui.decrementScale", "Zoom out"],
+
   "altOption+Digit0": ["ui.resetScaleAndPan", "Reset zoom and pan"],
   F1: ["ui.openKeybinds", "Open shortcuts"],
 
