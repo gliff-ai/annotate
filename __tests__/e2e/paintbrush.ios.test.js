@@ -82,26 +82,6 @@ wrapper(() => {
         await clickById(driver, "id-add-new-annotation");
         await drawPentagon(driver, 500, 400); // closed spline
         await clickById(driver, "id-close-active-spline");
-        // lasso spline:
-        await clickById(driver, "id-add-new-annotation");
-        await clickById(driver, "id-lasso-spline");
-
-        driver.executeScript(
-          makeEventJS("spline-canvas", "mousedown", 650, 150)
-        );
-        await sleep();
-        for (let i = 0; i < 40; i += 1) {
-          driver.executeScript(
-            makeEventJS("spline-canvas", "mousemove", 650, 150 + 7 * i)
-          );
-
-          await sleep(500);
-        }
-        driver.executeScript(makeEventJS("spline-canvas", "mouseup", 650, 400));
-        await sleep();
-        // IRL, a click event is generated after a mouseup event, and our code knows to ignore it because isDrawing/dragPoint will still be set
-        // we have to simulate that click event here, so that onClick unsets them, otherwise the next click event will be ignored:
-        driver.executeScript(makeEventJS("spline-canvas", "click", 650, 400));
 
         await sleep(100); // seems the next actions will execute before the above JS events have been processed if we don't wait a bit
 

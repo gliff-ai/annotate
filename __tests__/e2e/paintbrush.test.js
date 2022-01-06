@@ -66,6 +66,20 @@ wrapper(() => {
         await drawPentagon(actions, [500, 400]); // closed spline
         await clickById(driver, "id-close-active-spline");
 
+        // lasso spline:
+        await clickById(driver, "id-add-new-annotation");
+        await clickById(driver, "id-lasso-spline");
+        actions.move({ x: 650, y: 150, duration: 10 }).press();
+        const points = [...Array(40)].map((_, i) => [
+          650,
+          Math.floor(150 + (250 * i) / 40),
+        ]);
+        points.forEach(([x, y]) => {
+          actions.move({ x, y });
+        });
+        await actions.release().perform();
+        actions.clear();
+
         // test select tool:
         await clickById(driver, "id-select-annotation");
         await clickMouseAtPoint(actions, [250, 200]);
