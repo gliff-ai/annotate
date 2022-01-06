@@ -188,7 +188,6 @@ wrapper(() => {
           makeEventJS("boundingBox-canvas", "click", 300, 550)
         );
         await sleep();
-        await percySnapshot(driver, "paintbrush-splodge");
       },
       120000
     );
