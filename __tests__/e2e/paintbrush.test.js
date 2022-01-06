@@ -5,46 +5,24 @@ const {
   clickMouseAtPoint,
   clickById,
 } = require("./helpers");
+
 const { wrapper, test, webdriver } =
   require("@gliff-ai/jest-browserstack-automate")("Annotate", [
     {
-      browserName: "Chrome",
-      browser_version: "latest",
-      os: "OS X",
-      os_version: "Big Sur",
-    },
-    {
-      browserName: "Chrome",
-      browser_version: "latest",
-      os: "Windows",
-      os_version: "10",
-    },
-    {
+      device: "iPad 8th",
+      real_mobile: "true",
       browserName: "Safari",
-      browser_version: "latest",
-      os: "OS X",
-      os_version: "Big Sur",
-    },
-    {
-      browserName: "Edge",
-      browser_version: "latest",
-      os: "Windows",
-      os_version: "10",
     },
   ]);
 
 const { TARGET_URL = "http://localhost:3000" } = process.env;
 
 wrapper(() => {
-  describe("Percy complex screenshot", () => {
+  describe("Desktop Percy complex screenshot", () => {
     test(
       "paintbrush-splodge",
       async (driver, percySnapshot) => {
         await driver.get(TARGET_URL);
-
-        // Breaks Ipad Safari?
-        // if ((await driver.getCapabilities()).browser !== "ipad")
-        //   driver.manage().window().maximize();
 
         await driver.wait(until.titleIs("gliff.ai ANNOTATE"), 10000);
 
@@ -66,20 +44,6 @@ wrapper(() => {
         await clickById(driver, "id-add-new-annotation");
         await drawPentagon(actions, [500, 400]); // closed spline
         await clickById(driver, "id-close-active-spline");
-
-        // lasso spline:
-        await clickById(driver, "id-add-new-annotation");
-        await clickById(driver, "id-lasso-spline");
-        actions.move({ x: 650, y: 150, duration: 10 }).press();
-        const points = [...Array(40)].map((_, i) => [
-          650,
-          Math.floor(150 + (250 * i) / 40),
-        ]);
-        points.forEach(([x, y]) => {
-          actions.move({ x, y });
-        });
-        await actions.release().perform();
-        actions.clear();
 
         // test select tool:
         await clickById(driver, "id-select-annotation");
