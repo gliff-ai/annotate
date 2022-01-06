@@ -1,12 +1,12 @@
 // Keys are defined here: https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values
-// Modifiers are added by prefixing "shift" | "cmdCtrl" | "altOption" and then + the main key
-// eg cmdCtrl+KeyA
+// Modifiers are added by prefixing "shift" | "cmdCtrl" | "altOption" and then — the main key. The divider is an em dash, as that's not on a keyboard so we can safely split on it
+// eg cmdCtrl—KeyA
 
 // We have cmdCtrl and altOption which dynamically use the correct buttons to make it feel correct on a Mac/Non Mac
 
 // WARNING Shortcuts containing 3 or more keys will NOT have them all shown in the tooltips
 // Modifiers can be combined, but the order of modifier keys matters, they should be in alphabetical order
-// eg alt+shift+KeyA
+// eg alt—shift—KeyA
 
 type NamespacedMethod = `${
   | "ui"
@@ -45,11 +45,11 @@ const keybindings = {
 
   Equal: ["ui.addAnnotation", "Add new annotation"],
   Minus: ["ui.clearActiveAnnotation", "Clear active annotation"],
-  "cmdCtrl+KeyS": ["ui.saveAnnotations", "Save annotations"],
-  "altOption+KeyL": ["ui.selectAnnotationLabel", "Show annotation labels"],
+  "cmdCtrl—KeyS": ["ui.saveAnnotations", "Save annotations"],
+  "altOption—KeyL": ["ui.selectAnnotationLabel", "Show annotation labels"],
 
-  "cmdCtrl+KeyZ": ["ui.undo", "Undo Last Action"],
-  "cmdCtrl+KeyY": ["ui.redo", "Redo Last Undo"],
+  "cmdCtrl—KeyZ": ["ui.undo", "Undo Last Action"],
+  "cmdCtrl—KeyY": ["ui.redo", "Redo Last Undo"],
 
   KeyB: ["paintbrush.selectBrush", "Select Brush tool"],
   KeyE: ["paintbrush.selectEraser", "Select Brush Eraser tool"],
@@ -66,7 +66,7 @@ const keybindings = {
   KeyS: ["spline.selectSpline", "Select Spline tool"],
   KeyL: ["spline.selectLassoSpline", "Select Lasso Spline tool"],
   KeyO: ["spline.closeSpline", "Close active spline"],
-  "altOption+C": ["spline.convertSpline", "Convert Spline to paintbrush"],
+  "altOption—C": ["spline.convertSpline", "Convert Spline to paintbrush"],
   Backspace: ["spline.deleteSelectedPoint", "Delete selected spline point"],
   Escape: ["spline.deselectPoint", "Deselect spline point"],
 
@@ -82,19 +82,19 @@ const keybindings = {
   KeyD: ["download.openDownloadDropdown", "Download Annotations"],
   // KeyU: ["download.openDownloadDropdown", "Upload images"], // TODO no method listener for this
 
-  "cmdCtrl+ArrowLeft": ["ui.previousAnnotation", "Select previous annotation"],
-  "cmdCtrl+ArrowRight": ["ui.nextAnnotation", "Select next annotation"],
+  "cmdCtrl—ArrowLeft": ["ui.previousAnnotation", "Select previous annotation"],
+  "cmdCtrl—ArrowRight": ["ui.nextAnnotation", "Select next annotation"],
 
-  "cmdCtrl+Digit1": ["minimap.handleDrawerOpen", "Open minimap"],
-  "cmdCtrl+Digit2": ["minimap.handleDrawerClose", "Close minimap"],
-  "cmdCtrl+Equal": ["ui.incrementScale", "Zoom in"],
-  "cmdCtrl+Minus": ["ui.decrementScale", "Zoom out"],
+  "cmdCtrl—Digit1": ["minimap.handleDrawerOpen", "Open minimap"],
+  "cmdCtrl—Digit2": ["minimap.handleDrawerClose", "Close minimap"],
+  "cmdCtrl—Equal": ["ui.incrementScale", "Zoom in"],
+  "cmdCtrl—Minus": ["ui.decrementScale", "Zoom out"],
 
   // Duplicates for NumPad keys
-  "cmdCtrl+Add": ["ui.incrementScale", "Zoom in"],
-  "cmdCtrl+Subtract": ["ui.decrementScale", "Zoom out"],
+  "cmdCtrl—+": ["ui.incrementScale", "Zoom in"],
+  "cmdCtrl—-": ["ui.decrementScale", "Zoom out"],
 
-  "altOption+Digit0": ["ui.resetScaleAndPan", "Reset zoom and pan"],
+  "altOption—Digit0": ["ui.resetScaleAndPan", "Reset zoom and pan"],
   F1: ["ui.openKeybinds", "Open shortcuts"],
 
   [unassigned()]: ["spline.changeSplineModeToEdit", ""],

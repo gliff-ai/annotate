@@ -44,7 +44,7 @@ export function getShortcut(
 
   if (!shortcut) return {};
 
-  const raw = shortcut.split("+");
+  const raw = shortcut.split("—");
 
   let rawKey;
   let rawModifier;
