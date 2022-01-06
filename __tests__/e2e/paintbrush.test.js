@@ -1,9 +1,11 @@
 const { until, By, Origin } = require("selenium-webdriver");
+const { skipPartiallyEmittedExpressions } = require("typescript");
 const {
   dragBetweenPoints,
   drawPentagon,
   clickMouseAtPoint,
   clickById,
+  sleep,
 } = require("./helpers");
 
 const { wrapper, test, webdriver } =
@@ -111,6 +113,8 @@ wrapper(() => {
 
         // upload snapshot to Percy:
         await percySnapshot(driver, "paintbrush-splodge");
+
+        await sleep();
       },
       300000
     );
