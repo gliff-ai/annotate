@@ -13,13 +13,13 @@ const keydownListener = (
   let { code } = event;
 
   if (isMac) {
-    if (event.shiftKey) code = `shift+${code}`;
-    if (event.metaKey) code = `cmdCtrl+${code}`;
-    if (event.altKey) code = `altOption+${code}`;
+    if (event.shiftKey) code = `shift—${code}`;
+    if (event.metaKey) code = `cmdCtrl—${code}`;
+    if (event.altKey) code = `altOption—${code}`;
   } else {
-    if (event.shiftKey) code = `shift+${code}`;
-    if (event.ctrlKey) code = `cmdCtrl+${code}`;
-    if (event.altKey) code = `altOption+${code}`;
+    if (event.shiftKey) code = `shift—${code}`;
+    if (event.ctrlKey) code = `cmdCtrl—${code}`;
+    if (event.altKey) code = `altOption—${code}`;
   }
 
   if (keybindingsMap[code]) {
