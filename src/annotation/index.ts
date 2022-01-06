@@ -86,7 +86,7 @@ export class Annotations {
   @log
   deleteActiveAnnotation(): void {
     this.data.splice(this.activeAnnotationID, 1);
-    if (this.activeAnnotationID >= this.data.length) {
+    if (this.activeAnnotationID >= this.data.length && this.data.length > 0) {
       this.activeAnnotationID = this.data.length - 1; // necessary if we delete the one on the end
     }
     if (this.data.length === 0) {
