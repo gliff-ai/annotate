@@ -19,6 +19,7 @@ jobs:
         run: |
           git checkout -B ${{ env.BRANCH_NAME }}
       - name: set upstream and pull
+        run: |
           git branch --set-upstream-to origin/${{ env.BRANCH_NAME }}
           git pull
       - name: setup node
