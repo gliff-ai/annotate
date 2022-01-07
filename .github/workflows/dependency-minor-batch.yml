@@ -18,10 +18,15 @@ jobs:
       - name: create branch for updates
         run: |
           git checkout -B ${{ env.BRANCH_NAME }}
-      - name: set upstream and pull
-        run: |
           git branch --set-upstream-to origin/${{ env.BRANCH_NAME }}
+      - name: pull incase there is already a remote
+        run: |
           git pull
+        continue-on-error: true
+      - name: push incase there is not already a remote
+        run: |
+          git pull
+        continue-on-error: true
       - name: setup node
         uses: actions/setup-node@v1
         with:
@@ -64,4 +69,3 @@ jobs:
         if: ${{ failure() }}
         run: |
           git branch -D "{{ env.BRANCH_NAME }}
-          job.status = cancelled
