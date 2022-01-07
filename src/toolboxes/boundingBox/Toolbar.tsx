@@ -35,7 +35,7 @@ class Toolbar extends Component<Props> {
   }
 
   handleEvent = (event: Event): void => {
-    if (event.detail === "Rectangular Bounding Box") {
+    if (event.detail === Toolboxes.boundingBox) {
       this[event.type]?.call(this);
     }
   };
