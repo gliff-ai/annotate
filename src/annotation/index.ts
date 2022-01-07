@@ -89,7 +89,7 @@ export class Annotations {
   @log
   deleteActiveAnnotation(): void {
     this.data.splice(this.activeAnnotationID, 1);
-    if (this.activeAnnotationID >= this.data.length) {
+    if (this.activeAnnotationID >= this.data.length && this.data.length > 0) {
       this.activeAnnotationID = this.data.length - 1; // necessary if we delete the one on the end
     }
     if (this.data.length === 0) {
@@ -235,8 +235,8 @@ export class Annotations {
     const { z: prevZ, t: prevT } =
       this.data[this.activeAnnotationID].boundingBox.spaceTimeInfo;
     this.data[this.activeAnnotationID].boundingBox.spaceTimeInfo = {
-      z: z || prevZ,
-      t: t || prevT,
+      z: z !== undefined ? z : prevZ,
+      t: t !== undefined ? t : prevT,
     };
     if (addToUndoRedo) {
       this.updateUndoRedoActions("setBoundingBoxTimeInfo", [oldZT.z, oldZT.t]);
@@ -379,7 +379,7 @@ export class Annotations {
     const point = this.data[this.activeAnnotationID].spline.coordinates.splice(
       idx,
       1
-    );
+    )[0];
     if (addToUndoRedo) {
       this.updateUndoRedoActions("insertSplinePoint", [idx, point]);
       this.redoData = [];
@@ -779,7 +779,7 @@ export class Annotations {
       this.redoData.push(undoRedo);
       this.redrawUI?.();
     }
-    return canUndoRedo;
+    return this.canUndoRedo();
   }
 
   redo(): CanUndoRedo {
@@ -790,7 +790,7 @@ export class Annotations {
       this.undoData.push(undoRedo);
       this.redrawUI?.();
     }
-    return canUndoRedo;
+    return this.canUndoRedo();
   }
 
   giveRedrawCallback(callback: () => void): void {

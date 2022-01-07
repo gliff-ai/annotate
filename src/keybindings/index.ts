@@ -8,7 +8,7 @@ const keydownListener = (
   event: KeyboardEvent,
   keybindingsMap = keybindings, // So we can mock in test
   isMac = isMacLookup // So we can mock
-): void => {
+): boolean => {
   // Lookup event
   let { code } = event;
 
@@ -25,8 +25,13 @@ const keydownListener = (
   if (keybindingsMap[code]) {
     const [namespace, method] = keybindingsMap[code][0].split(".");
 
+    event.preventDefault();
     document.dispatchEvent(new CustomEvent(method, { detail: namespace }));
+
+    return false;
   }
+
+  return true;
 };
 
 export function getShortcut(
