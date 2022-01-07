@@ -15,18 +15,14 @@ jobs:
       - name: create env variable for branch name
         run: |
           echo "BRANCH_NAME=$(date +'%Y-%m-%d')-dependencies" >> $GITHUB_ENV
-      - name: create branch for updates
-        run: |
-          git checkout -B ${{ env.BRANCH_NAME }}
-          git branch --set-upstream-to origin/${{ env.BRANCH_NAME }}
-      - name: pull incase there is already a remote
-        run: |
-          git pull
-        continue-on-error: true
-      - name: push incase there is not already a remote
-        run: |
-          git pull
-        continue-on-error: true
+      - name: create/update the branch
+        uses: julb/action-manage-branch@v1
+        with:
+          name: ${{ env.BRANCH_NAME }}
+          state: present
+          from: ${{ github.ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.ROBOT_PAT }}
       - name: setup node
         uses: actions/setup-node@v1
         with:
