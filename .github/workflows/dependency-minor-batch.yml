@@ -16,13 +16,11 @@ jobs:
         run: |
           echo "BRANCH_NAME=$(date +'%Y-%m-%d')-dependencies" >> $GITHUB_ENV
       - name: create/update the branch
-        uses: julb/action-manage-branch@v1
-        with:
-          name: ${{ env.BRANCH_NAME }}
-          state: present
-          from: ${{ github.ref }}
+        uses: peterjgrainger/action-create-branch@v2.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.ROBOT_PAT }}
+        with:
+          branch: ${{ env.BRANCH_NAME }}
       - name: setup node
         uses: actions/setup-node@v1
         with:
