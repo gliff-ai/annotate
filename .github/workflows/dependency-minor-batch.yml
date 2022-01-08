@@ -21,6 +21,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.ROBOT_PAT }}
         with:
           branch: ${{ env.BRANCH_NAME }}
+      - name: checkout branch
+        run: |
+          git checkout --track origin/${{ env.BRANCH_NAME }}
       - name: setup node
         uses: actions/setup-node@v1
         with:
