@@ -1,14 +1,14 @@
 version: 2
 updates:
   - package-ecosystem: "github-actions"
-    directory: "/.github/"
+    directory: "/"
     schedule:
       interval: "weekly"
     reviewers:
-      - "gliff-ai/techteam"
+      - "gliff-ai/frontend"
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
     reviewers:
-      - "gliff-ai/techteam"
+      - "gliff-ai/frontend"
