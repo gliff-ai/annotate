@@ -15,13 +15,15 @@ jobs:
       - name: create env variable for branch name
         run: |
           echo "BRANCH_NAME=$(date +'%Y-%m-%d')-dependencies" >> $GITHUB_ENV
-      - name: create branch for updates
+      - name: create/update the branch
+        uses: peterjgrainger/action-create-branch@v2.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.ROBOT_PAT }}
+        with:
+          branch: ${{ env.BRANCH_NAME }}
+      - name: checkout branch
         run: |
-          git checkout -B ${{ env.BRANCH_NAME }}
-      - name: set upstream and pull
-        run: |
-          git branch --set-upstream-to origin/${{ env.BRANCH_NAME }}
-          git pull
+          git checkout --track origin/${{ env.BRANCH_NAME }}
       - name: setup node
         uses: actions/setup-node@v1
         with:
@@ -64,4 +66,3 @@ jobs:
         if: ${{ failure() }}
         run: |
           git branch -D "{{ env.BRANCH_NAME }}
-          job.status = cancelled
