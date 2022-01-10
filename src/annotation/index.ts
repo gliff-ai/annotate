@@ -550,6 +550,11 @@ export class Annotations {
         },
       }))
     );
+
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("deleteBrushStrokes", [linesToFill.length]);
+      this.redoData = [];
+    }
   }
 
   // AUDIT
@@ -681,7 +686,7 @@ export class Annotations {
     }
   }
 
-  addBrushStrokeMulti(
+  private addBrushStrokeMulti(
     newBrushStrokes: BrushStroke[],
     addToUndoRedo = true
   ): void {
