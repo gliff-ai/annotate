@@ -38,10 +38,17 @@ describe("Fill Active Paintbrush", () => {
     ]);
   });
 
-  test("test fill paintbrush", () => {
+  test("test fill paintbrush / undo / redo", () => {
     annotationsObject.addBrushStroke(brushStrokes[0]);
     annotationsObject.fillBrush(0, false);
-    const brushStrokesAfterFill = annotationsObject.getAllAnnotations()[0];
-    expect(brushStrokesAfterFill).toEqual(fillBrush);
+    const annotationAfterFill = annotationsObject.getAllAnnotations()[0];
+    expect(annotationAfterFill).toEqual(fillBrush);
+
+    // test undo / redo:
+    annotationsObject.undo();
+    expect(annotationsObject.getActiveAnnotation().brushStrokes.length).toBe(1);
+    annotationsObject.redo();
+    const annotationAfterRedo = annotationsObject.getAllAnnotations()[0];
+    expect(annotationAfterRedo).toEqual(fillBrush);
   });
 });
