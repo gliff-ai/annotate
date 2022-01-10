@@ -681,7 +681,7 @@ export class Annotations {
     }
   }
 
-  private addBrushStrokeMulti(
+  addBrushStrokeMulti(
     newBrushStrokes: BrushStroke[],
     addToUndoRedo = true
   ): void {
