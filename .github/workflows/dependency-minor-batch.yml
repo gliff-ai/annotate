@@ -4,7 +4,7 @@ on:
     - cron: "00,20,40 * * * *"
 
 jobs:
-  update:
+  npm_update:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -12,6 +12,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.ROBOT_PAT }}
+          ref: ${{ github.head_ref }}
       - name: create env variable for branch name
         run: |
           echo "BRANCH_NAME=$(date +'%Y-%m-%d')-dependencies" >> $GITHUB_ENV
