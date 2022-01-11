@@ -1,4 +1,4 @@
-import { Button, Modal, Box, Typography } from "@material-ui/core";
+import { Button, Modal, Box, Typography } from "@mui/material";
 import { ReactElement, useEffect, useState } from "react";
 import { keybindings } from "@/keybindings/keybindings";
 import { getShortcut } from "@/keybindings/index";

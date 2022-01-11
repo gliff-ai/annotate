@@ -1,5 +1,7 @@
 import { ChangeEvent, ReactElement } from "react";
-import { makeStyles, Slider } from "@material-ui/core";
+import { Slider } from "@mui/material";
+
+import makeStyles from "@mui/styles/makeStyles";
 
 export interface Config {
   name: string;
@@ -13,7 +15,7 @@ export interface Config {
 interface Props {
   value: number;
   config: Config;
-  onChange: (arg0: string) => (arg1: ChangeEvent, arg2: number) => void;
+  onChange: (arg0: string) => (arg1: Event, arg2: number) => void;
   sliderHeight?: string;
 }
 

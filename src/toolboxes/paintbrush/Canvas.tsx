@@ -111,7 +111,12 @@ export class CanvasClass extends Component<Props, State> {
     }
 
     // Redraw if we change pan or zoom
-    this.drawAllStrokes(this.backgroundCanvas?.canvasContext);
+
+    try {
+      this.drawAllStrokes(this.backgroundCanvas?.canvasContext);
+    } catch (err) {
+      console.log(err.message);
+    }
   }
 
   componentWillUnmount(): void {

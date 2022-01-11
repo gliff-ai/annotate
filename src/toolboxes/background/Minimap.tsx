@@ -1,11 +1,7 @@
 import { Component, ReactElement, MouseEvent } from "react";
-import {
-  Slide,
-  Card,
-  WithStyles,
-  withStyles,
-  Divider,
-} from "@material-ui/core";
+import { Slide, Card, Divider } from "@mui/material";
+import { WithStyles } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import { theme, IconButton, icons } from "@gliff-ai/style";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { MinimapCanvas } from "@/components/baseCanvas";
@@ -204,7 +200,7 @@ class Minimap extends Component<Props, State> {
                     }}
                     fill={this.props.buttonClicked === name}
                     tooltipPlacement="top"
-                  />
+                    size="large" />
                 ))}
               </div>
               <Divider className={this.props.classes.divider} />
@@ -260,7 +256,7 @@ class Minimap extends Component<Props, State> {
                 }}
                 fill={this.props.buttonClicked === "Maximise Map"}
                 tooltipPlacement="top"
-              />
+                size="large" />
             </Card>
           </Slide>
         )}

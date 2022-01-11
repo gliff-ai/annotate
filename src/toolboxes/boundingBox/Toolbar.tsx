@@ -1,6 +1,6 @@
 import { Component, ReactElement } from "react";
 import { IconButton, icons } from "@gliff-ai/style";
-import { ButtonGroup } from "@material-ui/core";
+import { ButtonGroup } from "@mui/material";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { getShortcut } from "@/keybindings";
 
@@ -58,7 +58,7 @@ class Toolbar extends Component<Props> {
           fill={this.props.active}
           onClick={this.selectBoundingBox}
           id="id-bounding-box"
-        />
+          size="large" />
       </ButtonGroup>
     </>
   );

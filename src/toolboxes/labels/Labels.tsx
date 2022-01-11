@@ -9,14 +9,14 @@ import {
 import {
   Avatar,
   Chip,
-  createStyles,
   Divider,
   IconButton,
   InputBase,
   ListItemText,
-  makeStyles,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
+import createStyles from "@mui/styles/createStyles";
+import makeStyles from "@mui/styles/makeStyles";
 import SVG from "react-inlinesvg";
 import { theme, icons } from "@gliff-ai/style";
 import { Annotations } from "@/annotation";
@@ -131,6 +131,7 @@ export const Labels: FunctionComponent<Props> = ({
         aria-label="add-new-label"
         onClick={handleAddLabel(newLabel)}
         edge="end"
+        size="large"
       >
         <SVG src={icons.add} width="12px" height="100%" fill="#A1A1A1" />
       </IconButton>
