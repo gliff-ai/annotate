@@ -3,15 +3,9 @@ on:
   issues:
     types:
       - opened
-      - reopened
-      - closed
   pull_request:
     types:
       - opened
-      - reopened
-      - review_requested
-      - closed
-
 # map fields with customized labels
 env:
   todo: Todo 🏗
@@ -25,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'issues' && github.event.action == 'opened'
     steps:
-      - name: Move issue to ${{ env.todo }}
+      - name: mark issue as ${{ env.todo }}
         uses: leonsteinhaeuser/project-beta-automations@v1.0.3
         with:
           gh_token: ${{ secrets.ROBOT_PAT }}
@@ -33,36 +27,10 @@ jobs:
           project_id: 13
           resource_node_id: ${{ github.event.issue.node_id }}
           status_value: ${{ env.todo }}
-  issue_reopened:
-    name: mark reopened Issue as In Progress
-    runs-on: ubuntu-latest
-    if: github.event_name == 'issues' && github.event.action == 'reopened'
-    steps:
-      - name: Move issue to ${{ env.in_progress }}
-        uses: leonsteinhaeuser/project-beta-automations@v1.0.3
-        with:
-          gh_token: ${{ secrets.ROBOT_PAT }}
-          organization: gliff-ai
-          project_id: 13
-          resource_node_id: ${{ github.event.issue.node_id }}
-          status_value: ${{ env.in_progress }}
-  issue_closed:
-    name: mark closed Issue as Done
-    runs-on: ubuntu-latest
-    if: github.event_name == 'issues' && github.event.action == 'closed'
-    steps:
-      - name: Moved issue to ${{ env.done }}
-        uses: leonsteinhaeuser/project-beta-automations@v1.0.3
-        with:
-          gh_token: ${{ secrets.ROBOT_PAT }}
-          organization: gliff-ai
-          project_id: 13
-          resource_node_id: ${{ github.event.issue.node_id }}
-          status_value: ${{ env.done }}
-  pr_opened_or_reopened_or_reviewrequested:
+  pr_opened:
     name: pr_opened_or_reopened_or_reviewrequested
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'review_requested')
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
     steps:
       - name: mark PR as ${{ env.for_review }}
         uses: leonsteinhaeuser/project-beta-automations@v1.0.3
@@ -71,17 +39,4 @@ jobs:
           organization: gliff-ai
           project_id: 13
           resource_node_id: ${{ github.event.pull_request.node_id }}
-          status_value: ${{ env.for_review }} # Target status
-  pr_closed:
-    name: pr_closed
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
-    steps:
-      - name: mark closed PR as ${{ env.done }}
-        uses: leonsteinhaeuser/project-beta-automations@v1.0.3
-        with:
-          gh_token: ${{ secrets.ROBOT_PAT }}
-          organization: gliff-ai
-          project_id: 13
-          resource_node_id: ${{ github.event.pull_request.node_id }}
-          status_value: ${{ env.done }} # Target status
+          status_value: ${{ env.for_review }}
