@@ -66,7 +66,7 @@ jobs:
           TO_BRANCH: "main"
           PULL_REQUEST_TITLE: "build(deps): apply minor and patch dependency updates"
           CONTENT_COMPARISON: true
-          TEAM_REVIEWERS: '["gliff-ai/frontend"]'
+          TEAM_REVIEWERS: '["frontend"]'
       - name: delete branch if failed
         if: ${{ failure() }}
         uses: dawidd6/action-delete-branch@v3
