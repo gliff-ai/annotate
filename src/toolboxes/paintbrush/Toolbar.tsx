@@ -319,7 +319,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                 fill={active()}
                 disabled={disabled()}
                 id={`id-${name.toLowerCase().replace(/ /g, "-")}`}
-                size="large"
+                size="small"
               />
             ))}
           </ButtonGroup>
@@ -404,7 +404,7 @@ class Toolbar extends Component<Props> {
             this.refBrushPopover = ref;
           }}
           id="id-paintbrush-toolbox"
-          size="large"
+          size="small"
         />
       </ButtonGroup>
 

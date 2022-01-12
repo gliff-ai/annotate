@@ -58,7 +58,8 @@ class Toolbar extends Component<Props> {
           fill={this.props.active}
           onClick={this.selectBoundingBox}
           id="id-bounding-box"
-          size="large" />
+          size="small"
+        />
       </ButtonGroup>
     </>
   );

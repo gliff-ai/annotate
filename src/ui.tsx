@@ -795,7 +795,7 @@ class UserInterface extends Component<Props, State> {
                 this.refBtnsPopovers[name] = ref;
               }}
               disabled={!enabled()}
-              size="large"
+              size="small"
             />
           ))}
 
@@ -809,7 +809,7 @@ class UserInterface extends Component<Props, State> {
               }}
               onMouseUp={this.selectDrawMode}
               fill={this.state.buttonClicked === "Save Annotations"}
-              size="large"
+              size="small"
             />
           )}
 

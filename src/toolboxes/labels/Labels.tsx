@@ -131,7 +131,7 @@ export const Labels: FunctionComponent<Props> = ({
         aria-label="add-new-label"
         onClick={handleAddLabel(newLabel)}
         edge="end"
-        size="large"
+        size="small"
       >
         <SVG src={icons.add} width="12px" height="100%" fill="#A1A1A1" />
       </IconButton>

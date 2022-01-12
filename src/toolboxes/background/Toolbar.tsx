@@ -229,7 +229,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                   }}
                   onClick={event}
                   fill={active()}
-                  size="large"
+                  size="small"
                 />
               ))}
           </ButtonGroup>
@@ -353,7 +353,7 @@ class Toolbar extends Component<Props> {
           setRefCallback={(ref) => {
             this.refBackgroundSettingsPopover = ref;
           }}
-          size="large"
+          size="small"
         />
       </ButtonGroup>
 

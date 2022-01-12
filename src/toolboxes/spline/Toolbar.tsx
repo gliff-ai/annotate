@@ -153,7 +153,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
             onClick={event}
             fill={active()}
             id={`id-${name.toLowerCase().replace(/ /g, "-")}`}
-            size="large"
+            size="small"
           />
         ))}
       </ButtonGroup>
@@ -204,7 +204,7 @@ class Toolbar extends Component<Props> {
             this.refSplinePopover = ref;
           }}
           id="id-spline-toolbox"
-          size="large"
+          size="small"
         />
       </ButtonGroup>
 
