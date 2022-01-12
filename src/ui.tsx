@@ -97,7 +97,7 @@ interface State {
   mode: Mode;
   canvasContainerColour: number[];
   presetLabels: string[];
-  open: boolean
+  open: boolean;
 }
 
 const styles = {
@@ -224,7 +224,7 @@ class UserInterface extends Component<Props, State> {
       mode: Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
       presetLabels: this.props.presetLabels || [],
-      open: true
+      open: true,
     };
 
     this.imageFileInfo = this.props.imageFileInfo || null;
@@ -667,24 +667,13 @@ class UserInterface extends Component<Props, State> {
     // to get triggered during text input.
     this.refBtnsPopovers["Annotation Label"] === this.state.activeSubmenuAnchor;
 
-    varhandleClose = (event: MouseEvent, reason?: string) => {
-      if (reason === "clickaway") {
-        return;
-      }
-  
-      this.setState({ open: false });
-    };
+  handleSnackbarClose = () => {
+    this.setState({ open: false });
+  };
 
   render = (): ReactNode => {
     const { classes, showAppBar, saveAnnotationsCallback } = this.props;
 
-    if (this.state.activeToolbox === "paintbrush")
-    {<WarningSnackbar
-      messageText={<>Snackbar</>}
-      onClose={this.handleClose}
-      open={this.state.open}
-      />}
-    
     const uploadDownload = (
       <>
         {(this.props.userAccess === UserAccess.Owner ||
@@ -1004,6 +993,13 @@ class UserInterface extends Component<Props, State> {
               canvasContainerColour={this.state.canvasContainerColour}
             />
           </Grid>
+          {this.state.activeToolbox === "paintbrush" ? (
+            <WarningSnackbar
+              messageText={<>Snackbar</>}
+              onClose={this.handleSnackbarClose}
+              open={this.state.open}
+            />
+          ) : null}
         </ThemeProvider>
       </StylesProvider>
     );
