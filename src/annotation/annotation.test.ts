@@ -88,29 +88,9 @@ describe("Undo/Redo paintbrush tests", () => {
     );
   });
 
-  test("addBrushStrokeMulti / undo / redo", () => {
-    annotationsObject.addBrushStrokeMulti(brushStrokes);
-    expect(annotationsObject.getAllAnnotations()[0].brushStrokes).toStrictEqual(
-      brushStrokes
-    );
-
-    const canUndoRedo = annotationsObject.undo();
-    expect(canUndoRedo).toStrictEqual({ undo: false, redo: true });
-    expect(annotationsObject.getAllAnnotations()).toStrictEqual([
-      blankAnnotation,
-    ]);
-
-    annotationsObject.redo();
-    expect(annotationsObject.getBrushStrokeCoordinates(0)).toStrictEqual(
-      brushStrokes[0].coordinates
-    );
-    expect(annotationsObject.getBrushStrokeCoordinates(1)).toStrictEqual(
-      brushStrokes[1].coordinates
-    );
-  });
-
   test("clearBrushStrokes / undo / redo", () => {
-    annotationsObject.addBrushStrokeMulti(brushStrokes);
+    annotationsObject.addBrushStroke(brushStrokes[0]);
+    annotationsObject.addBrushStroke(brushStrokes[1]);
     expect(annotationsObject.getAllAnnotations().length).toBe(1);
     expect(annotationsObject.getAllAnnotations()[0].brushStrokes.length).toBe(
       2
