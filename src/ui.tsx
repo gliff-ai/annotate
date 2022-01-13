@@ -455,7 +455,7 @@ class UserInterface extends Component<Props, State> {
     this.setState(
       {
         sliceIndex: 0,
-        channels: Array(slicesData[0].length).fill(true) as boolean[],
+        channels: Array(this.slicesData[0].length).fill(true) as boolean[],
       },
       this.mixChannels
     );
