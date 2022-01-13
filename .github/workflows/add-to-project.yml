@@ -8,9 +8,7 @@ on:
       - opened
 
 jobs:
-  reusable_workflow_job:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: gliff-ai/.github/.github/workflows/add-to-project.yml@v1
-        with:
-          token: ${{ secrets.ROBOT_PAT }}
+  add_to_project:
+    uses: gliff-ai/.github/.github/workflows/add-to-project.yml@v1
+    secrets:
+        ROBOT_PAT: ${{ secrets.ROBOT_PAT }}
