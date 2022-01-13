@@ -1,6 +1,4 @@
 import { ReactNode, Component, ReactElement } from "react";
-import simplify from "simplify-js";
-import { slpfLines } from "@gliff-ai/slpf";
 import { theme } from "@gliff-ai/style";
 import { Mode } from "@/ui";
 import { Annotations } from "@/annotation";
@@ -393,40 +391,10 @@ export class CanvasClass extends Component<Props, State> {
   };
 
   fillBrush = (): void => {
-    // Treat the current paintbrush item as a closed polygon and fill
-    // Simplifying the line for computational efficiency
-    const strokeCoordinates =
-      this.props.annotationsObject.getBrushStrokeCoordinates();
-
-    // simplify
-    // TODO pick tolerance more cleverly
-    const simplifiedCoordinates = simplify(strokeCoordinates, 10, true);
-
-    const linesToFill: XYPoint[][] = slpfLines(simplifiedCoordinates);
-
-    let color = this.props.annotationsObject.getActiveAnnotationColor();
-    // Do we already have a colour for this layer?
-    color =
-      color ||
-      getRGBAString(
-        palette[
-          this.props.annotationsObject.getActiveAnnotationID() % palette.length
-        ]
-      );
-
-    this.props.annotationsObject.addBrushStrokeMulti(
-      linesToFill.map((line: XYPoint[]) => ({
-        coordinates: line,
-        spaceTimeInfo: { z: this.props.sliceIndex, t: 0 },
-        brush: {
-          color,
-          radius: 1,
-          type: "paint",
-          is3D: this.props.is3D,
-        },
-      }))
+    this.props.annotationsObject.fillBrush(
+      this.props.sliceIndex,
+      this.props.is3D
     );
-
     this.drawAllStrokes(this.backgroundCanvas?.canvasContext);
   };
 
