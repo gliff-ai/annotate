@@ -1,20 +1,42 @@
 name: automatically add to project board
-on: [issues, pull_request]
+on:
+  issues:
+    types:
+      - opened
+  pull_request:
+    types:
+      - opened
+# map fields with customized labels
+env:
+  todo: Todo 🏗
+  done: Done 🚀
+  in_progress: In Progress 🚧
+  for_review: For Review 🔍
+
 jobs:
-  add_to_project_board:
+  issue_opened:
+    name: add newly opened Issue to project as Todo
     runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
     steps:
-      - name: add issue to project board
-        uses: docker://takanabe/github-actions-automate-projects:v0.0.1
-        if: github.event_name == 'issues' && github.event.action == 'opened'
-        env:
-          GITHUB_TOKEN: ${{ secrets.ROBOT_PAT }}
-          GITHUB_PROJECT_URL: https://github.com/orgs/gliff-ai/projects/10
-          GITHUB_PROJECT_COLUMN_NAME: To do
-      - name: add PR to project board
-        uses: docker://takanabe/github-actions-automate-projects:v0.0.1
-        if: github.event_name == 'pull_request' && github.event.action == 'opened'
-        env:
-          GITHUB_TOKEN: ${{ secrets.ROBOT_PAT }}
-          GITHUB_PROJECT_URL: https://github.com/orgs/gliff-ai/projects/10
-          GITHUB_PROJECT_COLUMN_NAME: Review in progress
+      - name: mark issue as ${{ env.todo }}
+        uses: leonsteinhaeuser/project-beta-automations@v1.0.3
+        with:
+          gh_token: ${{ secrets.ROBOT_PAT }}
+          organization: gliff-ai
+          project_id: 13
+          resource_node_id: ${{ github.event.issue.node_id }}
+          status_value: ${{ env.todo }}
+  pr_opened:
+    name: pr_opened_or_reopened_or_reviewrequested
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
+    steps:
+      - name: mark PR as ${{ env.for_review }}
+        uses: leonsteinhaeuser/project-beta-automations@v1.0.3
+        with:
+          gh_token: ${{ secrets.ROBOT_PAT }}
+          organization: gliff-ai
+          project_id: 13
+          resource_node_id: ${{ github.event.pull_request.node_id }}
+          status_value: ${{ env.for_review }}
