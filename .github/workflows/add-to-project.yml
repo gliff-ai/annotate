@@ -7,6 +7,6 @@ on:
 
 jobs:
   add_to_project:
-    uses: gliff-ai/.github/.github/workflows/add-to-project.yml@main
+    uses: gliff-ai/.github/.github/workflows/add-to-project.yml@v1
     secrets:
       ROBOT_PAT: ${{ secrets.ROBOT_PAT }}
