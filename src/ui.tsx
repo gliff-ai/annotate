@@ -882,7 +882,7 @@ class UserInterface extends Component<Props, State> {
                 <div
                   style={{
                     display: "block",
-                    position: "absolute",
+                    position: "fixed",
                     bottom: 0,
                     width: "100%",
                     // the height of the canvas container is 100% of the parent minus the height of the app bar
