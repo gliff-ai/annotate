@@ -875,6 +875,7 @@ class UserInterface extends Component<Props, State> {
                 style={{
                   backgroundColor: this.getRGBAforCanvasContainerColour(),
                   margin: 0,
+                  height: "100vh",
                 }}
               >
                 {appBar}
