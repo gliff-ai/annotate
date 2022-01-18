@@ -665,7 +665,6 @@ class UserInterface extends Component<Props, State> {
     // to get triggered during text input.
     this.refBtnsPopovers["Annotation Label"] === this.state.activeSubmenuAnchor;
 
-
   render = (): ReactNode => {
     const { classes, showAppBar, saveAnnotationsCallback } = this.props;
 
@@ -987,12 +986,22 @@ class UserInterface extends Component<Props, State> {
               setScaleAndPan={this.setScaleAndPan}
               canvasContainerColour={this.state.canvasContainerColour}
             />
-          </Grid>                     
-            <WarningSnackbar
-              messageText={<>Another toolbox is already in use. Add new annotation to continue.</>}
-              onClose={()=>{}}
-              open={this.annotationsObject.length() > 0 && !this.annotationsObject.isActiveAnnotationEmpty() && this.state.activeToolbox !== this.annotationsObject.getActiveAnnotation().toolbox}
-            />
+          </Grid>
+          <WarningSnackbar
+            messageText={
+              <>
+                Another toolbox is already in use. Add new annotation to
+                continue.
+              </>
+            }
+            onClose={() => {}}
+            open={
+              this.annotationsObject.length() > 0 &&
+              !this.annotationsObject.isActiveAnnotationEmpty() &&
+              this.state.activeToolbox !==
+                this.annotationsObject.getActiveAnnotation().toolbox
+            }
+          />
         </ThemeProvider>
       </StylesProvider>
     );
