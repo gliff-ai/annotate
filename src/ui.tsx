@@ -97,7 +97,6 @@ interface State {
   mode: Mode;
   canvasContainerColour: number[];
   presetLabels: string[];
-  open: boolean;
 }
 
 const styles = {
@@ -224,7 +223,6 @@ class UserInterface extends Component<Props, State> {
       mode: Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
       presetLabels: this.props.presetLabels || [],
-      open: true,
     };
 
     this.imageFileInfo = this.props.imageFileInfo || null;
@@ -667,9 +665,6 @@ class UserInterface extends Component<Props, State> {
     // to get triggered during text input.
     this.refBtnsPopovers["Annotation Label"] === this.state.activeSubmenuAnchor;
 
-  handleSnackbarClose = () => {
-    this.setState({ open: false });
-  };
 
   render = (): ReactNode => {
     const { classes, showAppBar, saveAnnotationsCallback } = this.props;
@@ -992,14 +987,12 @@ class UserInterface extends Component<Props, State> {
               setScaleAndPan={this.setScaleAndPan}
               canvasContainerColour={this.state.canvasContainerColour}
             />
-          </Grid>
-          {this.state.activeToolbox === "paintbrush" ? (
+          </Grid>                     
             <WarningSnackbar
-              messageText={<>Snackbar</>}
-              onClose={this.handleSnackbarClose}
-              open={this.state.open}
+              messageText={<>Another toolbox is already in use. Add new annotation to continue.</>}
+              onClose={()=>{}}
+              open={this.annotationsObject.length() > 0 && !this.annotationsObject.isActiveAnnotationEmpty() && this.state.activeToolbox !== this.annotationsObject.getActiveAnnotation().toolbox}
             />
-          ) : null}
         </ThemeProvider>
       </StylesProvider>
     );
