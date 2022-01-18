@@ -1,5 +1,5 @@
 import { Component, ReactElement, MouseEvent } from "react";
-import { Slide, Card, Divider } from "@mui/material";
+import { Slide, Card, Divider, Button } from "@mui/material";
 import { WithStyles } from "@mui/styles";
 import withStyles from "@mui/styles/withStyles";
 import { theme, IconButton, icons } from "@gliff-ai/style";
@@ -21,15 +21,10 @@ const styles = {
   baseIconButton: {
     display: "flex",
     justifyContent: "flex-end",
-    margin: "-10px 0 13px",
-
-    "& $button": {
-      marginRight: "10px",
-      "&:nth-child(4)": {
-        marginRight: "0",
-      },
+    margin: "-8px 0 14px",
+    "& > span": {
       "&:nth-child(1)": {
-        marginRight: "auto",
+        marginRight: "65px",
       },
     },
   },
