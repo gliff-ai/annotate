@@ -1,5 +1,5 @@
 import { Component, ReactElement, MouseEvent } from "react";
-import { Slide, Card, Divider, Button } from "@mui/material";
+import { Slide, Card, Divider } from "@mui/material";
 import { WithStyles } from "@mui/styles";
 import withStyles from "@mui/styles/withStyles";
 import { theme, IconButton, icons } from "@gliff-ai/style";

@@ -1,10 +1,4 @@
-import {
-  Component,
-  ChangeEvent,
-  ReactElement,
-  useState,
-  MouseEvent,
-} from "react";
+import { Component, ReactElement, useState, MouseEvent } from "react";
 import {
   ButtonGroup,
   Checkbox,
