@@ -253,6 +253,7 @@ class Minimap extends Component<Props, State> {
                 fill={this.props.buttonClicked === "Maximise Map"}
                 tooltipPlacement="top"
                 size="small"
+                id="id-maximise-map"
               />
             </Card>
           </Slide>
