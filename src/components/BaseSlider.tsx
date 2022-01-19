@@ -79,6 +79,7 @@ export const BaseSlider = ({
           max={config.max}
           getAriaValueText={getAriaValueText}
           marks={marks}
+          size="small"
         />
       </div>
     </>
