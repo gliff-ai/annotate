@@ -1,6 +1,6 @@
 import { ReactElement, MouseEvent } from "react";
 import { Grid, Typography, Popover, Card, Paper, Theme } from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { Labels, Props as LabelsProps } from "./Labels";
 
 const useStyles = makeStyles((theme: Theme) => ({
