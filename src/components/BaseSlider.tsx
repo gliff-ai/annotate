@@ -1,4 +1,4 @@
-import { ChangeEvent, ReactElement } from "react";
+import { ReactElement } from "react";
 import { Slider } from "@mui/material";
 
 import makeStyles from "@mui/styles/makeStyles";
