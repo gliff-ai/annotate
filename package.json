@@ -69,7 +69,7 @@
     "@percy/selenium-webdriver": "^1.0.0",
     "@types/selenium-webdriver": "^4.0.16",
     "@use-gesture/react": "^10.1.1",
-    "chromedriver": "^96.0.0",
+    "chromedriver": "^97.0.0",
     "detect-browser": "^5.2.1",
     "react-inlinesvg": "^2.3.0",
     "selenium-webdriver": "^4.0.0",
