@@ -21,6 +21,7 @@ import {
   IconButton,
   icons,
   generateClassName,
+  WarningSnackbar,
 } from "@gliff-ai/style";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
@@ -997,6 +998,21 @@ class UserInterface extends Component<Props, State> {
                 canvasContainerColour={this.state.canvasContainerColour}
               />
             </Grid>
+            <WarningSnackbar
+              messageText={
+                <>
+                  Another toolbox is already in use. Add new annotation to
+                  continue.
+                </>
+              }
+              onClose={() => {}}
+              open={
+                this.annotationsObject.length() > 0 &&
+                !this.annotationsObject.isActiveAnnotationEmpty() &&
+                this.state.activeToolbox !==
+                  this.annotationsObject.getActiveAnnotation().toolbox
+              }
+            />
           </ThemeProvider>
         </StyledEngineProvider>
       </StylesProvider>
