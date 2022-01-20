@@ -779,7 +779,7 @@ class UserInterface extends Component<Props, State> {
 
     const leftToolbar = (
       <Toolbar className={classes.leftToolbar}>
-        <ButtonGroup>
+        <ButtonGroup variant="text">
           {tools.map(({ icon, name, event, active, enabled }) => (
             <IconButton
               id={`id-${name.toLowerCase().replace(/ /g, "-")}`}

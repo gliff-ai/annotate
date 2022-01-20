@@ -141,7 +141,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
         },
       ]}
     >
-      <ButtonGroup size="small" id="spline-toolbar">
+      <ButtonGroup size="small" id="spline-toolbar" variant="text">
         {tools.map(({ icon, name, event, active }) => (
           <IconButton
             key={name}
@@ -191,7 +191,7 @@ class Toolbar extends Component<Props> {
 
   render = (): ReactElement => (
     <>
-      <ButtonGroup style={{ all: "revert" }}>
+      <ButtonGroup style={{ all: "revert" }} variant="text">
         <IconButton
           tooltip={{
             name: "Spline",

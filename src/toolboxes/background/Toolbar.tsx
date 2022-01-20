@@ -206,6 +206,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
             size="small"
             id="background-settings-toolbar"
             style={{ marginRight: "-10px" }}
+            variant="text"
           >
             {tools
               .filter(
@@ -334,7 +335,7 @@ class Toolbar extends Component<Props> {
 
   render = (): ReactElement => (
     <>
-      <ButtonGroup style={{ all: "revert" }}>
+      <ButtonGroup style={{ all: "revert" }} variant="text">
         <IconButton
           tooltip={{
             name: "Background Settings",

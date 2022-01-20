@@ -48,7 +48,7 @@ class Toolbar extends Component<Props> {
 
   render = (): ReactElement => (
     <>
-      <ButtonGroup style={{ all: "revert" }}>
+      <ButtonGroup style={{ all: "revert" }} variant="text">
         <IconButton
           tooltip={{
             name: "Rectangular Bounding Box",
