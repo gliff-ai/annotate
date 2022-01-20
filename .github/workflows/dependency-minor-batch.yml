@@ -17,7 +17,7 @@ jobs:
         run: |
           echo "BRANCH_NAME=$(date +'%Y-%m-%d')-dependencies" >> $GITHUB_ENV
       - name: create/update the branch
-        uses: peterjgrainger/action-create-branch@v2.0.1
+        uses: peterjgrainger/action-create-branch@v2.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.ROBOT_PAT }}
         with:
