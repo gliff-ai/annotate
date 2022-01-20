@@ -2,22 +2,18 @@ name: check PR title and label appropriately
 on:
   push:
     branches:
-      - main
+      - main, staging
   pull_request:
     types: [opened, edited, synchronize, auto_merge_enabled, reopened]
     branches:
-      - main
+      - main, staging
 
 jobs:
-  check_PR_labels:
-    runs-on: ubuntu-latest
-    steps:
-      - name: check PR title
-        uses: amannn/action-semantic-pull-request@v3.4.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: add PR label
-        uses: fuxingloh/multi-labeler@v1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          config-path: .github/labeler.yml
+  check_PR_title:
+    uses: gliff-ai/.github/.github/workflows/check-pr-title.yml@main
+    secrets:
+      ROBOT_PAT: ${{ secrets.ROBOT_PAT }}
+  add_labels:
+    uses: gliff-ai/.github/.github/workflows/add-labels.yml@main
+    secrets:
+      ROBOT_PAT: ${{ secrets.ROBOT_PAT }}
