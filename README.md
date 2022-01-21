@@ -17,7 +17,6 @@ A preview build of the current `main` branch is [here](https://annotate.staging.
 Looking for something specific? 🔍
 
 - [Repository Introduction](#gliffai-annotate)
-- [Demo-Preview](#demo-preview)
 - [Table of Contents](#table-of-contents)
 - [Installation](#installation)
 - [Development](#development)
@@ -84,7 +83,7 @@ A big thank you from the entire gliff.ai team to these fellow contributors ([emo
 [{{back to navigation}}](#table-of-contents)
 
 Need some help? 🤔 Have a question? 🧠 \
-Reach out to the gliff.ai team at [community@gliff.ai](mailto:community@gliff.ai?subject=[GitHub]) or on our [GitHub discussions](https://github.com/gliff-ai/annotate/discussions).
+Reach out to the gliff.ai team at [community@gliff.ai](mailto:community@gliff.ai?subject=[GitHub]) or on our [GitHub discussions](https://github.com/gliff-ai/roadmap/discussions/landing).
 
 ## License
 
