@@ -720,9 +720,9 @@ class UserInterface extends Component<Props, State> {
       <AppBar position="fixed" className={classes.appbar}>
         <Toolbar>
           <Grid container direction="row">
-            <Grid item className={classes.iconbutton}>
+            <div className={classes.iconbutton}>
               <Logo />
-            </Grid>
+            </div>
           </Grid>
           <KeybindPopup />
 
@@ -779,7 +779,7 @@ class UserInterface extends Component<Props, State> {
     ] as const;
 
     const leftToolbar = (
-      <Toolbar className={classes.leftToolbar}>
+      <div className={classes.leftToolbar}>
         <ButtonGroup variant="text">
           {tools.map(({ icon, name, event, active, enabled }) => (
             <IconButton
@@ -861,7 +861,7 @@ class UserInterface extends Component<Props, State> {
           updatePresetLabels={this.updatePresetLabels}
           activeAnnotationID={this.state.activeAnnotationID}
         />
-      </Toolbar>
+      </div>
     );
 
     return (
