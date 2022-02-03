@@ -1,5 +1,7 @@
 import { ReactElement, MouseEvent, Component } from "react";
-import { Menu, MenuItem, withStyles, WithStyles } from "@material-ui/core";
+import { Menu, MenuItem } from "@mui/material";
+import { WithStyles } from "@mui/styles";
+import withStyles from "@mui/styles/withStyles";
 import { ImageFileInfo } from "@gliff-ai/upload";
 import { IconButton, icons } from "@gliff-ai/style";
 import { keydownListener } from "@/keybindings";
@@ -173,7 +175,6 @@ class DownloadUI extends Component<Props, State> {
           keepMounted
           open={Boolean(this.state.anchorEl)}
           onClick={this.handleClose}
-          getContentAnchorEl={null}
           PopoverClasses={{ paper: classes.paper }}
         >
           {this.state.menuItems.map((item) => (

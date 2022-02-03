@@ -1,10 +1,4 @@
-import {
-  Component,
-  ChangeEvent,
-  ReactElement,
-  useState,
-  MouseEvent,
-} from "react";
+import { Component, ReactElement, useState, MouseEvent } from "react";
 import {
   ButtonGroup,
   Checkbox,
@@ -12,15 +6,15 @@ import {
   FormGroup,
   FormControl,
   Card,
-  makeStyles,
-  createStyles,
   Theme,
   CardHeader,
   CardContent,
   Typography,
   Popper,
   ClickAwayListener,
-} from "@material-ui/core";
+} from "@mui/material";
+import makeStyles from "@mui/styles/makeStyles";
+import createStyles from "@mui/styles/createStyles";
 import SVG from "react-inlinesvg";
 import { detect } from "detect-browser";
 
@@ -108,10 +102,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     return true;
   }
 
-  function changeBrightness(
-    e: ChangeEvent | MouseEvent | React.TouchEvent,
-    value: number
-  ) {
+  function changeBrightness(e: Event, value: number) {
     setBackground({
       brightness: value,
       contrast: background.contrast,
@@ -123,7 +114,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     return true;
   }
 
-  function changeContrast(e: ChangeEvent, value: number) {
+  function changeContrast(e: Event, value: number) {
     setBackground({
       contrast: value,
       brightness: background.brightness,
@@ -201,18 +192,21 @@ const Submenu = (props: SubmenuProps): ReactElement => {
           anchorEl={props.anchorElement}
           placement="right-end"
           style={{ display: "flex" }}
-          modifiers={{
-            offset: {
-              enabled: true,
-              offset: "10, 10",
+          modifiers={[
+            {
+              name: "offset",
+              options: {
+                offset: [10, 10],
+              },
             },
-          }}
+          ]}
         >
           <ButtonGroup
             orientation="vertical"
             size="small"
             id="background-settings-toolbar"
             style={{ marginRight: "-10px" }}
+            variant="text"
           >
             {tools
               .filter(
@@ -230,6 +224,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                   }}
                   onClick={event}
                   fill={active()}
+                  size="small"
                 />
               ))}
           </ButtonGroup>
@@ -340,7 +335,7 @@ class Toolbar extends Component<Props> {
 
   render = (): ReactElement => (
     <>
-      <ButtonGroup style={{ all: "revert" }}>
+      <ButtonGroup style={{ all: "revert" }} variant="text">
         <IconButton
           tooltip={{
             name: "Background Settings",
@@ -353,6 +348,7 @@ class Toolbar extends Component<Props> {
           setRefCallback={(ref) => {
             this.refBackgroundSettingsPopover = ref;
           }}
+          size="small"
         />
       </ButtonGroup>
 

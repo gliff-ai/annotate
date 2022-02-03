@@ -1,5 +1,5 @@
 import { Component, ReactElement, MouseEvent } from "react";
-import { ButtonGroup, Popper } from "@material-ui/core";
+import { ButtonGroup, Popper } from "@mui/material";
 import { IconButton, icons } from "@gliff-ai/style";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { getShortcut } from "@/keybindings";
@@ -132,14 +132,16 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       anchorEl={props.anchorElement}
       placement="right"
       style={{ display: "flex" }}
-      modifiers={{
-        offset: {
-          enabled: true,
-          offset: "10, 10",
+      modifiers={[
+        {
+          name: "offset",
+          options: {
+            offset: [10, 10],
+          },
         },
-      }}
+      ]}
     >
-      <ButtonGroup size="small" id="spline-toolbar">
+      <ButtonGroup size="small" id="spline-toolbar" variant="text">
         {tools.map(({ icon, name, event, active }) => (
           <IconButton
             key={name}
@@ -151,6 +153,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
             onClick={event}
             fill={active()}
             id={`id-${name.toLowerCase().replace(/ /g, "-")}`}
+            size="small"
           />
         ))}
       </ButtonGroup>
@@ -188,7 +191,7 @@ class Toolbar extends Component<Props> {
 
   render = (): ReactElement => (
     <>
-      <ButtonGroup style={{ all: "revert" }}>
+      <ButtonGroup style={{ all: "revert" }} variant="text">
         <IconButton
           tooltip={{
             name: "Spline",
@@ -201,6 +204,7 @@ class Toolbar extends Component<Props> {
             this.refSplinePopover = ref;
           }}
           id="id-spline-toolbox"
+          size="small"
         />
       </ButtonGroup>
 

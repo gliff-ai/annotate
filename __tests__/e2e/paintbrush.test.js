@@ -125,6 +125,9 @@ wrapper(() => {
         await clickMouseAtPoint(actions, [150, 450]);
         await clickMouseAtPoint(actions, [300, 550]);
 
+        // open minimap:
+        await clickById(driver, "id-maximise-map");
+
         // upload snapshot to Percy:
         await percySnapshot(driver, "paintbrush-splodge");
 
