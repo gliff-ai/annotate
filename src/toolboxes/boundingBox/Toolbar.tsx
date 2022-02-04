@@ -1,6 +1,6 @@
 import { Component, ReactElement } from "react";
 import { IconButton, icons } from "@gliff-ai/style";
-import { ButtonGroup } from "@material-ui/core";
+import { ButtonGroup } from "@mui/material";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { getShortcut } from "@/keybindings";
 
@@ -48,7 +48,7 @@ class Toolbar extends Component<Props> {
 
   render = (): ReactElement => (
     <>
-      <ButtonGroup style={{ all: "revert" }}>
+      <ButtonGroup style={{ all: "revert" }} variant="text">
         <IconButton
           tooltip={{
             name: "Rectangular Bounding Box",
@@ -58,6 +58,7 @@ class Toolbar extends Component<Props> {
           fill={this.props.active}
           onClick={this.selectBoundingBox}
           id="id-bounding-box"
+          size="small"
         />
       </ButtonGroup>
     </>

@@ -1,19 +1,14 @@
-import {
-  Component,
-  ChangeEvent,
-  ReactElement,
-  MouseEvent,
-  useState,
-} from "react";
+import { Component, ReactElement, MouseEvent, useState } from "react";
 import {
   ButtonGroup,
   Card,
-  createStyles,
   Divider,
-  makeStyles,
   Popper,
   ClickAwayListener,
-} from "@material-ui/core";
+} from "@mui/material";
+
+import createStyles from "@mui/styles/createStyles";
+import makeStyles from "@mui/styles/makeStyles";
 
 import { IconButton, icons } from "@gliff-ai/style";
 
@@ -96,7 +91,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
 
   const classes = useStyles();
 
-  function changeBrushRadius(_e: ChangeEvent, value: number) {
+  function changeBrushRadius(_e: Event, value: number) {
     setPaintbrush({
       ...paintbrush,
       brushRadius: value / 2, // convert from diameter (the displayed size) to radius (what the rest of the codebase expects)
@@ -178,10 +173,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     return true;
   }
 
-  function changeAnnotationTransparency(
-    _e: ChangeEvent,
-    annotationAlpha: number
-  ) {
+  function changeAnnotationTransparency(_e: Event, annotationAlpha: number) {
     setPaintbrush({
       ...paintbrush,
       annotationAlpha,
@@ -189,7 +181,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   }
 
   function changeAnnotationTransparencyFocused(
-    _e: ChangeEvent,
+    _e: Event,
     annotationActiveAlpha: number
   ) {
     setPaintbrush({
@@ -294,18 +286,21 @@ const Submenu = (props: SubmenuProps): ReactElement => {
           anchorEl={props.anchorElement}
           placement="right"
           style={{ display: "flex" }}
-          modifiers={{
-            offset: {
-              enabled: true,
-              offset: "40, 10",
+          modifiers={[
+            {
+              name: "offset",
+              options: {
+                offset: [40, 10],
+              },
             },
-          }}
+          ]}
         >
           <ButtonGroup
             orientation="vertical"
             size="small"
             id="paintbrush-toolbar"
             style={{ marginRight: "-10px" }}
+            variant="text"
           >
             {tools.map(({ icon, name, event, active, disabled }) => (
               <IconButton
@@ -319,6 +314,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                 fill={active()}
                 disabled={disabled()}
                 id={`id-${name.toLowerCase().replace(/ /g, "-")}`}
+                size="small"
               />
             ))}
           </ButtonGroup>
@@ -390,7 +386,7 @@ class Toolbar extends Component<Props> {
 
   render = (): ReactElement => (
     <>
-      <ButtonGroup style={{ all: "revert" }}>
+      <ButtonGroup style={{ all: "revert" }} variant="text">
         <IconButton
           tooltip={{
             name: "Paintbrush",
@@ -403,6 +399,7 @@ class Toolbar extends Component<Props> {
             this.refBrushPopover = ref;
           }}
           id="id-paintbrush-toolbox"
+          size="small"
         />
       </ButtonGroup>
 

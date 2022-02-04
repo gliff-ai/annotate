@@ -1,11 +1,7 @@
 import { Component, ReactElement, MouseEvent } from "react";
-import {
-  Slide,
-  Card,
-  WithStyles,
-  withStyles,
-  Divider,
-} from "@material-ui/core";
+import { Slide, Card, Divider } from "@mui/material";
+import { WithStyles } from "@mui/styles";
+import withStyles from "@mui/styles/withStyles";
 import { theme, IconButton, icons } from "@gliff-ai/style";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { MinimapCanvas } from "@/components/baseCanvas";
@@ -25,15 +21,10 @@ const styles = {
   baseIconButton: {
     display: "flex",
     justifyContent: "flex-end",
-    margin: "-10px 0 13px",
-
-    "& $button": {
-      marginRight: "10px",
-      "&:nth-child(4)": {
-        marginRight: "0",
-      },
+    margin: "-8px 0 14px",
+    "& > span": {
       "&:nth-child(1)": {
-        marginRight: "auto",
+        marginRight: "65px",
       },
     },
   },
@@ -204,6 +195,7 @@ class Minimap extends Component<Props, State> {
                     }}
                     fill={this.props.buttonClicked === name}
                     tooltipPlacement="top"
+                    size="small"
                   />
                 ))}
               </div>
@@ -260,6 +252,8 @@ class Minimap extends Component<Props, State> {
                 }}
                 fill={this.props.buttonClicked === "Maximise Map"}
                 tooltipPlacement="top"
+                size="small"
+                id="id-maximise-map"
               />
             </Card>
           </Slide>
