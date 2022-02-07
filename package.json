@@ -10,7 +10,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "npx --no-install vite build -c vite.config.lib.ts && tsc --emitDeclarationOnly --outDir dist && tsc-alias -p tsconfig.json",
+    "build": "npx vite build -c vite.config.lib.ts && tsc --emitDeclarationOnly --outDir dist && tsc-alias -p tsconfig.json && npm run build:patch",
     "watch": "npx --no-install vite build -c vite.config.lib.ts --watch",
     "format": "npx --no-install prettier --write src",
     "prettier": "npx --no-install prettier -c src",
@@ -19,6 +19,7 @@
     "serve": "vite",
     "build:example": "vite build",
     "test": "jest --coverage --passWithNoTests",
+    "build:patch": "sed -i 's/const generateClassName$1 = createGenerateClassName();/const generateClassName$1 = createGenerateClassName({seed:\"\",disableGlobal:true,productionPrefix:\"jss-annotate-\"});/g' dist/index.es.js",
     "test:visual": "npx percy snapshot snapshots.yml",
     "test:e2e": "percy exec -- jest -c jest.e2e.config.js --no-colors",
     "dev": "vite --host"
@@ -30,7 +31,7 @@
     "@emotion/styled": "^11.6.0",
     "@gliff-ai/eslint-config": "^0.1.3",
     "@gliff-ai/jest-browserstack-automate": "^5.0.6",
-    "@gliff-ai/style": "^8.0.0",
+    "@gliff-ai/style": "^8.1.4",
     "@mui/icons-material": "^5.2.5",
     "@mui/lab": "^5.0.0-alpha.64",
     "@mui/material": "^5.2.8",
@@ -60,7 +61,7 @@
   "peerDependencies": {
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
-    "@gliff-ai/style": "^8.0.0",
+    "@gliff-ai/style": "^8.1.4",
     "@mui/icons-material": "^5.2.5",
     "@mui/lab": "^5.0.0-alpha.64",
     "@mui/material": "^5.2.8",
