@@ -29,7 +29,7 @@
     "@babel/preset-env": "^7.15.8",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
-    "@gliff-ai/eslint-config": "^0.1.3",
+    "@gliff-ai/eslint-config": "^0.2.3",
     "@gliff-ai/jest-browserstack-automate": "^5.0.6",
     "@gliff-ai/style": "^8.1.4",
     "@mui/icons-material": "^5.2.5",
