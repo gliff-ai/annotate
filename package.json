@@ -10,7 +10,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "npx --no-install vite build -c vite.config.lib.ts && tsc --emitDeclarationOnly --outDir dist && tsc-alias -p tsconfig.json",
+    "build": "npx vite build -c vite.config.lib.ts && tsc --emitDeclarationOnly --outDir dist && tsc-alias -p tsconfig.json && npm run build:patch",
     "watch": "npx --no-install vite build -c vite.config.lib.ts --watch",
     "format": "npx --no-install prettier --write src",
     "prettier": "npx --no-install prettier -c src",
