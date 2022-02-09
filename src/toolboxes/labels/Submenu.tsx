@@ -1,9 +1,10 @@
 import { ReactElement, MouseEvent } from "react";
-import { Grid, Typography, Popover, Card, Paper, Theme } from "@mui/material";
+import { Grid, Typography, Popover, Card, Paper } from "@mui/material";
+import { theme } from "@gliff-ai/style";
 import makeStyles from "@mui/styles/makeStyles";
 import { Labels, Props as LabelsProps } from "./Labels";
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   annotationCard: {
     width: "271px",
     height: "fit-content",
