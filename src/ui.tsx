@@ -145,13 +145,6 @@ const styles = {
     width: "63px",
     zIndex: 100,
   },
-  uploadToolbar: {
-    right: "18px",
-    top: "80px",
-    marginTop: "30px",
-    zIndex: 100,
-    width: "64px",
-  },
   iconbutton: {
     marginBottom: "5px",
     marginTop: "7px",
@@ -707,16 +700,7 @@ class UserInterface extends Component<Props, State> {
       </>
     );
 
-    const appBar = !showAppBar ? (
-      <div
-        className={`${classes.uploadToolbar} MuiButtonGroup-root`}
-        style={{ position: "fixed" }}
-      >
-        <Grid container direction="row">
-          {uploadDownload}
-        </Grid>
-      </div>
-    ) : (
+    const appBar = !showAppBar ? null : (
       <AppBar position="fixed" className={classes.appbar}>
         <Toolbar>
           <Grid container direction="row">
