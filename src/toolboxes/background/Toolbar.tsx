@@ -6,7 +6,6 @@ import {
   FormGroup,
   FormControl,
   Card,
-  Theme,
   CardHeader,
   CardContent,
   Typography,
@@ -18,7 +17,7 @@ import createStyles from "@mui/styles/createStyles";
 import SVG from "react-inlinesvg";
 import { detect } from "detect-browser";
 
-import { IconButton, icons } from "@gliff-ai/style";
+import { IconButton, icons, theme } from "@gliff-ai/style";
 import { BaseSlider } from "@/components/BaseSlider";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { getShortcut } from "@/keybindings";
@@ -46,7 +45,7 @@ interface Props {
   displayedImage: ImageBitmap;
 }
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     subMenu: {
       display: "flex",
