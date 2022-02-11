@@ -182,6 +182,7 @@ interface Props extends WithStyles<typeof styles> {
   setIsLoading?: (isLoading: boolean) => void;
   userAccess?: UserAccess;
   plugins?: PluginObject | null;
+  launchPluginSettingsCallback?: (() => void) | null;
 }
 
 class UserInterface extends Component<Props, State> {
@@ -189,6 +190,7 @@ class UserInterface extends Component<Props, State> {
     showAppBar: true,
     userAccess: UserAccess.Collaborator,
     plugins: null,
+    launchPluginSettingsCallback: null,
   } as Pick<Props, "showAppBar">;
 
   annotationsObject: Annotations;
@@ -819,7 +821,12 @@ class UserInterface extends Component<Props, State> {
             anchorEl={this.state.activeSubmenuAnchor}
             onClose={this.handleClose}
           >
-            <PluginsCard plugins={this.props.plugins} />
+            <PluginsCard
+              plugins={this.props.plugins}
+              launchPluginSettingsCallback={
+                this.props.launchPluginSettingsCallback
+              }
+            />
           </Popover>
         </ButtonGroup>
         <ButtonGroup>

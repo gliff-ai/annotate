@@ -52,18 +52,18 @@ const useStyles = makeStyles({
 
 interface Props {
   plugins: PluginObject | null;
+  launchPluginSettingsCallback: () => void | null;
 }
 
-export const PluginsCard = ({ plugins }: Props): ReactElement | null => {
+export const PluginsCard = ({
+  plugins,
+  launchPluginSettingsCallback,
+}: Props): ReactElement | null => {
   const classes = useStyles();
   const [error, setError] = useState<string | null>(null);
   const [dialogContent, setDialogContent] = useState<JSX.Element | null>(null);
 
   if (!plugins) return null;
-
-  const openSettings = () => {
-    // TODO: Navigate to settings
-  };
 
   const openDocs = () => {
     // TODO: Navigate to docs
@@ -132,14 +132,16 @@ export const PluginsCard = ({ plugins }: Props): ReactElement | null => {
             orientation="horizontal"
             variant="text"
           >
-            <IconButton
-              tooltip={{ name: "Settings" }}
-              icon={icons.cog}
-              onClick={openSettings}
-              fill={false}
-              tooltipPlacement="top"
-              size="small"
-            />
+            {launchPluginSettingsCallback && (
+              <IconButton
+                tooltip={{ name: "Settings" }}
+                icon={icons.cog}
+                onClick={launchPluginSettingsCallback}
+                fill={false}
+                tooltipPlacement="top"
+                size="small"
+              />
+            )}
             <IconButton
               tooltip={{ name: "Docs" }}
               icon={icons.documentHelp}
