@@ -2,6 +2,10 @@
 
 ![Latest Tag](https://img.shields.io/github/v/tag/gliff-ai/annotate?&label=latest_tag&style=flat-square&color=f2f2f2) ![Number of Open Issues](https://img.shields.io/github/issues/gliff-ai/annotate?style=flat-square&color=yellow) ![Number of Open Pull Requests](https://img.shields.io/github/issues-pr/gliff-ai/annotate?style=flat-square&color=yellow) ![Number of Contributors](https://img.shields.io/github/contributors/gliff-ai/annotate?style=flat-square&color=yellow) ![Repository Size](https://img.shields.io/github/repo-size/gliff-ai/annotate?style=flat-square&color=red) ![Repo License](https://img.shields.io/github/license/gliff-ai/annotate?color=0078FF&style=flat-square)
 
+![Repo License](https://img.shields.io/github/license/gliff-ai/annotate?color=0078FF&style=flat-square) ![Repository Size](https://img.shields.io/github/repo-size/gliff-ai/annotate?style=flat-square&color=f2f2f2) ![Latest Tag](https://img.shields.io/github/v/tag/gliff-ai/annotate?&label=latest%20tag&style=flat-square&color=f2f2f2) ![Number of Open Issues](https://img.shields.io/github/issues/gliff-ai/annotate?style=flat-square&color=yellow) ![Number of Open Pull Requests](https://img.shields.io/github/issues-pr/gliff-ai/annotate?style=flat-square&color=yellow) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/contributors-0-yellow.svg?style=flat-square)](#contributors)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
+
 👋 **Welcome in!** 👋
 
 This repository contains the Open Source code for [gliff.ai](https://gliff.ai)’s ANNOTATE product. 
