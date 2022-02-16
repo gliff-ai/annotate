@@ -188,7 +188,10 @@ function getImageData(data: Uint8Array[], ifds: UTIF.IFD[]): Uint8Array {
   return imageData;
 }
 
-function exportImageDataAsTiff(imageData: Uint8Array, fileName: string): void {
+export function exportImageDataAsTiff(annotationsObject: Annotations, imageFileInfo: ImageFileInfo): void {
+  const imageData = getTiffData(annotationsObject, imageFileInfo);
+  const fileName = imageFileInfo.fileName;
+
   const anchor = document.createElement("a");
   const blob = new Blob([imageData], { type: "image/tiff" });
   const url = window.URL.createObjectURL(blob);
@@ -200,10 +203,10 @@ function exportImageDataAsTiff(imageData: Uint8Array, fileName: string): void {
   window.URL.revokeObjectURL(url);
 }
 
-export function downloadPaintbrushAsTiff(
+export function getTiffData(
   annotationsObject: Annotations,
   imageFileInfo: ImageFileInfo
-): void {
+): Uint8Array {
   // const uint16ColorMap = getColorMap(uint8ColorMap);
   const samplesPerPixel = 3;
   const { width, height, num_slices: slices, fileName } = imageFileInfo;
@@ -253,8 +256,5 @@ export function downloadPaintbrushAsTiff(
     });
 
   // Prepare data for export, combining slicesData wi ifds
-  const imageData = getImageData(slicesData, ifds);
-
-  // export image data as tiff file
-  exportImageDataAsTiff(imageData, fileName);
+  return getImageData(slicesData, ifds);
 }
