@@ -244,7 +244,7 @@ export function getTiffData(
   return getImageData(slicesData, ifds);
 }
 
-export function exportImageDataAsTiff(
+export function downloadBrushstrokesAsTiff(
   annotationsObject: Annotations,
   imageFileInfo: ImageFileInfo
 ): void {
