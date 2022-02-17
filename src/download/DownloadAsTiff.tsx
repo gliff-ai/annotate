@@ -188,28 +188,13 @@ function getImageData(data: Uint8Array[], ifds: UTIF.IFD[]): Uint8Array {
   return imageData;
 }
 
-export function exportImageDataAsTiff(annotationsObject: Annotations, imageFileInfo: ImageFileInfo): void {
-  const imageData = getTiffData(annotationsObject, imageFileInfo);
-  const fileName = imageFileInfo.fileName;
-
-  const anchor = document.createElement("a");
-  const blob = new Blob([imageData], { type: "image/tiff" });
-  const url = window.URL.createObjectURL(blob);
-  anchor.href = url;
-
-  const name = fileName.split(".").shift();
-  anchor.download = `${name}_annotations.tiff`;
-  anchor.click();
-  window.URL.revokeObjectURL(url);
-}
-
 export function getTiffData(
   annotationsObject: Annotations,
   imageFileInfo: ImageFileInfo
 ): Uint8Array {
   // const uint16ColorMap = getColorMap(uint8ColorMap);
   const samplesPerPixel = 3;
-  const { width, height, num_slices: slices, fileName } = imageFileInfo;
+  const { width, height, num_slices: slices } = imageFileInfo;
 
   const ifds = [...new Array<UTIF.IFD>(slices)].map(
     () =>
@@ -257,4 +242,22 @@ export function getTiffData(
 
   // Prepare data for export, combining slicesData wi ifds
   return getImageData(slicesData, ifds);
+}
+
+export function exportImageDataAsTiff(
+  annotationsObject: Annotations,
+  imageFileInfo: ImageFileInfo
+): void {
+  const imageData = getTiffData(annotationsObject, imageFileInfo);
+  const { fileName } = imageFileInfo;
+
+  const anchor = document.createElement("a");
+  const blob = new Blob([imageData], { type: "image/tiff" });
+  const url = window.URL.createObjectURL(blob);
+  anchor.href = url;
+
+  const name = fileName.split(".").shift();
+  anchor.download = `${name}_annotations.tiff`;
+  anchor.click();
+  window.URL.revokeObjectURL(url);
 }
