@@ -2,11 +2,11 @@ name: check PR title and label appropriately
 on:
   push:
     branches:
-      - main, staging
+      - main
   pull_request:
     types: [opened, edited, synchronize, auto_merge_enabled, reopened]
     branches:
-      - main, staging
+      - main
 
 jobs:
   check_PR_title:
