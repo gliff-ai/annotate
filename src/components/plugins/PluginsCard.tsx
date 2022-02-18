@@ -10,7 +10,14 @@ import {
 } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
 import SVG from "react-inlinesvg";
-import { theme, icons, IconButton, WarningSnackbar } from "@gliff-ai/style";
+import {
+  theme,
+  icons,
+  IconButton,
+  WarningSnackbar,
+  HtmlTooltip,
+  BaseTooltipTitle,
+} from "@gliff-ai/style";
 import type { PluginObject, PluginElement } from "./interfaces";
 import { PluginDialog } from "./PluginDialog";
 
@@ -65,10 +72,6 @@ export const PluginsCard = ({
 
   if (!plugins) return null;
 
-  const openDocs = () => {
-    // TODO: Navigate to docs
-  };
-
   const runPlugin = async (plugin: PluginElement): Promise<void> => {
     try {
       const url = window.location.href.split("/");
@@ -104,9 +107,20 @@ export const PluginsCard = ({
           onClick={() => runPlugin(p)}
           dense
         >
-          <Typography className={classes.truncate}>
-            {p.name}&nbsp;—&nbsp;{p.tooltip}
-          </Typography>
+          <HtmlTooltip
+            placement="top"
+            title={
+              <BaseTooltipTitle
+                tooltip={{
+                  name: `${p.name} — ${p.tooltip}`,
+                }}
+              />
+            }
+          >
+            <Typography className={classes.truncate}>
+              {p.name}&nbsp;—&nbsp;{p.tooltip}
+            </Typography>
+          </HtmlTooltip>
         </MenuItem>
       ));
     });
@@ -145,7 +159,9 @@ export const PluginsCard = ({
             <IconButton
               tooltip={{ name: "Docs" }}
               icon={icons.documentHelp}
-              onClick={openDocs}
+              onClick={() => {
+                document.location = "https://docs.gliff.app/";
+              }}
               tooltipPlacement="top"
               size="small"
             />
