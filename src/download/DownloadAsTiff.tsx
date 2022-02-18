@@ -188,25 +188,13 @@ function getImageData(data: Uint8Array[], ifds: UTIF.IFD[]): Uint8Array {
   return imageData;
 }
 
-function exportImageDataAsTiff(imageData: Uint8Array, fileName: string): void {
-  const anchor = document.createElement("a");
-  const blob = new Blob([imageData], { type: "image/tiff" });
-  const url = window.URL.createObjectURL(blob);
-  anchor.href = url;
-
-  const name = fileName.split(".").shift();
-  anchor.download = `${name}_annotations.tiff`;
-  anchor.click();
-  window.URL.revokeObjectURL(url);
-}
-
-export function downloadPaintbrushAsTiff(
+export function getTiffData(
   annotationsObject: Annotations,
   imageFileInfo: ImageFileInfo
-): void {
+): Uint8Array {
   // const uint16ColorMap = getColorMap(uint8ColorMap);
   const samplesPerPixel = 3;
-  const { width, height, num_slices: slices, fileName } = imageFileInfo;
+  const { width, height, num_slices: slices } = imageFileInfo;
 
   const ifds = [...new Array<UTIF.IFD>(slices)].map(
     () =>
@@ -253,8 +241,23 @@ export function downloadPaintbrushAsTiff(
     });
 
   // Prepare data for export, combining slicesData wi ifds
-  const imageData = getImageData(slicesData, ifds);
+  return getImageData(slicesData, ifds);
+}
 
-  // export image data as tiff file
-  exportImageDataAsTiff(imageData, fileName);
+export function downloadBrushstrokesAsTiff(
+  annotationsObject: Annotations,
+  imageFileInfo: ImageFileInfo
+): void {
+  const imageData = getTiffData(annotationsObject, imageFileInfo);
+  const { fileName } = imageFileInfo;
+
+  const anchor = document.createElement("a");
+  const blob = new Blob([imageData], { type: "image/tiff" });
+  const url = window.URL.createObjectURL(blob);
+  anchor.href = url;
+
+  const name = fileName.split(".").shift();
+  anchor.download = `${name}_annotations.tiff`;
+  anchor.click();
+  window.URL.revokeObjectURL(url);
 }

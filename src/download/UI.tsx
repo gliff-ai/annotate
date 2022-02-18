@@ -6,7 +6,7 @@ import { ImageFileInfo } from "@gliff-ai/upload";
 import { IconButton, icons } from "@gliff-ai/style";
 import { keydownListener } from "@/keybindings";
 import { Annotations } from "@/annotation";
-import { downloadPaintbrushAsTiff } from "./DownloadAsTiff";
+import { downloadBrushstrokesAsTiff } from "./DownloadAsTiff";
 import { downloadAnnotationsAsJson } from "./DownloadAsJson";
 import { Toolboxes } from "@/Toolboxes";
 
@@ -134,7 +134,7 @@ class DownloadUI extends Component<Props, State> {
           key: "paintbrush-tiff",
           text: "Export paintbrush as Tiff",
           onClick: () =>
-            downloadPaintbrushAsTiff(
+            downloadBrushstrokesAsTiff(
               this.props.annotationsObject,
               this.props.imageFileInfo
             ),
