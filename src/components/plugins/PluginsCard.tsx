@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useState, CSSProperties } from "react";
 import {
   Card,
   Paper,
@@ -8,7 +8,6 @@ import {
   MenuItem,
   ButtonGroup,
 } from "@mui/material";
-import makeStyles from "@mui/styles/makeStyles";
 import SVG from "react-inlinesvg";
 import {
   theme,
@@ -21,7 +20,11 @@ import {
 import type { PluginObject, PluginElement } from "./interfaces";
 import { PluginDialog } from "./PluginDialog";
 
-const useStyles = makeStyles({
+const style = (
+  hover: boolean
+): {
+  [key: string]: CSSProperties;
+} => ({
   card: { width: "300px" },
   paperHeader: {
     padding: "10px",
@@ -37,9 +40,7 @@ const useStyles = makeStyles({
     fontSize: "16px",
     paddingLeft: "20px",
     height: "40px",
-    "&:hover": {
-      backgroundColor: theme.palette.grey[300],
-    },
+    backgroundColor: hover ? theme.palette.grey[300] : "transparent",
   },
   divider: { margin: 0, width: "100%", lineHeight: "1px" },
   paperFooter: {
@@ -66,9 +67,10 @@ export const PluginsCard = ({
   plugins,
   launchPluginSettingsCallback,
 }: Props): ReactElement | null => {
-  const classes = useStyles();
   const [error, setError] = useState<string | null>(null);
   const [dialogContent, setDialogContent] = useState<JSX.Element | null>(null);
+  const [hover, setHover] = useState<boolean>(false);
+  const classes = style(hover);
 
   if (!plugins) return null;
 
@@ -97,13 +99,15 @@ export const PluginsCard = ({
   const getPluginButtons = (): JSX.Element[][] => {
     const pluginNames = Object.keys(plugins);
 
-    return pluginNames.map((name) => {
+    const pluginElements = pluginNames.map((name) => {
       const plugin = plugins[name];
 
       return plugin.map((p) => (
         <MenuItem
           key={p.name}
-          className={classes.menuItem}
+          style={classes.menuItem}
+          onMouseLeave={() => setHover(false)}
+          onMouseEnter={() => setHover(true)}
           onClick={() => runPlugin(p)}
           dense
         >
@@ -117,32 +121,34 @@ export const PluginsCard = ({
               />
             }
           >
-            <Typography className={classes.truncate}>
+            <Typography style={classes.truncate}>
               {p.name}&nbsp;—&nbsp;{p.tooltip}
             </Typography>
           </HtmlTooltip>
         </MenuItem>
       ));
     });
+
+    return pluginElements;
   };
 
   return (
     <>
-      <Card className={classes.card}>
+      <Card style={classes.card}>
         <Paper
           elevation={0}
           variant="outlined"
           square
-          className={classes.paperHeader}
+          style={classes.paperHeader}
         >
-          <Typography className={classes.topography}>Plugins</Typography>
+          <Typography style={classes.topography}>Plugins</Typography>
         </Paper>
         <MenuList>{getPluginButtons()}</MenuList>
-        <Divider className={classes.divider} />
-        <Paper elevation={0} square className={classes.paperFooter}>
-          <SVG src={icons.betaStatus} width="auto" height="25px" />
+        <Divider style={classes.divider} />
+        <Paper elevation={0} square style={classes.paperFooter}>
+          <SVG src={icons.betaStatus} height="25px" width="auto" />
           <ButtonGroup
-            className={classes.buttonGroup}
+            style={classes.buttonGroup}
             orientation="horizontal"
             variant="text"
           >

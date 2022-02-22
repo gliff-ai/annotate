@@ -1,6 +1,5 @@
-import { ReactElement, Dispatch, SetStateAction } from "react";
+import { ReactElement, Dispatch, SetStateAction, CSSProperties } from "react";
 import { Dialog, Paper } from "@mui/material";
-import makeStyles from "@mui/styles/makeStyles";
 import { theme, IconButton, icons } from "@gliff-ai/style";
 
 interface Props {
@@ -8,11 +7,15 @@ interface Props {
   setChildren: Dispatch<SetStateAction<JSX.Element>>;
 }
 
-const useStyle = makeStyles({
+const style: {
+  [key: string]: CSSProperties | { [key: string]: CSSProperties };
+} = {
   dialogPaper: {
-    width: "100%",
-    height: "70%",
-    backgroundColor: theme.palette.primary.light,
+    ".MuiDialog-paper": {
+      width: "100%",
+      height: "70%",
+      backgroundColor: theme.palette.primary.light,
+    },
   },
   paper: {
     width: "100%",
@@ -21,23 +24,23 @@ const useStyle = makeStyles({
   button: {
     float: "right",
   },
-});
+};
 
 export function PluginDialog({
   children,
   setChildren,
 }: Props): ReactElement | null {
-  const classes = useStyle();
+  const classes = style;
   return (
-    <Dialog open={!!children} classes={{ paper: classes.dialogPaper }}>
+    <Dialog open={!!children} style={classes.dialogPaper}>
       <IconButton
-        className={classes.button}
+        style={classes.button}
         icon={icons.removeLabel}
         tooltip={{ name: "Close" }}
         onClick={() => setChildren(null)}
         size="small"
       />
-      <Paper elevation={0} variant="outlined" className={classes.paper}>
+      <Paper elevation={0} variant="outlined" style={classes.paper}>
         {children}
       </Paper>
     </Dialog>
