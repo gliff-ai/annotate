@@ -146,7 +146,7 @@ export const PluginsCard = ({
         <MenuList>{getPluginButtons()}</MenuList>
         <Divider style={classes.divider} />
         <Paper elevation={0} square style={classes.paperFooter}>
-          <SVG src={icons.betaStatus} height="25px" width="auto" />
+          <SVG src={icons.betaStatus} height="25px" width="50px" />
           <ButtonGroup
             style={classes.buttonGroup}
             orientation="horizontal"
