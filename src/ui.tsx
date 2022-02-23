@@ -1,4 +1,4 @@
-import { Component, ReactNode, ReactElement } from "react";
+import { Component, ReactNode } from "react";
 import {
   AppBar,
   Container,
@@ -9,6 +9,7 @@ import {
   Paper,
   ThemeProvider,
   Theme,
+  Popover,
   StyledEngineProvider,
 } from "@mui/material";
 import { WithStyles } from "@mui/styles";
@@ -40,6 +41,7 @@ import { Download } from "@/download/UI";
 import { getShortcut, keydownListener } from "@/keybindings";
 import { BaseSlider, Config } from "@/components/BaseSlider";
 import { KeybindPopup } from "./keybindings/KeybindPopup";
+import { PluginObject, PluginsCard } from "./components/plugins";
 
 declare module "@mui/styles/defaultTheme" {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -178,15 +180,17 @@ interface Props extends WithStyles<typeof styles> {
   saveAnnotationsCallback?: (annotationsObject: Annotations) => void;
   showAppBar?: boolean;
   setIsLoading?: (isLoading: boolean) => void;
-  trustedServiceButtonToolbar?: ReactElement | null;
   userAccess?: UserAccess;
+  plugins?: PluginObject | null;
+  launchPluginSettingsCallback?: (() => void) | null;
 }
 
 class UserInterface extends Component<Props, State> {
   static defaultProps = {
     showAppBar: true,
-    trustedServiceButtonToolbar: null,
     userAccess: UserAccess.Collaborator,
+    plugins: null,
+    launchPluginSettingsCallback: null,
   } as Pick<Props, "showAppBar">;
 
   annotationsObject: Annotations;
@@ -643,6 +647,11 @@ class UserInterface extends Component<Props, State> {
     this.setButtonClicked("Annotation Label");
   };
 
+  selectPlugins = (): void => {
+    this.handleOpen()(this.refBtnsPopovers.Plugins);
+    this.setButtonClicked("Plugins");
+  };
+
   saveAnnotations = (): void => {
     if (!this.props.saveAnnotationsCallback) return;
     this.props.saveAnnotationsCallback(this.annotationsObject);
@@ -760,6 +769,14 @@ class UserInterface extends Component<Props, State> {
         active: () => false,
         enabled: () => this.annotationsObject.canRedo(),
       },
+      {
+        name: "Plugins",
+        icon: icons.plugins,
+        event: "selectPlugins",
+        active: () =>
+          this.state.activeSubmenuAnchor === this.refBtnsPopovers.Plugins,
+        enabled: () => !!this.props?.plugins,
+      },
     ] as const;
 
     const leftToolbar = (
@@ -797,8 +814,20 @@ class UserInterface extends Component<Props, State> {
               size="small"
             />
           )}
-
-          {this.props.trustedServiceButtonToolbar}
+          <Popover
+            open={
+              this.state.activeSubmenuAnchor === this.refBtnsPopovers.Plugins
+            }
+            anchorEl={this.state.activeSubmenuAnchor}
+            onClose={this.handleClose}
+          >
+            <PluginsCard
+              plugins={this.props.plugins}
+              launchPluginSettingsCallback={
+                this.props.launchPluginSettingsCallback
+              }
+            />
+          </Popover>
         </ButtonGroup>
         <ButtonGroup>
           <PaintbrushToolbar
