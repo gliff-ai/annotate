@@ -235,7 +235,7 @@ class UserInterface extends Component<Props, State> {
 
   @pageLoading
   componentDidMount(): void {
-    document.addEventListener("keydown", keydownListener);
+    document.addEventListener("keydown", keydownListener(this.isTyping));
 
     for (const event of events) {
       document.addEventListener(event, this.handleEvent);

@@ -81,7 +81,7 @@ class DownloadUI extends Component<Props, State> {
   componentDidMount = () => {
     this.prepareMenuItems();
 
-    document.addEventListener("keydown", keydownListener);
+    document.addEventListener("keydown", keydownListener(this.props.isTyping));
 
     for (const event of events) {
       document.addEventListener(event, this.handleEvent);
