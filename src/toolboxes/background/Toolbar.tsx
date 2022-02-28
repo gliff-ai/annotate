@@ -39,7 +39,6 @@ interface Props {
     event?: MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
   anchorElement: HTMLButtonElement | null;
-  isTyping: () => boolean;
   channels: boolean[];
   toggleChannelAtIndex: (index: number) => void;
   displayedImage: ImageBitmap;
@@ -328,7 +327,6 @@ class Toolbar extends Component<Props> {
   };
 
   openSubmenu = (): void => {
-    if (this.props.isTyping()) return;
     this.props.handleOpen()(this.refBackgroundSettingsPopover);
   };
 

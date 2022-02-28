@@ -277,7 +277,7 @@ class UserInterface extends Component<Props, State> {
   }
 
   handleEvent = (event: Event): void => {
-    if (event.detail === "ui" && !this.isTyping()) {
+    if (event.detail === "ui") {
       this[event.type]?.call(this);
     }
   };
@@ -835,7 +835,6 @@ class UserInterface extends Component<Props, State> {
             activateToolbox={this.activateToolbox}
             handleOpen={this.handleOpen}
             anchorElement={this.state.activeSubmenuAnchor}
-            isTyping={this.isTyping}
             is3D={this.slicesData?.length > 1}
           />
           <SplineToolbar
@@ -843,19 +842,16 @@ class UserInterface extends Component<Props, State> {
             activateToolbox={this.activateToolbox}
             handleOpen={this.handleOpen}
             anchorElement={this.state.activeSubmenuAnchor}
-            isTyping={this.isTyping}
           />
 
           <BoundingBoxToolbar
             active={this.state.activeToolbox === "boundingBox"}
             activateToolbox={this.activateToolbox}
             handleOpen={this.handleOpen}
-            isTyping={this.isTyping}
           />
           <BackgroundToolbar
             handleOpen={this.handleOpen}
             anchorElement={this.state.activeSubmenuAnchor}
-            isTyping={this.isTyping}
             channels={this.state.channels}
             toggleChannelAtIndex={this.toggleChannelAtIndex}
             displayedImage={this.state.displayedImage}
@@ -931,7 +927,6 @@ class UserInterface extends Component<Props, State> {
                     setActiveToolbox={(tool: Toolbox) => {
                       this.setState({ activeToolbox: tool });
                     }}
-                    isTyping={this.isTyping}
                   />
                   <BoundingBoxCanvas
                     scaleAndPan={this.state.scaleAndPan}
@@ -968,7 +963,6 @@ class UserInterface extends Component<Props, State> {
                     setActiveToolbox={(tool: Toolbox) => {
                       this.setState({ activeToolbox: tool });
                     }}
-                    isTyping={this.isTyping}
                   />
                   {this.slicesData?.length > 1 && (
                     <Paper

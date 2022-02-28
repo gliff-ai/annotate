@@ -101,7 +101,7 @@ class DownloadUI extends Component<Props, State> {
   };
 
   handleEvent = (event: Event): void => {
-    if (event.detail === "download" && !this.props.isTyping()) {
+    if (event.detail === "download") {
       this[event.type]?.call(this);
     }
   };
