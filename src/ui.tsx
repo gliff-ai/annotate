@@ -183,6 +183,9 @@ interface Props extends WithStyles<typeof styles> {
   userAccess?: UserAccess;
   plugins?: PluginObject | null;
   launchPluginSettingsCallback?: (() => void) | null;
+  defaultLabels?: string[];
+  restrictLabels?: boolean;
+  multiLabel?: boolean;
 }
 
 class UserInterface extends Component<Props, State> {
@@ -191,6 +194,9 @@ class UserInterface extends Component<Props, State> {
     userAccess: UserAccess.Collaborator,
     plugins: null,
     launchPluginSettingsCallback: null,
+    defaultLabels: [],
+    restrictLabels: false,
+    multiLabel: true,
   } as Pick<Props, "showAppBar">;
 
   annotationsObject: Annotations;
@@ -867,9 +873,9 @@ class UserInterface extends Component<Props, State> {
           onClose={this.handleClose}
           annotationsObject={this.annotationsObject}
           activeAnnotationID={this.state.activeAnnotationID}
-          defaultLabels={["cancer", "not cancer", "ducks"]}
-          restrictLabels={false}
-          multiLabel
+          defaultLabels={this.props.defaultLabels}
+          restrictLabels={this.props.restrictLabels}
+          multiLabel={this.props.multiLabel}
         />
       </div>
     );
