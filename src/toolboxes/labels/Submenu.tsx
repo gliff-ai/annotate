@@ -33,6 +33,8 @@ interface Props extends LabelsProps {
   anchorElement: HTMLButtonElement | null;
   onClose: (event: MouseEvent) => void;
   defaultLabels: string[];
+  restrictLabels: boolean;
+  multiLabel: boolean;
 }
 
 export const Submenu = (props: Props): ReactElement => {
@@ -61,6 +63,8 @@ export const Submenu = (props: Props): ReactElement => {
               annotationsObject={props.annotationsObject}
               activeAnnotationID={props.activeAnnotationID}
               defaultLabels={props.defaultLabels}
+              restrictLabels={props.restrictLabels}
+              multiLabel={props.multiLabel}
             />
           </Grid>
         </Paper>

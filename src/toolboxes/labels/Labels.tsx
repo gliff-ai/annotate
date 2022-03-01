@@ -25,6 +25,8 @@ export interface Props {
   annotationsObject: Annotations;
   activeAnnotationID: number;
   defaultLabels: string[];
+  restrictLabels: boolean;
+  multiLabel: boolean;
 }
 
 const useStyles = makeStyles(() =>
@@ -65,6 +67,8 @@ export const Labels: FunctionComponent<Props> = ({
   annotationsObject,
   activeAnnotationID,
   defaultLabels,
+  restrictLabels,
+  multiLabel,
 }: Props): ReactElement => {
   const classes = useStyles();
 
@@ -113,23 +117,28 @@ export const Labels: FunctionComponent<Props> = ({
 
   return (
     <>
-      <InputBase
-        className={classes.inputBase}
-        placeholder="New Label"
-        value={newLabel}
-        onChange={(e) => handleNewLabelChange(e)}
-      />
-      <IconButton
-        className={classes.addButton}
-        type="submit"
-        aria-label="add-new-label"
-        onClick={handleAddLabel(newLabel)}
-        edge="end"
-        size="small"
-      >
-        <SVG src={icons.add} width="12px" height="100%" fill="#A1A1A1" />
-      </IconButton>
-      <Divider className={classes.divider} />
+      {!restrictLabels && (
+        <>
+          <InputBase
+            className={classes.inputBase}
+            placeholder="New Label"
+            value={newLabel}
+            onChange={(e) => handleNewLabelChange(e)}
+          />
+          <IconButton
+            className={classes.addButton}
+            type="submit"
+            aria-label="add-new-label"
+            onClick={handleAddLabel(newLabel)}
+            edge="end"
+            size="small"
+          >
+            <SVG src={icons.add} width="12px" height="100%" fill="#A1A1A1" />
+          </IconButton>
+          <Divider className={classes.divider} />
+        </>
+      )}
+
       {assignedLabels.map((label) => (
         <Chip
           key={`chip-delete-${label}`}
