@@ -866,9 +866,8 @@ class UserInterface extends Component<Props, State> {
           anchorElement={this.state.activeSubmenuAnchor}
           onClose={this.handleClose}
           annotationsObject={this.annotationsObject}
-          presetLabels={this.state.presetLabels}
-          updatePresetLabels={this.updatePresetLabels}
           activeAnnotationID={this.state.activeAnnotationID}
+          defaultLabels={["cancer", "not cancer", "ducks"]}
         />
       </div>
     );

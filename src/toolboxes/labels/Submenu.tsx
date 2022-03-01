@@ -32,6 +32,7 @@ interface Props extends LabelsProps {
   isOpen: boolean;
   anchorElement: HTMLButtonElement | null;
   onClose: (event: MouseEvent) => void;
+  defaultLabels: string[];
 }
 
 export const Submenu = (props: Props): ReactElement => {
@@ -59,8 +60,7 @@ export const Submenu = (props: Props): ReactElement => {
             <Labels
               annotationsObject={props.annotationsObject}
               activeAnnotationID={props.activeAnnotationID}
-              presetLabels={props.presetLabels}
-              updatePresetLabels={props.updatePresetLabels}
+              defaultLabels={props.defaultLabels}
             />
           </Grid>
         </Paper>

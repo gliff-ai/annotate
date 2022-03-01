@@ -23,9 +23,8 @@ import { Annotations } from "@/annotation";
 
 export interface Props {
   annotationsObject: Annotations;
-  presetLabels: string[];
-  updatePresetLabels: (label: string) => void;
   activeAnnotationID: number;
+  defaultLabels: string[];
 }
 
 const useStyles = makeStyles(() =>
@@ -64,26 +63,22 @@ const useStyles = makeStyles(() =>
 
 export const Labels: FunctionComponent<Props> = ({
   annotationsObject,
-  presetLabels,
-  updatePresetLabels,
   activeAnnotationID,
+  defaultLabels,
 }: Props): ReactElement => {
   const classes = useStyles();
-
-  const [assignedLabels, setAssignedLabels] = useState(
-    annotationsObject.getLabels()
-  );
 
   // Get array with labels that are yet to be assigned.
   const getMenuLabels = useCallback(
     (labels: string[]): string[] =>
-      presetLabels.filter((label) => !labels.includes(label)),
-    [presetLabels]
+      defaultLabels.filter((label) => !labels.includes(label)),
+    [defaultLabels]
   );
 
-  const [menuLabels, setMenuLabels] = useState(
-    getMenuLabels(annotationsObject.getLabels())
+  const [assignedLabels, setAssignedLabels] = useState(
+    annotationsObject.getLabels()
   );
+  const [menuLabels, setMenuLabels] = useState(defaultLabels);
   const [newLabel, setNewLabel] = useState("");
 
   function handleNewLabelChange(
@@ -93,15 +88,14 @@ export const Labels: FunctionComponent<Props> = ({
   }
 
   const updateAllLabels = useCallback(() => {
-    const labels = annotationsObject.getLabels();
+    const labels = annotationsObject.getLabels(); // returns labels for the ACTIVE ANNOTATION, not all labels
     setAssignedLabels(labels);
     setMenuLabels(getMenuLabels(labels));
-  }, [annotationsObject, getMenuLabels]);
+  }, [annotationsObject, getMenuLabels, defaultLabels]);
 
   const handleAddLabel = (label: string) => (): void => {
     // Add a label to active annotation object and update some states.
     annotationsObject.addLabel(label);
-    updatePresetLabels(label);
     updateAllLabels();
     setNewLabel("");
   };
