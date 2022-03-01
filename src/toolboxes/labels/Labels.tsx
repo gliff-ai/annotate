@@ -73,14 +73,14 @@ export const Labels: FunctionComponent<Props> = ({
   const classes = useStyles();
 
   // Get array with labels that are yet to be assigned.
-  const myGetMenuLabels = () => {
+  const getMenuLabels = useCallback(() => {
     const menuLabels = restrictLabels
       ? defaultLabels
       : [...new Set(defaultLabels.concat(annotationsObject.getAllLabels()))];
     return menuLabels.filter(
       (label) => !annotationsObject.getLabels().includes(label)
     );
-  };
+  }, [annotationsObject, restrictLabels, defaultLabels]);
 
   const [assignedLabels, setAssignedLabels] = useState(
     annotationsObject.getLabels()
@@ -97,15 +97,15 @@ export const Labels: FunctionComponent<Props> = ({
   const updateAllLabels = useCallback(() => {
     const activeLabels = annotationsObject.getLabels(); // returns labels for the ACTIVE ANNOTATION, not all labels
     setAssignedLabels(activeLabels);
-    setMenuLabels(myGetMenuLabels());
-  }, [annotationsObject, defaultLabels]);
+    setMenuLabels(getMenuLabels());
+  }, [annotationsObject, getMenuLabels]);
 
   const handleAddLabel = (label: string) => (): void => {
     // Add a label to active annotation object and update some states.
     if (!multiLabel) {
       // if we're not allowing multiple labels per annotation, remove all currently assigned labels before adding this one:
-      for (const label of assignedLabels) {
-        annotationsObject.removeLabel(label);
+      for (const oldLabel of assignedLabels) {
+        annotationsObject.removeLabel(oldLabel);
       }
     }
     annotationsObject.addLabel(label);
@@ -122,7 +122,7 @@ export const Labels: FunctionComponent<Props> = ({
   useEffect(() => {
     // Re-render assigned labels at change of active annotation ID.
     updateAllLabels();
-  }, [activeAnnotationID]);
+  }, [activeAnnotationID, updateAllLabels]);
 
   return (
     <>
