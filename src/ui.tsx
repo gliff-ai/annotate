@@ -869,7 +869,7 @@ class UserInterface extends Component<Props, State> {
           activeAnnotationID={this.state.activeAnnotationID}
           defaultLabels={["cancer", "not cancer", "ducks"]}
           restrictLabels
-          multiLabel
+          multiLabel={false}
         />
       </div>
     );

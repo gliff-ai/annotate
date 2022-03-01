@@ -99,6 +99,12 @@ export const Labels: FunctionComponent<Props> = ({
 
   const handleAddLabel = (label: string) => (): void => {
     // Add a label to active annotation object and update some states.
+    if (!multiLabel) {
+      // if we're not allowing multiple labels per annotation, remove all currently assigned labels before adding this one:
+      for (const label of assignedLabels) {
+        annotationsObject.removeLabel(label);
+      }
+    }
     annotationsObject.addLabel(label);
     updateAllLabels();
     setNewLabel("");
