@@ -1,8 +1,8 @@
 import { XYPoint, ZTPoint } from "@/annotation/interfaces";
 
 export interface BoundingBoxCoordinates {
-  topLeft: XYPoint;
-  bottomRight: XYPoint;
+  topLeft: XYPoint | { x: null; y: null };
+  bottomRight: XYPoint | { x: null; y: null };
 }
 
 export interface BoundingBox {
