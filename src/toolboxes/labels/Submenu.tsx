@@ -11,7 +11,7 @@ const useStyles = makeStyles(() => ({
   },
   annotationPaper: {
     padding: "10px",
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: `${theme.palette.primary.main} !important`,
     width: "271px",
   },
   annotationTypography: {
