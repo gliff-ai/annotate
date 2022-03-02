@@ -207,6 +207,8 @@ class UserInterface extends Component<Props, State> {
 
   private refBtnsPopovers: { [buttonName: string]: HTMLButtonElement };
 
+  private keyListener: (event: KeyboardEvent) => boolean;
+
   constructor(props: Props) {
     super(props);
 
@@ -241,7 +243,8 @@ class UserInterface extends Component<Props, State> {
 
   @pageLoading
   componentDidMount(): void {
-    document.addEventListener("keydown", keydownListener(this.isTyping));
+    this.keyListener = keydownListener(this.isTyping);
+    document.addEventListener("keydown", this.keyListener);
 
     for (const event of events) {
       document.addEventListener(event, this.handleEvent);
@@ -277,6 +280,8 @@ class UserInterface extends Component<Props, State> {
   };
 
   componentWillUnmount(): void {
+    document.removeEventListener("keydown", this.keyListener);
+
     for (const event of events) {
       document.removeEventListener(event, this.handleEvent);
     }
