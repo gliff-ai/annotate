@@ -51,7 +51,7 @@ const useStyles = makeStyles(() =>
       borderColor: theme.palette.text.secondary,
     },
     addButton: {
-      position: "absolute",
+      position: "absolute !important" as "absolute",
       right: "18px",
     },
     divider: {
