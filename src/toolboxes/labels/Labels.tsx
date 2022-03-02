@@ -134,6 +134,11 @@ export const Labels: FunctionComponent<Props> = ({
             value={newLabel}
             onChange={(e) => handleNewLabelChange(e)}
             autoFocus
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                handleAddLabel(newLabel)();
+              }
+            }}
           />
           <IconButton
             className={classes.addButton}
