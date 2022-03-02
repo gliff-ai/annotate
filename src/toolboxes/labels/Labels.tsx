@@ -133,6 +133,7 @@ export const Labels: FunctionComponent<Props> = ({
             placeholder="New Label"
             value={newLabel}
             onChange={(e) => handleNewLabelChange(e)}
+            autoFocus
           />
           <IconButton
             className={classes.addButton}
