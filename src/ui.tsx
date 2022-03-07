@@ -192,7 +192,7 @@ class UserInterface extends Component<Props, State> {
   public static defaultProps: Omit<Props, "classes"> = {
     annotationsObject: null,
     saveAnnotationsCallback: null,
-    showAppBar: false,
+    showAppBar: true,
     setIsLoading: null,
     slicesData: null,
     imageFileInfo: undefined,
