@@ -155,6 +155,13 @@ export class Annotations {
 
   getLabels = (): string[] => this.data[this.activeAnnotationID].labels;
 
+  getAllLabels = (): string[] =>
+    [
+      ...new Set(
+        [].concat(...this.data.map((annotation) => annotation.labels))
+      ),
+    ] as string[]; // returns an array of all annotation labels, without duplicates
+
   // BOUNDING BOXES
   getBoundingBoxForActiveAnnotation = (): BoundingBox =>
     this.data[this.activeAnnotationID].boundingBox;

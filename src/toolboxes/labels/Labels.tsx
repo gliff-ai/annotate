@@ -23,9 +23,10 @@ import { Annotations } from "@/annotation";
 
 export interface Props {
   annotationsObject: Annotations;
-  presetLabels: string[];
-  updatePresetLabels: (label: string) => void;
   activeAnnotationID: number;
+  defaultLabels: string[];
+  restrictLabels: boolean;
+  multiLabel: boolean;
 }
 
 const useStyles = makeStyles(() =>
@@ -50,7 +51,7 @@ const useStyles = makeStyles(() =>
       borderColor: theme.palette.text.secondary,
     },
     addButton: {
-      position: "absolute",
+      position: "absolute !important" as "absolute",
       right: "18px",
     },
     divider: {
@@ -64,26 +65,27 @@ const useStyles = makeStyles(() =>
 
 export const Labels: FunctionComponent<Props> = ({
   annotationsObject,
-  presetLabels,
-  updatePresetLabels,
   activeAnnotationID,
+  defaultLabels,
+  restrictLabels,
+  multiLabel,
 }: Props): ReactElement => {
   const classes = useStyles();
+
+  // Get array with labels that are yet to be assigned.
+  const getMenuLabels = useCallback(() => {
+    const menuLabels = restrictLabels
+      ? defaultLabels
+      : [...new Set(defaultLabels.concat(annotationsObject.getAllLabels()))];
+    return menuLabels.filter(
+      (label) => !annotationsObject.getLabels().includes(label)
+    );
+  }, [annotationsObject, restrictLabels, defaultLabels]);
 
   const [assignedLabels, setAssignedLabels] = useState(
     annotationsObject.getLabels()
   );
-
-  // Get array with labels that are yet to be assigned.
-  const getMenuLabels = useCallback(
-    (labels: string[]): string[] =>
-      presetLabels.filter((label) => !labels.includes(label)),
-    [presetLabels]
-  );
-
-  const [menuLabels, setMenuLabels] = useState(
-    getMenuLabels(annotationsObject.getLabels())
-  );
+  const [menuLabels, setMenuLabels] = useState(defaultLabels);
   const [newLabel, setNewLabel] = useState("");
 
   function handleNewLabelChange(
@@ -93,15 +95,20 @@ export const Labels: FunctionComponent<Props> = ({
   }
 
   const updateAllLabels = useCallback(() => {
-    const labels = annotationsObject.getLabels();
-    setAssignedLabels(labels);
-    setMenuLabels(getMenuLabels(labels));
+    const activeLabels = annotationsObject.getLabels(); // returns labels for the ACTIVE ANNOTATION, not all labels
+    setAssignedLabels(activeLabels);
+    setMenuLabels(getMenuLabels());
   }, [annotationsObject, getMenuLabels]);
 
   const handleAddLabel = (label: string) => (): void => {
     // Add a label to active annotation object and update some states.
+    if (!multiLabel) {
+      // if we're not allowing multiple labels per annotation, remove all currently assigned labels before adding this one:
+      for (const oldLabel of assignedLabels) {
+        annotationsObject.removeLabel(oldLabel);
+      }
+    }
     annotationsObject.addLabel(label);
-    updatePresetLabels(label);
     updateAllLabels();
     setNewLabel("");
   };
@@ -119,23 +126,34 @@ export const Labels: FunctionComponent<Props> = ({
 
   return (
     <>
-      <InputBase
-        className={classes.inputBase}
-        placeholder="New Label"
-        value={newLabel}
-        onChange={(e) => handleNewLabelChange(e)}
-      />
-      <IconButton
-        className={classes.addButton}
-        type="submit"
-        aria-label="add-new-label"
-        onClick={handleAddLabel(newLabel)}
-        edge="end"
-        size="small"
-      >
-        <SVG src={icons.add} width="12px" height="100%" fill="#A1A1A1" />
-      </IconButton>
-      <Divider className={classes.divider} />
+      {!restrictLabels && (
+        <>
+          <InputBase
+            className={classes.inputBase}
+            placeholder="New Label"
+            value={newLabel}
+            onChange={(e) => handleNewLabelChange(e)}
+            autoFocus
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                handleAddLabel(newLabel)();
+              }
+            }}
+          />
+          <IconButton
+            className={classes.addButton}
+            type="submit"
+            aria-label="add-new-label"
+            onClick={handleAddLabel(newLabel)}
+            edge="end"
+            size="small"
+          >
+            <SVG src={icons.add} width="12px" height="100%" fill="#A1A1A1" />
+          </IconButton>
+          <Divider className={classes.divider} />
+        </>
+      )}
+
       {assignedLabels.map((label) => (
         <Chip
           key={`chip-delete-${label}`}

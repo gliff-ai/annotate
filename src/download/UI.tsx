@@ -4,7 +4,6 @@ import { WithStyles } from "@mui/styles";
 import withStyles from "@mui/styles/withStyles";
 import { ImageFileInfo } from "@gliff-ai/upload";
 import { IconButton, icons } from "@gliff-ai/style";
-import { keydownListener } from "@/keybindings";
 import { Annotations } from "@/annotation";
 import { downloadBrushstrokesAsTiff } from "./DownloadAsTiff";
 import { downloadAnnotationsAsJson } from "./DownloadAsJson";
@@ -81,8 +80,6 @@ class DownloadUI extends Component<Props, State> {
   componentDidMount = () => {
     this.prepareMenuItems();
 
-    document.addEventListener("keydown", keydownListener);
-
     for (const event of events) {
       document.addEventListener(event, this.handleEvent);
     }
@@ -101,7 +98,7 @@ class DownloadUI extends Component<Props, State> {
   };
 
   handleEvent = (event: Event): void => {
-    if (event.detail === "download" && !this.props.isTyping()) {
+    if (event.detail === "download") {
       this[event.type]?.call(this);
     }
   };

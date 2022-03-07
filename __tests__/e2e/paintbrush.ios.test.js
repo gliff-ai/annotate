@@ -67,13 +67,13 @@ wrapper(() => {
         await driver.wait(until.titleIs("gliff.ai ANNOTATE"), 10000);
 
         // draw brushstrokes:
-        await drawStroke(driver, { x: 200, y: 200 }, { x: 200, y: 400 });
+        await drawStroke(driver, { x: 200, y: 600 }, { x: 200, y: 800 });
         await clickById(driver, "id-add-new-annotation");
-        await drawStroke(driver, { x: 250, y: 200 }, { x: 250, y: 400 });
+        await drawStroke(driver, { x: 250, y: 600 }, { x: 250, y: 800 });
         await clickById(driver, "id-add-new-annotation");
-        await drawStroke(driver, { x: 300, y: 200 }, { x: 300, y: 400 });
+        await drawStroke(driver, { x: 300, y: 600 }, { x: 300, y: 800 });
         await clickById(driver, "id-add-new-annotation");
-        await drawStroke(driver, { x: 150, y: 300 }, { x: 350, y: 300 });
+        await drawStroke(driver, { x: 150, y: 700 }, { x: 350, y: 700 });
 
         // draw splines:
         await clickById(driver, "id-add-new-annotation");
@@ -88,7 +88,7 @@ wrapper(() => {
         // select tool:
         await clickById(driver, "id-select-annotation");
         driver.executeScript(
-          makeEventJS("boundingBox-canvas", "click", 250, 200)
+          makeEventJS("boundingBox-canvas", "click", 250, 600)
         );
 
         await sleep();
@@ -97,31 +97,40 @@ wrapper(() => {
         await clickById(driver, "id-paintbrush-toolbox"); // open paintbrush toolbox submenu
         await clickById(driver, "id-eraser"); // select eraser
 
-        // erase part of active annotation
+        // click background to close eraser submenu so it doesn't obscure the brushstrokes:
         driver.executeScript(
-          makeEventJS("paintbrush-interaction-canvas", "mousedown", 250, 200)
+          makeEventJS("paintbrush-interaction-canvas", "mousedown", 50, 500)
         );
         await sleep();
         driver.executeScript(
-          makeEventJS("paintbrush-interaction-canvas", "mouseup", 250, 200)
+          makeEventJS("paintbrush-interaction-canvas", "mouseup", 50, 500)
+        );
+
+        // erase part of active annotation
+        driver.executeScript(
+          makeEventJS("paintbrush-interaction-canvas", "mousedown", 250, 600)
+        );
+        await sleep();
+        driver.executeScript(
+          makeEventJS("paintbrush-interaction-canvas", "mouseup", 250, 600)
         );
         await sleep();
         // try to erase part of inactive annotation (should fail)
         driver.executeScript(
-          makeEventJS("paintbrush-interaction-canvas", "mousedown", 300, 200)
+          makeEventJS("paintbrush-interaction-canvas", "mousedown", 300, 600)
         );
         await sleep();
         driver.executeScript(
-          makeEventJS("paintbrush-interaction-canvas", "mouseup", 300, 200)
+          makeEventJS("paintbrush-interaction-canvas", "mouseup", 300, 600)
         );
         await sleep();
         // erase part of active annotation that overlaps with an inactive annotation:
         driver.executeScript(
-          makeEventJS("paintbrush-interaction-canvas", "mousedown", 250, 300)
+          makeEventJS("paintbrush-interaction-canvas", "mousedown", 250, 700)
         );
         await sleep();
         driver.executeScript(
-          makeEventJS("paintbrush-interaction-canvas", "mouseup", 250, 300)
+          makeEventJS("paintbrush-interaction-canvas", "mouseup", 250, 700)
         );
 
         // fill brush:
@@ -168,6 +177,11 @@ wrapper(() => {
           makeEventJS("boundingBox-canvas", "click", 300, 550)
         );
         await sleep();
+
+        // enter label text:
+        await clickById(driver, "id-annotation-label");
+        let actions = driver.actions();
+        await actions.sendKeys("ABCdefghijklmnopqrstuvw").perform();
       },
       120000
     );

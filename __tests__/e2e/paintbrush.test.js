@@ -50,13 +50,13 @@ wrapper(() => {
         // draw brushstrokes:
         let actions = driver.actions();
 
-        dragBetweenPoints(actions, [200, 200], [[200, 400]]);
+        dragBetweenPoints(actions, [200, 600], [[200, 800]]);
         await clickById(driver, "id-add-new-annotation");
-        dragBetweenPoints(actions, [250, 200], [[250, 400]]);
+        dragBetweenPoints(actions, [250, 600], [[250, 800]]);
         await clickById(driver, "id-add-new-annotation");
-        dragBetweenPoints(actions, [300, 200], [[300, 400]]);
+        dragBetweenPoints(actions, [300, 600], [[300, 800]]);
         await clickById(driver, "id-add-new-annotation");
-        dragBetweenPoints(actions, [150, 300], [[350, 300]]);
+        dragBetweenPoints(actions, [150, 700], [[350, 700]]);
 
         // regular splines:
         await clickById(driver, "id-add-new-annotation");
@@ -82,20 +82,23 @@ wrapper(() => {
 
         // test select tool:
         await clickById(driver, "id-select-annotation");
-        await clickMouseAtPoint(actions, [250, 200]);
+        await clickMouseAtPoint(actions, [250, 600]);
 
         // eraser:
         await clickById(driver, "id-paintbrush-toolbox"); // open paintbrush toolbox submenu
         await clickById(driver, "id-eraser"); // select eraser
 
+        // click background to close eraser submenu so it doesn't obscure the brushstrokes:
+        await clickMouseAtPoint(actions, [50, 500]);
+
         // erase part of active annotation
-        await clickMouseAtPoint(actions, [250, 200]);
+        await clickMouseAtPoint(actions, [250, 600]);
 
         // try to erase part of inactive annotation (should fail)
-        await clickMouseAtPoint(actions, [300, 200]);
+        await clickMouseAtPoint(actions, [300, 600]);
 
         // erase part of active annotation that overlaps with an inactive annotation:
-        await clickMouseAtPoint(actions, [250, 300]);
+        await clickMouseAtPoint(actions, [250, 700]);
 
         // fill brush:
         await clickById(driver, "id-add-new-annotation");
@@ -127,6 +130,10 @@ wrapper(() => {
 
         // open minimap:
         await clickById(driver, "id-maximise-map");
+
+        // enter label text:
+        await clickById(driver, "id-annotation-label");
+        await actions.sendKeys("ABCdefghijklmnopqrstuvw").perform();
 
         // upload snapshot to Percy:
         await percySnapshot(driver, "paintbrush-splodge");

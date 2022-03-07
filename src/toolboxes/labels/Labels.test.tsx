@@ -17,8 +17,9 @@ describe("labels assignment", () => {
       <Labels
         activeAnnotationID={0}
         annotationsObject={annotationsObject}
-        presetLabels={[currLabel, prevLabel]} // preset labels
-        updatePresetLabels={jest.fn()}
+        defaultLabels={[currLabel, prevLabel]} // preset labels
+        restrictLabels={false}
+        multiLabel
       />
     );
   });

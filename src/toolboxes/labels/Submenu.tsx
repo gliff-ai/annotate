@@ -11,7 +11,7 @@ const useStyles = makeStyles(() => ({
   },
   annotationPaper: {
     padding: "10px",
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: `${theme.palette.primary.main} !important`,
     width: "271px",
   },
   annotationTypography: {
@@ -32,6 +32,9 @@ interface Props extends LabelsProps {
   isOpen: boolean;
   anchorElement: HTMLButtonElement | null;
   onClose: (event: MouseEvent) => void;
+  defaultLabels: string[];
+  restrictLabels: boolean;
+  multiLabel: boolean;
 }
 
 export const Submenu = (props: Props): ReactElement => {
@@ -59,8 +62,9 @@ export const Submenu = (props: Props): ReactElement => {
             <Labels
               annotationsObject={props.annotationsObject}
               activeAnnotationID={props.activeAnnotationID}
-              presetLabels={props.presetLabels}
-              updatePresetLabels={props.updatePresetLabels}
+              defaultLabels={props.defaultLabels}
+              restrictLabels={props.restrictLabels}
+              multiLabel={props.multiLabel}
             />
           </Grid>
         </Paper>
