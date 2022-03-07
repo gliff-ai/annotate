@@ -706,7 +706,6 @@ class UserInterface extends Component<Props, State> {
           <Download
             annotationsObject={this.annotationsObject}
             imageFileInfo={this.imageFileInfo}
-            isTyping={this.isTyping}
             redraw={this.state.redraw}
           />
         </Grid>
@@ -858,7 +857,6 @@ class UserInterface extends Component<Props, State> {
             anchorElement={this.state.activeSubmenuAnchor}
             channels={this.state.channels}
             toggleChannelAtIndex={this.toggleChannelAtIndex}
-            displayedImage={this.state.displayedImage}
           />
         </ButtonGroup>
 

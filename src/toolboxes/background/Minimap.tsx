@@ -65,7 +65,10 @@ interface Props extends WithStyles<typeof styles> {
   ) => void;
   displayedImage: ImageBitmap;
   viewportPositionAndSize: PositionAndSize;
+  // these are used in the onClick, but the linter can't see it:
+  // eslint-disable-next-line react/no-unused-prop-types
   incrementScale: () => void;
+  // eslint-disable-next-line react/no-unused-prop-types
   decrementScale: () => void;
   minimapPositionAndSize: PositionAndSize;
   setMinimapPositionAndSize: (
@@ -76,6 +79,7 @@ interface Props extends WithStyles<typeof styles> {
     x: number;
     y: number;
   };
+  // eslint-disable-next-line react/no-unused-prop-types
   resetScaleAndPan: () => void;
   setScaleAndPan: (newScaleAndPan: {
     scale?: number;

@@ -50,7 +50,6 @@ interface Event extends CustomEvent {
 interface Props extends WithStyles<typeof styles> {
   annotationsObject: Annotations;
   imageFileInfo: ImageFileInfo;
-  isTyping: () => boolean;
   redraw: number;
 }
 

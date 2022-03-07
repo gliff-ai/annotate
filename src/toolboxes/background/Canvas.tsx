@@ -12,6 +12,12 @@ interface State {
   edgeColour: string | null;
 }
 export class CanvasClass extends Component<Props, State> {
+  public static defaultProps: {
+    setCanvasContainerColourCallback: (colour: number[]) => void;
+  } = {
+    setCanvasContainerColourCallback: null,
+  };
+
   private baseCanvas: BaseCanvas;
 
   constructor(props: Props) {

@@ -32,6 +32,7 @@ interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   mode: Mode;
   setMode: (mode: Mode) => void;
   annotationsObject: Annotations;
+  // eslint-disable-next-line react/no-unused-prop-types
   redraw: number;
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
