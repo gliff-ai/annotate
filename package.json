@@ -45,6 +45,7 @@
     "@types/utif": "^3.0.1",
     "@typescript-eslint/eslint-plugin": "^4.19.0",
     "@typescript-eslint/parser": "^4.18.0",
+    "chromedriver": "^98.0.1",
     "esbuild": "^0.14.0",
     "eslint": "^7.25.0",
     "jest": "^27.0.3",

@@ -4,35 +4,38 @@ import type { NamespacedMethod } from "./keybindings";
 const isMacLookup =
   navigator.platform.startsWith("mac") || navigator.platform.startsWith("Mac");
 
-const keydownListener = (
-  event: KeyboardEvent,
-  keybindingsMap = keybindings, // So we can mock in test
-  isMac = isMacLookup // So we can mock
-): boolean => {
-  // Lookup event
-  let { code } = event;
+const keydownListener =
+  (isTyping: () => boolean) =>
+  (
+    event: KeyboardEvent,
+    keybindingsMap = keybindings, // So we can mock in test
+    isMac = isMacLookup // So we can mock
+  ): boolean => {
+    // Lookup event
+    let { code } = event;
 
-  if (isMac) {
-    if (event.shiftKey) code = `shift+${code}`;
-    if (event.metaKey) code = `cmdCtrl+${code}`;
-    if (event.altKey) code = `altOption+${code}`;
-  } else {
-    if (event.shiftKey) code = `shift+${code}`;
-    if (event.ctrlKey) code = `cmdCtrl+${code}`;
-    if (event.altKey) code = `altOption+${code}`;
-  }
+    if (isMac) {
+      if (event.shiftKey) code = `shift+${code}`;
+      if (event.metaKey) code = `cmdCtrl+${code}`;
+      if (event.altKey) code = `altOption+${code}`;
+    } else {
+      if (event.shiftKey) code = `shift+${code}`;
+      if (event.ctrlKey) code = `cmdCtrl+${code}`;
+      if (event.altKey) code = `altOption+${code}`;
+    }
 
-  if (keybindingsMap[code]) {
-    const [namespace, method] = keybindingsMap[code][0].split(".");
+    if (keybindingsMap[code] && !isTyping()) {
+      const [namespace, method] = keybindingsMap[code][0].split(".");
 
-    event.preventDefault();
-    document.dispatchEvent(new CustomEvent(method, { detail: namespace }));
+      event.preventDefault();
 
-    return false;
-  }
+      document.dispatchEvent(new CustomEvent(method, { detail: namespace }));
 
-  return true;
-};
+      return false;
+    }
+
+    return true;
+  };
 
 export function getShortcut(
   value: NamespacedMethod,

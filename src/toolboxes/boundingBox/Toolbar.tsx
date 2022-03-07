@@ -18,7 +18,6 @@ interface Props {
   handleOpen: (
     event?: React.MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
-  isTyping: () => boolean;
 }
 
 class Toolbar extends Component<Props> {
@@ -41,7 +40,6 @@ class Toolbar extends Component<Props> {
   };
 
   selectBoundingBox = (): void => {
-    if (this.props.isTyping()) return;
     this.props.activateToolbox(Toolboxes.boundingBox);
     this.props.handleOpen()(null); // close whatever submenu is open (boundingBox doesn't have a submenu)
   };

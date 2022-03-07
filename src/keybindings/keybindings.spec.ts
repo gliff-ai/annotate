@@ -12,7 +12,7 @@ test("Handles standard keys", (done: any): void => {
   document.addEventListener("Only A", (): void => done());
 
   const event = new KeyboardEvent("keypress", { code: "KeyA" });
-  keydownListener(event, bindings);
+  keydownListener(() => false)(event, bindings);
 });
 
 test("Handles Namespacing", (done: any): void => {
@@ -22,7 +22,7 @@ test("Handles Namespacing", (done: any): void => {
   });
 
   const event = new KeyboardEvent("keypress", { code: "KeyA" });
-  keydownListener(event, bindings);
+  keydownListener(() => false)(event, bindings);
 });
 
 test("Handles modifier keys", (done: any): void => {
@@ -30,7 +30,7 @@ test("Handles modifier keys", (done: any): void => {
   document.addEventListener("Ctrl + A", (): void => done());
 
   const event = new KeyboardEvent("keypress", { code: "KeyA", ctrlKey: true });
-  keydownListener(event, bindings);
+  keydownListener(() => false)(event, bindings);
 });
 
 test("Handles multiple modifier keys", (done: any): void => {
@@ -43,7 +43,7 @@ test("Handles multiple modifier keys", (done: any): void => {
     shiftKey: true,
     ctrlKey: true,
   });
-  keydownListener(event, bindings);
+  keydownListener(() => false)(event, bindings);
 });
 
 test("Correctly gets shortcut keys", (): void => {

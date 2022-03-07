@@ -183,6 +183,9 @@ interface Props extends WithStyles<typeof styles> {
   userAccess?: UserAccess;
   plugins?: PluginObject | null;
   launchPluginSettingsCallback?: (() => void) | null;
+  defaultLabels?: string[];
+  restrictLabels?: boolean;
+  multiLabel?: boolean;
 }
 
 class UserInterface extends Component<Props, State> {
@@ -191,6 +194,9 @@ class UserInterface extends Component<Props, State> {
     userAccess: UserAccess.Collaborator,
     plugins: null,
     launchPluginSettingsCallback: null,
+    defaultLabels: [],
+    restrictLabels: false,
+    multiLabel: true,
   } as Pick<Props, "showAppBar">;
 
   annotationsObject: Annotations;
@@ -200,6 +206,8 @@ class UserInterface extends Component<Props, State> {
   private imageFileInfo: ImageFileInfo | null;
 
   private refBtnsPopovers: { [buttonName: string]: HTMLButtonElement };
+
+  private keyListener: (event: KeyboardEvent) => boolean;
 
   constructor(props: Props) {
     super(props);
@@ -235,7 +243,8 @@ class UserInterface extends Component<Props, State> {
 
   @pageLoading
   componentDidMount(): void {
-    document.addEventListener("keydown", keydownListener);
+    this.keyListener = keydownListener(this.isTyping);
+    document.addEventListener("keydown", this.keyListener);
 
     for (const event of events) {
       document.addEventListener(event, this.handleEvent);
@@ -271,13 +280,15 @@ class UserInterface extends Component<Props, State> {
   };
 
   componentWillUnmount(): void {
+    document.removeEventListener("keydown", this.keyListener);
+
     for (const event of events) {
       document.removeEventListener(event, this.handleEvent);
     }
   }
 
   handleEvent = (event: Event): void => {
-    if (event.detail === "ui" && !this.isTyping()) {
+    if (event.detail === "ui") {
       this[event.type]?.call(this);
     }
   };
@@ -835,7 +846,6 @@ class UserInterface extends Component<Props, State> {
             activateToolbox={this.activateToolbox}
             handleOpen={this.handleOpen}
             anchorElement={this.state.activeSubmenuAnchor}
-            isTyping={this.isTyping}
             is3D={this.slicesData?.length > 1}
           />
           <SplineToolbar
@@ -843,19 +853,16 @@ class UserInterface extends Component<Props, State> {
             activateToolbox={this.activateToolbox}
             handleOpen={this.handleOpen}
             anchorElement={this.state.activeSubmenuAnchor}
-            isTyping={this.isTyping}
           />
 
           <BoundingBoxToolbar
             active={this.state.activeToolbox === "boundingBox"}
             activateToolbox={this.activateToolbox}
             handleOpen={this.handleOpen}
-            isTyping={this.isTyping}
           />
           <BackgroundToolbar
             handleOpen={this.handleOpen}
             anchorElement={this.state.activeSubmenuAnchor}
-            isTyping={this.isTyping}
             channels={this.state.channels}
             toggleChannelAtIndex={this.toggleChannelAtIndex}
             displayedImage={this.state.displayedImage}
@@ -870,9 +877,10 @@ class UserInterface extends Component<Props, State> {
           anchorElement={this.state.activeSubmenuAnchor}
           onClose={this.handleClose}
           annotationsObject={this.annotationsObject}
-          presetLabels={this.state.presetLabels}
-          updatePresetLabels={this.updatePresetLabels}
           activeAnnotationID={this.state.activeAnnotationID}
+          defaultLabels={this.props.defaultLabels}
+          restrictLabels={this.props.restrictLabels}
+          multiLabel={this.props.multiLabel}
         />
       </div>
     );
@@ -931,7 +939,6 @@ class UserInterface extends Component<Props, State> {
                     setActiveToolbox={(tool: Toolbox) => {
                       this.setState({ activeToolbox: tool });
                     }}
-                    isTyping={this.isTyping}
                   />
                   <BoundingBoxCanvas
                     scaleAndPan={this.state.scaleAndPan}
@@ -968,7 +975,6 @@ class UserInterface extends Component<Props, State> {
                     setActiveToolbox={(tool: Toolbox) => {
                       this.setState({ activeToolbox: tool });
                     }}
-                    isTyping={this.isTyping}
                   />
                   {this.slicesData?.length > 1 && (
                     <Paper
