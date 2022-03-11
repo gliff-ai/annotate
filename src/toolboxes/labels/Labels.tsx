@@ -76,7 +76,11 @@ export const Labels: FunctionComponent<Props> = ({
   const getMenuLabels = useCallback(() => {
     const menuLabels = restrictLabels
       ? defaultLabels
-      : [...new Set(defaultLabels.concat(annotationsObject.getAllLabels()))];
+      : [
+          ...new Set(
+            defaultLabels.concat(annotationsObject.getAllUniqueLabels())
+          ),
+        ];
     return menuLabels.filter(
       (label) => !annotationsObject.getLabels().includes(label)
     );
