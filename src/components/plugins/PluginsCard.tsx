@@ -17,7 +17,9 @@ import {
   HtmlTooltip,
   BaseTooltipTitle,
 } from "@gliff-ai/style";
-import type { PluginObject, PluginElement } from "./interfaces";
+import { Annotations } from "@/annotation";
+import { Annotation } from "@/annotation/interfaces";
+import type { PluginObject, PluginElement, PluginOutput } from "./interfaces";
 import { PluginDialog } from "./PluginDialog";
 
 const style = (
@@ -61,11 +63,17 @@ const style = (
 interface Props {
   plugins: PluginObject | null;
   launchPluginSettingsCallback: () => void | null;
+  saveMetadataCallback: ((data: any) => void) | null;
+  imageData: ImageBitmap[][];
+  annotationsObject: Annotations;
 }
 
 export const PluginsCard = ({
   plugins,
   launchPluginSettingsCallback,
+  saveMetadataCallback,
+  imageData,
+  annotationsObject,
 }: Props): ReactElement | null => {
   const [error, setError] = useState<string | null>(null);
   const [dialogContent, setDialogContent] = useState<JSX.Element | null>(null);
@@ -74,13 +82,58 @@ export const PluginsCard = ({
 
   if (!plugins) return null;
 
+  const storeOutputData = (
+    collectionUid: string,
+    imageUid: string,
+    data: PluginOutput["data"]
+  ): void => {
+    const { annotationData, metadata } = data;
+
+    if (annotationData !== undefined) {
+      // add the new annotations to the annotationsObject
+      annotationData.forEach((annotation: Annotation) => {
+        const {
+          toolbox,
+          labels,
+          spline,
+          boundingBox,
+          brushStrokes,
+          parameters,
+        } = annotation;
+        annotationsObject.addAnnotation(
+          toolbox,
+          labels,
+          spline,
+          boundingBox,
+          brushStrokes,
+          parameters
+        );
+      });
+    }
+
+    if (metadata !== undefined && saveMetadataCallback) {
+      saveMetadataCallback({
+        collectionUid,
+        metadata: [{ id: imageUid, ...metadata }],
+      });
+    }
+  };
+
   const runPlugin = async (plugin: PluginElement): Promise<void> => {
     try {
       const url = window.location.href.split("/");
-      const data = {
-        imageUid: url.pop(),
-        collectionUid: url.pop(),
-      };
+      const imageUid = url.pop();
+      const collectionUid = url.pop();
+
+      let data;
+      if (plugin.type === "Javascript") {
+        data = {
+          imageData,
+          annotationData: annotationsObject.getAllAnnotations(),
+        };
+      } else {
+        data = { imageUid, collectionUid };
+      }
 
       const response = await plugin.onClick(data);
 
@@ -90,6 +143,10 @@ export const PluginsCard = ({
 
       if (response?.domElement) {
         setDialogContent(response.domElement);
+      }
+
+      if (response?.data) {
+        storeOutputData(collectionUid, imageUid, response.data);
       }
     } catch (e) {
       console.error(e);

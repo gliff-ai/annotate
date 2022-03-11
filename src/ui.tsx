@@ -186,10 +186,11 @@ interface Props extends WithStyles<typeof styles> {
   defaultLabels?: string[];
   restrictLabels?: boolean;
   multiLabel?: boolean;
+  saveMetadataCallback?: ((data: any) => void) | null;
 }
 
 class UserInterface extends Component<Props, State> {
-  static defaultProps = {
+  public static defaultProps: Omit<Props, "classes"> = {
     showAppBar: true,
     userAccess: UserAccess.Collaborator,
     plugins: null,
@@ -197,7 +198,8 @@ class UserInterface extends Component<Props, State> {
     defaultLabels: [],
     restrictLabels: false,
     multiLabel: true,
-  } as Pick<Props, "showAppBar">;
+    saveMetadataCallback: null,
+  };
 
   annotationsObject: Annotations;
 
@@ -837,6 +839,9 @@ class UserInterface extends Component<Props, State> {
               launchPluginSettingsCallback={
                 this.props.launchPluginSettingsCallback
               }
+              imageData={this.slicesData}
+              annotationsObject={this.annotationsObject}
+              saveMetadataCallback={this.props.saveMetadataCallback}
             />
           </Popover>
         </ButtonGroup>
