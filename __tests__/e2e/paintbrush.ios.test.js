@@ -180,7 +180,9 @@ wrapper(() => {
 
         // enter label text:
         await clickById(driver, "id-annotation-label");
-        (await driver.findElement(By.id("id-labels-input"))).sendKeys("abc");
+        (await driver.findElement(By.id("id-labels-input"))).sendKeys(
+          "ABCdefghijklmnopqrstuvw"
+        );
         await sleep();
       },
       120000
