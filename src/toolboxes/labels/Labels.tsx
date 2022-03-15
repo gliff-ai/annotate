@@ -139,6 +139,7 @@ export const Labels: FunctionComponent<Props> = ({
                 handleAddLabel(newLabel)();
               }
             }}
+            id="id-labels-input"
           />
           <IconButton
             className={classes.addButton}
