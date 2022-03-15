@@ -4,10 +4,8 @@ import { XYPoint, PositionAndSize } from "@/annotation/interfaces";
 
 export interface Props {
   name?: string;
-  zoomExtents?: {
-    min: number;
-    max: number;
-  };
+  // not used in this class but used by all the other Canvas classes that extend this Props type
+  /* eslint-disable react/no-unused-prop-types */
   scaleAndPan: {
     x: number;
     y: number;
@@ -28,6 +26,24 @@ export interface Props {
 }
 
 export class BaseCanvas extends Component<Props> {
+  public static defaultProps: Omit<
+    Props,
+    "scaleAndPan" | "canvasPositionAndSize"
+  > = {
+    name: "BaseCanvas",
+    cursor: "none",
+    onClick: null,
+    onMouseDown: null,
+    onTouchStart: null,
+    onTouchMove: null,
+    onTouchEnd: null,
+    onMouseMove: null,
+    onMouseUp: null,
+    onContextMenu: null,
+    setCanvasPositionAndSize: null,
+    displayedImage: null,
+  };
+
   private canvas: HTMLCanvasElement;
 
   private canvasContainer: HTMLDivElement;

@@ -41,7 +41,6 @@ interface Props {
   anchorElement: HTMLButtonElement | null;
   channels: boolean[];
   toggleChannelAtIndex: (index: number) => void;
-  displayedImage: ImageBitmap;
 }
 
 const useStyles = makeStyles(() =>

@@ -4,7 +4,6 @@ import { Props as BaseProps, BaseCanvas } from "./Canvas";
 import { getMinimapViewFinder, minimapToCanvas } from "./transforms";
 
 export interface Props extends BaseProps {
-  cursor?: "move";
   canvasPositionAndSize: PositionAndSize;
   minimapPositionAndSize: PositionAndSize;
   setScaleAndPan: (scaleAndPan: {
@@ -17,6 +16,12 @@ export interface Props extends BaseProps {
 }
 
 export class MinimapCanvas extends Component<Props> {
+  public static defaultProps: {
+    setMinimapPositionAndSize: (
+      minimapPositionAndSize: PositionAndSize
+    ) => void;
+  } = { setMinimapPositionAndSize: null };
+
   public baseCanvas: BaseCanvas;
 
   private boundingRect: PositionAndSize;
