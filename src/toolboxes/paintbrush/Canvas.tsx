@@ -28,6 +28,7 @@ interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   brushRadius: number;
   annotationActiveAlpha: number;
   annotationAlpha: number;
+  // eslint-disable-next-line react/no-unused-prop-types
   redraw: number;
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
@@ -111,7 +112,7 @@ export class CanvasClass extends Component<Props, State> {
 
     try {
       this.drawAllStrokes(this.backgroundCanvas?.canvasContext);
-    } catch (e: any) {
+    } catch (e) {
       console.error(`${(e as Error).message}`);
     }
   }

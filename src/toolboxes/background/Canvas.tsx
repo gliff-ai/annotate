@@ -12,6 +12,12 @@ interface State {
   edgeColour: string | null;
 }
 export class CanvasClass extends Component<Props, State> {
+  public static defaultProps: {
+    setCanvasContainerColourCallback: (colour: number[]) => void;
+  } = {
+    setCanvasContainerColourCallback: null,
+  };
+
   private baseCanvas: BaseCanvas;
 
   constructor(props: Props) {
@@ -112,7 +118,6 @@ export class CanvasClass extends Component<Props, State> {
       }}
       name="background"
       scaleAndPan={this.props.scaleAndPan}
-      zoomExtents={{ min: 0.3, max: 3 }}
       canvasPositionAndSize={this.props.canvasPositionAndSize}
       setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
     />

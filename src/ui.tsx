@@ -105,7 +105,6 @@ interface State {
   buttonClicked: string;
   mode: Mode;
   canvasContainerColour: number[];
-  presetLabels: string[];
 }
 
 const styles = {
@@ -176,9 +175,10 @@ interface Props extends WithStyles<typeof styles> {
   slicesData?: ImageBitmap[][] | null;
   imageFileInfo?: ImageFileInfo;
   annotationsObject?: Annotations;
-  presetLabels?: string[];
   saveAnnotationsCallback?: (annotationsObject: Annotations) => void;
   showAppBar?: boolean;
+  // setIsLoading is used, but in progress.tsx
+  // eslint-disable-next-line react/no-unused-prop-types
   setIsLoading?: (isLoading: boolean) => void;
   userAccess?: UserAccess;
   plugins?: PluginObject | null;
@@ -191,7 +191,12 @@ interface Props extends WithStyles<typeof styles> {
 
 class UserInterface extends Component<Props, State> {
   public static defaultProps: Omit<Props, "classes"> = {
+    annotationsObject: null,
+    saveAnnotationsCallback: null,
     showAppBar: true,
+    setIsLoading: null,
+    slicesData: null,
+    imageFileInfo: undefined,
     userAccess: UserAccess.Collaborator,
     plugins: null,
     launchPluginSettingsCallback: null,
@@ -236,7 +241,6 @@ class UserInterface extends Component<Props, State> {
       activeToolbox: Toolboxes.paintbrush,
       mode: Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
-      presetLabels: this.props.presetLabels || [],
     };
 
     this.imageFileInfo = this.props.imageFileInfo || null;
@@ -298,17 +302,6 @@ class UserInterface extends Component<Props, State> {
   getRGBAforCanvasContainerColour = (): string => {
     const [r, g, b, a] = [...this.state.canvasContainerColour];
     return `rgba(${r},${g},${b},${a})`;
-  };
-
-  updatePresetLabels = (label: string): void => {
-    if (!this.state.displayedImage) return;
-    function onlyUnique(value: string, index: number, self: string[]) {
-      return self.indexOf(value) === index;
-    }
-    this.setState(({ presetLabels }) => {
-      presetLabels.push(label);
-      return { presetLabels: presetLabels.filter(onlyUnique) };
-    });
   };
 
   setViewportPositionAndSize = (
@@ -715,7 +708,6 @@ class UserInterface extends Component<Props, State> {
           <Download
             annotationsObject={this.annotationsObject}
             imageFileInfo={this.imageFileInfo}
-            isTyping={this.isTyping}
             redraw={this.state.redraw}
           />
         </Grid>
@@ -870,7 +862,6 @@ class UserInterface extends Component<Props, State> {
             anchorElement={this.state.activeSubmenuAnchor}
             channels={this.state.channels}
             toggleChannelAtIndex={this.toggleChannelAtIndex}
-            displayedImage={this.state.displayedImage}
           />
         </ButtonGroup>
 
