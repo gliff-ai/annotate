@@ -832,6 +832,7 @@ class UserInterface extends Component<Props, State> {
                 this.props.launchPluginSettingsCallback
               }
               imageData={this.slicesData}
+              imageFileInfo={this.props.imageFileInfo}
               annotationsObject={this.annotationsObject}
               saveMetadataCallback={this.props.saveMetadataCallback}
             />

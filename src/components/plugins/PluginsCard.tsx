@@ -21,6 +21,7 @@ import { Annotations } from "@/annotation";
 import { Annotation } from "@/annotation/interfaces";
 import type { PluginObject, PluginElement, PluginOutput } from "./interfaces";
 import { PluginDialog } from "./PluginDialog";
+import { ImageFileInfo } from "@gliff-ai/upload";
 
 const style = (
   hover: boolean
@@ -66,6 +67,7 @@ interface Props {
   saveMetadataCallback: ((data: any) => void) | null;
   imageData: ImageBitmap[][];
   annotationsObject: Annotations;
+  imageFileInfo: ImageFileInfo;
 }
 
 export const PluginsCard = ({
@@ -73,6 +75,7 @@ export const PluginsCard = ({
   launchPluginSettingsCallback,
   saveMetadataCallback,
   imageData,
+  imageFileInfo,
   annotationsObject,
 }: Props): ReactElement | null => {
   const [error, setError] = useState<string | null>(null);
@@ -129,6 +132,7 @@ export const PluginsCard = ({
       if (plugin.type === "Javascript") {
         data = {
           imageData,
+          imageFileInfo,
           annotationData: annotationsObject.getAllAnnotations(),
         };
       } else {

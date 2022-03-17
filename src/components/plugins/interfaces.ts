@@ -1,4 +1,5 @@
 import { Annotation } from "@/annotation/interfaces";
+import { ImageFileInfo } from "@gliff-ai/upload";
 
 interface PluginElement {
   type?: string;
@@ -13,6 +14,7 @@ type PluginInput = Partial<{
   collectionUid: string;
   imageUid: string;
   imageData: ImageBitmap[][]; // image data (i.e., slicesData)
+  imageFileInfo: ImageFileInfo;
   annotationData: Annotation[]; // all annotations
 }>;
 
