@@ -1,5 +1,5 @@
-import { Annotation } from "@/annotation/interfaces";
 import { ImageFileInfo } from "@gliff-ai/upload";
+import { Annotation } from "@/annotation/interfaces";
 
 interface PluginElement {
   type?: string;

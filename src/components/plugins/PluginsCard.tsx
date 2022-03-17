@@ -17,11 +17,11 @@ import {
   HtmlTooltip,
   BaseTooltipTitle,
 } from "@gliff-ai/style";
+import { ImageFileInfo } from "@gliff-ai/upload";
 import { Annotations } from "@/annotation";
 import { Annotation } from "@/annotation/interfaces";
 import type { PluginObject, PluginElement, PluginOutput } from "./interfaces";
 import { PluginDialog } from "./PluginDialog";
-import { ImageFileInfo } from "@gliff-ai/upload";
 
 const style = (
   hover: boolean
