@@ -6,9 +6,10 @@ import loadImage from "./autoload";
 const plugins = {
   "Example plug-in": [
     {
+      type: "Javascript",
       name: "Example plug-in",
       tooltip: "Short description",
-      onClick: (data = {}) => {
+      onClick: function () {
         alert("Some plug-in action.");
         return Promise.resolve({});
       },

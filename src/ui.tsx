@@ -186,6 +186,7 @@ interface Props extends WithStyles<typeof styles> {
   defaultLabels?: string[];
   restrictLabels?: boolean;
   multiLabel?: boolean;
+  saveMetadataCallback?: ((data: any) => void) | null;
 }
 
 class UserInterface extends Component<Props, State> {
@@ -202,6 +203,7 @@ class UserInterface extends Component<Props, State> {
     defaultLabels: [],
     restrictLabels: false,
     multiLabel: true,
+    saveMetadataCallback: null,
   };
 
   annotationsObject: Annotations;
@@ -829,6 +831,10 @@ class UserInterface extends Component<Props, State> {
               launchPluginSettingsCallback={
                 this.props.launchPluginSettingsCallback
               }
+              imageData={this.slicesData}
+              imageFileInfo={this.props.imageFileInfo}
+              annotationsObject={this.annotationsObject}
+              saveMetadataCallback={this.props.saveMetadataCallback}
             />
           </Popover>
         </ButtonGroup>
