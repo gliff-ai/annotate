@@ -155,7 +155,7 @@ export class Annotations {
 
   getLabels = (): string[] => this.data[this.activeAnnotationID].labels;
 
-  getAllLabels = (): string[] =>
+  getAllUniqueLabels = (): string[] =>
     [
       ...new Set(
         [].concat(...this.data.map((annotation) => annotation.labels))
