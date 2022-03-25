@@ -272,8 +272,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       <Popper
         open={props.isOpen}
         anchorEl={props.anchorElement}
-        placement="right-end"
-        offset={[10, 10]}
+        placement="right"
+        offset={[40, 10]}
         handleClickAway={handleClickAway}
         el={
           <>
