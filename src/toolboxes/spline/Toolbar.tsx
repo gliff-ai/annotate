@@ -1,6 +1,5 @@
 import { Component, ReactElement, MouseEvent } from "react";
-import { ButtonGroup } from "@mui/material";
-import { IconButton, icons, Popper } from "@gliff-ai/style";
+import { IconButton, icons, Popper, ButtonGroup } from "@gliff-ai/style";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { getShortcut } from "@/keybindings";
 import { useSplineStore } from "./Store";

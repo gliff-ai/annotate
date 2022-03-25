@@ -9,9 +9,9 @@ import {
   CardHeader,
   CardContent,
   Typography,
+  Box,
 } from "@mui/material";
-import makeStyles from "@mui/styles/makeStyles";
-import createStyles from "@mui/styles/createStyles";
+
 import SVG from "react-inlinesvg";
 import { detect } from "detect-browser";
 import { Popper } from "@gliff-ai/style";
@@ -42,46 +42,24 @@ interface Props {
   toggleChannelAtIndex: (index: number) => void;
 }
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    subMenu: {
-      display: "flex",
-      justifyContent: "space-between",
-      height: "fit-content",
-      background: "none",
-    },
-    subMenuCard: {
-      height: "fit-content",
-      width: "285",
-      marginLeft: "18px", // TODO other toolbars should use this approach
-    },
-    baseSlider: {
-      width: "285px",
-      height: "65px",
-      textAlign: "center",
-      display: "flex",
-      marginBottom: "6px",
-    },
-    channelHeader: {
-      backgroundColor: theme.palette.primary.main,
-    },
+const baseSliderStyle = {
+  width: "285",
+  height: "65px",
+  textAlign: "center",
+  display: "flex",
+  mb: "6px",
+};
 
-    channelInfo: {
-      fontSize: "14px",
-      fontWeight: 400,
-    },
-    sliderName: {
-      marginLeft: "10px",
-      marginBottom: "5px",
-      paddingTop: "6px",
-    },
-  })
-);
+const sliderNameStyle = {
+  marginLeft: "12px",
+  marginBottom: "-2px",
+  paddingTop: "6px",
+  fontWeight: 500,
+};
 
 const Submenu = (props: SubmenuProps): ReactElement => {
   const [background, setBackground] = useBackgroundStore();
   const [buttonClicked, setButtonClicked] = useState(null as string);
-  const classes = useStyles();
 
   const submenuEvents = [
     "selectContrast",
@@ -218,41 +196,42 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                   />
                 ))}
             </ButtonGroup>
-            <Card className={classes.subMenuCard}>
+            <Card
+              sx={{ height: "fit-content", width: "285", marginLeft: "18px" }}
+            >
               {buttonClicked === "Brightness" && (
                 <>
-                  <div className={classes.sliderName}>Brightness</div>
-                  <div className={classes.baseSlider}>
+                  <Box sx={{ ...sliderNameStyle }}>Brightness</Box>
+                  <Box sx={{ ...baseSliderStyle }}>
                     <BaseSlider
                       value={background.brightness}
                       config={SLIDER_CONFIG[Sliders.brightness]}
                       onChange={() => changeBrightness}
                     />
-                  </div>
+                  </Box>
                 </>
               )}
 
               {buttonClicked === "Contrast" && (
                 <>
-                  <div className={classes.sliderName}>Contrast</div>
-                  <div className={classes.baseSlider}>
+                  <Box sx={{ ...sliderNameStyle }}>Contrast</Box>
+                  <Box sx={{ ...baseSliderStyle }}>
                     <BaseSlider
                       value={background.contrast}
                       config={SLIDER_CONFIG[Sliders.contrast]}
                       onChange={() => changeContrast}
                     />
-                  </div>
+                  </Box>
                 </>
               )}
               {buttonClicked === "Channels" && props.channelControls && (
                 <>
                   <CardHeader
-                    className={classes.channelHeader}
-                    title={
-                      <Typography style={{ fontWeight: 500 }}>
-                        Channel
-                      </Typography>
-                    }
+                    sx={{
+                      backgroundColor: theme.palette.primary.main,
+                      "& .MuiTypography-root": { fontWeight: 500 },
+                    }}
+                    title={<Typography>Channel</Typography>}
                   />
                   <CardContent>
                     <FormControl component="fieldset">
@@ -263,7 +242,9 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                             value="top"
                             control={control}
                             label={
-                              <Typography className={classes.channelInfo}>
+                              <Typography
+                                sx={{ fontSize: "14px", fontWeight: 400 }}
+                              >
                                 {`Channel ${i + 1}`}
                               </Typography>
                             }

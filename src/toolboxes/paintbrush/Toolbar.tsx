@@ -1,10 +1,13 @@
 import { Component, ReactElement, MouseEvent, useState } from "react";
-import { ButtonGroup, Card, Divider } from "@mui/material";
 
-import createStyles from "@mui/styles/createStyles";
-import makeStyles from "@mui/styles/makeStyles";
-
-import { Popper, IconButton, icons } from "@gliff-ai/style";
+import {
+  Popper,
+  IconButton,
+  icons,
+  ButtonGroup,
+  Card,
+  Divider,
+} from "@gliff-ai/style";
 
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { BaseSlider } from "@/components/BaseSlider";
@@ -13,6 +16,7 @@ import { usePaintbrushStore } from "./Store";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { getShortcut } from "@/keybindings";
 import { useMountEffect } from "@/hooks/use-mountEffect";
+import { Box } from "@mui/system";
 
 interface SubmenuProps {
   isOpen: boolean;
@@ -31,37 +35,20 @@ interface Props {
   is3D: boolean;
 }
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    baseSlider: {
-      width: "285",
-      height: "65px",
-      textAlign: "center",
-      display: "flex",
-      marginBottom: "6px",
-    },
-    subMenu: {
-      display: "flex",
-      justifyContent: "space-between",
-      background: "none",
-    },
-    subMenuCard: {
-      width: "285px",
-      height: "fit-content",
-      marginLeft: "18px", // TODO other toolbars should use this approach
-    },
-    sliderName: {
-      marginLeft: "12px",
-      marginBottom: "-2px",
-      paddingTop: "6px",
-      fontWeight: 500,
-    },
-    divider: {
-      margin: 0,
-      width: "100%",
-    },
-  })
-);
+const baseSliderStyle = {
+  width: "285",
+  height: "65px",
+  textAlign: "center",
+  display: "flex",
+  mb: "6px",
+};
+
+const sliderNameStyle = {
+  marginLeft: "12px",
+  marginBottom: "-2px",
+  paddingTop: "6px",
+  fontWeight: 500,
+};
 
 const events = ["selectBrush"] as const;
 const ToolboxName: Toolbox = "paintbrush";
@@ -81,8 +68,6 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     "selectEraser",
     "toggleShowTransparency",
   ] as const;
-
-  const classes = useStyles();
 
   function changeBrushRadius(_e: Event, value: number) {
     setPaintbrush({
@@ -303,46 +288,55 @@ const Submenu = (props: SubmenuProps): ReactElement => {
 
             <>
               {openSubmenu && (
-                <Card className={classes.subMenuCard}>
+                <Card
+                  sx={{
+                    width: "285px",
+                    height: "fit-content",
+                    marginLeft: "18px",
+                  }}
+                >
                   {openSlider && (
                     <>
-                      <div className={classes.sliderName}>
+                      <Box sx={{ ...sliderNameStyle }}>
                         {paintbrush.brushType === "Paintbrush"
                           ? "Brush Size"
                           : "Eraser Size"}
-                      </div>
-                      <div className={classes.baseSlider}>
+                      </Box>
+                      <Box sx={{ ...baseSliderStyle }}>
                         <BaseSlider
                           value={paintbrush.brushRadius * 2}
                           config={SLIDER_CONFIG[Sliders.brushRadius]}
                           onChange={() => changeBrushRadius}
                         />
-                      </div>
+                      </Box>
                     </>
                   )}
                   {showTransparency && (
                     <>
-                      <div className={classes.sliderName}>
+                      <Box sx={{ ...sliderNameStyle }}>
                         Non-Active Annotation
-                      </div>
-                      <div className={classes.baseSlider}>
+                      </Box>
+                      <Box sx={{ ...baseSliderStyle }}>
                         <BaseSlider
                           value={paintbrush.annotationAlpha}
                           config={SLIDER_CONFIG[Sliders.annotationAlpha]}
                           onChange={() => changeAnnotationTransparency}
                         />
-                      </div>
-                      <Divider className={classes.divider} />
-                      <div className={classes.sliderName}>
-                        Active Annotation
-                      </div>
-                      <div className={classes.baseSlider}>
+                      </Box>
+                      <Divider
+                        sx={{
+                          margin: 0,
+                          width: "100%",
+                        }}
+                      />
+                      <Box sx={{ ...sliderNameStyle }}>Active Annotation</Box>
+                      <Box sx={{ ...baseSliderStyle }}>
                         <BaseSlider
                           value={paintbrush.annotationActiveAlpha}
                           config={SLIDER_CONFIG[Sliders.annotationActiveAlpha]}
                           onChange={() => changeAnnotationTransparencyFocused}
                         />
-                      </div>
+                      </Box>
                     </>
                   )}
                 </Card>
