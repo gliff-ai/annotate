@@ -14,7 +14,7 @@ import makeStyles from "@mui/styles/makeStyles";
 import createStyles from "@mui/styles/createStyles";
 import SVG from "react-inlinesvg";
 import { detect } from "detect-browser";
-import { BasePopper } from "@gliff-ai/style";
+import { Popper } from "@gliff-ai/style";
 
 import { IconButton, icons, theme } from "@gliff-ai/style";
 import { BaseSlider } from "@/components/BaseSlider";
@@ -182,23 +182,15 @@ const Submenu = (props: SubmenuProps): ReactElement => {
 
   return (
     <>
-      <BasePopper
+      <Popper
         open={props.isOpen}
         anchorEl={props.anchorElement}
         placement="right-end"
         style={{ display: "flex" }}
-        modifiers={[
-          {
-            name: "offset",
-            options: {
-              offset: [10, 10],
-            },
-          },
-        ]}
+        offset={[10, 10]}
         handleClickAway={handleClickAway}
         el={
           <>
-            {" "}
             <ButtonGroup
               orientation="vertical"
               size="small"
@@ -286,7 +278,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
             </Card>
           </>
         }
-      ></BasePopper>
+      />
     </>
   );
 };
