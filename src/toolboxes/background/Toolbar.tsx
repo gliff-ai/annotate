@@ -43,7 +43,7 @@ interface Props {
 }
 
 const baseSliderStyle = {
-  width: "285",
+  width: "285px",
   height: "65px",
   textAlign: "center",
   display: "flex",
@@ -197,7 +197,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                 ))}
             </ButtonGroup>
             <Card
-              sx={{ height: "fit-content", width: "285", marginLeft: "18px" }}
+              sx={{ height: "fit-content", width: "285px", marginLeft: "18px" }}
             >
               {buttonClicked === "Brightness" && (
                 <>
