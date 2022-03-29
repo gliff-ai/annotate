@@ -71,7 +71,7 @@
   "dependencies": {
     "@babel/plugin-transform-runtime": "^7.16.4",
     "@gliff-ai/slpf": "^1.1.2",
-    "@gliff-ai/style": "file:gliff-ai-style-9.0.1.tgz",
+    "@gliff-ai/style": "^9.1.0",
     "@gliff-ai/upload": "^1.0.1",
     "@percy/selenium-webdriver": "^1.0.0",
     "@types/selenium-webdriver": "^4.0.16",
