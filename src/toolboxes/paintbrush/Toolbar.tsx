@@ -8,6 +8,7 @@ import {
   Card,
   Divider,
 } from "@gliff-ai/style";
+import { Box } from "@mui/system";
 
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { BaseSlider } from "@/components/BaseSlider";
@@ -16,7 +17,6 @@ import { usePaintbrushStore } from "./Store";
 import { Sliders, SLIDER_CONFIG } from "./configSlider";
 import { getShortcut } from "@/keybindings";
 import { useMountEffect } from "@/hooks/use-mountEffect";
-import { Box } from "@mui/system";
 
 interface SubmenuProps {
   isOpen: boolean;

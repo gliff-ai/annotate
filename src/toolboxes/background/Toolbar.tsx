@@ -14,9 +14,8 @@ import {
 
 import SVG from "react-inlinesvg";
 import { detect } from "detect-browser";
-import { Popper } from "@gliff-ai/style";
 
-import { IconButton, icons, theme } from "@gliff-ai/style";
+import { IconButton, icons, theme, Popper } from "@gliff-ai/style";
 import { BaseSlider } from "@/components/BaseSlider";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { getShortcut } from "@/keybindings";

@@ -147,7 +147,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
           ))}
         </ButtonGroup>
       }
-    ></Popper>
+    />
   );
 };
 
