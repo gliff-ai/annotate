@@ -23,7 +23,6 @@ const loadImage = (filename: string): Promise<UploadData> =>
             height: image.height,
             num_slices: 1,
             num_channels: 1,
-            fileID: "",
             resolution_x: 0,
             resolution_y: 0,
             resolution_z: 0,
