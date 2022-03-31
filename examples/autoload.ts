@@ -16,20 +16,22 @@ const loadImage = (filename: string): Promise<UploadData> =>
       createImageBitmap(image)
         .then((imageBitmap) => {
           const slicesData: Array<Array<ImageBitmap>> = [[imageBitmap]];
-          const imageFileInfo: ImageFileInfo = new ImageFileInfo({
+          const imageFileInfo: ImageFileInfo = {
             fileName: filename,
             size: image.width * image.height,
             width: image.width,
             height: image.height,
             num_slices: 1,
             num_channels: 1,
-          });
+          };
           resolve({ slicesData, imageFileInfo });
         })
         .catch((e) => {
           logger.error(e);
         });
     };
+
+    image.src = filename;
   });
 
 export default loadImage;
