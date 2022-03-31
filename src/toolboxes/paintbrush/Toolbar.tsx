@@ -1,16 +1,14 @@
 import { Component, ReactElement, MouseEvent, useState } from "react";
+
 import {
+  Popper,
+  IconButton,
+  icons,
   ButtonGroup,
   Card,
   Divider,
-  Popper,
-  ClickAwayListener,
-} from "@mui/material";
-
-import createStyles from "@mui/styles/createStyles";
-import makeStyles from "@mui/styles/makeStyles";
-
-import { IconButton, icons } from "@gliff-ai/style";
+} from "@gliff-ai/style";
+import { Box } from "@mui/system";
 
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { BaseSlider } from "@/components/BaseSlider";
@@ -37,37 +35,20 @@ interface Props {
   is3D: boolean;
 }
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    baseSlider: {
-      width: "285",
-      height: "65px",
-      textAlign: "center",
-      display: "flex",
-      marginBottom: "6px",
-    },
-    subMenu: {
-      display: "flex",
-      justifyContent: "space-between",
-      background: "none",
-    },
-    subMenuCard: {
-      width: "285px",
-      height: "fit-content",
-      marginLeft: "18px", // TODO other toolbars should use this approach
-    },
-    sliderName: {
-      marginLeft: "12px",
-      marginBottom: "-2px",
-      paddingTop: "6px",
-      fontWeight: 500,
-    },
-    divider: {
-      margin: 0,
-      width: "100%",
-    },
-  })
-);
+const baseSliderStyle = {
+  width: "285",
+  height: "65px",
+  textAlign: "center",
+  display: "flex",
+  mb: "6px",
+};
+
+const sliderNameStyle = {
+  marginLeft: "12px",
+  marginBottom: "-2px",
+  paddingTop: "6px",
+  fontWeight: 500,
+};
 
 const events = ["selectBrush"] as const;
 const ToolboxName: Toolbox = "paintbrush";
@@ -87,8 +68,6 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     "selectEraser",
     "toggleShowTransparency",
   ] as const;
-
-  const classes = useStyles();
 
   function changeBrushRadius(_e: Event, value: number) {
     setPaintbrush({
@@ -275,96 +254,96 @@ const Submenu = (props: SubmenuProps): ReactElement => {
 
   return (
     <>
-      <ClickAwayListener
-        mouseEvent="onMouseDown"
-        touchEvent="onTouchStart"
-        onClickAway={handleClickAway}
-      >
-        <Popper
-          open={props.isOpen}
-          anchorEl={props.anchorElement}
-          placement="right"
-          style={{ display: "flex" }}
-          modifiers={[
-            {
-              name: "offset",
-              options: {
-                offset: [40, 10],
-              },
-            },
-          ]}
-        >
-          <ButtonGroup
-            orientation="vertical"
-            size="small"
-            id="paintbrush-toolbar"
-            style={{ marginRight: "-10px" }}
-            variant="text"
-          >
-            {tools.map(({ icon, name, event, active, disabled }) => (
-              <IconButton
-                key={name}
-                icon={icon}
-                tooltip={{
-                  name,
-                  ...getShortcut(`${ToolboxName}.${event.name}`),
-                }}
-                onClick={event}
-                fill={active()}
-                disabled={disabled()}
-                id={`id-${name.toLowerCase().replace(/ /g, "-")}`}
-                size="small"
-              />
-            ))}
-          </ButtonGroup>
-
+      <Popper
+        open={props.isOpen}
+        anchorEl={props.anchorElement}
+        offset={[40, 10]}
+        handleClickAway={handleClickAway}
+        el={
           <>
-            {openSubmenu && (
-              <Card className={classes.subMenuCard}>
-                {openSlider && (
-                  <>
-                    <div className={classes.sliderName}>
-                      {paintbrush.brushType === "Paintbrush"
-                        ? "Brush Size"
-                        : "Eraser Size"}
-                    </div>
-                    <div className={classes.baseSlider}>
-                      <BaseSlider
-                        value={paintbrush.brushRadius * 2}
-                        config={SLIDER_CONFIG[Sliders.brushRadius]}
-                        onChange={() => changeBrushRadius}
+            <ButtonGroup
+              orientation="vertical"
+              size="small"
+              id="paintbrush-toolbar"
+              style={{ marginRight: "-10px" }}
+              variant="text"
+            >
+              {tools.map(({ icon, name, event, active, disabled }) => (
+                <IconButton
+                  key={name}
+                  icon={icon}
+                  tooltip={{
+                    name,
+                    ...getShortcut(`${ToolboxName}.${event.name}`),
+                  }}
+                  onClick={event}
+                  fill={active()}
+                  disabled={disabled()}
+                  id={`id-${name.toLowerCase().replace(/ /g, "-")}`}
+                  size="small"
+                />
+              ))}
+            </ButtonGroup>
+
+            <>
+              {openSubmenu && (
+                <Card
+                  sx={{
+                    width: "285px",
+                    height: "fit-content",
+                    marginLeft: "18px",
+                  }}
+                >
+                  {openSlider && (
+                    <>
+                      <Box sx={{ ...sliderNameStyle }}>
+                        {paintbrush.brushType === "Paintbrush"
+                          ? "Brush Size"
+                          : "Eraser Size"}
+                      </Box>
+                      <Box sx={{ ...baseSliderStyle }}>
+                        <BaseSlider
+                          value={paintbrush.brushRadius * 2}
+                          config={SLIDER_CONFIG[Sliders.brushRadius]}
+                          onChange={() => changeBrushRadius}
+                        />
+                      </Box>
+                    </>
+                  )}
+                  {showTransparency && (
+                    <>
+                      <Box sx={{ ...sliderNameStyle }}>
+                        Non-Active Annotation
+                      </Box>
+                      <Box sx={{ ...baseSliderStyle }}>
+                        <BaseSlider
+                          value={paintbrush.annotationAlpha}
+                          config={SLIDER_CONFIG[Sliders.annotationAlpha]}
+                          onChange={() => changeAnnotationTransparency}
+                        />
+                      </Box>
+                      <Divider
+                        sx={{
+                          margin: 0,
+                          width: "100%",
+                        }}
                       />
-                    </div>
-                  </>
-                )}
-                {showTransparency && (
-                  <>
-                    <div className={classes.sliderName}>
-                      Non-Active Annotation
-                    </div>
-                    <div className={classes.baseSlider}>
-                      <BaseSlider
-                        value={paintbrush.annotationAlpha}
-                        config={SLIDER_CONFIG[Sliders.annotationAlpha]}
-                        onChange={() => changeAnnotationTransparency}
-                      />
-                    </div>
-                    <Divider className={classes.divider} />
-                    <div className={classes.sliderName}>Active Annotation</div>
-                    <div className={classes.baseSlider}>
-                      <BaseSlider
-                        value={paintbrush.annotationActiveAlpha}
-                        config={SLIDER_CONFIG[Sliders.annotationActiveAlpha]}
-                        onChange={() => changeAnnotationTransparencyFocused}
-                      />
-                    </div>
-                  </>
-                )}
-              </Card>
-            )}
+                      <Box sx={{ ...sliderNameStyle }}>Active Annotation</Box>
+                      <Box sx={{ ...baseSliderStyle }}>
+                        <BaseSlider
+                          value={paintbrush.annotationActiveAlpha}
+                          config={SLIDER_CONFIG[Sliders.annotationActiveAlpha]}
+                          onChange={() => changeAnnotationTransparencyFocused}
+                        />
+                      </Box>
+                    </>
+                  )}
+                </Card>
+              )}
+            </>
           </>
-        </Popper>
-      </ClickAwayListener>
+        }
+      />
     </>
   );
 };
