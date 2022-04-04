@@ -268,10 +268,16 @@ class UserInterface extends Component<Props, State> {
     ) {
       this.slicesData = this.props.slicesData;
       /* eslint-disable react/no-did-update-set-state */
-      this.setState({
-        displayedImage: this.slicesData[0][0],
-        sliceIndex: 0,
-      });
+      this.setState(
+        {
+          channels: this.slicesData[0].map(() => true),
+          sliceIndex: 0,
+        },
+        () => {
+          this.mixChannels(); // computes and sets this.state.displayedImage
+        }
+      );
+
       this.imageFileInfo = this.props.imageFileInfo;
     }
 
