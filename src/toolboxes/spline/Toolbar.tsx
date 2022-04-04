@@ -1,6 +1,5 @@
 import { Component, ReactElement, MouseEvent } from "react";
-import { ButtonGroup, Popper } from "@mui/material";
-import { IconButton, icons } from "@gliff-ai/style";
+import { IconButton, icons, Popper, ButtonGroup } from "@gliff-ai/style";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { getShortcut } from "@/keybindings";
 import { useSplineStore } from "./Store";
@@ -130,34 +129,25 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     <Popper
       open={props.isOpen}
       anchorEl={props.anchorElement}
-      placement="right"
-      style={{ display: "flex" }}
-      modifiers={[
-        {
-          name: "offset",
-          options: {
-            offset: [10, 10],
-          },
-        },
-      ]}
-    >
-      <ButtonGroup size="small" id="spline-toolbar" variant="text">
-        {tools.map(({ icon, name, event, active }) => (
-          <IconButton
-            key={name}
-            icon={icon}
-            tooltip={{
-              name,
-              ...getShortcut(`${ToolboxName}.${event.name}`),
-            }}
-            onClick={event}
-            fill={active()}
-            id={`id-${name.toLowerCase().replace(/ /g, "-")}`}
-            size="small"
-          />
-        ))}
-      </ButtonGroup>
-    </Popper>
+      el={
+        <ButtonGroup size="small" id="spline-toolbar" variant="text">
+          {tools.map(({ icon, name, event, active }) => (
+            <IconButton
+              key={name}
+              icon={icon}
+              tooltip={{
+                name,
+                ...getShortcut(`${ToolboxName}.${event.name}`),
+              }}
+              onClick={event}
+              fill={active()}
+              id={`id-${name.toLowerCase().replace(/ /g, "-")}`}
+              size="small"
+            />
+          ))}
+        </ButtonGroup>
+      }
+    />
   );
 };
 

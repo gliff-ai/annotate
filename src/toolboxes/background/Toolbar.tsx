@@ -9,15 +9,13 @@ import {
   CardHeader,
   CardContent,
   Typography,
-  Popper,
-  ClickAwayListener,
+  Box,
 } from "@mui/material";
-import makeStyles from "@mui/styles/makeStyles";
-import createStyles from "@mui/styles/createStyles";
+
 import SVG from "react-inlinesvg";
 import { detect } from "detect-browser";
 
-import { IconButton, icons, theme } from "@gliff-ai/style";
+import { IconButton, icons, theme, Popper } from "@gliff-ai/style";
 import { BaseSlider } from "@/components/BaseSlider";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { getShortcut } from "@/keybindings";
@@ -43,46 +41,24 @@ interface Props {
   toggleChannelAtIndex: (index: number) => void;
 }
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    subMenu: {
-      display: "flex",
-      justifyContent: "space-between",
-      height: "fit-content",
-      background: "none",
-    },
-    subMenuCard: {
-      height: "fit-content",
-      width: "285",
-      marginLeft: "18px", // TODO other toolbars should use this approach
-    },
-    baseSlider: {
-      width: "285px",
-      height: "65px",
-      textAlign: "center",
-      display: "flex",
-      marginBottom: "6px",
-    },
-    channelHeader: {
-      backgroundColor: theme.palette.primary.main,
-    },
+const baseSliderStyle = {
+  width: "285px",
+  height: "65px",
+  textAlign: "center",
+  display: "flex",
+  mb: "6px",
+};
 
-    channelInfo: {
-      fontSize: "14px",
-      fontWeight: 400,
-    },
-    sliderName: {
-      marginLeft: "10px",
-      marginBottom: "5px",
-      paddingTop: "6px",
-    },
-  })
-);
+const sliderNameStyle = {
+  marginLeft: "12px",
+  marginBottom: "-2px",
+  paddingTop: "6px",
+  fontWeight: 500,
+};
 
 const Submenu = (props: SubmenuProps): ReactElement => {
   const [background, setBackground] = useBackgroundStore();
   const [buttonClicked, setButtonClicked] = useState(null as string);
-  const classes = useStyles();
 
   const submenuEvents = [
     "selectContrast",
@@ -183,106 +159,105 @@ const Submenu = (props: SubmenuProps): ReactElement => {
 
   return (
     <>
-      <ClickAwayListener onClickAway={handleClickAway}>
-        <Popper
-          open={props.isOpen}
-          anchorEl={props.anchorElement}
-          placement="right-end"
-          style={{ display: "flex" }}
-          modifiers={[
-            {
-              name: "offset",
-              options: {
-                offset: [10, 10],
-              },
-            },
-          ]}
-        >
-          <ButtonGroup
-            orientation="vertical"
-            size="small"
-            id="background-settings-toolbar"
-            style={{ marginRight: "-10px" }}
-            variant="text"
-          >
-            {tools
-              .filter(
-                ({ name }) =>
-                  browser !== "safari" ||
-                  !(name === "Contrast" || name === "Brightness")
-              )
-              .map(({ icon, name, event, active }) => (
-                <IconButton
-                  key={name}
-                  icon={icon}
-                  tooltip={{
-                    name,
-                    ...getShortcut(`${ToolboxName}.${event.name}`),
-                  }}
-                  onClick={event}
-                  fill={active()}
-                  size="small"
-                />
-              ))}
-          </ButtonGroup>
-          <Card className={classes.subMenuCard}>
-            {buttonClicked === "Brightness" && (
-              <>
-                <div className={classes.sliderName}>Brightness</div>
-                <div className={classes.baseSlider}>
-                  <BaseSlider
-                    value={background.brightness}
-                    config={SLIDER_CONFIG[Sliders.brightness]}
-                    onChange={() => changeBrightness}
+      <Popper
+        open={props.isOpen}
+        anchorEl={props.anchorElement}
+        popperPlacement="right-end"
+        style={{ display: "flex" }}
+        handleClickAway={handleClickAway}
+        el={
+          <>
+            <ButtonGroup
+              orientation="vertical"
+              size="small"
+              id="background-settings-toolbar"
+              style={{ marginRight: "-10px" }}
+              variant="text"
+            >
+              {tools
+                .filter(
+                  ({ name }) =>
+                    browser !== "safari" ||
+                    !(name === "Contrast" || name === "Brightness")
+                )
+                .map(({ icon, name, event, active }) => (
+                  <IconButton
+                    key={name}
+                    icon={icon}
+                    tooltip={{
+                      name,
+                      ...getShortcut(`${ToolboxName}.${event.name}`),
+                    }}
+                    onClick={event}
+                    fill={active()}
+                    size="small"
                   />
-                </div>
-              </>
-            )}
+                ))}
+            </ButtonGroup>
+            <Card
+              sx={{ height: "fit-content", width: "285px", marginLeft: "18px" }}
+            >
+              {buttonClicked === "Brightness" && (
+                <>
+                  <Box sx={{ ...sliderNameStyle }}>Brightness</Box>
+                  <Box sx={{ ...baseSliderStyle }}>
+                    <BaseSlider
+                      value={background.brightness}
+                      config={SLIDER_CONFIG[Sliders.brightness]}
+                      onChange={() => changeBrightness}
+                    />
+                  </Box>
+                </>
+              )}
 
-            {buttonClicked === "Contrast" && (
-              <>
-                <div className={classes.sliderName}>Contrast</div>
-                <div className={classes.baseSlider}>
-                  <BaseSlider
-                    value={background.contrast}
-                    config={SLIDER_CONFIG[Sliders.contrast]}
-                    onChange={() => changeContrast}
+              {buttonClicked === "Contrast" && (
+                <>
+                  <Box sx={{ ...sliderNameStyle }}>Contrast</Box>
+                  <Box sx={{ ...baseSliderStyle }}>
+                    <BaseSlider
+                      value={background.contrast}
+                      config={SLIDER_CONFIG[Sliders.contrast]}
+                      onChange={() => changeContrast}
+                    />
+                  </Box>
+                </>
+              )}
+              {buttonClicked === "Channels" && props.channelControls && (
+                <>
+                  <CardHeader
+                    sx={{
+                      backgroundColor: theme.palette.primary.main,
+                      "& .MuiTypography-root": { fontWeight: 500 },
+                    }}
+                    title={<Typography>Channel</Typography>}
                   />
-                </div>
-              </>
-            )}
-            {buttonClicked === "Channels" && props.channelControls && (
-              <>
-                <CardHeader
-                  className={classes.channelHeader}
-                  title={
-                    <Typography style={{ fontWeight: 500 }}>Channel</Typography>
-                  }
-                />
-                <CardContent>
-                  <FormControl component="fieldset">
-                    <FormGroup aria-label="position">
-                      {props.channelControls.map((control, i) => (
-                        <FormControlLabel
-                          key={`C${i + 1}`}
-                          value="top"
-                          control={control}
-                          label={
-                            <Typography className={classes.channelInfo}>
-                              {`Channel ${i + 1}`}
-                            </Typography>
-                          }
-                          labelPlacement="end"
-                        />
-                      ))}
-                    </FormGroup>
-                  </FormControl>
-                </CardContent>
-              </>
-            )}
-          </Card>
-        </Popper>
-      </ClickAwayListener>
+                  <CardContent>
+                    <FormControl component="fieldset">
+                      <FormGroup aria-label="position">
+                        {props.channelControls.map((control, i) => (
+                          <FormControlLabel
+                            key={`C${i + 1}`}
+                            value="top"
+                            control={control}
+                            label={
+                              <Typography
+                                sx={{ fontSize: "14px", fontWeight: 400 }}
+                              >
+                                {`Channel ${i + 1}`}
+                              </Typography>
+                            }
+                            labelPlacement="end"
+                          />
+                        ))}
+                      </FormGroup>
+                    </FormControl>
+                  </CardContent>
+                </>
+              )}
+            </Card>
+          </>
+        }
+      />
     </>
   );
 };
