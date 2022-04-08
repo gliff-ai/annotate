@@ -181,3 +181,41 @@ export function minimapToCanvas(
 
   return { x, y };
 }
+
+export function touchPointsToScaleAndPan(
+  canvas1: XYPoint,
+  canvas2: XYPoint,
+  image1: XYPoint,
+  image2: XYPoint,
+  imageHeight: number,
+  imageWidth: number,
+  canvasPositionAndSize: PositionAndSize
+): {
+  x: number;
+  y: number;
+  scale: number;
+} {
+  // returns the scaleAndPan that places the image point image1 at canvas point canvas1,
+  // and image point image2 at canvas point canvas2
+  // (or at least as close as possible without rotating the image)
+
+  // initial scaling factor that's applied to the image to fit it in the canvas prior to any zoom scaling:
+  const ratio = Math.min(
+    canvasPositionAndSize.width / imageWidth,
+    canvasPositionAndSize.height / imageHeight
+  );
+
+  // set scale such that the distance between the image points in canvas space is
+  // the same as the distance between the touch points:
+  const scale =
+    Math.hypot(canvas1.x - canvas2.x, canvas1.y - canvas2.y) /
+    (Math.hypot(image1.x - image2.x, image1.y - image2.y) * ratio);
+
+  // pan the image such that the midpoints of image1/2 and canvas1/2 are aligned:
+  const panX =
+    (canvas1.x + canvas2.x) / 2 - ((image1.x + image2.x) / 2) * ratio * scale;
+  const panY =
+    (canvas1.y + canvas2.y) / 2 - ((image1.y + image2.y) / 2) * ratio * scale;
+
+  return { x: panX, y: panY, scale };
+}
