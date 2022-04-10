@@ -924,6 +924,7 @@ class UserInterface extends Component<Props, State> {
                     setCanvasContainerColourCallback={(canvasContainerColour) =>
                       this.setState({ canvasContainerColour })
                     }
+                    setScaleAndPan={this.setScaleAndPan}
                   />
                   <SplineCanvas
                     scaleAndPan={this.state.scaleAndPan}
@@ -942,6 +943,7 @@ class UserInterface extends Component<Props, State> {
                     setActiveToolbox={(tool: Toolbox) => {
                       this.setState({ activeToolbox: tool });
                     }}
+                    setScaleAndPan={this.setScaleAndPan}
                   />
                   <BoundingBoxCanvas
                     scaleAndPan={this.state.scaleAndPan}
@@ -960,6 +962,7 @@ class UserInterface extends Component<Props, State> {
                     setActiveToolbox={(tool: Toolbox) => {
                       this.setState({ activeToolbox: tool });
                     }}
+                    setScaleAndPan={this.setScaleAndPan}
                   />
                   <PaintbrushCanvas
                     scaleAndPan={this.state.scaleAndPan}
@@ -978,6 +981,7 @@ class UserInterface extends Component<Props, State> {
                     setActiveToolbox={(tool: Toolbox) => {
                       this.setState({ activeToolbox: tool });
                     }}
+                    setScaleAndPan={this.setScaleAndPan}
                   />
                   {this.slicesData?.length > 1 && (
                     <Paper

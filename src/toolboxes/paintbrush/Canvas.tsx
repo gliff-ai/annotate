@@ -550,6 +550,7 @@ export class CanvasClass extends Component<Props, State> {
             }}
             name={`${this.name}-background`}
             scaleAndPan={this.props.scaleAndPan}
+            setScaleAndPan={this.props.setScaleAndPan}
             canvasPositionAndSize={this.state.canvasPositionAndSize}
             setCanvasPositionAndSize={this.setCanvasPositionAndSize}
           />
@@ -564,6 +565,8 @@ export class CanvasClass extends Component<Props, State> {
             }}
             name={`${this.name}-interaction`}
             scaleAndPan={this.props.scaleAndPan}
+            setScaleAndPan={this.props.setScaleAndPan}
+            displayedImage={this.props.displayedImage}
             canvasPositionAndSize={this.state.canvasPositionAndSize}
             setCanvasPositionAndSize={this.setCanvasPositionAndSize}
           />
@@ -620,6 +623,7 @@ export const Canvas = (
       annotationsObject={props.annotationsObject}
       displayedImage={props.displayedImage}
       scaleAndPan={props.scaleAndPan}
+      setScaleAndPan={props.setScaleAndPan}
       brushRadius={paintbrush.brushRadius}
       annotationActiveAlpha={paintbrush.annotationActiveAlpha / 100}
       annotationAlpha={paintbrush.annotationAlpha / 100}

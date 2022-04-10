@@ -115,6 +115,7 @@ export class MinimapCanvas extends Component<Props> {
       onMouseUp={this.onMouseUp}
       name={this.props.name}
       scaleAndPan={{ x: 0, y: 0, scale: 1 }}
+      setScaleAndPan={this.props.setScaleAndPan}
       canvasPositionAndSize={this.props.minimapPositionAndSize}
       setCanvasPositionAndSize={this.props.setMinimapPositionAndSize}
       ref={(baseCanvas) => {
