@@ -406,26 +406,34 @@ export class CanvasClass extends Component<Props, State> {
   /* *** Mouse/Touch events *** */
   onMouseDown = (canvasX: number, canvasY: number): void => {
     if (this.props.mode === Mode.draw) {
-      // Start drawing
-      this.isDrawing = true;
+      if (this.isDrawing === false) {
+        // Start drawing
+        this.isDrawing = true;
 
-      if (this.props.activeToolbox === "Eraser") {
-        // if using the eraser, we redraw all strokes except the active annotation,
-        // then draw the active annotation on the interaction canvas and erase from
-        // there as we add to this.points
+        if (this.props.activeToolbox === "Eraser") {
+          // if using the eraser, we redraw all strokes except the active annotation,
+          // then draw the active annotation on the interaction canvas and erase from
+          // there as we add to this.points
 
-        // Redraw everything except the active annotation:
-        this.drawAllStrokes(this.backgroundCanvas?.canvasContext, "inactive");
+          // Redraw everything except the active annotation:
+          this.drawAllStrokes(this.backgroundCanvas?.canvasContext, "inactive");
 
-        // Redraw the active annotation:
-        this.drawAllStrokes(this.interactionCanvas.canvasContext, "active");
+          // Redraw the active annotation:
+          this.drawAllStrokes(this.interactionCanvas.canvasContext, "active");
+        }
+
+        // Ensure the initial down position gets added to our line
+        this.updateStroke(canvasX, canvasY);
+
+        // Redraw cursor (it will be brighter now because this.isDrawing === true):
+        this.drawCursor(canvasX, canvasY);
+      } else {
+        // If onMouseDown happens when this.isDrawing === true, then we've had two onMouseDown events
+        // with no onMouseUp in between them. That can only happen if we're on iPad and the user has placed
+        // two fingers on the screen, indicating pinch-to-zoom. In this case we want to abort the brushstroke.
+        this.isDrawing = false;
+        this.points = [];
       }
-
-      // Ensure the initial down position gets added to our line
-      this.updateStroke(canvasX, canvasY);
-
-      // Redraw cursor (it will be brighter now because this.isDrawing === true):
-      this.drawCursor(canvasX, canvasY);
     } else if (this.props.mode === Mode.select) {
       // In select mode a single click allows to select a different spline annotation
       const { x: imageX, y: imageY } = canvasToImage(
