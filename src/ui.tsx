@@ -9,7 +9,6 @@ import {
   Paper,
   ThemeProvider,
   Theme,
-  Popover,
   StyledEngineProvider,
 } from "@mui/material";
 import { WithStyles } from "@mui/styles";
@@ -23,6 +22,7 @@ import {
   icons,
   generateClassName,
   WarningSnackbar,
+  Popover,
 } from "@gliff-ai/style";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
@@ -826,11 +826,16 @@ class UserInterface extends Component<Props, State> {
             />
           )}
           <Popover
-            open={
-              this.state.activeSubmenuAnchor === this.refBtnsPopovers.Plugins
+            title="Plugins"
+            TriggerButton={
+              <IconButton
+                tooltip={{
+                  name: "Plugins",
+                }}
+                icon={icons.plugins}
+                size="small"
+              />
             }
-            anchorEl={this.state.activeSubmenuAnchor}
-            onClose={this.handleClose}
           >
             <PluginsCard
               plugins={this.props.plugins}

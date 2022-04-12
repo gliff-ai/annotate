@@ -195,46 +195,36 @@ export const PluginsCard = ({
 
   return (
     <>
-      <Card style={classes.card}>
-        <Paper
-          elevation={0}
-          variant="outlined"
-          square
-          style={classes.paperHeader}
+      <MenuList>{getPluginButtons()}</MenuList>
+      <Divider style={classes.divider} />
+      <Paper elevation={0} square style={classes.paperFooter}>
+        <SVG src={icons.betaStatus} height="25px" width="50px" />
+        <ButtonGroup
+          style={classes.buttonGroup}
+          orientation="horizontal"
+          variant="text"
         >
-          <Typography style={classes.topography}>Plugins</Typography>
-        </Paper>
-        <MenuList>{getPluginButtons()}</MenuList>
-        <Divider style={classes.divider} />
-        <Paper elevation={0} square style={classes.paperFooter}>
-          <SVG src={icons.betaStatus} height="25px" width="50px" />
-          <ButtonGroup
-            style={classes.buttonGroup}
-            orientation="horizontal"
-            variant="text"
-          >
-            {launchPluginSettingsCallback && (
-              <IconButton
-                tooltip={{ name: "Settings" }}
-                icon={icons.cog}
-                onClick={launchPluginSettingsCallback}
-                fill={false}
-                tooltipPlacement="top"
-                size="small"
-              />
-            )}
+          {launchPluginSettingsCallback && (
             <IconButton
-              tooltip={{ name: "Docs" }}
-              icon={icons.documentHelp}
-              onClick={() => {
-                document.location = "https://docs.gliff.app/";
-              }}
+              tooltip={{ name: "Settings" }}
+              icon={icons.cog}
+              onClick={launchPluginSettingsCallback}
+              fill={false}
               tooltipPlacement="top"
               size="small"
             />
-          </ButtonGroup>
-        </Paper>
-      </Card>
+          )}
+          <IconButton
+            tooltip={{ name: "Docs" }}
+            icon={icons.documentHelp}
+            onClick={() => {
+              document.location = "https://docs.gliff.app/";
+            }}
+            tooltipPlacement="top"
+            size="small"
+          />
+        </ButtonGroup>
+      </Paper>
       <WarningSnackbar
         open={error !== null}
         onClose={() => setError(null)}
