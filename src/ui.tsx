@@ -825,6 +825,19 @@ class UserInterface extends Component<Props, State> {
               size="small"
             />
           )}
+          <LabelsSubmenu
+            isOpen={
+              this.state.activeSubmenuAnchor ===
+              this.refBtnsPopovers["Annotation Label"]
+            }
+            anchorElement={this.state.activeSubmenuAnchor}
+            onClose={this.handleClose}
+            annotationsObject={this.annotationsObject}
+            activeAnnotationID={this.state.activeAnnotationID}
+            defaultLabels={this.props.defaultLabels}
+            restrictLabels={this.props.restrictLabels}
+            multiLabel={this.props.multiLabel}
+          />
           <Popover
             title="Plugins"
             TriggerButton={
@@ -849,6 +862,7 @@ class UserInterface extends Component<Props, State> {
             />
           </Popover>
         </ButtonGroup>
+
         <ButtonGroup>
           <PaintbrushToolbar
             active={this.state.activeToolbox === "paintbrush"}
@@ -878,12 +892,12 @@ class UserInterface extends Component<Props, State> {
         </ButtonGroup>
 
         <LabelsSubmenu
-          isOpen={
-            this.state.activeSubmenuAnchor ===
-            this.refBtnsPopovers["Annotation Label"]
-          }
-          anchorElement={this.state.activeSubmenuAnchor}
-          onClose={this.handleClose}
+          // isOpen={
+          //   this.state.activeSubmenuAnchor ===
+          //   this.refBtnsPopovers["Annotation Label"]
+          // }
+          // anchorElement={this.state.activeSubmenuAnchor}
+          // onClose={this.handleClose}
           annotationsObject={this.annotationsObject}
           activeAnnotationID={this.state.activeAnnotationID}
           defaultLabels={this.props.defaultLabels}

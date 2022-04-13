@@ -1,8 +1,9 @@
 import { ReactElement, MouseEvent } from "react";
-import { Grid, Typography, Popover, Card, Paper } from "@mui/material";
-import { theme } from "@gliff-ai/style";
+import { Grid, Typography, Card, Paper } from "@mui/material";
+import { theme, Popover, IconButton, icons } from "@gliff-ai/style";
 import makeStyles from "@mui/styles/makeStyles";
 import { Labels, Props as LabelsProps } from "./Labels";
+import { display } from "@mui/system";
 
 const useStyles = makeStyles(() => ({
   annotationCard: {
@@ -42,33 +43,28 @@ export const Submenu = (props: Props): ReactElement => {
 
   return (
     <Popover
-      open={props.isOpen}
-      anchorEl={props.anchorElement}
-      onClose={props.onClose}
+      title="Annotation Labels"
+      TriggerButton={
+        <IconButton
+          tooltip={{
+            name: "Open Popover",
+          }}
+          icon={icons.plugins}
+          size="small"
+          style={{ display: "none" }}
+        />
+      }
+      // open={props.isOpen}
+      // anchorEl={props.anchorElement}
+      // onClose={props.onClose}
     >
-      <Card className={classes.annotationCard}>
-        <Paper
-          elevation={0}
-          variant="outlined"
-          square
-          className={classes.annotationPaper}
-        >
-          <Typography className={classes.annotationTypography}>
-            Annotation Labels
-          </Typography>
-        </Paper>
-        <Paper elevation={0} square className={classes.labelsPaper}>
-          <Grid>
-            <Labels
-              annotationsObject={props.annotationsObject}
-              activeAnnotationID={props.activeAnnotationID}
-              defaultLabels={props.defaultLabels}
-              restrictLabels={props.restrictLabels}
-              multiLabel={props.multiLabel}
-            />
-          </Grid>
-        </Paper>
-      </Card>
+      <Labels
+        annotationsObject={props.annotationsObject}
+        activeAnnotationID={props.activeAnnotationID}
+        defaultLabels={props.defaultLabels}
+        restrictLabels={props.restrictLabels}
+        multiLabel={props.multiLabel}
+      />
     </Popover>
   );
 };
