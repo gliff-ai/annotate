@@ -23,6 +23,7 @@ import {
   generateClassName,
   WarningSnackbar,
   Popover,
+  MuiPopover,
 } from "@gliff-ai/style";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
@@ -838,17 +839,12 @@ class UserInterface extends Component<Props, State> {
             restrictLabels={this.props.restrictLabels}
             multiLabel={this.props.multiLabel}
           />
-          <Popover
-            title="Plugins"
-            TriggerButton={
-              <IconButton
-                tooltip={{
-                  name: "Plugins",
-                }}
-                icon={icons.plugins}
-                size="small"
-              />
+          <MuiPopover
+            open={
+              this.state.activeSubmenuAnchor === this.refBtnsPopovers.Plugins
             }
+            anchorEl={this.state.activeSubmenuAnchor}
+            onClose={this.handleClose}
           >
             <PluginsCard
               plugins={this.props.plugins}
@@ -860,7 +856,7 @@ class UserInterface extends Component<Props, State> {
               annotationsObject={this.annotationsObject}
               saveMetadataCallback={this.props.saveMetadataCallback}
             />
-          </Popover>
+          </MuiPopover>
         </ButtonGroup>
 
         <ButtonGroup>

@@ -1,6 +1,5 @@
-import { ReactElement, useState, CSSProperties } from "react";
+import { ReactElement, useState } from "react";
 import {
-  Card,
   Paper,
   Typography,
   Divider,
@@ -10,56 +9,18 @@ import {
 } from "@mui/material";
 import SVG from "react-inlinesvg";
 import {
-  theme,
   icons,
   IconButton,
   WarningSnackbar,
   HtmlTooltip,
   BaseTooltipTitle,
+  Card,
 } from "@gliff-ai/style";
 import { ImageFileInfo } from "@gliff-ai/upload";
 import { Annotations } from "@/annotation";
 import { Annotation } from "@/annotation/interfaces";
 import type { PluginObject, PluginElement, PluginOutput } from "./interfaces";
 import { PluginDialog } from "./PluginDialog";
-
-const style = (
-  hover: boolean
-): {
-  [key: string]: CSSProperties;
-} => ({
-  card: { width: "300px" },
-  paperHeader: {
-    padding: "10px",
-    backgroundColor: theme.palette.primary.main,
-  },
-  topography: {
-    display: "inline",
-    fontWeight: 500,
-    marginLeft: "10px",
-  },
-  menuItem: {
-    margin: 0,
-    fontSize: "16px",
-    paddingLeft: "20px",
-    height: "40px",
-    backgroundColor: hover ? theme.palette.grey[300] : "transparent",
-  },
-  divider: { margin: 0, width: "100%", lineHeight: "1px" },
-  paperFooter: {
-    padding: "0 20px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  buttonGroup: { border: "none", backgroundColor: "transparent" },
-  truncate: {
-    width: "250px",
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-  },
-});
 
 interface Props {
   plugins: PluginObject | null;
@@ -80,8 +41,6 @@ export const PluginsCard = ({
 }: Props): ReactElement | null => {
   const [error, setError] = useState<string | null>(null);
   const [dialogContent, setDialogContent] = useState<JSX.Element | null>(null);
-  const [hover, setHover] = useState<boolean>(false);
-  const classes = style(hover);
 
   if (!plugins) return null;
 
@@ -166,11 +125,14 @@ export const PluginsCard = ({
       return plugin.map((p) => (
         <MenuItem
           key={p.name}
-          style={classes.menuItem}
-          onMouseLeave={() => setHover(false)}
-          onMouseEnter={() => setHover(true)}
           onClick={() => runPlugin(p)}
           dense
+          sx={{
+            margin: 0,
+            fontSize: "16px",
+            paddingLeft: "20px",
+            height: "40px",
+          }}
         >
           <HtmlTooltip
             placement="top"
@@ -182,7 +144,14 @@ export const PluginsCard = ({
               />
             }
           >
-            <Typography style={classes.truncate}>
+            <Typography
+              sx={{
+                width: "250px",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
               {p.name}&nbsp;—&nbsp;{p.tooltip}
             </Typography>
           </HtmlTooltip>
@@ -194,45 +163,59 @@ export const PluginsCard = ({
   };
 
   return (
-    <>
-      <MenuList>{getPluginButtons()}</MenuList>
-      <Divider style={classes.divider} />
-      <Paper elevation={0} square style={classes.paperFooter}>
-        <SVG src={icons.betaStatus} height="25px" width="50px" />
-        <ButtonGroup
-          style={classes.buttonGroup}
-          orientation="horizontal"
-          variant="text"
+    <Card title="Plugins">
+      <>
+        <MenuList>{getPluginButtons()}</MenuList>
+        <Divider sx={{ margin: 0, width: "100%", lineHeight: "1px" }} />
+        <Paper
+          elevation={0}
+          square
+          sx={{
+            padding: "0 20px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
         >
-          {launchPluginSettingsCallback && (
+          <SVG src={icons.betaStatus} height="25px" width="50px" />
+          <ButtonGroup
+            orientation="horizontal"
+            variant="text"
+            sx={{
+              border: "none",
+              backgroundColor: "transparent",
+            }}
+          >
+            {launchPluginSettingsCallback && (
+              <IconButton
+                tooltip={{ name: "Settings" }}
+                icon={icons.cog}
+                onClick={launchPluginSettingsCallback}
+                fill={false}
+                tooltipPlacement="top"
+                size="small"
+              />
+            )}
             <IconButton
-              tooltip={{ name: "Settings" }}
-              icon={icons.cog}
-              onClick={launchPluginSettingsCallback}
-              fill={false}
+              tooltip={{ name: "Docs" }}
+              icon={icons.documentHelp}
+              onClick={() => {
+                document.location = "https://docs.gliff.app/";
+              }}
               tooltipPlacement="top"
               size="small"
             />
-          )}
-          <IconButton
-            tooltip={{ name: "Docs" }}
-            icon={icons.documentHelp}
-            onClick={() => {
-              document.location = "https://docs.gliff.app/";
-            }}
-            tooltipPlacement="top"
-            size="small"
-          />
-        </ButtonGroup>
-      </Paper>
-      <WarningSnackbar
-        open={error !== null}
-        onClose={() => setError(null)}
-        messageText={error}
-      />
-      <PluginDialog setChildren={setDialogContent}>
-        {dialogContent}
-      </PluginDialog>
-    </>
+          </ButtonGroup>
+        </Paper>
+        <WarningSnackbar
+          open={error !== null}
+          onClose={() => setError(null)}
+          messageText={error}
+        />
+        <PluginDialog setChildren={setDialogContent}>
+          {dialogContent}
+        </PluginDialog>
+      </>
+    </Card>
   );
 };
