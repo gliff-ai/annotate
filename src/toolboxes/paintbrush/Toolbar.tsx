@@ -5,7 +5,7 @@ import {
   IconButton,
   icons,
   ButtonGroup,
-  Card,
+  MuiCard,
   Divider,
 } from "@gliff-ai/style";
 import { Box } from "@mui/system";
@@ -287,7 +287,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
 
             <>
               {openSubmenu && (
-                <Card
+                <MuiCard
                   sx={{
                     width: "285px",
                     height: "fit-content",
@@ -338,7 +338,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                       </Box>
                     </>
                   )}
-                </Card>
+                </MuiCard>
               )}
             </>
           </>

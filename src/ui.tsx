@@ -892,12 +892,12 @@ class UserInterface extends Component<Props, State> {
         </ButtonGroup>
 
         <LabelsSubmenu
-          // isOpen={
-          //   this.state.activeSubmenuAnchor ===
-          //   this.refBtnsPopovers["Annotation Label"]
-          // }
-          // anchorElement={this.state.activeSubmenuAnchor}
-          // onClose={this.handleClose}
+          isOpen={
+            this.state.activeSubmenuAnchor ===
+            this.refBtnsPopovers["Annotation Label"]
+          }
+          anchorElement={this.state.activeSubmenuAnchor}
+          onClose={this.handleClose}
           annotationsObject={this.annotationsObject}
           activeAnnotationID={this.state.activeAnnotationID}
           defaultLabels={this.props.defaultLabels}
