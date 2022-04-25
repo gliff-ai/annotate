@@ -328,26 +328,7 @@ class CanvasClass extends Component<Props, State> {
       if (isCTRL) {
         this.onCTRLClick(x, y);
       } else {
-        // if our current spline annotation object is for the visible slice
-        // get the current spline coordinates
-        const coordinates = this.props.annotationsObject.getSplineCoordinates();
-
-        // check if we clicked within the nudge radius of an existing point
-        const nudgePointIdx = this.clickNearPoint(
-          { x: imageX, y: imageY },
-          coordinates
-        );
-
-        if (nudgePointIdx !== -1) {
-          // If the mouse click was near an existing point, nudge that point
-          const nudgePoint = coordinates[nudgePointIdx];
-
-          this.props.annotationsObject.updateSplinePoint(
-            (nudgePoint.x + imageX) / 2,
-            (nudgePoint.y + imageY) / 2,
-            nudgePointIdx
-          );
-        } else if (
+        if (
           this.props.mode === Mode.draw &&
           !this.props.annotationsObject.splineIsClosed()
         ) {
