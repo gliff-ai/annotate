@@ -249,7 +249,7 @@ class CanvasClass extends Component<Props, State> {
   };
 
   clickNearPoint = (clickPoint: XYPoint, splineVector: XYPoint[]): number => {
-    // iterates through the points of splineVector, returns the index of the first point within distance 25 of clickPoint
+    // iterates through the points of splineVector, returns the index of the closest point within distance 25 of clickPoint
     // clickPoint and splineVector are both expected to be in image space
     // returns -1 if no point was within distance 25
 
@@ -262,6 +262,8 @@ class CanvasClass extends Component<Props, State> {
       this.state.canvasPositionAndSize
     );
 
+    let minDist = 9999999;
+    let minDistIdx = -1;
     for (let i = 0; i < splineVector.length; i += 1) {
       // transform points into canvas space so the nudge radius won't depend on zoom level:
       let point = splineVector[i];
@@ -278,10 +280,13 @@ class CanvasClass extends Component<Props, State> {
         (point.x - clickPointX) ** 2 + (point.y - clickPointY) ** 2
       );
 
-      if (distanceToPoint < 25) return i;
+      if (distanceToPoint < 25 && distanceToPoint < minDist) {
+        minDist = distanceToPoint;
+        minDistIdx = i;
+      }
     }
 
-    return -1;
+    return minDistIdx;
   };
 
   onClick = (x: number, y: number, isCTRL?: boolean): void => {
