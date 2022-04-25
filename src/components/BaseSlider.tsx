@@ -80,7 +80,7 @@ export const BaseSlider = ({
           getAriaValueText={getAriaValueText}
           marks={marks}
           size="small"
-          style={{ height: "100%" }}
+          sx={{ height: "100%" }}
         />
       </div>
     </>
