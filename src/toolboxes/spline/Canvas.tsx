@@ -294,11 +294,22 @@ class CanvasClass extends Component<Props, State> {
     // or add new point to a normal spline (Mode.draw and this.props.activeToolbox === "Spline")
     // or add TL or BR point to a rectangle spline (Mode.draw and this.props.activeToolbox === Tools.rectspline.name)
 
+    const coordinates = this.props.annotationsObject.getSplineCoordinates();
+
     if (this.isDrawing || this.dragPoint) {
       // turns out onClick still runs when releasing a drag, so we want to abort in that case:
       this.isDrawing = false;
       this.dragPoint = null;
-      return;
+
+      if (
+        !(
+          this.selectedPointIndex === coordinates.length - 1 &&
+          this.dragPoint != coordinates[coordinates.length - 1]
+        )
+      )
+        // But if the selected point is the last point in the spline, and we've not actually moved it,
+        // then don't abort onClick - the user is trying to add a point near the end of the spline.
+        return;
     }
 
     // X and Y are in CanvasSpace, convert to ImageSpace
@@ -502,7 +513,7 @@ class CanvasClass extends Component<Props, State> {
     const nearPoint = this.clickNearPoint(clickPoint, coordinates);
     if (nearPoint !== -1) {
       this.selectedPointIndex = nearPoint;
-      this.dragPoint = clickPoint;
+      this.dragPoint = coordinates[nearPoint];
     } else if (
       this.props.activeToolbox === "Magic Spline" &&
       !this.props.annotationsObject.splineIsClosed()
