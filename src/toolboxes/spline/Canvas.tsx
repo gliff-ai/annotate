@@ -351,7 +351,11 @@ class CanvasClass extends Component<Props, State> {
           // else, i.e. not near an existing point
           // if the spline is not closed and we are in Mode.draw then
           // add coordinates to the current spline
-          if (this.props.activeToolbox === "Spline") {
+          if (
+            this.props.activeToolbox === "Spline" &&
+            JSON.stringify({ x: imageX, y: imageY }) !==
+              JSON.stringify(coordinates[coordinates.length - 1]) // don't allow duplicate points
+          ) {
             // if a normal spline, just add points as needed
             this.props.annotationsObject.addSplinePoint({
               x: imageX,
