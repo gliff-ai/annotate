@@ -57,9 +57,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     return true;
   };
 
-  const handleClickAway = () => {
-    return;
-  };
+  const handleClickAway = () => {};
 
   const tools = [
     {

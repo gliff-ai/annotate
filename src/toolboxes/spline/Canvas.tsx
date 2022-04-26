@@ -304,7 +304,7 @@ class CanvasClass extends Component<Props, State> {
       if (
         !(
           this.selectedPointIndex === coordinates.length - 1 &&
-          this.dragPoint != coordinates[coordinates.length - 1]
+          this.dragPoint !== coordinates[coordinates.length - 1]
         )
       )
         // But if the selected point is the last point in the spline, and we've not actually moved it,
@@ -343,22 +343,20 @@ class CanvasClass extends Component<Props, State> {
     if (this.sliceIndexMatch()) {
       if (isCTRL) {
         this.onCTRLClick(x, y);
-      } else {
-        if (
-          this.props.mode === Mode.draw &&
-          !this.props.annotationsObject.splineIsClosed() &&
-          this.props.activeToolbox === "Spline" &&
-          JSON.stringify({ x: imageX, y: imageY }) !==
-            JSON.stringify(coordinates[coordinates.length - 1]) // don't allow duplicate points
-        ) {
-          // if a normal spline, just add points as needed
-          this.props.annotationsObject.addSplinePoint({
-            x: imageX,
-            y: imageY,
-          });
-          this.selectedPointIndex =
-            this.props.annotationsObject.getSplineLength() - 1;
-        }
+      } else if (
+        this.props.mode === Mode.draw &&
+        !this.props.annotationsObject.splineIsClosed() &&
+        this.props.activeToolbox === "Spline" &&
+        JSON.stringify({ x: imageX, y: imageY }) !==
+          JSON.stringify(coordinates[coordinates.length - 1]) // don't allow duplicate points
+      ) {
+        // if a normal spline, just add points as needed
+        this.props.annotationsObject.addSplinePoint({
+          x: imageX,
+          y: imageY,
+        });
+        this.selectedPointIndex =
+          this.props.annotationsObject.getSplineLength() - 1;
       }
     }
 
