@@ -365,13 +365,47 @@ class CanvasClass extends Component<Props, State> {
         JSON.stringify({ x: imageX, y: imageY }) !==
           JSON.stringify(coordinates[coordinates.length - 1]) // don't allow duplicate points
       ) {
-        // if a normal spline, just add points as needed
-        this.props.annotationsObject.addSplinePoint({
-          x: imageX,
-          y: imageY,
-        });
-        this.selectedPointIndex =
-          this.props.annotationsObject.getSplineLength() - 1;
+        const cubic = true;
+        if (cubic && coordinates.length > 0) {
+          // add three points (second control point for the current terminal point, first control point for the new terminal point, and the new terminal point):
+          const newPoint = { x: imageX, y: imageY };
+          const prevPoint = coordinates[coordinates.length - 1];
+          const prevPrevPoint = coordinates[coordinates.length - 2];
+
+          // add the current terminal point's second control point:
+          let newControlPoint: XYPoint;
+          if (coordinates.length === 1) {
+            // do it 25% the way to the new point if we're adding the second point in the curve
+            newControlPoint = {
+              x: 0.75 * prevPoint.x + 0.25 * newPoint.x,
+              y: 0.75 * prevPoint.y + 0.25 * newPoint.y,
+            };
+          } else {
+            // otherwise, place it equal and opposite to the current terminal point's first control point, ensuring a smooth curve:
+            newControlPoint = {
+              x: 2 * prevPoint.x - prevPrevPoint.x,
+              y: 2 * prevPoint.y - prevPrevPoint.y,
+            };
+          }
+          this.props.annotationsObject.addSplinePoint(newControlPoint);
+
+          // add the new point's first control point, 25% along the line to the newly added control point:
+          this.props.annotationsObject.addSplinePoint({
+            x: 0.25 * newControlPoint.x + 0.75 * newPoint.x,
+            y: 0.25 * newControlPoint.y + 0.75 * newPoint.y,
+          });
+
+          // add the new point:
+          this.props.annotationsObject.addSplinePoint(newPoint);
+        } else {
+          // if a normal spline, just add points as needed
+          this.props.annotationsObject.addSplinePoint({
+            x: imageX,
+            y: imageY,
+          });
+          this.selectedPointIndex =
+            this.props.annotationsObject.getSplineLength() - 1;
+        }
       }
     }
 
