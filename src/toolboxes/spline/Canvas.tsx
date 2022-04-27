@@ -106,9 +106,24 @@ class CanvasClass extends Component<Props, State> {
     isActive = false,
     color: string
   ): void => {
-    const splineVector = spline.coordinates;
+    let splineVector = spline.coordinates;
 
     if (splineVector.length === 0) return;
+
+    // transform spline points to canvas space and shift one of them if we're dragging it:
+    if (isActive && this.dragPoint) {
+      splineVector[this.selectedPointIndex] = this.dragPoint;
+    }
+    splineVector = splineVector.map((point) =>
+      imageToCanvas(
+        point.x,
+        point.y,
+        this.props.displayedImage.width,
+        this.props.displayedImage.height,
+        this.props.scaleAndPan,
+        this.state.canvasPositionAndSize
+      )
+    );
 
     const { canvasContext: context } = this.baseCanvas;
     const lineWidth = isActive ? 2 : 1;
@@ -125,78 +140,50 @@ class CanvasClass extends Component<Props, State> {
 
     if (splineVector.length > 1) {
       // Go to the first point
-      let firstPoint: XYPoint;
-      if (isActive && this.selectedPointIndex === 0 && this.dragPoint) {
-        firstPoint = this.dragPoint;
-      } else {
-        firstPoint = splineVector[0]; // eslint-disable-line prefer-destructuring
-      }
-
-      firstPoint = imageToCanvas(
-        firstPoint.x,
-        firstPoint.y,
-        this.props.displayedImage.width,
-        this.props.displayedImage.height,
-        this.props.scaleAndPan,
-        this.state.canvasPositionAndSize
-      );
-
       context.beginPath();
-      context.moveTo(firstPoint.x, firstPoint.y);
+      context.moveTo(splineVector[0].x, splineVector[0].y);
 
-      // Draw each point by taking our raw coordinates and applying the transform so they fit on our canvas
-      for (const [idx, { x, y }] of splineVector.entries()) {
-        let drawPoint: XYPoint;
-        if (isActive && this.dragPoint && idx === this.selectedPointIndex) {
-          // draw the point at the current mouse position if we're dragging it:
-          drawPoint = this.dragPoint;
-        } else {
-          drawPoint = { x, y };
+      const cubic = true;
+      if (cubic) {
+        let i = 1;
+        while (i + 3 <= splineVector.length) {
+          context.bezierCurveTo(
+            splineVector[i].x,
+            splineVector[i].y,
+            splineVector[i + 1].x,
+            splineVector[i + 1].y,
+            splineVector[i + 2].x,
+            splineVector[i + 2].y
+          );
+          i += 3;
         }
-        nextPoint = imageToCanvas(
-          drawPoint.x,
-          drawPoint.y,
-          this.props.displayedImage.width,
-          this.props.displayedImage.height,
-          this.props.scaleAndPan,
-          this.state.canvasPositionAndSize
-        );
-        context.lineTo(nextPoint.x, nextPoint.y);
+      } else {
+        // Draw each point by taking our raw coordinates and applying the transform so they fit on our canvas
+        for (const [idx, { x, y }] of splineVector.entries()) {
+          context.lineTo(x, y);
+        }
+        if (spline.isClosed) {
+          context.lineTo(splineVector[0].x, splineVector[0].y);
+        }
       }
-      if (spline.isClosed) {
-        context.lineTo(firstPoint.x, firstPoint.y);
-      }
+
       context.stroke();
     }
 
     // Draw all points
     context.beginPath();
     splineVector.forEach(({ x, y }, i) => {
-      let drawPoint: XYPoint;
-      if (isActive && this.dragPoint && i === this.selectedPointIndex) {
-        drawPoint = this.dragPoint;
-      } else {
-        drawPoint = { x, y };
-      }
-      nextPoint = imageToCanvas(
-        drawPoint.x,
-        drawPoint.y,
-        this.props.displayedImage.width,
-        this.props.displayedImage.height,
-        this.props.scaleAndPan,
-        this.state.canvasPositionAndSize
-      );
       if (this.selectedPointIndex === i && isActive) {
         context.fillRect(
-          nextPoint.x - pointSize / 2,
-          nextPoint.y - pointSize / 2,
+          x - pointSize / 2,
+          y - pointSize / 2,
           pointSize,
           pointSize
         ); // draw a filled square to mark the point as selected
       } else {
         context.rect(
-          nextPoint.x - pointSize / 2,
-          nextPoint.y - pointSize / 2,
+          x - pointSize / 2,
+          y - pointSize / 2,
           pointSize,
           pointSize
         ); // draw a square to mark the point
