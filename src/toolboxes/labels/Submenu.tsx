@@ -11,22 +11,20 @@ interface Props extends LabelsProps {
   multiLabel: boolean;
 }
 
-export const Submenu = (props: Props): ReactElement => {
-  return (
-    <MuiPopover
-      open={props.isOpen}
-      anchorEl={props.anchorElement}
-      onClose={props.onClose}
-    >
-      <Card title="Annotation Labels">
-        <Labels
-          annotationsObject={props.annotationsObject}
-          activeAnnotationID={props.activeAnnotationID}
-          defaultLabels={props.defaultLabels}
-          restrictLabels={props.restrictLabels}
-          multiLabel={props.multiLabel}
-        />
-      </Card>
-    </MuiPopover>
-  );
-};
+export const Submenu = (props: Props): ReactElement => (
+  <MuiPopover
+    open={props.isOpen}
+    anchorEl={props.anchorElement}
+    onClose={props.onClose}
+  >
+    <Card title="Annotation Labels">
+      <Labels
+        annotationsObject={props.annotationsObject}
+        activeAnnotationID={props.activeAnnotationID}
+        defaultLabels={props.defaultLabels}
+        restrictLabels={props.restrictLabels}
+        multiLabel={props.multiLabel}
+      />
+    </Card>
+  </MuiPopover>
+);
