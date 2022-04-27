@@ -22,7 +22,6 @@ import {
   icons,
   generateClassName,
   WarningSnackbar,
-  Popover,
   MuiPopover,
 } from "@gliff-ai/style";
 import { Annotations } from "@/annotation";
