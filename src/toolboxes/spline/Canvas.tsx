@@ -106,6 +106,8 @@ class CanvasClass extends Component<Props, State> {
     isActive = false,
     color: string
   ): void => {
+    const cubic = true;
+
     let splineVector = spline.coordinates;
 
     if (splineVector.length === 0) return;
@@ -136,17 +138,15 @@ class CanvasClass extends Component<Props, State> {
     context.fillStyle = secondaryColor;
 
     const pointSize = 6;
-    let nextPoint;
 
     if (splineVector.length > 1) {
       // Go to the first point
       context.beginPath();
       context.moveTo(splineVector[0].x, splineVector[0].y);
 
-      const cubic = true;
       if (cubic) {
         let i = 1;
-        while (i + 3 <= splineVector.length) {
+        while (i + 2 < splineVector.length) {
           context.bezierCurveTo(
             splineVector[i].x,
             splineVector[i].y,
@@ -168,11 +168,39 @@ class CanvasClass extends Component<Props, State> {
       }
 
       context.stroke();
+
+      if (cubic && isActive) {
+        // draw lines to control points:
+        context.beginPath();
+        context.strokeStyle = getRGBAString(
+          palette[
+            this.props.annotationsObject.getActiveAnnotationID() %
+              palette.length
+          ]
+        );
+        context.lineWidth = 1;
+        let i = 0;
+        while (i < splineVector.length) {
+          context.moveTo(splineVector[i].x, splineVector[i].y);
+          if (i + 1 < splineVector.length) {
+            context.lineTo(splineVector[i + 1].x, splineVector[i + 1].y);
+          }
+          context.moveTo(splineVector[i].x, splineVector[i].y);
+          if (i > 0) {
+            context.lineTo(splineVector[i - 1].x, splineVector[i - 1].y);
+          }
+          i += 3;
+        }
+        context.stroke();
+        context.strokeStyle = isActive ? mainColor : color;
+      }
     }
 
     // Draw all points
     context.beginPath();
     splineVector.forEach(({ x, y }, i) => {
+      if (!isActive && cubic && i % 3 !== 0) return;
+
       if (this.selectedPointIndex === i && isActive) {
         context.fillRect(
           x - pointSize / 2,
