@@ -31,6 +31,7 @@
     "@emotion/styled": "^11.6.0",
     "@gliff-ai/eslint-config": "^0.1.3",
     "@gliff-ai/jest-browserstack-automate": "^5.0.6",
+    "@gliff-ai/style": "^10.0.2",
     "@gliff-ai/upload": "^1.2.8",
     "@mui/icons-material": "<=5.4.3",
     "@mui/material": "<=5.4.3",
@@ -63,6 +64,7 @@
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
     "@gliff-ai/upload": "^1.2.8",
+    "@gliff-ai/style": "^10.0.2",
     "@mui/icons-material": "<=5.4.3",
     "@mui/material": "<=5.4.3",
     "@mui/styles": "<=5.4.3",
@@ -73,7 +75,6 @@
   "dependencies": {
     "@babel/plugin-transform-runtime": "^7.16.4",
     "@gliff-ai/slpf": "^1.1.2",
-    "@gliff-ai/style": "file:gliff-ai-style-9.0.4.tgz",
     "@percy/selenium-webdriver": "^1.0.0",
     "@types/selenium-webdriver": "^4.0.16",
     "@use-gesture/react": "^10.1.1",
