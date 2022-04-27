@@ -249,7 +249,7 @@ class CanvasClass extends Component<Props, State> {
   };
 
   clickNearPoint = (clickPoint: XYPoint, splineVector: XYPoint[]): number => {
-    // iterates through the points of splineVector, returns the index of the first point within distance 25 of clickPoint
+    // iterates through the points of splineVector, returns the index of the closest point within distance 25 of clickPoint
     // clickPoint and splineVector are both expected to be in image space
     // returns -1 if no point was within distance 25
 
@@ -262,6 +262,8 @@ class CanvasClass extends Component<Props, State> {
       this.state.canvasPositionAndSize
     );
 
+    let minDist = 9999999;
+    let minDistIdx = -1;
     for (let i = 0; i < splineVector.length; i += 1) {
       // transform points into canvas space so the nudge radius won't depend on zoom level:
       let point = splineVector[i];
@@ -278,10 +280,13 @@ class CanvasClass extends Component<Props, State> {
         (point.x - clickPointX) ** 2 + (point.y - clickPointY) ** 2
       );
 
-      if (distanceToPoint < 25) return i;
+      if (distanceToPoint < 25 && distanceToPoint < minDist) {
+        minDist = distanceToPoint;
+        minDistIdx = i;
+      }
     }
 
-    return -1;
+    return minDistIdx;
   };
 
   onClick = (x: number, y: number, isCTRL?: boolean): void => {
@@ -289,11 +294,22 @@ class CanvasClass extends Component<Props, State> {
     // or add new point to a normal spline (Mode.draw and this.props.activeToolbox === "Spline")
     // or add TL or BR point to a rectangle spline (Mode.draw and this.props.activeToolbox === Tools.rectspline.name)
 
+    const coordinates = this.props.annotationsObject.getSplineCoordinates();
+
     if (this.isDrawing || this.dragPoint) {
       // turns out onClick still runs when releasing a drag, so we want to abort in that case:
       this.isDrawing = false;
       this.dragPoint = null;
-      return;
+
+      if (
+        !(
+          this.selectedPointIndex === coordinates.length - 1 &&
+          this.dragPoint !== coordinates[coordinates.length - 1]
+        )
+      )
+        // But if the selected point is the last point in the spline, and we've not actually moved it,
+        // then don't abort onClick - the user is trying to add a point near the end of the spline.
+        return;
     }
 
     // X and Y are in CanvasSpace, convert to ImageSpace
@@ -327,43 +343,20 @@ class CanvasClass extends Component<Props, State> {
     if (this.sliceIndexMatch()) {
       if (isCTRL) {
         this.onCTRLClick(x, y);
-      } else {
-        // if our current spline annotation object is for the visible slice
-        // get the current spline coordinates
-        const coordinates = this.props.annotationsObject.getSplineCoordinates();
-
-        // check if we clicked within the nudge radius of an existing point
-        const nudgePointIdx = this.clickNearPoint(
-          { x: imageX, y: imageY },
-          coordinates
-        );
-
-        if (nudgePointIdx !== -1) {
-          // If the mouse click was near an existing point, nudge that point
-          const nudgePoint = coordinates[nudgePointIdx];
-
-          this.props.annotationsObject.updateSplinePoint(
-            (nudgePoint.x + imageX) / 2,
-            (nudgePoint.y + imageY) / 2,
-            nudgePointIdx
-          );
-        } else if (
-          this.props.mode === Mode.draw &&
-          !this.props.annotationsObject.splineIsClosed()
-        ) {
-          // else, i.e. not near an existing point
-          // if the spline is not closed and we are in Mode.draw then
-          // add coordinates to the current spline
-          if (this.props.activeToolbox === "Spline") {
-            // if a normal spline, just add points as needed
-            this.props.annotationsObject.addSplinePoint({
-              x: imageX,
-              y: imageY,
-            });
-            this.selectedPointIndex =
-              this.props.annotationsObject.getSplineLength() - 1;
-          }
-        }
+      } else if (
+        this.props.mode === Mode.draw &&
+        !this.props.annotationsObject.splineIsClosed() &&
+        this.props.activeToolbox === "Spline" &&
+        JSON.stringify({ x: imageX, y: imageY }) !==
+          JSON.stringify(coordinates[coordinates.length - 1]) // don't allow duplicate points
+      ) {
+        // if a normal spline, just add points as needed
+        this.props.annotationsObject.addSplinePoint({
+          x: imageX,
+          y: imageY,
+        });
+        this.selectedPointIndex =
+          this.props.annotationsObject.getSplineLength() - 1;
       }
     }
 
@@ -516,7 +509,7 @@ class CanvasClass extends Component<Props, State> {
     const nearPoint = this.clickNearPoint(clickPoint, coordinates);
     if (nearPoint !== -1) {
       this.selectedPointIndex = nearPoint;
-      this.dragPoint = clickPoint;
+      this.dragPoint = coordinates[nearPoint];
     } else if (
       this.props.activeToolbox === "Magic Spline" &&
       !this.props.annotationsObject.splineIsClosed()
