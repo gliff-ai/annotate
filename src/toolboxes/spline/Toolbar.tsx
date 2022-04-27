@@ -57,6 +57,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     return true;
   };
 
+  const handleClickAway = () => {};
+
   const tools = [
     {
       name: "Spline",
@@ -129,6 +131,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     <Popper
       open={props.isOpen}
       anchorEl={props.anchorElement}
+      handleClickAway={handleClickAway}
       el={
         <ButtonGroup size="small" id="spline-toolbar" variant="text">
           {tools.map(({ icon, name, event, active }) => (
