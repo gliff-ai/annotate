@@ -264,9 +264,9 @@ class CanvasClass extends Component<Props, State> {
   };
 
   clickNearPoint = (clickPoint: XYPoint, splineVector: XYPoint[]): number => {
-    // iterates through the points of splineVector, returns the index of the closest point within distance 25 of clickPoint
+    // iterates through the points of splineVector, returns the index of the closest point within distance 16 of clickPoint
     // clickPoint and splineVector are both expected to be in image space
-    // returns -1 if no point was within distance 25
+    // returns -1 if no point was within distance 16
 
     const { x: clickPointX, y: clickPointY } = imageToCanvas(
       clickPoint.x,
@@ -295,7 +295,7 @@ class CanvasClass extends Component<Props, State> {
         (point.x - clickPointX) ** 2 + (point.y - clickPointY) ** 2
       );
 
-      if (distanceToPoint < 25 && distanceToPoint < minDist) {
+      if (distanceToPoint < 16 && distanceToPoint < minDist) {
         minDist = distanceToPoint;
         minDistIdx = i;
       }
@@ -386,6 +386,41 @@ class CanvasClass extends Component<Props, State> {
 
           // add the new point:
           this.props.annotationsObject.addSplinePoint(newPoint);
+
+          // make the curve smooth:
+          coordinates = this.props.annotationsObject.getSplineCoordinates();
+          const i = coordinates.length - 4;
+          if (i >= 3) {
+            const norm = (point: XYPoint) =>
+              Math.sqrt(point.x ** 2 + point.y ** 2);
+
+            // a: previous point
+            // b: this point
+            // c: next point
+            const ab = {
+              x: coordinates[i].x - coordinates[i - 3].x,
+              y: coordinates[i].y - coordinates[i - 3].y,
+            };
+            const bc = {
+              x: coordinates[i + 3].x - coordinates[i].x,
+              y: coordinates[i + 3].y - coordinates[i].y,
+            };
+            const ac = {
+              x: coordinates[i + 3].x - coordinates[i - 3].x,
+              y: coordinates[i + 3].y - coordinates[i - 3].y,
+            };
+
+            this.props.annotationsObject.updateSplinePoint(
+              coordinates[i].x - (ac.x * norm(ab) * 0.3) / norm(ac),
+              coordinates[i].y - (ac.y * norm(ab) * 0.3) / norm(ac),
+              i - 1
+            );
+            this.props.annotationsObject.updateSplinePoint(
+              coordinates[i].x + (ac.x * norm(bc) * 0.3) / norm(ac),
+              coordinates[i].y + (ac.y * norm(bc) * 0.3) / norm(ac),
+              i + 1
+            );
+          }
         } else {
           // if a normal spline, just add points as needed
           this.props.annotationsObject.addSplinePoint({
@@ -394,42 +429,6 @@ class CanvasClass extends Component<Props, State> {
           });
           this.selectedPointIndex =
             this.props.annotationsObject.getSplineLength() - 1;
-        }
-
-        coordinates = this.props.annotationsObject.getSplineCoordinates();
-        const i = coordinates.length - 4;
-        if (i >= 3) {
-          // make the curve smooth:
-
-          const norm = (point: XYPoint) =>
-            Math.sqrt(point.x ** 2 + point.y ** 2);
-
-          // a: previous point
-          // b: this point
-          // c: next point
-          const ab = {
-            x: coordinates[i].x - coordinates[i - 3].x,
-            y: coordinates[i].y - coordinates[i - 3].y,
-          };
-          const bc = {
-            x: coordinates[i + 3].x - coordinates[i].x,
-            y: coordinates[i + 3].y - coordinates[i].y,
-          };
-          const ac = {
-            x: coordinates[i + 3].x - coordinates[i - 3].x,
-            y: coordinates[i + 3].y - coordinates[i - 3].y,
-          };
-
-          this.props.annotationsObject.updateSplinePoint(
-            coordinates[i].x - (ac.x * norm(ab) * 0.3) / norm(ac),
-            coordinates[i].y - (ac.y * norm(ab) * 0.3) / norm(ac),
-            i - 1
-          );
-          this.props.annotationsObject.updateSplinePoint(
-            coordinates[i].x + (ac.x * norm(bc) * 0.3) / norm(ac),
-            coordinates[i].y + (ac.y * norm(bc) * 0.3) / norm(ac),
-            i + 1
-          );
         }
       }
     }
