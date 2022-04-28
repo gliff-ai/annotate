@@ -114,6 +114,21 @@ class CanvasClass extends Component<Props, State> {
 
     // transform spline points to canvas space and shift one of them if we're dragging it:
     if (isActive && this.dragPoint) {
+      if (cubic && this.selectedPointIndex % 3 === 0) {
+        // dragging a Bezier curve node, so move the control points with it:
+        const translation = {
+          x: this.dragPoint.x - splineVector[this.selectedPointIndex].x,
+          y: this.dragPoint.y - splineVector[this.selectedPointIndex].y,
+        };
+        if (this.selectedPointIndex > 0) {
+          splineVector[this.selectedPointIndex - 1].x += translation.x;
+          splineVector[this.selectedPointIndex - 1].y += translation.y;
+        }
+        if (this.selectedPointIndex < splineVector.length - 1) {
+          splineVector[this.selectedPointIndex + 1].x += translation.x;
+          splineVector[this.selectedPointIndex + 1].y += translation.y;
+        }
+      }
       splineVector[this.selectedPointIndex] = this.dragPoint;
     }
     splineVector = splineVector.map((point) =>
