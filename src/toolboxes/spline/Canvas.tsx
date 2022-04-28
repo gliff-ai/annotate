@@ -309,7 +309,7 @@ class CanvasClass extends Component<Props, State> {
     // or add new point to a normal spline (Mode.draw and this.props.activeToolbox === "Spline")
     // or add TL or BR point to a rectangle spline (Mode.draw and this.props.activeToolbox === Tools.rectspline.name)
 
-    const coordinates = this.props.annotationsObject.getSplineCoordinates();
+    let coordinates = this.props.annotationsObject.getSplineCoordinates();
 
     if (this.isDrawing || this.dragPoint) {
       // turns out onClick still runs when releasing a drag, so we want to abort in that case:
@@ -370,23 +370,12 @@ class CanvasClass extends Component<Props, State> {
           // add three points (second control point for the current terminal point, first control point for the new terminal point, and the new terminal point):
           const newPoint = { x: imageX, y: imageY };
           const prevPoint = coordinates[coordinates.length - 1];
-          const prevPrevPoint = coordinates[coordinates.length - 2];
 
-          // add the current terminal point's second control point:
-          let newControlPoint: XYPoint;
-          if (coordinates.length === 1) {
-            // do it 25% the way to the new point if we're adding the second point in the curve
-            newControlPoint = {
-              x: 0.75 * prevPoint.x + 0.25 * newPoint.x,
-              y: 0.75 * prevPoint.y + 0.25 * newPoint.y,
-            };
-          } else {
-            // otherwise, place it equal and opposite to the current terminal point's first control point, ensuring a smooth curve:
-            newControlPoint = {
-              x: 2 * prevPoint.x - prevPrevPoint.x,
-              y: 2 * prevPoint.y - prevPrevPoint.y,
-            };
-          }
+          // add the current terminal point's second control point 25% the way to the new point if we're adding the second point in the curve:
+          const newControlPoint = {
+            x: 0.75 * prevPoint.x + 0.25 * newPoint.x,
+            y: 0.75 * prevPoint.y + 0.25 * newPoint.y,
+          };
           this.props.annotationsObject.addSplinePoint(newControlPoint);
 
           // add the new point's first control point, 25% along the line to the newly added control point:
@@ -405,6 +394,42 @@ class CanvasClass extends Component<Props, State> {
           });
           this.selectedPointIndex =
             this.props.annotationsObject.getSplineLength() - 1;
+        }
+
+        coordinates = this.props.annotationsObject.getSplineCoordinates();
+        const i = coordinates.length - 4;
+        if (i >= 3) {
+          // make the curve smooth:
+
+          const norm = (point: XYPoint) =>
+            Math.sqrt(point.x ** 2 + point.y ** 2);
+
+          // a: previous point
+          // b: this point
+          // c: next point
+          const ab = {
+            x: coordinates[i].x - coordinates[i - 3].x,
+            y: coordinates[i].y - coordinates[i - 3].y,
+          };
+          const bc = {
+            x: coordinates[i + 3].x - coordinates[i].x,
+            y: coordinates[i + 3].y - coordinates[i].y,
+          };
+          const ac = {
+            x: coordinates[i + 3].x - coordinates[i - 3].x,
+            y: coordinates[i + 3].y - coordinates[i - 3].y,
+          };
+
+          this.props.annotationsObject.updateSplinePoint(
+            coordinates[i].x - (ac.x * norm(ab) * 0.3) / norm(ac),
+            coordinates[i].y - (ac.y * norm(ab) * 0.3) / norm(ac),
+            i - 1
+          );
+          this.props.annotationsObject.updateSplinePoint(
+            coordinates[i].x + (ac.x * norm(bc) * 0.3) / norm(ac),
+            coordinates[i].y + (ac.y * norm(bc) * 0.3) / norm(ac),
+            i + 1
+          );
         }
       }
     }
