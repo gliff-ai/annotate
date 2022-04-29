@@ -193,7 +193,7 @@ export const PluginsCard = ({
               height: "30px",
               position: "absolute",
               top: "112px",
-              right: "11px",
+              right: "2px",
             }}
           >
             {launchPluginSettingsCallback && (
