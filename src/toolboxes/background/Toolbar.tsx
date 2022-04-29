@@ -231,30 +231,27 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                 )}
                 {buttonClicked === "Channels" && props.channelControls && (
                   <>
-                    <Card
-                      title="Channel"
-                      children={
-                        <FormControl component="fieldset">
-                          <FormGroup aria-label="position">
-                            {props.channelControls.map((control, i) => (
-                              <FormControlLabel
-                                key={`C${i + 1}`}
-                                value="top"
-                                control={control}
-                                label={
-                                  <Typography
-                                    sx={{ fontSize: "14px", fontWeight: 400 }}
-                                  >
-                                    {`Channel ${i + 1}`}
-                                  </Typography>
-                                }
-                                labelPlacement="end"
-                              />
-                            ))}
-                          </FormGroup>
-                        </FormControl>
-                      }
-                    />
+                    <Card title="Channel">
+                      <FormControl component="fieldset">
+                        <FormGroup aria-label="position">
+                          {props.channelControls.map((control, i) => (
+                            <FormControlLabel
+                              key={`C${i + 1}`}
+                              value="top"
+                              control={control}
+                              label={
+                                <Typography
+                                  sx={{ fontSize: "14px", fontWeight: 400 }}
+                                >
+                                  {`Channel ${i + 1}`}
+                                </Typography>
+                              }
+                              labelPlacement="end"
+                            />
+                          ))}
+                        </FormGroup>
+                      </FormControl>
+                    </Card>
                   </>
                 )}
               </>
