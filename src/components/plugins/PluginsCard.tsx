@@ -130,7 +130,7 @@ export const PluginsCard = ({
           sx={{
             margin: 0,
             fontSize: "16px",
-            paddingLeft: "20px",
+            paddingLeft: "0px",
             height: "40px",
           }}
         >
@@ -166,24 +166,34 @@ export const PluginsCard = ({
     <Card title="Plugins">
       <>
         <MenuList>{getPluginButtons()}</MenuList>
-        <Divider sx={{ margin: 0, width: "100%", lineHeight: "1px" }} />
+        <Divider
+          sx={{
+            margin: 0,
+            width: "100%",
+            lineHeight: "1px",
+          }}
+        />
         <Paper
           elevation={0}
           square
           sx={{
-            padding: "0 20px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            marginTop: "10px",
           }}
         >
-          <SVG src={icons.betaStatus} height="25px" width="50px" />
+          <SVG src={icons.betaStatus} height="30px" width="50px" />
           <ButtonGroup
             orientation="horizontal"
             variant="text"
             sx={{
               border: "none",
               backgroundColor: "transparent",
+              height: "30px",
+              position: "absolute",
+              top: "112px",
+              right: "11px",
             }}
           >
             {launchPluginSettingsCallback && (
