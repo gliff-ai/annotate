@@ -128,6 +128,13 @@ class CanvasClass extends Component<Props, State> {
           splineVector[this.selectedPointIndex + 1].x += translation.x;
           splineVector[this.selectedPointIndex + 1].y += translation.y;
         }
+        if (
+          this.selectedPointIndex === 0 &&
+          this.props.annotationsObject.splineIsClosed()
+        ) {
+          splineVector[splineVector.length - 1].x += translation.x;
+          splineVector[splineVector.length - 1].y += translation.y;
+        }
       }
       splineVector[this.selectedPointIndex] = this.dragPoint;
     }
@@ -172,6 +179,20 @@ class CanvasClass extends Component<Props, State> {
           );
           i += 3;
         }
+        if (
+          this.props.annotationsObject.splineIsClosed() &&
+          i + 2 == splineVector.length
+        ) {
+          // draw final arc to close the curve:
+          context.bezierCurveTo(
+            splineVector[i].x,
+            splineVector[i].y,
+            splineVector[i + 1].x,
+            splineVector[i + 1].y,
+            splineVector[0].x,
+            splineVector[0].y
+          );
+        }
       } else {
         // Draw each point by taking our raw coordinates and applying the transform so they fit on our canvas
         for (const [idx, { x, y }] of splineVector.entries()) {
@@ -205,6 +226,17 @@ class CanvasClass extends Component<Props, State> {
             context.lineTo(splineVector[i - 1].x, splineVector[i - 1].y);
           }
           i += 3;
+        }
+        if (
+          this.props.annotationsObject.splineIsClosed() &&
+          i == splineVector.length
+        ) {
+          // draw line connecting first point with its "first" control point:
+          context.moveTo(splineVector[0].x, splineVector[0].y);
+          context.lineTo(
+            splineVector[splineVector.length - 1].x,
+            splineVector[splineVector.length - 1].y
+          );
         }
         context.stroke();
         context.strokeStyle = isActive ? mainColor : color;
@@ -469,12 +501,81 @@ class CanvasClass extends Component<Props, State> {
     // check the current annotation is on the current slice
     if (!this.sliceIndexMatch()) return;
 
-    const coordinates = this.props.annotationsObject.getSplineCoordinates();
+    let coordinates = this.props.annotationsObject.getSplineCoordinates();
     if (coordinates.length < 3) {
       return; // need at least three points to make a closed polygon
     }
 
     this.props.annotationsObject.setSplineClosed(true);
+
+    const cubic = true;
+    if (cubic) {
+      // need to add a couple of control points:
+      this.props.annotationsObject.addSplinePoint({
+        x: coordinates[coordinates.length - 1].x,
+        y: coordinates[coordinates.length - 1].y,
+      });
+      this.props.annotationsObject.addSplinePoint({
+        x: coordinates[0].x,
+        y: coordinates[0].y,
+      });
+
+      // smooth the curve at final control point:
+      coordinates = this.props.annotationsObject.getSplineCoordinates();
+      const norm = (point: XYPoint) => Math.sqrt(point.x ** 2 + point.y ** 2);
+      // a: previous point
+      // b: this point
+      // c: next point
+      const final = coordinates.length - 3;
+      let ab = {
+        x: coordinates[final].x - coordinates[final - 3].x,
+        y: coordinates[final].y - coordinates[final - 3].y,
+      };
+      let bc = {
+        x: coordinates[0].x - coordinates[final].x,
+        y: coordinates[0].y - coordinates[final].y,
+      };
+      let ac = {
+        x: coordinates[0].x - coordinates[final - 3].x,
+        y: coordinates[0].y - coordinates[final - 3].y,
+      };
+
+      this.props.annotationsObject.updateSplinePoint(
+        coordinates[final].x - (ac.x * norm(ab) * 0.3) / norm(ac),
+        coordinates[final].y - (ac.y * norm(ab) * 0.3) / norm(ac),
+        final - 1
+      );
+      this.props.annotationsObject.updateSplinePoint(
+        coordinates[final].x + (ac.x * norm(bc) * 0.3) / norm(ac),
+        coordinates[final].y + (ac.y * norm(bc) * 0.3) / norm(ac),
+        final + 1
+      );
+
+      // smooth the curve at first control point:
+      ab = {
+        x: coordinates[0].x - coordinates[final].x,
+        y: coordinates[0].y - coordinates[final].y,
+      };
+      bc = {
+        x: coordinates[3].x - coordinates[0].x,
+        y: coordinates[3].y - coordinates[0].y,
+      };
+      ac = {
+        x: coordinates[3].x - coordinates[final].x,
+        y: coordinates[3].y - coordinates[final].y,
+      };
+
+      this.props.annotationsObject.updateSplinePoint(
+        coordinates[0].x - (ac.x * norm(ab) * 0.3) / norm(ac),
+        coordinates[0].y - (ac.y * norm(ab) * 0.3) / norm(ac),
+        coordinates.length - 1
+      );
+      this.props.annotationsObject.updateSplinePoint(
+        coordinates[0].x + (ac.x * norm(bc) * 0.3) / norm(ac),
+        coordinates[0].y + (ac.y * norm(bc) * 0.3) / norm(ac),
+        1
+      );
+    }
 
     this.drawAllSplines();
   };
