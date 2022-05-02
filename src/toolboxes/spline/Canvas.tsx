@@ -37,6 +37,7 @@ export const events = [
   "closeSpline",
   "convertSpline",
   "fillSpline",
+  "makeBezier",
 ] as const;
 
 const mainColor = theme.palette.primary.main;
@@ -106,7 +107,7 @@ class CanvasClass extends Component<Props, State> {
     isActive = false,
     color: string
   ): void => {
-    const cubic = true;
+    const cubic = this.props.activeToolbox === "Bezier Spline";
 
     let splineVector = spline.coordinates;
 
@@ -166,7 +167,8 @@ class CanvasClass extends Component<Props, State> {
       context.beginPath();
       context.moveTo(splineVector[0].x, splineVector[0].y);
 
-      if (cubic) {
+      console.log(this.props.activeToolbox);
+      if (this.props.activeToolbox === "Bezier Spline") {
         let i = 1;
         while (i + 2 < splineVector.length) {
           context.bezierCurveTo(
@@ -408,11 +410,11 @@ class CanvasClass extends Component<Props, State> {
       } else if (
         this.props.mode === Mode.draw &&
         !this.props.annotationsObject.splineIsClosed() &&
-        this.props.activeToolbox === "Spline" &&
+        ["Spline", "Bezier Spline"].includes(this.props.activeToolbox) &&
         JSON.stringify({ x: imageX, y: imageY }) !==
           JSON.stringify(coordinates[coordinates.length - 1]) // don't allow duplicate points
       ) {
-        const cubic = true;
+        const cubic = this.props.activeToolbox === "Bezier Spline";
         if (cubic && coordinates.length > 0) {
           // add three points (second control point for the current terminal point, first control point for the new terminal point, and the new terminal point):
           const newPoint = { x: imageX, y: imageY };
@@ -508,7 +510,7 @@ class CanvasClass extends Component<Props, State> {
 
     this.props.annotationsObject.setSplineClosed(true);
 
-    const cubic = true;
+    const cubic = this.props.activeToolbox === "Bezier Spline";
     if (cubic) {
       // need to add a couple of control points:
       this.props.annotationsObject.addSplinePoint({
@@ -617,6 +619,29 @@ class CanvasClass extends Component<Props, State> {
       document.dispatchEvent(
         new CustomEvent("fillBrush", { detail: Toolboxes.paintbrush })
       );
+    }
+  };
+
+  makeBezier = (): void => {
+    // trim points to 3n + 1:
+    const coordinates = this.props.annotationsObject.getSplineCoordinates();
+    if (this.props.annotationsObject.splineIsClosed()) {
+      const pointsToDelete = coordinates.length % 3;
+      // this.props.annotationsObject.setSplineClosed(false); // can't have a closed Bezier spline without 3n points
+      if (pointsToDelete !== 0) {
+        for (let i = 0; i < pointsToDelete; i += 1) {
+          this.props.annotationsObject.deleteSplinePoint(
+            coordinates.length - 1 - i
+          );
+        }
+      }
+    } else {
+      const pointsToDelete = (coordinates.length - 1) % 3;
+      for (let i = 0; i < pointsToDelete; i += 1) {
+        this.props.annotationsObject.deleteSplinePoint(
+          coordinates.length - 1 - i
+        );
+      }
     }
   };
 
@@ -828,7 +853,8 @@ class CanvasClass extends Component<Props, State> {
   isActive = (): boolean =>
     this.props.activeToolbox === "Spline" ||
     this.props.activeToolbox === "Lasso Spline" ||
-    this.props.activeToolbox === "Magic Spline";
+    this.props.activeToolbox === "Magic Spline" ||
+    this.props.activeToolbox === "Bezier Spline";
 
   sliceIndexMatch = (): boolean =>
     this.props.annotationsObject.getSplineForActiveAnnotation().spaceTimeInfo
