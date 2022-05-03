@@ -1,7 +1,7 @@
 import { keybindings, displayNames } from "./keybindings";
 import type { NamespacedMethod } from "./keybindings";
 
-const isMacLookup =
+export const isMacLookup =
   navigator.platform.startsWith("mac") || navigator.platform.startsWith("Mac");
 
 const keydownListener =

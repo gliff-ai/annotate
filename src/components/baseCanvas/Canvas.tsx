@@ -1,6 +1,7 @@
 import { Component, ReactNode, MouseEvent } from "react";
 
 import { XYPoint, PositionAndSize } from "@/annotation/interfaces";
+import { isMacLookup } from "@/keybindings";
 
 export interface Props {
   name?: string;
@@ -111,7 +112,7 @@ export class BaseCanvas extends Component<Props> {
 
   onClickHandler = (e: MouseEvent): void => {
     const { x, y } = this.windowToCanvas(e);
-    const isCTRL = e.ctrlKey;
+    const isCTRL = isMacLookup ? e.metaKey : e.ctrlKey;
 
     if (this.props.onClick) {
       this.props.onClick(x, y, isCTRL);
