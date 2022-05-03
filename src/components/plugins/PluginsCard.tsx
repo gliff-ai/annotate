@@ -150,6 +150,7 @@ export const PluginsCard = ({
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
+                marginLeft: "16px",
               }}
             >
               {p.name}&nbsp;—&nbsp;{p.tooltip}
@@ -161,9 +162,8 @@ export const PluginsCard = ({
 
     return pluginElements;
   };
-
   return (
-    <Card title="Plugins">
+    <Card title="Plugins" noPadding>
       <>
         <MenuList>{getPluginButtons()}</MenuList>
         <Divider
@@ -181,6 +181,8 @@ export const PluginsCard = ({
             alignItems: "center",
             justifyContent: "space-between",
             marginTop: "10px",
+            margin: "0 15px 0",
+            height: "40px",
           }}
         >
           <SVG src={icons.betaStatus} height="30px" width="50px" />
@@ -190,10 +192,8 @@ export const PluginsCard = ({
             sx={{
               border: "none",
               backgroundColor: "transparent",
-              height: "30px",
-              position: "absolute",
-              top: "112px",
-              right: "2px",
+              position: "relative",
+              right: "-15px",
             }}
           >
             {launchPluginSettingsCallback && (
