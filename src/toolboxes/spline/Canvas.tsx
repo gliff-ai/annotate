@@ -681,6 +681,8 @@ class CanvasClass extends Component<Props, State> {
           }}
           name={this.name}
           scaleAndPan={this.props.scaleAndPan}
+          setScaleAndPan={this.props.setScaleAndPan}
+          displayedImage={this.props.displayedImage}
           canvasPositionAndSize={this.state.canvasPositionAndSize}
           setCanvasPositionAndSize={this.setCanvasPositionAndSize}
         />
@@ -705,6 +707,7 @@ export const Canvas = (props: Props): ReactElement => {
       annotationsObject={props.annotationsObject}
       displayedImage={props.displayedImage}
       scaleAndPan={props.scaleAndPan}
+      setScaleAndPan={props.setScaleAndPan}
       redraw={props.redraw}
       sliceIndex={props.sliceIndex}
       setUIActiveAnnotationID={props.setUIActiveAnnotationID}

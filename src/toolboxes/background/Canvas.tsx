@@ -118,6 +118,8 @@ export class CanvasClass extends Component<Props, State> {
       }}
       name="background"
       scaleAndPan={this.props.scaleAndPan}
+      setScaleAndPan={this.props.setScaleAndPan}
+      displayedImage={this.props.displayedImage}
       canvasPositionAndSize={this.props.canvasPositionAndSize}
       setCanvasPositionAndSize={this.props.setCanvasPositionAndSize}
     />
@@ -134,6 +136,7 @@ export const Canvas = (
       contrast={background.contrast}
       brightness={background.brightness}
       scaleAndPan={props.scaleAndPan}
+      setScaleAndPan={props.setScaleAndPan}
       canvasPositionAndSize={props.canvasPositionAndSize}
       displayedImage={props.displayedImage}
       setCanvasPositionAndSize={props.setCanvasPositionAndSize}
