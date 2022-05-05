@@ -47,6 +47,7 @@ const spline: Spline = {
   ],
   spaceTimeInfo: { z: 0, t: 0 },
   isClosed: false,
+  isBezier: false,
 };
 
 let blankAnnotation: Annotation;

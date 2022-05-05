@@ -107,7 +107,7 @@ class CanvasClass extends PureComponent<Props, State> {
     isActive = false,
     color: string
   ): void => {
-    const cubic = this.props.activeToolbox === "Bezier Spline";
+    const cubic = this.props.annotationsObject.splineIsBezier();
 
     let splineVector = spline.coordinates;
 
@@ -167,8 +167,7 @@ class CanvasClass extends PureComponent<Props, State> {
       context.beginPath();
       context.moveTo(splineVector[0].x, splineVector[0].y);
 
-      console.log(this.props.activeToolbox);
-      if (this.props.activeToolbox === "Bezier Spline") {
+      if (cubic) {
         let i = 1;
         while (i + 2 < splineVector.length) {
           context.bezierCurveTo(
@@ -414,7 +413,7 @@ class CanvasClass extends PureComponent<Props, State> {
         JSON.stringify({ x: imageX, y: imageY }) !==
           JSON.stringify(coordinates[coordinates.length - 1]) // don't allow duplicate points
       ) {
-        const cubic = this.props.activeToolbox === "Bezier Spline";
+        const cubic = this.props.annotationsObject.splineIsBezier();
         if (cubic && coordinates.length > 0) {
           // add three points (second control point for the current terminal point, first control point for the new terminal point, and the new terminal point):
           const newPoint = { x: imageX, y: imageY };
@@ -510,7 +509,7 @@ class CanvasClass extends PureComponent<Props, State> {
 
     this.props.annotationsObject.setSplineClosed(true);
 
-    const cubic = this.props.activeToolbox === "Bezier Spline";
+    const cubic = this.props.annotationsObject.splineIsBezier();
     if (cubic) {
       // need to add a couple of control points:
       this.props.annotationsObject.addSplinePoint({
@@ -623,11 +622,14 @@ class CanvasClass extends PureComponent<Props, State> {
   };
 
   makeBezier = (): void => {
+    this.props.annotationsObject.setSplineBezier(
+      !this.props.annotationsObject.splineIsBezier()
+    );
+
     // trim points to 3n + 1:
     const coordinates = this.props.annotationsObject.getSplineCoordinates();
     if (this.props.annotationsObject.splineIsClosed()) {
       const pointsToDelete = coordinates.length % 3;
-      // this.props.annotationsObject.setSplineClosed(false); // can't have a closed Bezier spline without 3n points
       if (pointsToDelete !== 0) {
         for (let i = 0; i < pointsToDelete; i += 1) {
           this.props.annotationsObject.deleteSplinePoint(
@@ -643,6 +645,8 @@ class CanvasClass extends PureComponent<Props, State> {
         );
       }
     }
+
+    this.drawAllSplines();
   };
 
   snapToGradient = (idx: number, snapeRadius = 25): void => {

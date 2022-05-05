@@ -62,6 +62,7 @@ export class Annotations {
       coordinates: [],
       spaceTimeInfo: { z: 0, t: 0 },
       isClosed: false,
+      isBezier: false,
     },
     boundingBox: BoundingBox = {
       coordinates: {
@@ -349,6 +350,11 @@ export class Annotations {
     return spline.isClosed;
   }
 
+  splineIsBezier(id: number = null): boolean {
+    const { spline } = this.data[id || this.activeAnnotationID];
+    return spline.isBezier;
+  }
+
   @log
   clearSplineCoordinates(addToUndoRedo = true): void {
     const oldCoords = JSON.parse(
@@ -441,6 +447,15 @@ export class Annotations {
     this.data[this.activeAnnotationID].spline.isClosed = closed;
     if (addToUndoRedo) {
       this.updateUndoRedoActions("setSplineClosed", [!closed]);
+      this.redoData = [];
+    }
+  }
+
+  @log
+  setSplineBezier(bezier: boolean, addToUndoRedo = true): void {
+    this.data[this.activeAnnotationID].spline.isBezier = bezier;
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("setSplineBezier", [!bezier]);
       this.redoData = [];
     }
   }

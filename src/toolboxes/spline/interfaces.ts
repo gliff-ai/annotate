@@ -4,4 +4,5 @@ export interface Spline {
   coordinates: XYPoint[];
   spaceTimeInfo: ZTPoint;
   isClosed: boolean;
+  isBezier: boolean;
 }

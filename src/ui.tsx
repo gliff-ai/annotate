@@ -601,6 +601,12 @@ class UserInterface extends Component<Props, State> {
     this.forceUpdate();
   };
 
+  redrawEverything = (): void => {
+    this.setState((prevState) => ({
+      redrawEverything: prevState.redrawEverything + 1,
+    }));
+  };
+
   changeSlice = (e: Event, value: number): void => {
     this.setState({ sliceIndex: value }, () => {
       this.reuseEmptyAnnotation();
@@ -668,17 +674,13 @@ class UserInterface extends Component<Props, State> {
   };
 
   undo = (): void => {
-    this.setState((prevState) => ({
-      redrawEverything: prevState.redrawEverything + 1,
-    }));
+    this.redrawEverything();
     this.setButtonClicked("Undo");
     this.annotationsObject.undo();
   };
 
   redo = (): void => {
-    this.setState((prevState) => ({
-      redrawEverything: prevState.redrawEverything + 1,
-    }));
+    this.redrawEverything();
     this.setButtonClicked("Redo");
     this.annotationsObject.redo();
   };

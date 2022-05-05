@@ -58,7 +58,6 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   };
 
   const selectBezierSpline = () => {
-    setSpline({ splineType: "Bezier Spline" });
     document.dispatchEvent(
       new CustomEvent("makeBezier", { detail: Toolboxes.spline })
     );
