@@ -55,7 +55,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
 
   const closeSpline = () => {
     document.dispatchEvent(
-      new CustomEvent("closeSpline", { detail: Toolboxes.spline })
+      new CustomEvent("toggleSplineClosed", { detail: Toolboxes.spline })
     );
 
     return true;

@@ -34,7 +34,7 @@ interface State {
 export const events = [
   "deleteSelectedPoint",
   "deselectPoint",
-  "closeSpline",
+  "toggleSplineClosed",
   "convertSpline",
   "fillSpline",
   "toggleBezier",
@@ -496,86 +496,90 @@ class CanvasClass extends PureComponent<Props, State> {
     this.addNewPointNearSpline(imageX, imageY);
   };
 
-  closeSpline = (): void => {
-    // Append the first spline point to the end, making a closed polygon
+  toggleSplineClosed = (): void => {
+    if (!this.props.annotationsObject.splineIsClosed()) {
+      // Append the first spline point to the end, making a closed polygon
 
-    // check the current annotation is on the current slice
-    if (!this.sliceIndexMatch()) return;
+      // check the current annotation is on the current slice
+      if (!this.sliceIndexMatch()) return;
 
-    let coordinates = this.props.annotationsObject.getSplineCoordinates();
-    if (coordinates.length < 3) {
-      return; // need at least three points to make a closed polygon
-    }
+      let coordinates = this.props.annotationsObject.getSplineCoordinates();
+      if (coordinates.length < 3) {
+        return; // need at least three points to make a closed polygon
+      }
 
-    this.props.annotationsObject.setSplineClosed(true);
+      this.props.annotationsObject.setSplineClosed(true);
 
-    const cubic = this.props.annotationsObject.splineIsBezier();
-    if (cubic) {
-      // need to add a couple of control points:
-      this.props.annotationsObject.addSplinePoint({
-        x: coordinates[coordinates.length - 1].x,
-        y: coordinates[coordinates.length - 1].y,
-      });
-      this.props.annotationsObject.addSplinePoint({
-        x: coordinates[0].x,
-        y: coordinates[0].y,
-      });
+      const cubic = this.props.annotationsObject.splineIsBezier();
+      if (cubic) {
+        // need to add a couple of control points:
+        this.props.annotationsObject.addSplinePoint({
+          x: coordinates[coordinates.length - 1].x,
+          y: coordinates[coordinates.length - 1].y,
+        });
+        this.props.annotationsObject.addSplinePoint({
+          x: coordinates[0].x,
+          y: coordinates[0].y,
+        });
 
-      // smooth the curve at final control point:
-      coordinates = this.props.annotationsObject.getSplineCoordinates();
-      const norm = (point: XYPoint) => Math.sqrt(point.x ** 2 + point.y ** 2);
-      // a: previous point
-      // b: this point
-      // c: next point
-      const final = coordinates.length - 3;
-      let ab = {
-        x: coordinates[final].x - coordinates[final - 3].x,
-        y: coordinates[final].y - coordinates[final - 3].y,
-      };
-      let bc = {
-        x: coordinates[0].x - coordinates[final].x,
-        y: coordinates[0].y - coordinates[final].y,
-      };
-      let ac = {
-        x: coordinates[0].x - coordinates[final - 3].x,
-        y: coordinates[0].y - coordinates[final - 3].y,
-      };
+        // smooth the curve at final control point:
+        coordinates = this.props.annotationsObject.getSplineCoordinates();
+        const norm = (point: XYPoint) => Math.sqrt(point.x ** 2 + point.y ** 2);
+        // a: previous point
+        // b: this point
+        // c: next point
+        const final = coordinates.length - 3;
+        let ab = {
+          x: coordinates[final].x - coordinates[final - 3].x,
+          y: coordinates[final].y - coordinates[final - 3].y,
+        };
+        let bc = {
+          x: coordinates[0].x - coordinates[final].x,
+          y: coordinates[0].y - coordinates[final].y,
+        };
+        let ac = {
+          x: coordinates[0].x - coordinates[final - 3].x,
+          y: coordinates[0].y - coordinates[final - 3].y,
+        };
 
-      this.props.annotationsObject.updateSplinePoint(
-        coordinates[final].x - (ac.x * norm(ab) * 0.3) / norm(ac),
-        coordinates[final].y - (ac.y * norm(ab) * 0.3) / norm(ac),
-        final - 1
-      );
-      this.props.annotationsObject.updateSplinePoint(
-        coordinates[final].x + (ac.x * norm(bc) * 0.3) / norm(ac),
-        coordinates[final].y + (ac.y * norm(bc) * 0.3) / norm(ac),
-        final + 1
-      );
+        this.props.annotationsObject.updateSplinePoint(
+          coordinates[final].x - (ac.x * norm(ab) * 0.3) / norm(ac),
+          coordinates[final].y - (ac.y * norm(ab) * 0.3) / norm(ac),
+          final - 1
+        );
+        this.props.annotationsObject.updateSplinePoint(
+          coordinates[final].x + (ac.x * norm(bc) * 0.3) / norm(ac),
+          coordinates[final].y + (ac.y * norm(bc) * 0.3) / norm(ac),
+          final + 1
+        );
 
-      // smooth the curve at first control point:
-      ab = {
-        x: coordinates[0].x - coordinates[final].x,
-        y: coordinates[0].y - coordinates[final].y,
-      };
-      bc = {
-        x: coordinates[3].x - coordinates[0].x,
-        y: coordinates[3].y - coordinates[0].y,
-      };
-      ac = {
-        x: coordinates[3].x - coordinates[final].x,
-        y: coordinates[3].y - coordinates[final].y,
-      };
+        // smooth the curve at first control point:
+        ab = {
+          x: coordinates[0].x - coordinates[final].x,
+          y: coordinates[0].y - coordinates[final].y,
+        };
+        bc = {
+          x: coordinates[3].x - coordinates[0].x,
+          y: coordinates[3].y - coordinates[0].y,
+        };
+        ac = {
+          x: coordinates[3].x - coordinates[final].x,
+          y: coordinates[3].y - coordinates[final].y,
+        };
 
-      this.props.annotationsObject.updateSplinePoint(
-        coordinates[0].x - (ac.x * norm(ab) * 0.3) / norm(ac),
-        coordinates[0].y - (ac.y * norm(ab) * 0.3) / norm(ac),
-        coordinates.length - 1
-      );
-      this.props.annotationsObject.updateSplinePoint(
-        coordinates[0].x + (ac.x * norm(bc) * 0.3) / norm(ac),
-        coordinates[0].y + (ac.y * norm(bc) * 0.3) / norm(ac),
-        1
-      );
+        this.props.annotationsObject.updateSplinePoint(
+          coordinates[0].x - (ac.x * norm(ab) * 0.3) / norm(ac),
+          coordinates[0].y - (ac.y * norm(ab) * 0.3) / norm(ac),
+          coordinates.length - 1
+        );
+        this.props.annotationsObject.updateSplinePoint(
+          coordinates[0].x + (ac.x * norm(bc) * 0.3) / norm(ac),
+          coordinates[0].y + (ac.y * norm(bc) * 0.3) / norm(ac),
+          1
+        );
+      }
+    } else {
+      this.props.annotationsObject.setSplineClosed(false);
     }
 
     this.drawAllSplines();
