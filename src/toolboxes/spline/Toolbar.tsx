@@ -26,12 +26,24 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   ] as const;
 
   const selectSpline = () => {
+    if (spline.splineType === "Bezier Spline") {
+      document.dispatchEvent(
+        new CustomEvent("toggleBezier", { detail: Toolboxes.spline })
+      );
+    }
+
     setSpline({ splineType: "Spline" });
 
     return true;
   };
 
   const selectLassoSpline = () => {
+    if (spline.splineType === "Bezier Spline") {
+      document.dispatchEvent(
+        new CustomEvent("toggleBezier", { detail: Toolboxes.spline })
+      );
+    }
+
     setSpline({ splineType: "Lasso Spline" });
 
     return true;
@@ -58,9 +70,12 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   };
 
   const selectBezierSpline = () => {
-    document.dispatchEvent(
-      new CustomEvent("makeBezier", { detail: Toolboxes.spline })
-    );
+    if (spline.splineType !== "Bezier Spline") {
+      document.dispatchEvent(
+        new CustomEvent("toggleBezier", { detail: Toolboxes.spline })
+      );
+    }
+    setSpline({ splineType: "Bezier Spline" });
 
     return true;
   };

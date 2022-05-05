@@ -37,7 +37,7 @@ export const events = [
   "closeSpline",
   "convertSpline",
   "fillSpline",
-  "makeBezier",
+  "toggleBezier",
 ] as const;
 
 const mainColor = theme.palette.primary.main;
@@ -621,28 +621,23 @@ class CanvasClass extends PureComponent<Props, State> {
     }
   };
 
-  makeBezier = (): void => {
+  toggleBezier = (): void => {
     this.props.annotationsObject.setSplineBezier(
       !this.props.annotationsObject.splineIsBezier()
     );
 
-    // trim points to 3n + 1:
-    const coordinates = this.props.annotationsObject.getSplineCoordinates();
-    if (this.props.annotationsObject.splineIsClosed()) {
-      const pointsToDelete = coordinates.length % 3;
+    if (this.props.annotationsObject.splineIsBezier()) {
+      // trim points to 3n + 1:
+      const coordinates = this.props.annotationsObject.getSplineCoordinates();
+      const pointsToDelete = this.props.annotationsObject.splineIsClosed()
+        ? coordinates.length % 3
+        : (coordinates.length - 1) % 3;
       if (pointsToDelete !== 0) {
         for (let i = 0; i < pointsToDelete; i += 1) {
           this.props.annotationsObject.deleteSplinePoint(
             coordinates.length - 1 - i
           );
         }
-      }
-    } else {
-      const pointsToDelete = (coordinates.length - 1) % 3;
-      for (let i = 0; i < pointsToDelete; i += 1) {
-        this.props.annotationsObject.deleteSplinePoint(
-          coordinates.length - 1 - i
-        );
       }
     }
 
