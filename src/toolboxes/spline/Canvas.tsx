@@ -497,6 +497,8 @@ class CanvasClass extends PureComponent<Props, State> {
   };
 
   toggleSplineClosed = (): void => {
+    const cubic = this.props.annotationsObject.splineIsBezier();
+
     if (!this.props.annotationsObject.splineIsClosed()) {
       // Append the first spline point to the end, making a closed polygon
 
@@ -510,7 +512,6 @@ class CanvasClass extends PureComponent<Props, State> {
 
       this.props.annotationsObject.setSplineClosed(true);
 
-      const cubic = this.props.annotationsObject.splineIsBezier();
       if (cubic) {
         // need to add a couple of control points:
         this.props.annotationsObject.addSplinePoint({
@@ -580,6 +581,14 @@ class CanvasClass extends PureComponent<Props, State> {
       }
     } else {
       this.props.annotationsObject.setSplineClosed(false);
+
+      if (cubic) {
+        // trim the last two points off (they represent the "in" control handle for the first point
+        // and the "out" control handle for the last point, which are meaningless if the curve is open):
+        const splineLength = this.props.annotationsObject.getSplineLength();
+        this.props.annotationsObject.deleteSplinePoint(splineLength - 1);
+        this.props.annotationsObject.deleteSplinePoint(splineLength - 2);
+      }
     }
 
     this.drawAllSplines();
