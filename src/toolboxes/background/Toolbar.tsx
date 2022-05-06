@@ -1,21 +1,22 @@
 import { Component, ReactElement, useState, MouseEvent } from "react";
-import {
-  ButtonGroup,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
-  FormControl,
-  Card,
-  CardHeader,
-  CardContent,
-  Typography,
-  Box,
-} from "@mui/material";
+import { FormGroup } from "@mui/material"; // TODO move to STYLE
 
 import SVG from "react-inlinesvg";
 import { detect } from "detect-browser";
 
-import { IconButton, icons, theme, Popper } from "@gliff-ai/style";
+import {
+  IconButton,
+  icons,
+  Popper,
+  ButtonGroup,
+  Checkbox,
+  FormControlLabel,
+  FormControl,
+  Card,
+  Typography,
+  Box,
+  MuiCard,
+} from "@gliff-ai/style";
 import { BaseSlider } from "@/components/BaseSlider";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { getShortcut } from "@/keybindings";
@@ -194,67 +195,67 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                   />
                 ))}
             </ButtonGroup>
-            <Card
-              sx={{ height: "fit-content", width: "285px", marginLeft: "18px" }}
+            <MuiCard
+              sx={{
+                height: "fit-content",
+                width: "285px",
+                marginLeft: "18px",
+                borderRadius: "6px",
+              }}
             >
-              {buttonClicked === "Brightness" && (
-                <>
-                  <Box sx={{ ...sliderNameStyle }}>Brightness</Box>
-                  <Box sx={{ ...baseSliderStyle }}>
-                    <BaseSlider
-                      value={background.brightness}
-                      config={SLIDER_CONFIG[Sliders.brightness]}
-                      onChange={() => changeBrightness}
-                    />
-                  </Box>
-                </>
-              )}
+              <>
+                {buttonClicked === "Brightness" && (
+                  <>
+                    <Box sx={{ ...sliderNameStyle }}>Brightness</Box>
+                    <Box sx={{ ...baseSliderStyle }}>
+                      <BaseSlider
+                        value={background.brightness}
+                        config={SLIDER_CONFIG[Sliders.brightness]}
+                        onChange={() => changeBrightness}
+                      />
+                    </Box>
+                  </>
+                )}
 
-              {buttonClicked === "Contrast" && (
-                <>
-                  <Box sx={{ ...sliderNameStyle }}>Contrast</Box>
-                  <Box sx={{ ...baseSliderStyle }}>
-                    <BaseSlider
-                      value={background.contrast}
-                      config={SLIDER_CONFIG[Sliders.contrast]}
-                      onChange={() => changeContrast}
-                    />
-                  </Box>
-                </>
-              )}
-              {buttonClicked === "Channels" && props.channelControls && (
-                <>
-                  <CardHeader
-                    sx={{
-                      backgroundColor: theme.palette.primary.main,
-                      "& .MuiTypography-root": { fontWeight: 500 },
-                    }}
-                    title={<Typography>Channel</Typography>}
-                  />
-                  <CardContent>
-                    <FormControl component="fieldset">
-                      <FormGroup aria-label="position">
-                        {props.channelControls.map((control, i) => (
-                          <FormControlLabel
-                            key={`C${i + 1}`}
-                            value="top"
-                            control={control}
-                            label={
-                              <Typography
-                                sx={{ fontSize: "14px", fontWeight: 400 }}
-                              >
-                                {`Channel ${i + 1}`}
-                              </Typography>
-                            }
-                            labelPlacement="end"
-                          />
-                        ))}
-                      </FormGroup>
-                    </FormControl>
-                  </CardContent>
-                </>
-              )}
-            </Card>
+                {buttonClicked === "Contrast" && (
+                  <>
+                    <Box sx={{ ...sliderNameStyle }}>Contrast</Box>
+                    <Box sx={{ ...baseSliderStyle }}>
+                      <BaseSlider
+                        value={background.contrast}
+                        config={SLIDER_CONFIG[Sliders.contrast]}
+                        onChange={() => changeContrast}
+                      />
+                    </Box>
+                  </>
+                )}
+                {buttonClicked === "Channels" && props.channelControls && (
+                  <>
+                    <Card title="Channel">
+                      <FormControl component="fieldset">
+                        <FormGroup aria-label="position">
+                          {props.channelControls.map((control, i) => (
+                            <FormControlLabel
+                              key={`C${i + 1}`}
+                              value="top"
+                              control={control}
+                              label={
+                                <Typography
+                                  sx={{ fontSize: "14px", fontWeight: 400 }}
+                                >
+                                  {`Channel ${i + 1}`}
+                                </Typography>
+                              }
+                              labelPlacement="end"
+                            />
+                          ))}
+                        </FormGroup>
+                      </FormControl>
+                    </Card>
+                  </>
+                )}
+              </>
+            </MuiCard>
           </>
         }
       />

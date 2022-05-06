@@ -25,7 +25,7 @@ export function getNewImageSizeAndDisplacement(
 
   const offsetX = width / 2 - newWidth / 2 + scaleAndPan.x;
   const offsetY = height / 2 - newHeight / 2 + scaleAndPan.y;
-  return { offsetX, offsetY, newWidth, newHeight };
+  return { offsetX, offsetY, newWidth, newHeight }; // used as the destination rectangle in ctx.drawImage
 }
 
 export function drawImageOnCanvas(

@@ -21,10 +21,10 @@ jobs:
       # The next 3 steps are for building the web application to be tested and starting the web server on the runner environment
 
       - name: "Checkout the repository"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 15
 

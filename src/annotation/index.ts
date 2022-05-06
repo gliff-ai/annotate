@@ -548,9 +548,12 @@ export class Annotations {
     // Simplifying the line for computational efficiency
     const strokeCoordinates = this.getBrushStrokeCoordinates();
 
-    // simplify
-    // TODO pick tolerance more cleverly
-    const simplifiedCoordinates = simplify(strokeCoordinates, 10, true);
+    // simplify coordinates:
+    const simplifiedCoordinates = simplify(
+      strokeCoordinates,
+      this.data[this.activeAnnotationID].brushStrokes[0].brush.radius,
+      true
+    );
 
     const linesToFill: XYPoint[][] = slpfLines(simplifiedCoordinates);
 

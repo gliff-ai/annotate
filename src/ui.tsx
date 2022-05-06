@@ -9,7 +9,6 @@ import {
   Paper,
   ThemeProvider,
   Theme,
-  Popover,
   StyledEngineProvider,
 } from "@mui/material";
 import { WithStyles } from "@mui/styles";
@@ -23,6 +22,7 @@ import {
   icons,
   generateClassName,
   WarningSnackbar,
+  MuiPopover,
 } from "@gliff-ai/style";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
@@ -844,7 +844,20 @@ class UserInterface extends Component<Props, State> {
               size="small"
             />
           )}
-          <Popover
+          <LabelsSubmenu
+            isOpen={
+              this.state.activeSubmenuAnchor ===
+              this.refBtnsPopovers["Annotation Label"]
+            }
+            anchorElement={this.state.activeSubmenuAnchor}
+            onClose={this.handleClose}
+            annotationsObject={this.annotationsObject}
+            activeAnnotationID={this.state.activeAnnotationID}
+            defaultLabels={this.props.defaultLabels}
+            restrictLabels={this.props.restrictLabels}
+            multiLabel={this.props.multiLabel}
+          />
+          <MuiPopover
             open={
               this.state.activeSubmenuAnchor === this.refBtnsPopovers.Plugins
             }
@@ -861,8 +874,9 @@ class UserInterface extends Component<Props, State> {
               annotationsObject={this.annotationsObject}
               saveMetadataCallback={this.props.saveMetadataCallback}
             />
-          </Popover>
+          </MuiPopover>
         </ButtonGroup>
+
         <ButtonGroup>
           <PaintbrushToolbar
             active={this.state.activeToolbox === "paintbrush"}
@@ -943,6 +957,7 @@ class UserInterface extends Component<Props, State> {
                     setCanvasContainerColourCallback={
                       this.setCanvasContainerColourCallback
                     }
+                    setScaleAndPan={this.setScaleAndPan}
                   />
                   <SplineCanvas
                     scaleAndPan={this.state.scaleAndPan}
@@ -957,6 +972,7 @@ class UserInterface extends Component<Props, State> {
                       this.setUIActiveAnnotationIDCallback
                     }
                     setActiveToolbox={this.setActiveToolboxCallback}
+                    setScaleAndPan={this.setScaleAndPan}
                   />
                   <BoundingBoxCanvas
                     scaleAndPan={this.state.scaleAndPan}
@@ -971,6 +987,7 @@ class UserInterface extends Component<Props, State> {
                       this.setUIActiveAnnotationIDCallback
                     }
                     setActiveToolbox={this.setActiveToolboxCallback}
+                    setScaleAndPan={this.setScaleAndPan}
                   />
                   <PaintbrushCanvas
                     scaleAndPan={this.state.scaleAndPan}
@@ -985,6 +1002,7 @@ class UserInterface extends Component<Props, State> {
                       this.setUIActiveAnnotationIDCallback
                     }
                     setActiveToolbox={this.setActiveToolboxCallback}
+                    setScaleAndPan={this.setScaleAndPan}
                   />
                   {this.slicesData?.length > 1 && (
                     <Paper

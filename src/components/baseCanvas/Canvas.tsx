@@ -1,6 +1,9 @@
 import { Component, ReactNode, MouseEvent } from "react";
 
 import { XYPoint, PositionAndSize } from "@/annotation/interfaces";
+import { isMacLookup } from "@/keybindings";
+
+import { canvasToImage, touchPointsToScaleAndPan } from "./transforms";
 
 export interface Props {
   name?: string;
@@ -11,6 +14,11 @@ export interface Props {
     y: number;
     scale: number;
   };
+  setScaleAndPan: (scaleAndPan: {
+    scale?: number;
+    x?: number;
+    y?: number;
+  }) => void;
   cursor?: "crosshair" | "move" | "pointer" | "none" | "not-allowed";
   onClick?: (x: number, y: number, isCTRL?: boolean) => void;
   onMouseDown?: (x: number, y: number) => void;
@@ -28,7 +36,7 @@ export interface Props {
 export class BaseCanvas extends Component<Props> {
   public static defaultProps: Omit<
     Props,
-    "scaleAndPan" | "canvasPositionAndSize"
+    "scaleAndPan" | "canvasPositionAndSize" | "setScaleAndPan"
   > = {
     name: "BaseCanvas",
     cursor: "none",
@@ -51,6 +59,8 @@ export class BaseCanvas extends Component<Props> {
   public canvasContext: CanvasRenderingContext2D;
 
   private canvasObserver: ResizeObserver;
+
+  private pinchZoomImagePoints: { image1: XYPoint; image2: XYPoint }; // image coordinates of initial touch points during pinch-to-zoom
 
   public clearWindow = (): void => {
     this.canvasContext.save();
@@ -111,7 +121,7 @@ export class BaseCanvas extends Component<Props> {
 
   onClickHandler = (e: MouseEvent): void => {
     const { x, y } = this.windowToCanvas(e);
-    const isCTRL = e.ctrlKey;
+    const isCTRL = isMacLookup ? e.metaKey : e.ctrlKey;
 
     if (this.props.onClick) {
       this.props.onClick(x, y, isCTRL);
@@ -127,13 +137,42 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onTouchStartHandler = (e: React.TouchEvent<HTMLCanvasElement>): void => {
-    const { x, y } = this.windowToCanvas({
-      clientX: e.touches[0].clientX,
-      clientY: e.touches[0].clientY,
-    });
+    if (e.touches.length === 1) {
+      const { x, y } = this.windowToCanvas({
+        clientX: e.touches[0].clientX,
+        clientY: e.touches[0].clientY,
+      });
 
-    if (this.props.onMouseDown) {
-      this.props.onMouseDown(x, y);
+      if (this.props.onMouseDown) {
+        this.props.onMouseDown(x, y);
+      }
+    } else if (e.touches.length === 2) {
+      const canvas1 = this.windowToCanvas({
+        clientX: e.touches[0].clientX,
+        clientY: e.touches[0].clientY,
+      });
+      const canvas2 = this.windowToCanvas({
+        clientX: e.touches[1].clientX,
+        clientY: e.touches[1].clientY,
+      });
+      this.pinchZoomImagePoints = {
+        image1: canvasToImage(
+          canvas1.x,
+          canvas1.y,
+          this.props.displayedImage.width,
+          this.props.displayedImage.height,
+          this.props.scaleAndPan,
+          this.props.canvasPositionAndSize
+        ),
+        image2: canvasToImage(
+          canvas2.x,
+          canvas2.y,
+          this.props.displayedImage.width,
+          this.props.displayedImage.height,
+          this.props.scaleAndPan,
+          this.props.canvasPositionAndSize
+        ),
+      };
     }
   };
 
@@ -146,12 +185,34 @@ export class BaseCanvas extends Component<Props> {
   };
 
   onTouchMovehandler = (e: React.TouchEvent<HTMLCanvasElement>): void => {
-    const { x, y } = this.windowToCanvas({
-      clientX: e.touches[0].clientX,
-      clientY: e.touches[0].clientY,
-    });
-    if (this.props.onMouseMove) {
-      this.props.onMouseMove(x, y);
+    if (e.touches.length === 1) {
+      const { x, y } = this.windowToCanvas({
+        clientX: e.touches[0].clientX,
+        clientY: e.touches[0].clientY,
+      });
+      if (this.props.onMouseMove) {
+        this.props.onMouseMove(x, y);
+      }
+    } else if (e.touches.length === 2) {
+      const canvas1 = this.windowToCanvas({
+        clientX: e.touches[0].clientX,
+        clientY: e.touches[0].clientY,
+      });
+      const canvas2 = this.windowToCanvas({
+        clientX: e.touches[1].clientX,
+        clientY: e.touches[1].clientY,
+      });
+      this.props.setScaleAndPan(
+        touchPointsToScaleAndPan(
+          canvas1,
+          canvas2,
+          this.pinchZoomImagePoints.image1,
+          this.pinchZoomImagePoints.image2,
+          this.props.displayedImage.width,
+          this.props.displayedImage.height,
+          this.props.canvasPositionAndSize
+        )
+      );
     }
   };
 
