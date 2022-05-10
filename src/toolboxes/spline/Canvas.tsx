@@ -107,7 +107,7 @@ class CanvasClass extends PureComponent<Props, State> {
     isActive = false,
     color: string
   ): void => {
-    const cubic = this.props.annotationsObject.splineIsBezier();
+    const cubic = spline.isBezier;
 
     let splineVector = spline.coordinates;
 
