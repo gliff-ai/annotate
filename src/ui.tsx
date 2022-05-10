@@ -526,6 +526,7 @@ class UserInterface extends Component<Props, State> {
     this.setState({
       activeAnnotationID: this.annotationsObject.getActiveAnnotationID(),
     });
+    this.redrawEverything();
   };
 
   nextAnnotation = (): void => {
@@ -581,7 +582,7 @@ class UserInterface extends Component<Props, State> {
       );
       this.annotationsObject.setSplineSpaceTimeInfo(this.state.sliceIndex);
     }
-    this.redrawUI();
+    this.redrawEverything();
   };
 
   clearActiveAnnotation = (): void => {
@@ -594,7 +595,7 @@ class UserInterface extends Component<Props, State> {
         this.state.activeToolbox
       );
     }
-    this.redrawUI();
+    this.redrawEverything();
   };
 
   redrawUI = (): void => {
