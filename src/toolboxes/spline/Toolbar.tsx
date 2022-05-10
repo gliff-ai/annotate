@@ -27,6 +27,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   ] as const;
 
   const selectSpline = () => {
+    console.log(spline.splineType);
     if (spline.splineType === "Bezier Spline") {
       document.dispatchEvent(
         new CustomEvent("toggleBezier", { detail: Toolboxes.spline })
@@ -39,6 +40,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   };
 
   const selectLassoSpline = () => {
+    console.log(spline.splineType);
     if (spline.splineType === "Bezier Spline") {
       document.dispatchEvent(
         new CustomEvent("toggleBezier", { detail: Toolboxes.spline })
@@ -71,6 +73,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   };
 
   const selectBezierSpline = () => {
+    console.log(spline.splineType);
     if (spline.splineType !== "Bezier Spline") {
       document.dispatchEvent(
         new CustomEvent("toggleBezier", { detail: Toolboxes.spline })
@@ -98,7 +101,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     },
     {
       name: "Bezier Spline",
-      icon: icons.lassoSpline,
+      icon: icons.bezierSpline,
       event: selectBezierSpline,
       active: () => spline.splineType === "Bezier Spline",
     },
