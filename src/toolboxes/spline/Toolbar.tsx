@@ -3,7 +3,7 @@ import { IconButton, icons, Popper, ButtonGroup } from "@gliff-ai/style";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { getShortcut } from "@/keybindings";
 import { useSplineStore } from "./Store";
-import { useMountEffect } from "@/hooks/use-mountEffect";
+import { useEffect } from "react";
 
 const events = ["selectSpline"] as const;
 
@@ -127,7 +127,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     // },
   ];
 
-  useMountEffect(() => {
+  useEffect(() => {
     const submenuEventFunctions = {
       selectSpline,
       selectLassoSpline,
@@ -156,7 +156,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
         document.removeEventListener(event, handleEvent);
       }
     };
-  });
+  }, [spline]); // need to re-bind the event handlers whenever spline changes, because they seem to use the value spline when they're bound rather than the current value
 
   if (props.anchorElement === null) return null;
 
