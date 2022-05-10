@@ -1,9 +1,8 @@
-import { Component, ReactElement, MouseEvent } from "react";
+import { Component, ReactElement, MouseEvent, useEffect } from "react";
 import { IconButton, icons, Popper, ButtonGroup } from "@gliff-ai/style";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { getShortcut } from "@/keybindings";
 import { useSplineStore } from "./Store";
-import { useEffect } from "react";
 
 const events = ["selectSpline"] as const;
 

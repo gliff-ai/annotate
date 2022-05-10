@@ -182,7 +182,7 @@ class CanvasClass extends PureComponent<Props, State> {
         }
         if (
           this.props.annotationsObject.splineIsClosed() &&
-          i + 2 == splineVector.length
+          i + 2 === splineVector.length
         ) {
           // draw final arc to close the curve:
           context.bezierCurveTo(
@@ -230,7 +230,7 @@ class CanvasClass extends PureComponent<Props, State> {
         }
         if (
           this.props.annotationsObject.splineIsClosed() &&
-          i == splineVector.length
+          i === splineVector.length
         ) {
           // draw line connecting first point with its "first" control point:
           context.moveTo(splineVector[0].x, splineVector[0].y);
@@ -943,9 +943,8 @@ export const Canvas = (props: Props): ReactElement => {
   );
 };
 
-function evaluateBezier(): void {
-  const coordinates = this.props.annotationsObject.getSplineCoordinates();
-  this.props.annotationsObject.addAnnotation("spline");
+function evaluateBezier(coordinates: XYPoint[]): XYPoint[] {
+  const result: XYPoint[] = [];
   for (let i = 0; i < coordinates.length - 3; i += 3) {
     for (let t = 0; t <= 1; t += 0.01) {
       // lerp between p0 and p1, p1 and p2, and p2 and p3:
@@ -969,9 +968,10 @@ function evaluateBezier(): void {
       const cx = (1 - t) * b0x + t * b1x;
       const cy = (1 - t) * b0y + t * b1y;
 
-      this.props.annotationsObject.addSplinePoint({ x: cx, y: cy });
+      result.push({ x: cx, y: cy });
     }
   }
+  return result;
 }
 
 export { evaluateBezier };
