@@ -702,19 +702,19 @@ class UserInterface extends Component<Props, State> {
     // to get triggered during text input.
     this.refBtnsPopovers["Annotation Label"] === this.state.activeSubmenuAnchor;
 
-  setModeCallback = (mode: Mode) => {
+  setModeCallback = (mode: Mode): void => {
     this.setState(() => ({ mode, buttonClicked: null }));
   };
 
-  setUIActiveAnnotationIDCallback = (id: number) => {
+  setUIActiveAnnotationIDCallback = (id: number): void => {
     this.setState({ activeAnnotationID: id });
   };
 
-  setActiveToolboxCallback = (tool: Toolbox) => {
+  setActiveToolboxCallback = (tool: Toolbox): void => {
     this.setState({ activeToolbox: tool });
   };
 
-  setCanvasContainerColourCallback = (canvasContainerColour: number[]) =>
+  setCanvasContainerColourCallback = (canvasContainerColour: number[]): void =>
     this.setState({ canvasContainerColour });
 
   render = (): ReactNode => {

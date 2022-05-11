@@ -26,7 +26,6 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   ] as const;
 
   const selectSpline = () => {
-    console.log(spline.splineType);
     if (spline.splineType === "Bezier Spline") {
       document.dispatchEvent(
         new CustomEvent("toggleBezier", { detail: Toolboxes.spline })
@@ -39,7 +38,6 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   };
 
   const selectLassoSpline = () => {
-    console.log(spline.splineType);
     if (spline.splineType === "Bezier Spline") {
       document.dispatchEvent(
         new CustomEvent("toggleBezier", { detail: Toolboxes.spline })
@@ -72,7 +70,6 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   };
 
   const selectBezierSpline = () => {
-    console.log(spline.splineType);
     if (spline.splineType !== "Bezier Spline") {
       document.dispatchEvent(
         new CustomEvent("toggleBezier", { detail: Toolboxes.spline })
@@ -126,6 +123,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     // },
   ];
 
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     const submenuEventFunctions = {
       selectSpline,
@@ -156,6 +154,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       }
     };
   }, [spline]); // need to re-bind the event handlers whenever spline changes, because they seem to use the value spline when they're bound rather than the current value
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   if (props.anchorElement === null) return null;
 
