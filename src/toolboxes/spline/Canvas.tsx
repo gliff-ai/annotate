@@ -38,6 +38,7 @@ export const events = [
   "convertSpline",
   "fillSpline",
   "toggleBezier",
+  "makeBezierIfBezierActive",
 ] as const;
 
 const mainColor = theme.palette.primary.main;
@@ -655,6 +656,16 @@ class CanvasClass extends PureComponent<Props, State> {
     }
 
     this.drawAllSplines();
+  };
+
+  makeBezierIfBezierActive = (): void => {
+    // If we create a new annotation with Bezier Spline active, ui has no way to know the spline type
+    // because it's a class component so it can't access the useSplineStore hook.
+    // Instead, it dispatches an event that triggers this function, which cat set isBezier appropriately
+    // because the spline type is passed in via the activeToolbox prop.
+    if (this.props.activeToolbox === "Bezier Spline") {
+      this.props.annotationsObject.setSplineBezier(true);
+    }
   };
 
   snapToGradient = (idx: number, snapeRadius = 25): void => {

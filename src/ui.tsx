@@ -526,6 +526,17 @@ class UserInterface extends Component<Props, State> {
     this.setState({
       activeAnnotationID: this.annotationsObject.getActiveAnnotationID(),
     });
+    if (this.state.activeToolbox === Toolboxes.spline) {
+      // This component doesn't know which spline type is active, because that data is stored
+      // in a hook variable and class components can't use hooks. Therefore, if we're in the spline
+      // toolbox, dispatch an event that tells the spline canvas to check the spline type and
+      // set the isBezier flag on the annotation appropriately:
+      document.dispatchEvent(
+        new CustomEvent("makeBezierIfBezierActive", {
+          detail: Toolboxes.spline,
+        })
+      );
+    }
     this.redrawEverything();
   };
 
