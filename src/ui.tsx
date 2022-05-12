@@ -98,7 +98,7 @@ interface State {
   activeAnnotationID: number;
   viewportPositionAndSize: Required<PositionAndSize>;
   minimapPositionAndSize: Required<PositionAndSize>;
-  redraw: number;
+  redrawEverything: number;
   sliceIndex: number;
   channels: boolean[];
   activeSubmenuAnchor: HTMLButtonElement | null; // A HTML element. It specifies which button has its submenu open, and serves as anchorEl for that submenu: https://material-ui.com/api/menu/#props
@@ -235,7 +235,7 @@ class UserInterface extends Component<Props, State> {
       sliceIndex: 0,
       channels: [true],
       displayedImage: this.slicesData ? this.slicesData[0][0] : null,
-      redraw: 0,
+      redrawEverything: 0,
       activeSubmenuAnchor: null,
       buttonClicked: null,
       activeToolbox: Toolboxes.paintbrush,
@@ -257,7 +257,7 @@ class UserInterface extends Component<Props, State> {
     }
     this.mixChannels();
 
-    this.annotationsObject.giveRedrawCallback(this.callRedraw);
+    this.annotationsObject.giveRedrawCallback(this.redrawUI);
     this.annotationsObject.addAnnotation(this.state.activeToolbox);
   }
 
@@ -286,8 +286,8 @@ class UserInterface extends Component<Props, State> {
       prevProps.annotationsObject !== this.props.annotationsObject
     ) {
       this.annotationsObject = this.props.annotationsObject;
-      this.annotationsObject.giveRedrawCallback(this.callRedraw);
-      this.callRedraw();
+      this.annotationsObject.giveRedrawCallback(this.redrawUI);
+      this.redrawUI();
     }
   };
 
@@ -481,7 +481,7 @@ class UserInterface extends Component<Props, State> {
     // Otherwise the props for annotationsObject will update after the uplaoed image has been stored.
     if (!this.props.annotationsObject) {
       this.annotationsObject = new Annotations();
-      this.annotationsObject.giveRedrawCallback(this.callRedraw);
+      this.annotationsObject.giveRedrawCallback(this.redrawUI);
       this.annotationsObject.addAnnotation(this.state.activeToolbox);
     }
 
@@ -526,6 +526,18 @@ class UserInterface extends Component<Props, State> {
     this.setState({
       activeAnnotationID: this.annotationsObject.getActiveAnnotationID(),
     });
+    if (this.state.activeToolbox === Toolboxes.spline) {
+      // This component doesn't know which spline type is active, because that data is stored
+      // in a hook variable and class components can't use hooks. Therefore, if we're in the spline
+      // toolbox, dispatch an event that tells the spline canvas to check the spline type and
+      // set the isBezier flag on the annotation appropriately:
+      document.dispatchEvent(
+        new CustomEvent("makeBezierIfBezierActive", {
+          detail: Toolboxes.spline,
+        })
+      );
+    }
+    this.redrawEverything();
   };
 
   nextAnnotation = (): void => {
@@ -581,7 +593,7 @@ class UserInterface extends Component<Props, State> {
       );
       this.annotationsObject.setSplineSpaceTimeInfo(this.state.sliceIndex);
     }
-    this.callRedraw();
+    this.redrawEverything();
   };
 
   clearActiveAnnotation = (): void => {
@@ -594,12 +606,16 @@ class UserInterface extends Component<Props, State> {
         this.state.activeToolbox
       );
     }
-    this.callRedraw();
+    this.redrawEverything();
   };
 
-  callRedraw = (): void => {
+  redrawUI = (): void => {
+    this.forceUpdate();
+  };
+
+  redrawEverything = (): void => {
     this.setState((prevState) => ({
-      redraw: prevState.redraw + 1,
+      redrawEverything: prevState.redrawEverything + 1,
     }));
   };
 
@@ -670,13 +686,13 @@ class UserInterface extends Component<Props, State> {
   };
 
   undo = (): void => {
-    this.callRedraw();
+    this.redrawEverything();
     this.setButtonClicked("Undo");
     this.annotationsObject.undo();
   };
 
   redo = (): void => {
-    this.callRedraw();
+    this.redrawEverything();
     this.setButtonClicked("Redo");
     this.annotationsObject.redo();
   };
@@ -685,6 +701,21 @@ class UserInterface extends Component<Props, State> {
     // Added to prevent single-key shortcuts that are also valid text input
     // to get triggered during text input.
     this.refBtnsPopovers["Annotation Label"] === this.state.activeSubmenuAnchor;
+
+  setModeCallback = (mode: Mode): void => {
+    this.setState(() => ({ mode, buttonClicked: null }));
+  };
+
+  setUIActiveAnnotationIDCallback = (id: number): void => {
+    this.setState({ activeAnnotationID: id });
+  };
+
+  setActiveToolboxCallback = (tool: Toolbox): void => {
+    this.setState({ activeToolbox: tool });
+  };
+
+  setCanvasContainerColourCallback = (canvasContainerColour: number[]): void =>
+    this.setState({ canvasContainerColour });
 
   render = (): ReactNode => {
     const { classes, showAppBar, saveAnnotationsCallback } = this.props;
@@ -714,7 +745,7 @@ class UserInterface extends Component<Props, State> {
           <Download
             annotationsObject={this.annotationsObject}
             imageFileInfo={this.imageFileInfo}
-            redraw={this.state.redraw}
+            redraw={this.state.redrawEverything}
           />
         </Grid>
       </>
@@ -935,8 +966,8 @@ class UserInterface extends Component<Props, State> {
                     displayedImage={this.state.displayedImage}
                     canvasPositionAndSize={this.state.viewportPositionAndSize}
                     setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                    setCanvasContainerColourCallback={(canvasContainerColour) =>
-                      this.setState({ canvasContainerColour })
+                    setCanvasContainerColourCallback={
+                      this.setCanvasContainerColourCallback
                     }
                     setScaleAndPan={this.setScaleAndPan}
                   />
@@ -944,57 +975,45 @@ class UserInterface extends Component<Props, State> {
                     scaleAndPan={this.state.scaleAndPan}
                     activeToolbox={this.state.activeToolbox}
                     mode={this.state.mode}
-                    setMode={(mode: Mode) => {
-                      this.setState(() => ({ mode, buttonClicked: null }));
-                    }}
+                    setMode={this.setModeCallback}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
-                    redraw={this.state.redraw}
+                    redraw={this.state.redrawEverything}
                     sliceIndex={this.state.sliceIndex}
-                    setUIActiveAnnotationID={(id) => {
-                      this.setState({ activeAnnotationID: id });
-                    }}
-                    setActiveToolbox={(tool: Toolbox) => {
-                      this.setState({ activeToolbox: tool });
-                    }}
+                    setUIActiveAnnotationID={
+                      this.setUIActiveAnnotationIDCallback
+                    }
+                    setActiveToolbox={this.setActiveToolboxCallback}
                     setScaleAndPan={this.setScaleAndPan}
                   />
                   <BoundingBoxCanvas
                     scaleAndPan={this.state.scaleAndPan}
                     activeToolbox={this.state.activeToolbox}
                     mode={this.state.mode}
-                    setMode={(mode: Mode) => {
-                      this.setState(() => ({ mode, buttonClicked: null }));
-                    }}
+                    setMode={this.setModeCallback}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
-                    redraw={this.state.redraw}
+                    redraw={this.state.redrawEverything}
                     sliceIndex={this.state.sliceIndex}
-                    setUIActiveAnnotationID={(id) => {
-                      this.setState({ activeAnnotationID: id });
-                    }}
-                    setActiveToolbox={(tool: Toolbox) => {
-                      this.setState({ activeToolbox: tool });
-                    }}
+                    setUIActiveAnnotationID={
+                      this.setUIActiveAnnotationIDCallback
+                    }
+                    setActiveToolbox={this.setActiveToolboxCallback}
                     setScaleAndPan={this.setScaleAndPan}
                   />
                   <PaintbrushCanvas
                     scaleAndPan={this.state.scaleAndPan}
                     activeToolbox={this.state.activeToolbox}
                     mode={this.state.mode}
-                    setMode={(mode: Mode) => {
-                      this.setState(() => ({ mode, buttonClicked: null }));
-                    }}
+                    setMode={this.setModeCallback}
                     annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
-                    redraw={this.state.redraw}
+                    redraw={this.state.redrawEverything}
                     sliceIndex={this.state.sliceIndex}
-                    setUIActiveAnnotationID={(id) => {
-                      this.setState({ activeAnnotationID: id });
-                    }}
-                    setActiveToolbox={(tool: Toolbox) => {
-                      this.setState({ activeToolbox: tool });
-                    }}
+                    setUIActiveAnnotationID={
+                      this.setUIActiveAnnotationIDCallback
+                    }
+                    setActiveToolbox={this.setActiveToolboxCallback}
                     setScaleAndPan={this.setScaleAndPan}
                   />
                   {this.slicesData?.length > 1 && (

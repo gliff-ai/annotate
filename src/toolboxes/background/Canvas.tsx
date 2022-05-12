@@ -1,4 +1,4 @@
-import { Component, ReactNode, ReactElement } from "react";
+import { PureComponent, ReactNode, ReactElement } from "react";
 import { BaseCanvas, CanvasProps } from "@/components/baseCanvas";
 import { drawImageOnCanvas, getImageDataFromCanvas } from "./drawImage";
 import { useBackgroundStore } from "./Store";
@@ -11,7 +11,7 @@ interface Props extends CanvasProps {
 interface State {
   edgeColour: string | null;
 }
-export class CanvasClass extends Component<Props, State> {
+export class CanvasClass extends PureComponent<Props, State> {
   public static defaultProps: {
     setCanvasContainerColourCallback: (colour: number[]) => void;
   } = {

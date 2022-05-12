@@ -1,4 +1,4 @@
-import { ReactNode, Component, ReactElement } from "react";
+import { ReactNode, PureComponent, ReactElement } from "react";
 import { theme } from "@gliff-ai/style";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
 import { Mode } from "@/ui";
@@ -34,9 +34,11 @@ interface State {
 export const events = [
   "deleteSelectedPoint",
   "deselectPoint",
-  "closeSpline",
+  "toggleSplineClosed",
   "convertSpline",
   "fillSpline",
+  "toggleBezier",
+  "makeBezierIfBezierActive",
 ] as const;
 
 const mainColor = theme.palette.primary.main;
@@ -48,7 +50,7 @@ interface Event extends CustomEvent {
 
 type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 
-class CanvasClass extends Component<Props, State> {
+class CanvasClass extends PureComponent<Props, State> {
   readonly name = Toolboxes.spline;
 
   private baseCanvas: BaseCanvas;
@@ -106,9 +108,48 @@ class CanvasClass extends Component<Props, State> {
     isActive = false,
     color: string
   ): void => {
-    const splineVector = spline.coordinates;
+    const cubic = spline.isBezier;
+
+    let splineVector = spline.coordinates;
 
     if (splineVector.length === 0) return;
+
+    // transform spline points to canvas space and shift one of them if we're dragging it:
+    if (isActive && this.dragPoint) {
+      if (cubic && this.selectedPointIndex % 3 === 0) {
+        // dragging a Bezier curve node, so move the control points with it:
+        const translation = {
+          x: this.dragPoint.x - splineVector[this.selectedPointIndex].x,
+          y: this.dragPoint.y - splineVector[this.selectedPointIndex].y,
+        };
+        if (this.selectedPointIndex > 0) {
+          splineVector[this.selectedPointIndex - 1].x += translation.x;
+          splineVector[this.selectedPointIndex - 1].y += translation.y;
+        }
+        if (this.selectedPointIndex < splineVector.length - 1) {
+          splineVector[this.selectedPointIndex + 1].x += translation.x;
+          splineVector[this.selectedPointIndex + 1].y += translation.y;
+        }
+        if (
+          this.selectedPointIndex === 0 &&
+          this.props.annotationsObject.splineIsClosed()
+        ) {
+          splineVector[splineVector.length - 1].x += translation.x;
+          splineVector[splineVector.length - 1].y += translation.y;
+        }
+      }
+      splineVector[this.selectedPointIndex] = this.dragPoint;
+    }
+    splineVector = splineVector.map((point) =>
+      imageToCanvas(
+        point.x,
+        point.y,
+        this.props.displayedImage.width,
+        this.props.displayedImage.height,
+        this.props.scaleAndPan,
+        this.state.canvasPositionAndSize
+      )
+    );
 
     const { canvasContext: context } = this.baseCanvas;
     const lineWidth = isActive ? 2 : 1;
@@ -121,82 +162,105 @@ class CanvasClass extends Component<Props, State> {
     context.fillStyle = secondaryColor;
 
     const pointSize = 6;
-    let nextPoint;
 
     if (splineVector.length > 1) {
       // Go to the first point
-      let firstPoint: XYPoint;
-      if (isActive && this.selectedPointIndex === 0 && this.dragPoint) {
-        firstPoint = this.dragPoint;
-      } else {
-        firstPoint = splineVector[0]; // eslint-disable-line prefer-destructuring
-      }
-
-      firstPoint = imageToCanvas(
-        firstPoint.x,
-        firstPoint.y,
-        this.props.displayedImage.width,
-        this.props.displayedImage.height,
-        this.props.scaleAndPan,
-        this.state.canvasPositionAndSize
-      );
-
       context.beginPath();
-      context.moveTo(firstPoint.x, firstPoint.y);
+      context.moveTo(splineVector[0].x, splineVector[0].y);
 
-      // Draw each point by taking our raw coordinates and applying the transform so they fit on our canvas
-      for (const [idx, { x, y }] of splineVector.entries()) {
-        let drawPoint: XYPoint;
-        if (isActive && this.dragPoint && idx === this.selectedPointIndex) {
-          // draw the point at the current mouse position if we're dragging it:
-          drawPoint = this.dragPoint;
-        } else {
-          drawPoint = { x, y };
+      if (cubic) {
+        let i = 1;
+        while (i + 2 < splineVector.length) {
+          context.bezierCurveTo(
+            splineVector[i].x,
+            splineVector[i].y,
+            splineVector[i + 1].x,
+            splineVector[i + 1].y,
+            splineVector[i + 2].x,
+            splineVector[i + 2].y
+          );
+          i += 3;
         }
-        nextPoint = imageToCanvas(
-          drawPoint.x,
-          drawPoint.y,
-          this.props.displayedImage.width,
-          this.props.displayedImage.height,
-          this.props.scaleAndPan,
-          this.state.canvasPositionAndSize
-        );
-        context.lineTo(nextPoint.x, nextPoint.y);
+        if (
+          this.props.annotationsObject.splineIsClosed() &&
+          i + 2 === splineVector.length
+        ) {
+          // draw final arc to close the curve:
+          context.bezierCurveTo(
+            splineVector[i].x,
+            splineVector[i].y,
+            splineVector[i + 1].x,
+            splineVector[i + 1].y,
+            splineVector[0].x,
+            splineVector[0].y
+          );
+        }
+      } else {
+        // Draw each point by taking our raw coordinates and applying the transform so they fit on our canvas
+        for (const [idx, { x, y }] of splineVector.entries()) {
+          context.lineTo(x, y);
+        }
+        if (spline.isClosed) {
+          context.lineTo(splineVector[0].x, splineVector[0].y);
+        }
       }
-      if (spline.isClosed) {
-        context.lineTo(firstPoint.x, firstPoint.y);
-      }
+
       context.stroke();
+
+      if (cubic && isActive) {
+        // draw lines to control points:
+        context.beginPath();
+        context.strokeStyle = getRGBAString(
+          palette[
+            this.props.annotationsObject.getActiveAnnotationID() %
+              palette.length
+          ]
+        );
+        context.lineWidth = 1;
+        let i = 0;
+        while (i < splineVector.length) {
+          context.moveTo(splineVector[i].x, splineVector[i].y);
+          if (i + 1 < splineVector.length) {
+            context.lineTo(splineVector[i + 1].x, splineVector[i + 1].y);
+          }
+          context.moveTo(splineVector[i].x, splineVector[i].y);
+          if (i > 0) {
+            context.lineTo(splineVector[i - 1].x, splineVector[i - 1].y);
+          }
+          i += 3;
+        }
+        if (
+          this.props.annotationsObject.splineIsClosed() &&
+          i === splineVector.length
+        ) {
+          // draw line connecting first point with its "first" control point:
+          context.moveTo(splineVector[0].x, splineVector[0].y);
+          context.lineTo(
+            splineVector[splineVector.length - 1].x,
+            splineVector[splineVector.length - 1].y
+          );
+        }
+        context.stroke();
+        context.strokeStyle = isActive ? mainColor : color;
+      }
     }
 
     // Draw all points
     context.beginPath();
     splineVector.forEach(({ x, y }, i) => {
-      let drawPoint: XYPoint;
-      if (isActive && this.dragPoint && i === this.selectedPointIndex) {
-        drawPoint = this.dragPoint;
-      } else {
-        drawPoint = { x, y };
-      }
-      nextPoint = imageToCanvas(
-        drawPoint.x,
-        drawPoint.y,
-        this.props.displayedImage.width,
-        this.props.displayedImage.height,
-        this.props.scaleAndPan,
-        this.state.canvasPositionAndSize
-      );
+      if (!isActive && cubic && i % 3 !== 0) return;
+
       if (this.selectedPointIndex === i && isActive) {
         context.fillRect(
-          nextPoint.x - pointSize / 2,
-          nextPoint.y - pointSize / 2,
+          x - pointSize / 2,
+          y - pointSize / 2,
           pointSize,
           pointSize
         ); // draw a filled square to mark the point as selected
       } else {
         context.rect(
-          nextPoint.x - pointSize / 2,
-          nextPoint.y - pointSize / 2,
+          x - pointSize / 2,
+          y - pointSize / 2,
           pointSize,
           pointSize
         ); // draw a square to mark the point
@@ -249,9 +313,9 @@ class CanvasClass extends Component<Props, State> {
   };
 
   clickNearPoint = (clickPoint: XYPoint, splineVector: XYPoint[]): number => {
-    // iterates through the points of splineVector, returns the index of the closest point within distance 25 of clickPoint
+    // iterates through the points of splineVector, returns the index of the closest point within distance 16 of clickPoint
     // clickPoint and splineVector are both expected to be in image space
-    // returns -1 if no point was within distance 25
+    // returns -1 if no point was within distance 16
 
     const { x: clickPointX, y: clickPointY } = imageToCanvas(
       clickPoint.x,
@@ -280,7 +344,7 @@ class CanvasClass extends Component<Props, State> {
         (point.x - clickPointX) ** 2 + (point.y - clickPointY) ** 2
       );
 
-      if (distanceToPoint < 25 && distanceToPoint < minDist) {
+      if (distanceToPoint < 16 && distanceToPoint < minDist) {
         minDist = distanceToPoint;
         minDistIdx = i;
       }
@@ -294,7 +358,7 @@ class CanvasClass extends Component<Props, State> {
     // or add new point to a normal spline (Mode.draw and this.props.activeToolbox === "Spline")
     // or add TL or BR point to a rectangle spline (Mode.draw and this.props.activeToolbox === Tools.rectspline.name)
 
-    const coordinates = this.props.annotationsObject.getSplineCoordinates();
+    let coordinates = this.props.annotationsObject.getSplineCoordinates();
 
     if (this.isDrawing || this.dragPoint) {
       // turns out onClick still runs when releasing a drag, so we want to abort in that case:
@@ -346,17 +410,75 @@ class CanvasClass extends Component<Props, State> {
       } else if (
         this.props.mode === Mode.draw &&
         !this.props.annotationsObject.splineIsClosed() &&
-        this.props.activeToolbox === "Spline" &&
+        ["Spline", "Bezier Spline"].includes(this.props.activeToolbox) &&
         JSON.stringify({ x: imageX, y: imageY }) !==
           JSON.stringify(coordinates[coordinates.length - 1]) // don't allow duplicate points
       ) {
-        // if a normal spline, just add points as needed
-        this.props.annotationsObject.addSplinePoint({
-          x: imageX,
-          y: imageY,
-        });
-        this.selectedPointIndex =
-          this.props.annotationsObject.getSplineLength() - 1;
+        const cubic = this.props.annotationsObject.splineIsBezier();
+        if (cubic && coordinates.length > 0) {
+          // add three points (second control point for the current terminal point, first control point for the new terminal point, and the new terminal point):
+          const newPoint = { x: imageX, y: imageY };
+          const prevPoint = coordinates[coordinates.length - 1];
+
+          // add the current terminal point's second control point 25% the way to the new point if we're adding the second point in the curve:
+          const newControlPoint = {
+            x: 0.75 * prevPoint.x + 0.25 * newPoint.x,
+            y: 0.75 * prevPoint.y + 0.25 * newPoint.y,
+          };
+          this.props.annotationsObject.addSplinePoint(newControlPoint);
+
+          // add the new point's first control point, 25% along the line to the newly added control point:
+          this.props.annotationsObject.addSplinePoint({
+            x: 0.25 * newControlPoint.x + 0.75 * newPoint.x,
+            y: 0.25 * newControlPoint.y + 0.75 * newPoint.y,
+          });
+
+          // add the new point:
+          this.props.annotationsObject.addSplinePoint(newPoint);
+
+          // make the curve smooth:
+          coordinates = this.props.annotationsObject.getSplineCoordinates();
+          const i = coordinates.length - 4;
+          if (i >= 3) {
+            const norm = (point: XYPoint) =>
+              Math.sqrt(point.x ** 2 + point.y ** 2);
+
+            // a: previous point
+            // b: this point
+            // c: next point
+            const ab = {
+              x: coordinates[i].x - coordinates[i - 3].x,
+              y: coordinates[i].y - coordinates[i - 3].y,
+            };
+            const bc = {
+              x: coordinates[i + 3].x - coordinates[i].x,
+              y: coordinates[i + 3].y - coordinates[i].y,
+            };
+            const ac = {
+              x: coordinates[i + 3].x - coordinates[i - 3].x,
+              y: coordinates[i + 3].y - coordinates[i - 3].y,
+            };
+
+            this.props.annotationsObject.updateSplinePoint(
+              coordinates[i].x - (ac.x * norm(ab) * 0.3) / norm(ac),
+              coordinates[i].y - (ac.y * norm(ab) * 0.3) / norm(ac),
+              i - 1
+            );
+            this.props.annotationsObject.updateSplinePoint(
+              coordinates[i].x + (ac.x * norm(bc) * 0.3) / norm(ac),
+              coordinates[i].y + (ac.y * norm(bc) * 0.3) / norm(ac),
+              i + 1
+            );
+          }
+        } else {
+          // if a normal spline, just add points as needed
+          this.props.annotationsObject.addSplinePoint({
+            x: imageX,
+            y: imageY,
+          });
+          this.selectedPointIndex =
+            this.props.annotationsObject.getSplineLength() - 1;
+        }
       }
     }
 
@@ -375,18 +497,100 @@ class CanvasClass extends Component<Props, State> {
     this.addNewPointNearSpline(imageX, imageY);
   };
 
-  closeSpline = (): void => {
-    // Append the first spline point to the end, making a closed polygon
+  toggleSplineClosed = (): void => {
+    const cubic = this.props.annotationsObject.splineIsBezier();
 
-    // check the current annotation is on the current slice
-    if (!this.sliceIndexMatch()) return;
+    if (!this.props.annotationsObject.splineIsClosed()) {
+      // Append the first spline point to the end, making a closed polygon
 
-    const coordinates = this.props.annotationsObject.getSplineCoordinates();
-    if (coordinates.length < 3) {
-      return; // need at least three points to make a closed polygon
+      // check the current annotation is on the current slice
+      if (!this.sliceIndexMatch()) return;
+
+      let coordinates = this.props.annotationsObject.getSplineCoordinates();
+      if (coordinates.length < 3) {
+        return; // need at least three points to make a closed polygon
+      }
+
+      this.props.annotationsObject.setSplineClosed(true);
+
+      if (cubic) {
+        // need to add a couple of control points:
+        this.props.annotationsObject.addSplinePoint({
+          x: coordinates[coordinates.length - 1].x,
+          y: coordinates[coordinates.length - 1].y,
+        });
+        this.props.annotationsObject.addSplinePoint({
+          x: coordinates[0].x,
+          y: coordinates[0].y,
+        });
+
+        // smooth the curve at final control point:
+        coordinates = this.props.annotationsObject.getSplineCoordinates();
+        const norm = (point: XYPoint) => Math.sqrt(point.x ** 2 + point.y ** 2);
+        // a: previous point
+        // b: this point
+        // c: next point
+        const final = coordinates.length - 3;
+        let ab = {
+          x: coordinates[final].x - coordinates[final - 3].x,
+          y: coordinates[final].y - coordinates[final - 3].y,
+        };
+        let bc = {
+          x: coordinates[0].x - coordinates[final].x,
+          y: coordinates[0].y - coordinates[final].y,
+        };
+        let ac = {
+          x: coordinates[0].x - coordinates[final - 3].x,
+          y: coordinates[0].y - coordinates[final - 3].y,
+        };
+
+        this.props.annotationsObject.updateSplinePoint(
+          coordinates[final].x - (ac.x * norm(ab) * 0.3) / norm(ac),
+          coordinates[final].y - (ac.y * norm(ab) * 0.3) / norm(ac),
+          final - 1
+        );
+        this.props.annotationsObject.updateSplinePoint(
+          coordinates[final].x + (ac.x * norm(bc) * 0.3) / norm(ac),
+          coordinates[final].y + (ac.y * norm(bc) * 0.3) / norm(ac),
+          final + 1
+        );
+
+        // smooth the curve at first control point:
+        ab = {
+          x: coordinates[0].x - coordinates[final].x,
+          y: coordinates[0].y - coordinates[final].y,
+        };
+        bc = {
+          x: coordinates[3].x - coordinates[0].x,
+          y: coordinates[3].y - coordinates[0].y,
+        };
+        ac = {
+          x: coordinates[3].x - coordinates[final].x,
+          y: coordinates[3].y - coordinates[final].y,
+        };
+
+        this.props.annotationsObject.updateSplinePoint(
+          coordinates[0].x - (ac.x * norm(ab) * 0.3) / norm(ac),
+          coordinates[0].y - (ac.y * norm(ab) * 0.3) / norm(ac),
+          coordinates.length - 1
+        );
+        this.props.annotationsObject.updateSplinePoint(
+          coordinates[0].x + (ac.x * norm(bc) * 0.3) / norm(ac),
+          coordinates[0].y + (ac.y * norm(bc) * 0.3) / norm(ac),
+          1
+        );
+      }
+    } else {
+      this.props.annotationsObject.setSplineClosed(false);
+
+      if (cubic) {
+        // trim the last two points off (they represent the "in" control handle for the first point
+        // and the "out" control handle for the last point, which are meaningless if the curve is open):
+        const splineLength = this.props.annotationsObject.getSplineLength();
+        this.props.annotationsObject.deleteSplinePoint(splineLength - 1);
+        this.props.annotationsObject.deleteSplinePoint(splineLength - 2);
+      }
     }
-
-    this.props.annotationsObject.setSplineClosed(true);
 
     this.drawAllSplines();
   };
@@ -428,6 +632,39 @@ class CanvasClass extends Component<Props, State> {
       document.dispatchEvent(
         new CustomEvent("fillBrush", { detail: Toolboxes.paintbrush })
       );
+    }
+  };
+
+  toggleBezier = (): void => {
+    this.props.annotationsObject.setSplineBezier(
+      !this.props.annotationsObject.splineIsBezier()
+    );
+
+    if (this.props.annotationsObject.splineIsBezier()) {
+      // trim points to 3n + 1:
+      const coordinates = this.props.annotationsObject.getSplineCoordinates();
+      const pointsToDelete = this.props.annotationsObject.splineIsClosed()
+        ? coordinates.length % 3
+        : (coordinates.length - 1) % 3;
+      if (pointsToDelete !== 0) {
+        for (let i = 0; i < pointsToDelete; i += 1) {
+          this.props.annotationsObject.deleteSplinePoint(
+            coordinates.length - 1 - i
+          );
+        }
+      }
+    }
+
+    this.drawAllSplines();
+  };
+
+  makeBezierIfBezierActive = (): void => {
+    // If we create a new annotation with Bezier Spline active, ui has no way to know the spline type
+    // because it's a class component so it can't access the useSplineStore hook.
+    // Instead, it dispatches an event that triggers this function, which cat set isBezier appropriately
+    // because the spline type is passed in via the activeToolbox prop.
+    if (this.props.activeToolbox === "Bezier Spline") {
+      this.props.annotationsObject.setSplineBezier(true);
     }
   };
 
@@ -639,7 +876,8 @@ class CanvasClass extends Component<Props, State> {
   isActive = (): boolean =>
     this.props.activeToolbox === "Spline" ||
     this.props.activeToolbox === "Lasso Spline" ||
-    this.props.activeToolbox === "Magic Spline";
+    this.props.activeToolbox === "Magic Spline" ||
+    this.props.activeToolbox === "Bezier Spline";
 
   sliceIndexMatch = (): boolean =>
     this.props.annotationsObject.getSplineForActiveAnnotation().spaceTimeInfo
@@ -715,3 +953,36 @@ export const Canvas = (props: Props): ReactElement => {
     />
   );
 };
+
+function evaluateBezier(coordinates: XYPoint[]): XYPoint[] {
+  const result: XYPoint[] = [];
+  for (let i = 0; i < coordinates.length - 3; i += 3) {
+    for (let t = 0; t <= 1; t += 0.01) {
+      // lerp between p0 and p1, p1 and p2, and p2 and p3:
+      const a0x = (1 - t) * coordinates[i].x + t * coordinates[i + 1].x;
+      const a0y = (1 - t) * coordinates[i].y + t * coordinates[i + 1].y;
+
+      const a1x = (1 - t) * coordinates[i + 1].x + t * coordinates[i + 2].x;
+      const a1y = (1 - t) * coordinates[i + 1].y + t * coordinates[i + 2].y;
+
+      const a2x = (1 - t) * coordinates[i + 2].x + t * coordinates[i + 3].x;
+      const a2y = (1 - t) * coordinates[i + 2].y + t * coordinates[i + 3].y;
+
+      // lerp between l0 and l1, and l1 and l2:
+      const b0x = (1 - t) * a0x + t * a1x;
+      const b0y = (1 - t) * a0y + t * a1y;
+
+      const b1x = (1 - t) * a1x + t * a2x;
+      const b1y = (1 - t) * a1y + t * a2y;
+
+      // lerp between b0 and b1:
+      const cx = (1 - t) * b0x + t * b1x;
+      const cy = (1 - t) * b0y + t * b1y;
+
+      result.push({ x: cx, y: cy });
+    }
+  }
+  return result;
+}
+
+export { evaluateBezier };

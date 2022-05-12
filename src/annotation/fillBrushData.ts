@@ -3,7 +3,12 @@ import { Annotation } from "@/annotation/interfaces";
 const fillbrush: Annotation = {
   labels: [],
   toolbox: "paintbrush",
-  spline: { coordinates: [], spaceTimeInfo: { z: 0, t: 0 }, isClosed: false },
+  spline: {
+    coordinates: [],
+    spaceTimeInfo: { z: 0, t: 0 },
+    isClosed: false,
+    isBezier: false,
+  },
   boundingBox: {
     coordinates: {
       topLeft: { x: null, y: null },

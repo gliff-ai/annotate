@@ -1,9 +1,8 @@
-import { Component, ReactElement, MouseEvent } from "react";
+import { Component, ReactElement, MouseEvent, useEffect } from "react";
 import { IconButton, icons, Popper, ButtonGroup } from "@gliff-ai/style";
 import { Toolbox, Toolboxes } from "@/Toolboxes";
 import { getShortcut } from "@/keybindings";
 import { useSplineStore } from "./Store";
-import { useMountEffect } from "@/hooks/use-mountEffect";
 
 const events = ["selectSpline"] as const;
 
@@ -21,17 +20,30 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   const submenuEvents = [
     "selectSpline",
     "selectLassoSpline",
+    "selectBezierSpline",
     // "closeSpline", // This is listened for in the canvas, the keybinding calls that directly
     // "convertSpline", // This is listened for in the canvas, the keybinding calls that directly
   ] as const;
 
   const selectSpline = () => {
+    if (spline.splineType === "Bezier Spline") {
+      document.dispatchEvent(
+        new CustomEvent("toggleBezier", { detail: Toolboxes.spline })
+      );
+    }
+
     setSpline({ splineType: "Spline" });
 
     return true;
   };
 
   const selectLassoSpline = () => {
+    if (spline.splineType === "Bezier Spline") {
+      document.dispatchEvent(
+        new CustomEvent("toggleBezier", { detail: Toolboxes.spline })
+      );
+    }
+
     setSpline({ splineType: "Lasso Spline" });
 
     return true;
@@ -43,7 +55,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
 
   const closeSpline = () => {
     document.dispatchEvent(
-      new CustomEvent("closeSpline", { detail: Toolboxes.spline })
+      new CustomEvent("toggleSplineClosed", { detail: Toolboxes.spline })
     );
 
     return true;
@@ -53,6 +65,17 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     document.dispatchEvent(
       new CustomEvent("convertSpline", { detail: Toolboxes.spline })
     );
+
+    return true;
+  };
+
+  const selectBezierSpline = () => {
+    if (spline.splineType !== "Bezier Spline") {
+      document.dispatchEvent(
+        new CustomEvent("toggleBezier", { detail: Toolboxes.spline })
+      );
+    }
+    setSpline({ splineType: "Bezier Spline" });
 
     return true;
   };
@@ -72,7 +95,12 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       event: selectLassoSpline,
       active: () => spline.splineType === "Lasso Spline",
     },
-
+    {
+      name: "Bezier Spline",
+      icon: icons.bezierSpline,
+      event: selectBezierSpline,
+      active: () => spline.splineType === "Bezier Spline",
+    },
     {
       name: "Close Active Spline",
       icon: icons.closeSpline,
@@ -95,10 +123,12 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     // },
   ];
 
-  useMountEffect(() => {
+  /* eslint-disable react-hooks/exhaustive-deps */
+  useEffect(() => {
     const submenuEventFunctions = {
       selectSpline,
       selectLassoSpline,
+      selectBezierSpline,
       closeSpline,
       convertSpline,
     };
@@ -123,7 +153,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
         document.removeEventListener(event, handleEvent);
       }
     };
-  });
+  }, [spline]); // need to re-bind the event handlers whenever spline changes, because they seem to use the value spline when they're bound rather than the current value
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   if (props.anchorElement === null) return null;
 
