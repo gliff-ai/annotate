@@ -30,8 +30,8 @@ export default defineConfig({
       output: {
         minifyInternalExports: false,
         manualChunks(id) {
-          if (id.includes("/toolboxes/spline/")) {
-            return "spline";
+          if (id.includes("evaluateBezier")) {
+            return "evaluateBezier";
           }
 
           return "main";
