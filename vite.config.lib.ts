@@ -25,6 +25,7 @@ export default defineConfig({
         "@emotion/react",
         "@emotion/styled",
         "@gliff-ai/style",
+        "@gliff-ai/upload",
       ],
       output: {
         globals: {},
