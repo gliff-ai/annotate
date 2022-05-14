@@ -9,7 +9,7 @@ export default defineConfig({
     minify: false, // TODO maybe?
     lib: {
       entry: path.resolve(__dirname, "src/index.tsx"),
-      name: "@gliff-ai/manage",
+      name: "@gliff-ai/annotate",
       formats: ["es"],
       fileName: "index",
     },
@@ -28,6 +28,14 @@ export default defineConfig({
         "@gliff-ai/upload",
       ],
       output: {
+        minifyInternalExports: false,
+        manualChunks(id) {
+          if (id.includes("/toolboxes/spline/")) {
+            return "spline";
+          }
+
+          return "main";
+        },
         globals: {},
       },
     },

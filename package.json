@@ -19,7 +19,7 @@
     "serve": "vite",
     "build:example": "vite build",
     "test": "jest --coverage --passWithNoTests",
-    "build:patch": "sed -i 's/const generateClassName$1 = createGenerateClassName();/const generateClassName$1 = createGenerateClassName({seed:\"\",disableGlobal:true,productionPrefix:\"jss-annotate-\"});/g' dist/index.es.js",
+    "build:patch": "sed -i 's/const generateClassName$1 = createGenerateClassName();/const generateClassName$1 = createGenerateClassName({seed:\"\",disableGlobal:true,productionPrefix:\"jss-annotate-\"});/g' dist/main.js",
     "test:visual": "npx percy snapshot snapshots.yml",
     "test:e2e": "percy exec -- jest -c jest.e2e.config.js --no-colors",
     "dev": "vite --host"
