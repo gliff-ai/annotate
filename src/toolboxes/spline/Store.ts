@@ -4,7 +4,6 @@ import { createStore } from "@/store";
 interface SplineData {
   splineType: string;
 }
-
 const defaultSpline: SplineData = { splineType: "Spline" };
 
 // we've created store with initial value. This can now be used anywhere and will share the value.

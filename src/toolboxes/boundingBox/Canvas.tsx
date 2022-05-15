@@ -1,4 +1,4 @@
-import { ReactNode, Component, ReactElement } from "react";
+import { ReactNode, PureComponent, ReactElement } from "react";
 import { theme } from "@gliff-ai/style";
 import { Mode } from "@/ui";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
@@ -56,7 +56,7 @@ interface Event extends CustomEvent {
 
 type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 
-export class CanvasClass extends Component<Props, State> {
+export class CanvasClass extends PureComponent<Props, State> {
   readonly name = Toolboxes.boundingBox;
 
   private baseCanvas: BaseCanvas;

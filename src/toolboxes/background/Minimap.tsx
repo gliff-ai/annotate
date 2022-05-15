@@ -1,4 +1,4 @@
-import { Component, ReactElement, MouseEvent } from "react";
+import { PureComponent, ReactElement, MouseEvent } from "react";
 import { Slide, Card, Divider } from "@mui/material";
 import { WithStyles } from "@mui/styles";
 import withStyles from "@mui/styles/withStyles";
@@ -94,7 +94,7 @@ interface State {
   transition: boolean;
 }
 
-class Minimap extends Component<Props, State> {
+class Minimap extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
 
@@ -218,6 +218,7 @@ class Minimap extends Component<Props, State> {
                     setCanvasPositionAndSize={
                       this.props.setMinimapPositionAndSize
                     }
+                    setScaleAndPan={this.props.setScaleAndPan}
                   />
                   <MinimapCanvas
                     displayedImage={this.props.displayedImage}

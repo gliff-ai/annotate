@@ -1,32 +1,6 @@
 import { ReactElement, MouseEvent } from "react";
-import { Grid, Typography, Popover, Card, Paper } from "@mui/material";
-import { theme } from "@gliff-ai/style";
-import makeStyles from "@mui/styles/makeStyles";
+import { Card, MuiPopover } from "@gliff-ai/style";
 import { Labels, Props as LabelsProps } from "./Labels";
-
-const useStyles = makeStyles(() => ({
-  annotationCard: {
-    width: "271px",
-    height: "fit-content",
-  },
-  annotationPaper: {
-    padding: "10px",
-    backgroundColor: `${theme.palette.primary.main} !important`,
-    width: "271px",
-  },
-  annotationTypography: {
-    display: "inline",
-    fontWeight: 500,
-  },
-  annotationAvatar: {
-    backgroundColor: theme.palette.primary.main,
-    display: "inline",
-  },
-  labelsPaper: {
-    padding: "15px",
-  },
-  svg: { width: "18px", height: "auto" },
-}));
 
 interface Props extends LabelsProps {
   isOpen: boolean;
@@ -37,38 +11,20 @@ interface Props extends LabelsProps {
   multiLabel: boolean;
 }
 
-export const Submenu = (props: Props): ReactElement => {
-  const classes = useStyles();
-
-  return (
-    <Popover
-      open={props.isOpen}
-      anchorEl={props.anchorElement}
-      onClose={props.onClose}
-    >
-      <Card className={classes.annotationCard}>
-        <Paper
-          elevation={0}
-          variant="outlined"
-          square
-          className={classes.annotationPaper}
-        >
-          <Typography className={classes.annotationTypography}>
-            Annotation Labels
-          </Typography>
-        </Paper>
-        <Paper elevation={0} square className={classes.labelsPaper}>
-          <Grid>
-            <Labels
-              annotationsObject={props.annotationsObject}
-              activeAnnotationID={props.activeAnnotationID}
-              defaultLabels={props.defaultLabels}
-              restrictLabels={props.restrictLabels}
-              multiLabel={props.multiLabel}
-            />
-          </Grid>
-        </Paper>
-      </Card>
-    </Popover>
-  );
-};
+export const Submenu = (props: Props): ReactElement => (
+  <MuiPopover
+    open={props.isOpen}
+    anchorEl={props.anchorElement}
+    onClose={props.onClose}
+  >
+    <Card title="Annotation Labels">
+      <Labels
+        annotationsObject={props.annotationsObject}
+        activeAnnotationID={props.activeAnnotationID}
+        defaultLabels={props.defaultLabels}
+        restrictLabels={props.restrictLabels}
+        multiLabel={props.multiLabel}
+      />
+    </Card>
+  </MuiPopover>
+);

@@ -65,7 +65,8 @@ const keybindings = {
 
   KeyS: ["spline.selectSpline", "Select Spline tool"],
   KeyL: ["spline.selectLassoSpline", "Select Lasso Spline tool"],
-  KeyO: ["spline.closeSpline", "Close active spline"],
+  "altOption+KeyB": ["spline.selectBezierSpline", "Select Bezier Spline tool"],
+  KeyO: ["spline.toggleSplineClosed", "Close active spline"],
   "altOption+C": ["spline.convertSpline", "Convert Spline to paintbrush"],
   Backspace: ["spline.deleteSelectedPoint", "Delete selected spline point"],
   Escape: ["spline.deselectPoint", "Deselect spline point"],
