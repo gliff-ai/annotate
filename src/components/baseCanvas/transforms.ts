@@ -217,7 +217,7 @@ export function touchPointsToScaleAndPan(
     (image1.y + image2.y) / 2,
     imageWidth,
     imageHeight,
-    { x: 0, y: 0, scale: scale },
+    { x: 0, y: 0, scale },
     canvasPositionAndSize
   );
 

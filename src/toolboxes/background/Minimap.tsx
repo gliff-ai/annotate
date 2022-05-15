@@ -218,7 +218,6 @@ class Minimap extends PureComponent<Props, State> {
                     setCanvasPositionAndSize={
                       this.props.setMinimapPositionAndSize
                     }
-                    setScaleAndPan={this.props.setScaleAndPan}
                   />
                   <MinimapCanvas
                     displayedImage={this.props.displayedImage}
