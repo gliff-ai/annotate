@@ -187,6 +187,7 @@ interface Props extends WithStyles<typeof styles> {
   restrictLabels?: boolean;
   multiLabel?: boolean;
   saveMetadataCallback?: ((data: any) => void) | null;
+  readonly?: boolean;
 }
 
 class UserInterface extends Component<Props, State> {
@@ -204,6 +205,7 @@ class UserInterface extends Component<Props, State> {
     restrictLabels: false,
     multiLabel: true,
     saveMetadataCallback: null,
+    readonly: false,
   };
 
   annotationsObject: Annotations;
@@ -916,20 +918,6 @@ class UserInterface extends Component<Props, State> {
             toggleChannelAtIndex={this.toggleChannelAtIndex}
           />
         </ButtonGroup>
-
-        <LabelsSubmenu
-          isOpen={
-            this.state.activeSubmenuAnchor ===
-            this.refBtnsPopovers["Annotation Label"]
-          }
-          anchorElement={this.state.activeSubmenuAnchor}
-          onClose={this.handleClose}
-          annotationsObject={this.annotationsObject}
-          activeAnnotationID={this.state.activeAnnotationID}
-          defaultLabels={this.props.defaultLabels}
-          restrictLabels={this.props.restrictLabels}
-          multiLabel={this.props.multiLabel}
-        />
       </div>
     );
 
