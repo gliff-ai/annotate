@@ -921,6 +921,35 @@ class UserInterface extends Component<Props, State> {
       </div>
     );
 
+    const readonlyToolbar = (
+      <div className={classes.leftToolbar}>
+        <ButtonGroup>
+          <IconButton
+            id={"id-select-annotation"}
+            key={"Select Annotation"}
+            icon={tools[0].icon}
+            tooltip={{
+              name: "Select Annotation",
+              ...getShortcut("ui.toggleMode"),
+            }}
+            onClick={this["toggleMode"]}
+            fill={tools[0].active()}
+            setRefCallback={(ref: HTMLButtonElement) => {
+              this.refBtnsPopovers["Select Annotation"] = ref;
+            }}
+            disabled={!tools[0].enabled()}
+            size="small"
+          />
+          <BackgroundToolbar
+            handleOpen={this.handleOpen}
+            anchorElement={this.state.activeSubmenuAnchor}
+            channels={this.state.channels}
+            toggleChannelAtIndex={this.toggleChannelAtIndex}
+          />
+        </ButtonGroup>
+      </div>
+    );
+
     return (
       <StylesProvider generateClassName={generateClassName("annotate")}>
         <StyledEngineProvider injectFirst>
@@ -937,7 +966,7 @@ class UserInterface extends Component<Props, State> {
                 }}
               >
                 {appBar}
-                {leftToolbar}
+                {this.props.readonly ? readonlyToolbar : leftToolbar}
                 <div
                   style={{
                     display: "block",
