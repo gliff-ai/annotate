@@ -12,7 +12,7 @@ type PluginObject = { [name: string]: PluginElement[] };
 
 type PluginInput = Partial<{
   collectionUid: string;
-  imageUid: string;
+  imageUids: string[];
   imageData: ImageBitmap[][]; // image data (i.e., slicesData)
   imageFileInfo: ImageFileInfo;
   annotationData: Annotation[]; // all annotations
