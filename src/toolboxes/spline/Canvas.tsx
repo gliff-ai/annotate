@@ -65,11 +65,14 @@ class CanvasClass extends PureComponent<Props, State> {
 
   private numberOfMoves: number; // increments on mouse move; used to space out the magic spline points
 
+  private lassoPointsAdded: number; // number of spline points added in current drag gesture
+
   constructor(props: Props) {
     super(props);
     this.selectedPointIndex = -1;
     this.isDrawing = false;
     this.numberOfMoves = 0;
+    this.lassoPointsAdded = 0;
     this.dragPoint = null;
     this.state = {
       canvasPositionAndSize: { top: 0, left: 0, width: 0, height: 0 },
@@ -762,11 +765,26 @@ class CanvasClass extends PureComponent<Props, State> {
       this.props.activeToolbox === "Lasso Spline" &&
       !this.props.annotationsObject.splineIsClosed()
     ) {
-      // lasso spline, add a new point but no snapping
-      this.props.annotationsObject.addSplinePoint(clickPoint);
-      this.selectedPointIndex =
-        this.props.annotationsObject.getSplineLength() - 1;
-      this.isDrawing = true;
+      if (this.isDrawing === false) {
+        // lasso spline, add a new point but no snapping
+        this.props.annotationsObject.addSplinePoint(clickPoint);
+        this.selectedPointIndex =
+          this.props.annotationsObject.getSplineLength() - 1;
+        this.isDrawing = true;
+        this.lassoPointsAdded = 1;
+      } else {
+        // if this.isDrawing === true then we've had two onMouseDownOrTouchStart events with no MouseUpOrTouchEnd in betwen them
+        // this means the user is attempting pinch-to-zoom on iPad, so we abort the spline here:
+        this.isDrawing = false;
+        // undo whatever spline points have been added in this drag gesture:
+        for (let i = 0; i < this.lassoPointsAdded; i += 1) {
+          this.props.annotationsObject.deleteSplinePoint(
+            this.props.annotationsObject.getSplineLength() - 1
+          );
+        }
+        this.selectedPointIndex =
+          this.props.annotationsObject.getSplineLength() - 1;
+      }
     }
 
     this.drawAllSplines();
@@ -814,6 +832,7 @@ class CanvasClass extends PureComponent<Props, State> {
       });
       this.selectedPointIndex =
         this.props.annotationsObject.getSplineLength() - 1;
+      this.lassoPointsAdded += 1;
     } else {
       // dragging a point on a normal spline
       this.dragPoint = clickPoint;
@@ -825,6 +844,8 @@ class CanvasClass extends PureComponent<Props, State> {
 
   onMouseUpOrTouchEnd = (): void => {
     // Works as part of drag and drop for points.
+    this.numberOfMoves = 0;
+    this.lassoPointsAdded = 0;
     if (this.dragPoint) {
       this.props.annotationsObject.updateSplinePoint(
         this.dragPoint.x,

@@ -211,11 +211,19 @@ export function touchPointsToScaleAndPan(
     Math.hypot(canvas1.x - canvas2.x, canvas1.y - canvas2.y) /
     (Math.hypot(image1.x - image2.x, image1.y - image2.y) * ratio);
 
+  // get the position of the midpoint of the image points in canvas space with no pan:
+  const unpannedMidpoint = imageToCanvas(
+    (image1.x + image2.x) / 2,
+    (image1.y + image2.y) / 2,
+    imageWidth,
+    imageHeight,
+    { x: 0, y: 0, scale },
+    canvasPositionAndSize
+  );
+
   // pan the image such that the midpoints of image1/2 and canvas1/2 are aligned:
-  const panX =
-    (canvas1.x + canvas2.x) / 2 - ((image1.x + image2.x) / 2) * ratio * scale;
-  const panY =
-    (canvas1.y + canvas2.y) / 2 - ((image1.y + image2.y) / 2) * ratio * scale;
+  const panX = (canvas1.x + canvas2.x) / 2 - unpannedMidpoint.x;
+  const panY = (canvas1.y + canvas2.y) / 2 - unpannedMidpoint.y;
 
   return { x: panX, y: panY, scale };
 }
