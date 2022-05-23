@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useState, MouseEvent } from "react";
 import {
   Card,
   Popover,
@@ -12,8 +12,13 @@ interface Props {
   currentUser: string;
   users: string[];
   changeUser: (username: string) => void;
-  fill: boolean;
+  anchorElement: HTMLButtonElement | null;
+  handleOpen: (
+    event?: MouseEvent
+  ) => (anchorElement?: HTMLButtonElement) => void;
 }
+
+let refBackgroundSettingsPopover: HTMLButtonElement;
 
 export const UsersPopover = (props: Props): ReactElement => {
   const [username, setUsername] = useState<string>(props.currentUser);
@@ -27,8 +32,14 @@ export const UsersPopover = (props: Props): ReactElement => {
         <IconButton
           tooltip={{ name: "Select A User" }}
           icon={icons.usersPage}
-          fill={props.fill}
+          fill={props.anchorElement === refBackgroundSettingsPopover}
           size="small"
+          setRefCallback={(ref) => {
+            refBackgroundSettingsPopover = ref;
+          }}
+          onClick={() => {
+            props.handleOpen()(refBackgroundSettingsPopover);
+          }}
         />
       }
     >
@@ -42,7 +53,6 @@ export const UsersPopover = (props: Props): ReactElement => {
         }}
         key="input-user1"
         placeholder=""
-        value={username}
         renderInput={(params) => (
           <TextField
             {...params}

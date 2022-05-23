@@ -951,7 +951,8 @@ class UserInterface extends Component<Props, State> {
               this.annotationsObject = this.props.userAnnotations[username];
               this.redrawEverything();
             }}
-            fill={false}
+            anchorElement={this.state.activeSubmenuAnchor}
+            handleOpen={this.handleOpen}
           />
           <BackgroundToolbar
             handleOpen={this.handleOpen}
