@@ -42,6 +42,7 @@ import { getShortcut, keydownListener } from "@/keybindings";
 import { BaseSlider, Config } from "@/components/BaseSlider";
 import { KeybindPopup } from "./keybindings/KeybindPopup";
 import { PluginObject, PluginsCard } from "./components/plugins";
+import { UsersPopover } from "./components/UsersPopover";
 
 declare module "@mui/styles/defaultTheme" {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -105,6 +106,7 @@ interface State {
   buttonClicked: string;
   mode: Mode;
   canvasContainerColour: number[];
+  currentUser: string; // only used in readonly mode, when we might have multiple annotations to view for an image
 }
 
 const styles = {
@@ -188,6 +190,7 @@ interface Props extends WithStyles<typeof styles> {
   multiLabel?: boolean;
   saveMetadataCallback?: ((data: any) => void) | null;
   readonly?: boolean;
+  userAnnotations?: { [username: string]: Annotations };
 }
 
 class UserInterface extends Component<Props, State> {
@@ -243,6 +246,7 @@ class UserInterface extends Component<Props, State> {
       activeToolbox: Toolboxes.paintbrush,
       mode: Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
+      currentUser: "",
     };
 
     this.imageFileInfo = this.props.imageFileInfo || null;
@@ -905,7 +909,6 @@ class UserInterface extends Component<Props, State> {
             handleOpen={this.handleOpen}
             anchorElement={this.state.activeSubmenuAnchor}
           />
-
           <BoundingBoxToolbar
             active={this.state.activeToolbox === "boundingBox"}
             activateToolbox={this.activateToolbox}
@@ -939,6 +942,16 @@ class UserInterface extends Component<Props, State> {
             }}
             disabled={!tools[0].enabled()}
             size="small"
+          />
+          <UsersPopover
+            currentUser={this.state.currentUser}
+            users={Object.keys(this.props.userAnnotations)}
+            changeUser={(username: string) => {
+              this.setState({ currentUser: username });
+              this.annotationsObject = this.props.userAnnotations[username];
+              this.redrawEverything();
+            }}
+            fill={false}
           />
           <BackgroundToolbar
             handleOpen={this.handleOpen}
