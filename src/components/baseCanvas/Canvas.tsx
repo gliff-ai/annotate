@@ -173,6 +173,13 @@ export class BaseCanvas extends Component<Props> {
           this.props.canvasPositionAndSize
         ),
       };
+      if (
+        this.props.onMouseDown &&
+        e.touches.length !== e.changedTouches.length // true if the fingers DON'T go down at the same time
+      ) {
+        // this will cause PaintbrushCanvas to abort the current brushstroke (the actual coordinates don't matter):
+        this.props.onMouseDown(canvas2.x, canvas2.y);
+      }
     }
   };
 

@@ -4,7 +4,7 @@ jobs:
   ubuntu-job:
     name: "BrowserStack Test on Ubuntu"
     runs-on: ubuntu-latest # Can be self-hosted runner also
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - name: "BrowserStack Env Setup" # Invokes the setup-env action
         uses: browserstack/github-actions/setup-env@master
@@ -17,6 +17,7 @@ jobs:
         with:
           local-testing: start
           local-identifier: random
+          local-logging-level: all-logs
 
       # The next 3 steps are for building the web application to be tested and starting the web server on the runner environment
 
@@ -26,10 +27,10 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 15
+          node-version: 18
 
       - name: "Building web application to be tested"
-        run: npm i
+        run: npm ci
 
       - run: npm run build:example
 
@@ -42,3 +43,9 @@ jobs:
         run: TARGET_URL=http://bs-local.com:8080/ npm run test:e2e
         env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
+
+      - name: Stop Local Testing
+        if: always()
+        uses: browserstack/github-actions/setup-local@master
+        with:
+          local-testing: stop

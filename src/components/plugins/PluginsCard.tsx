@@ -95,7 +95,8 @@ export const PluginsCard = ({
           annotationData: annotationsObject.getAllAnnotations(),
         };
       } else {
-        data = { imageUid, collectionUid };
+        // NOTE: the plugin expects an array of image uids
+        data = { imageUids: [imageUid], collectionUid };
       }
 
       const response = await plugin.onClick(data);
