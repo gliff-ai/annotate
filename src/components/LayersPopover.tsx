@@ -16,8 +16,6 @@ import { Annotations } from "@/annotation";
 import { Annotation } from "@/annotation/interfaces";
 import createStyles from "@mui/styles/createStyles";
 import makeStyles from "@mui/styles/makeStyles";
-import { AccordionSummaryProps } from "@mui/material/AccordionSummary";
-import { styled } from "@mui/material/styles";
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -63,8 +61,8 @@ export const LayersPopover = (props: Props): ReactElement => {
       transformOrigin={{ vertical: "top", horizontal: "left" }}
       TriggerButton={
         <IconButton
-          tooltip={{ name: "Select A User" }}
-          icon={icons.usersPage}
+          tooltip={{ name: "Annotation Layers" }}
+          icon={icons.layers}
           size="small"
           setRefCallback={(ref) => {
             refBackgroundSettingsPopover = ref;
