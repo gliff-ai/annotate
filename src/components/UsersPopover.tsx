@@ -9,7 +9,6 @@ import {
 } from "@gliff-ai/style";
 
 interface Props {
-  currentUser: string;
   users: string[];
   changeUser: (username: string) => void;
   handleOpen: (
@@ -20,7 +19,10 @@ interface Props {
 let refBackgroundSettingsPopover: HTMLButtonElement;
 
 export const UsersPopover = (props: Props): ReactElement => {
-  const [username, setUsername] = useState<string>(props.currentUser);
+  const [username, setUsername] = useState<string>(props.users[0]);
+
+  if (username === undefined && props.users.length > 0)
+    setUsername(props.users[0]);
 
   return (
     <Popover
@@ -43,12 +45,10 @@ export const UsersPopover = (props: Props): ReactElement => {
     >
       <Autocomplete
         onChange={(event, value) => {
-          console.log("onChange");
           setUsername(value);
+          props.changeUser(value);
         }}
-        onInputChange={(event, value) => {
-          setUsername(value);
-        }}
+        value={username}
         key="input-user1"
         placeholder=""
         renderInput={(params) => (
@@ -63,7 +63,7 @@ export const UsersPopover = (props: Props): ReactElement => {
             autoFocus
             sx={{
               fontSize: 14,
-              width: "225px",
+              width: "300px",
               marginBottom: "20px",
               borderBottom: "solid 1px #dadde9",
             }}

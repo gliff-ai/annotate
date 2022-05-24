@@ -107,7 +107,6 @@ interface State {
   buttonClicked: string;
   mode: Mode;
   canvasContainerColour: number[];
-  currentUser: string; // only used in readonly mode, when we might have multiple annotations to view for an image
 }
 
 const styles = {
@@ -247,7 +246,6 @@ class UserInterface extends Component<Props, State> {
       activeToolbox: Toolboxes.paintbrush,
       mode: Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
-      currentUser: "",
     };
 
     this.imageFileInfo = this.props.imageFileInfo || null;
@@ -945,10 +943,8 @@ class UserInterface extends Component<Props, State> {
             size="small"
           />
           <UsersPopover
-            currentUser={this.state.currentUser}
             users={Object.keys(this.props.userAnnotations)}
             changeUser={(username: string) => {
-              this.setState({ currentUser: username });
               this.annotationsObject = this.props.userAnnotations[username];
               this.redrawEverything();
             }}
