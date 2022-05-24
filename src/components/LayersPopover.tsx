@@ -87,6 +87,7 @@ export const LayersPopover = (props: Props): ReactElement => {
                   props.setActiveAnnotation(i);
                 }
               }}
+              key={`layers-accordion-${i}`}
             >
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
@@ -102,7 +103,7 @@ export const LayersPopover = (props: Props): ReactElement => {
                 }`}
               </AccordionSummary>
               <AccordionDetails className={classes.accordionDetails}>
-                {annotation.labels.map((label) => (
+                {annotation.labels.map((label, j) => (
                   <Chip
                     className={classes.labelsChip}
                     label={
@@ -111,6 +112,7 @@ export const LayersPopover = (props: Props): ReactElement => {
                       </Typography>
                     }
                     variant="outlined"
+                    key={`labels-chip-${i}-${j}`}
                   />
                 ))}
               </AccordionDetails>
