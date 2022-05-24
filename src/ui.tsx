@@ -43,6 +43,7 @@ import { BaseSlider, Config } from "@/components/BaseSlider";
 import { KeybindPopup } from "./keybindings/KeybindPopup";
 import { PluginObject, PluginsCard } from "./components/plugins";
 import { UsersPopover } from "./components/UsersPopover";
+import { LayersPopover } from "./components/LayersPopover";
 
 declare module "@mui/styles/defaultTheme" {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -924,7 +925,7 @@ class UserInterface extends Component<Props, State> {
       </div>
     );
 
-    const readonlyToolbar = (
+    const readonlyToolbar = this.props.readonly && (
       <div className={classes.leftToolbar}>
         <ButtonGroup>
           <IconButton
@@ -951,8 +952,15 @@ class UserInterface extends Component<Props, State> {
               this.annotationsObject = this.props.userAnnotations[username];
               this.redrawEverything();
             }}
-            anchorElement={this.state.activeSubmenuAnchor}
             handleOpen={this.handleOpen}
+          />
+          <LayersPopover
+            annotationsObject={this.annotationsObject}
+            handleOpen={this.handleOpen}
+            setActiveAnnotation={(id: number) => {
+              this.annotationsObject.setActiveAnnotationID(id);
+              this.redrawEverything();
+            }}
           />
           <BackgroundToolbar
             handleOpen={this.handleOpen}

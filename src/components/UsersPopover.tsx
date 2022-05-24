@@ -12,7 +12,6 @@ interface Props {
   currentUser: string;
   users: string[];
   changeUser: (username: string) => void;
-  anchorElement: HTMLButtonElement | null;
   handleOpen: (
     event?: MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
@@ -32,7 +31,6 @@ export const UsersPopover = (props: Props): ReactElement => {
         <IconButton
           tooltip={{ name: "Select A User" }}
           icon={icons.usersPage}
-          fill={props.anchorElement === refBackgroundSettingsPopover}
           size="small"
           setRefCallback={(ref) => {
             refBackgroundSettingsPopover = ref;
