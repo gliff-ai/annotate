@@ -107,6 +107,8 @@ interface State {
   buttonClicked: string;
   mode: Mode;
   canvasContainerColour: number[];
+  user1: string;
+  user2: string;
 }
 
 const styles = {
@@ -177,6 +179,7 @@ interface Props extends WithStyles<typeof styles> {
   slicesData?: ImageBitmap[][] | null;
   imageFileInfo?: ImageFileInfo;
   annotationsObject?: Annotations;
+  annotationsObject2?: Annotations; // second annotation chosen by user in CURATE View Annotations dialog, for side-by-side comparison
   saveAnnotationsCallback?: (annotationsObject: Annotations) => void;
   showAppBar?: boolean;
   // setIsLoading is used, but in progress.tsx
@@ -247,6 +250,8 @@ class UserInterface extends Component<Props, State> {
       activeToolbox: Toolboxes.paintbrush,
       mode: Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
+      user1: "", // initialised properly in componentDidMount once annotations objects are passed in
+      user2: "",
     };
 
     this.imageFileInfo = this.props.imageFileInfo || null;
@@ -294,6 +299,22 @@ class UserInterface extends Component<Props, State> {
       this.annotationsObject = this.props.annotationsObject;
       this.annotationsObject.giveRedrawCallback(this.redrawUI);
       this.redrawUI();
+    }
+
+    if (this.props.readonly) {
+      if (
+        this.props.annotationsObject &&
+        Object.keys(this.props.userAnnotations).length > 0 &&
+        (!prevProps.annotationsObject ||
+          Object.keys(prevProps.userAnnotations).length === 0)
+      ) {
+        const user1 = Object.entries(this.props.userAnnotations).find(
+          ([username, annotationsObject]) =>
+            JSON.stringify(annotationsObject.getAllAnnotations()) ===
+            JSON.stringify(this.props.annotationsObject.getAllAnnotations())
+        )[0];
+        this.setState({ user1 });
+      }
     }
   };
 
@@ -944,8 +965,10 @@ class UserInterface extends Component<Props, State> {
             size="small"
           />
           <UsersPopover
+            currentUser={this.state.user1}
             users={Object.keys(this.props.userAnnotations)}
             changeUser={(username: string) => {
+              this.setState({ user1: username });
               this.annotationsObject = this.props.userAnnotations[username];
               this.redrawEverything();
             }}
