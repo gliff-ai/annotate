@@ -209,6 +209,7 @@ class UserInterface extends Component<Props, State> {
     multiLabel: true,
     saveMetadataCallback: null,
     readonly: false,
+    userAnnotations: {},
   };
 
   annotationsObject: Annotations;
@@ -927,14 +928,14 @@ class UserInterface extends Component<Props, State> {
       <div className={classes.leftToolbar}>
         <ButtonGroup>
           <IconButton
-            id={"id-select-annotation"}
-            key={"Select Annotation"}
+            id="id-select-annotation"
+            key="Select Annotation"
             icon={tools[0].icon}
             tooltip={{
               name: "Select Annotation",
               ...getShortcut("ui.toggleMode"),
             }}
-            onClick={this["toggleMode"]}
+            onClick={this.toggleMode}
             fill={tools[0].active()}
             setRefCallback={(ref: HTMLButtonElement) => {
               this.refBtnsPopovers["Select Annotation"] = ref;

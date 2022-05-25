@@ -53,7 +53,7 @@ export const UsersPopover = (props: Props): ReactElement => {
         placeholder=""
         renderInput={(params) => (
           <TextField
-            {...params}
+            {...params} // eslint-disable-line react/jsx-props-no-spreading
             label="Username"
             onKeyPress={(e) => {
               if (e.key === "Enter") {

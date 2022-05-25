@@ -12,10 +12,10 @@ import {
   theme,
 } from "@gliff-ai/style";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Annotations } from "@/annotation";
-import { Annotation } from "@/annotation/interfaces";
 import createStyles from "@mui/styles/createStyles";
 import makeStyles from "@mui/styles/makeStyles";
+import { Annotations } from "@/annotation";
+import { Annotation } from "@/annotation/interfaces";
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -76,46 +76,49 @@ export const LayersPopover = (props: Props): ReactElement => {
       <>
         {props.annotationsObject
           .getAllAnnotations()
-          .map((annotation, i, array) => (
-            <Accordion
-              disableGutters
-              expanded={props.annotationsObject.getActiveAnnotationID() === i}
-              onChange={(event, expanded) => {
-                if (expanded) {
-                  props.setActiveAnnotation(i);
-                }
-              }}
-              key={`layers-accordion-${i}`}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                className={classes.accordionSummary}
+          .map((annotation, i, array) => {
+            const name = `${layerTypeString(annotation)} ${
+              array
+                .filter(
+                  (annotation2) => annotation2.toolbox === annotation.toolbox
+                )
+                .indexOf(annotation) + 1
+            }`;
+
+            return (
+              <Accordion
+                disableGutters
+                expanded={props.annotationsObject.getActiveAnnotationID() === i}
+                onChange={(event, expanded) => {
+                  if (expanded) {
+                    props.setActiveAnnotation(i);
+                  }
+                }}
+                key={name}
               >
-                {`${layerTypeString(annotation)} ${
-                  array
-                    .filter(
-                      (annotation2) =>
-                        annotation2.toolbox === annotation.toolbox
-                    )
-                    .indexOf(annotation) + 1
-                }`}
-              </AccordionSummary>
-              <AccordionDetails className={classes.accordionDetails}>
-                {annotation.labels.map((label, j) => (
-                  <Chip
-                    className={classes.labelsChip}
-                    label={
-                      <Typography className={classes.chipFont}>
-                        {label}
-                      </Typography>
-                    }
-                    variant="outlined"
-                    key={`labels-chip-${i}-${j}`}
-                  />
-                ))}
-              </AccordionDetails>
-            </Accordion>
-          ))}
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  className={classes.accordionSummary}
+                >
+                  {name}
+                </AccordionSummary>
+                <AccordionDetails className={classes.accordionDetails}>
+                  {annotation.labels.map((label, j) => (
+                    <Chip
+                      className={classes.labelsChip}
+                      label={
+                        <Typography className={classes.chipFont}>
+                          {label}
+                        </Typography>
+                      }
+                      variant="outlined"
+                      key={`${name}-${label}`}
+                    />
+                  ))}
+                </AccordionDetails>
+              </Accordion>
+            );
+          })}
       </>
     </Popover>
   );
