@@ -31,6 +31,8 @@ interface SubmenuProps {
   anchorElement: HTMLButtonElement | null;
   channelControls: ReactElement[];
   openSubmenu: () => void;
+  isChannelPinned: boolean;
+  handleChannelPin: () => void;
 }
 
 interface Props {
@@ -40,6 +42,8 @@ interface Props {
   anchorElement: HTMLButtonElement | null;
   channels: boolean[];
   toggleChannelAtIndex: (index: number) => void;
+  isChannelPinned: boolean;
+  handleChannelPin: () => void;
 }
 
 const baseSliderStyle = {
@@ -151,6 +155,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   });
 
   const handleClickAway = () => {
+    if (buttonClicked === "Channels" && props.isChannelPinned) return;
     setButtonClicked("");
   };
 
@@ -231,7 +236,11 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                 )}
                 {buttonClicked === "Channels" && props.channelControls && (
                   <>
-                    <Card title="Channel">
+                    <Card
+                      title="Channel"
+                      isPinned={props.isChannelPinned}
+                      handlePin={props.handleChannelPin}
+                    >
                       <FormControl component="fieldset">
                         <FormGroup aria-label="position">
                           {props.channelControls.map((control, i) => (
@@ -331,6 +340,8 @@ class Toolbar extends Component<Props> {
         openSubmenu={this.openSubmenu}
         anchorElement={this.props.anchorElement}
         channelControls={this.channelControls}
+        isChannelPinned={this.props.isChannelPinned}
+        handleChannelPin={this.props.handleChannelPin}
       />
     </>
   );

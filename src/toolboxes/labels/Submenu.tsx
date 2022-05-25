@@ -9,6 +9,8 @@ interface Props extends LabelsProps {
   defaultLabels: string[];
   restrictLabels: boolean;
   multiLabel: boolean;
+  isPinned: boolean;
+  handlePin: () => void;
 }
 
 export const Submenu = (props: Props): ReactElement => (
@@ -17,7 +19,11 @@ export const Submenu = (props: Props): ReactElement => (
     anchorEl={props.anchorElement}
     onClose={props.onClose}
   >
-    <Card title="Annotation Labels">
+    <Card
+      title="Annotation Labels"
+      isPinned={props.isPinned}
+      handlePin={props.handlePin}
+    >
       <Labels
         annotationsObject={props.annotationsObject}
         activeAnnotationID={props.activeAnnotationID}

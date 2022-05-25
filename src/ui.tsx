@@ -94,6 +94,7 @@ interface State {
     scale: number;
   };
   activeToolbox?: Toolbox; // FIXME
+  isToolPinned?: { [tool: string]: boolean };
   displayedImage?: ImageBitmap;
   activeAnnotationID: number;
   viewportPositionAndSize: Required<PositionAndSize>;
@@ -241,6 +242,11 @@ class UserInterface extends Component<Props, State> {
       activeToolbox: Toolboxes.paintbrush,
       mode: Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
+      isToolPinned: {
+        "Annotation Label": false,
+        Plugins: false,
+        Channels: false,
+      },
     };
 
     this.imageFileInfo = this.props.imageFileInfo || null;
@@ -584,6 +590,15 @@ class UserInterface extends Component<Props, State> {
     });
   };
 
+  setIsToolPinned = (tool: string) => (): void => {
+    if (this.state.isToolPinned[tool] === undefined) return;
+    this.setState((prevState) => {
+      const newIsPinned = { ...prevState.isToolPinned };
+      newIsPinned[tool] = !newIsPinned[tool];
+      return { isToolPinned: newIsPinned };
+    });
+  };
+
   reuseEmptyAnnotation = (): void => {
     /* If the active annotation object is empty, change the value of toolbox
     to match the active tool. */
@@ -634,7 +649,8 @@ class UserInterface extends Component<Props, State> {
     }, this.mixChannels);
   };
 
-  handleClose = (): void => {
+  handleClose = (isDisabled?: boolean) => (): void => {
+    if (isDisabled) return;
     this.setState({ activeSubmenuAnchor: null });
   };
 
@@ -862,19 +878,23 @@ class UserInterface extends Component<Props, State> {
               this.refBtnsPopovers["Annotation Label"]
             }
             anchorElement={this.state.activeSubmenuAnchor}
-            onClose={this.handleClose}
+            onClose={this.handleClose(
+              this.state.isToolPinned["Annotation Label"]
+            )}
             annotationsObject={this.annotationsObject}
             activeAnnotationID={this.state.activeAnnotationID}
             defaultLabels={this.props.defaultLabels}
             restrictLabels={this.props.restrictLabels}
             multiLabel={this.props.multiLabel}
+            isPinned={this.state.isToolPinned["Annotation Label"]}
+            handlePin={this.setIsToolPinned("Annotation Label")}
           />
           <MuiPopover
             open={
               this.state.activeSubmenuAnchor === this.refBtnsPopovers.Plugins
             }
             anchorEl={this.state.activeSubmenuAnchor}
-            onClose={this.handleClose}
+            onClose={this.handleClose(this.state.isToolPinned.Plugins)}
           >
             <PluginsCard
               plugins={this.props.plugins}
@@ -885,6 +905,8 @@ class UserInterface extends Component<Props, State> {
               imageFileInfo={this.props.imageFileInfo}
               annotationsObject={this.annotationsObject}
               saveMetadataCallback={this.props.saveMetadataCallback}
+              isPinned={this.state.isToolPinned.Plugins}
+              handlePin={this.setIsToolPinned("Plugins")}
             />
           </MuiPopover>
         </ButtonGroup>
@@ -914,22 +936,28 @@ class UserInterface extends Component<Props, State> {
             anchorElement={this.state.activeSubmenuAnchor}
             channels={this.state.channels}
             toggleChannelAtIndex={this.toggleChannelAtIndex}
+            isChannelPinned={this.state.isToolPinned.Channels}
+            handleChannelPin={this.setIsToolPinned("Channels")}
           />
         </ButtonGroup>
 
-        <LabelsSubmenu
+        {/* <LabelsSubmenu
           isOpen={
             this.state.activeSubmenuAnchor ===
             this.refBtnsPopovers["Annotation Label"]
           }
           anchorElement={this.state.activeSubmenuAnchor}
-          onClose={this.handleClose}
+          onClose={this.handleClose(
+            this.state.isToolPinned["Annotation Label"]
+          )}
           annotationsObject={this.annotationsObject}
           activeAnnotationID={this.state.activeAnnotationID}
           defaultLabels={this.props.defaultLabels}
           restrictLabels={this.props.restrictLabels}
           multiLabel={this.props.multiLabel}
-        />
+          isPinned={this.state.isToolPinned["Annotation Label"]}
+          handlePin={this.setIsToolPinned("Annotation Label")}
+        /> */}
       </div>
     );
 
