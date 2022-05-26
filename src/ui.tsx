@@ -108,7 +108,7 @@ interface State {
   mode: Mode;
   canvasContainerColour: number[];
   user1: string;
-  user2: string;
+  // user2: string;
 }
 
 const styles = {
@@ -179,7 +179,7 @@ interface Props extends WithStyles<typeof styles> {
   slicesData?: ImageBitmap[][] | null;
   imageFileInfo?: ImageFileInfo;
   annotationsObject?: Annotations;
-  annotationsObject2?: Annotations; // second annotation chosen by user in CURATE View Annotations dialog, for side-by-side comparison
+  // annotationsObject2?: Annotations; // second annotation chosen by user in CURATE View Annotations dialog, for side-by-side comparison
   saveAnnotationsCallback?: (annotationsObject: Annotations) => void;
   showAppBar?: boolean;
   // setIsLoading is used, but in progress.tsx
@@ -251,7 +251,7 @@ class UserInterface extends Component<Props, State> {
       mode: Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
       user1: "", // initialised properly in componentDidMount once annotations objects are passed in
-      user2: "",
+      // user2: "",
     };
 
     this.imageFileInfo = this.props.imageFileInfo || null;
