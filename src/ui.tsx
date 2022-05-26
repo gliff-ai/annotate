@@ -22,7 +22,7 @@ import {
   icons,
   generateClassName,
   WarningSnackbar,
-  MuiPopover,
+  Popper,
 } from "@gliff-ai/style";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
@@ -590,11 +590,11 @@ class UserInterface extends Component<Props, State> {
     });
   };
 
-  setIsToolPinned = (tool: string) => (): void => {
+  setIsToolPinned = (tool: string, value?: boolean) => (): void => {
     if (this.state.isToolPinned[tool] === undefined) return;
     this.setState((prevState) => {
       const newIsPinned = { ...prevState.isToolPinned };
-      newIsPinned[tool] = !newIsPinned[tool];
+      newIsPinned[tool] = value !== undefined ? value : !newIsPinned[tool];
       return { isToolPinned: newIsPinned };
     });
   };
@@ -649,9 +649,8 @@ class UserInterface extends Component<Props, State> {
     }, this.mixChannels);
   };
 
-  handleClose = (isDisabled?: boolean) => (): void => {
-    if (isDisabled) return;
-    this.setState({ activeSubmenuAnchor: null });
+  handleClose = (): void => {
+    this.setState({ activeSubmenuAnchor: null, buttonClicked: "" });
   };
 
   handleOpen =
@@ -688,12 +687,10 @@ class UserInterface extends Component<Props, State> {
 
   selectAnnotationLabel = (): void => {
     this.handleOpen()(this.refBtnsPopovers["Annotation Label"]);
-    this.setButtonClicked("Annotation Label");
   };
 
   selectPlugins = (): void => {
     this.handleOpen()(this.refBtnsPopovers.Plugins);
-    this.setButtonClicked("Plugins");
   };
 
   saveAnnotations = (): void => {
@@ -732,6 +729,15 @@ class UserInterface extends Component<Props, State> {
 
   setCanvasContainerColourCallback = (canvasContainerColour: number[]): void =>
     this.setState({ canvasContainerColour });
+
+  handleClickAway = (tool: string) => (): void => {
+    if (!this.state.isToolPinned[tool] && this.state.buttonClicked === tool) {
+      this.handleClose();
+      this.setIsToolPinned(tool, false); // reset default
+    } else if (this.state.buttonClicked !== tool) {
+      this.setButtonClicked(tool); // set button clicked at first open
+    }
+  };
 
   render = (): ReactNode => {
     const { classes, showAppBar, saveAnnotationsCallback } = this.props;
@@ -878,9 +884,7 @@ class UserInterface extends Component<Props, State> {
               this.refBtnsPopovers["Annotation Label"]
             }
             anchorElement={this.state.activeSubmenuAnchor}
-            onClose={this.handleClose(
-              this.state.isToolPinned["Annotation Label"]
-            )}
+            handleClickAway={this.handleClickAway("Annotation Label")}
             annotationsObject={this.annotationsObject}
             activeAnnotationID={this.state.activeAnnotationID}
             defaultLabels={this.props.defaultLabels}
@@ -889,28 +893,29 @@ class UserInterface extends Component<Props, State> {
             isPinned={this.state.isToolPinned["Annotation Label"]}
             handlePin={this.setIsToolPinned("Annotation Label")}
           />
-          <MuiPopover
+          <Popper
             open={
               this.state.activeSubmenuAnchor === this.refBtnsPopovers.Plugins
             }
             anchorEl={this.state.activeSubmenuAnchor}
-            onClose={this.handleClose(this.state.isToolPinned.Plugins)}
-          >
-            <PluginsCard
-              plugins={this.props.plugins}
-              launchPluginSettingsCallback={
-                this.props.launchPluginSettingsCallback
-              }
-              imageData={this.slicesData}
-              imageFileInfo={this.props.imageFileInfo}
-              annotationsObject={this.annotationsObject}
-              saveMetadataCallback={this.props.saveMetadataCallback}
-              isPinned={this.state.isToolPinned.Plugins}
-              handlePin={this.setIsToolPinned("Plugins")}
-            />
-          </MuiPopover>
+            popperPlacement="right-end"
+            handleClickAway={this.handleClickAway("Plugins")}
+            el={
+              <PluginsCard
+                plugins={this.props.plugins}
+                launchPluginSettingsCallback={
+                  this.props.launchPluginSettingsCallback
+                }
+                imageData={this.slicesData}
+                imageFileInfo={this.props.imageFileInfo}
+                annotationsObject={this.annotationsObject}
+                saveMetadataCallback={this.props.saveMetadataCallback}
+                isPinned={this.state.isToolPinned.Plugins}
+                handlePin={this.setIsToolPinned("Plugins")}
+              />
+            }
+          />
         </ButtonGroup>
-
         <ButtonGroup>
           <PaintbrushToolbar
             active={this.state.activeToolbox === "paintbrush"}
@@ -940,24 +945,6 @@ class UserInterface extends Component<Props, State> {
             handleChannelPin={this.setIsToolPinned("Channels")}
           />
         </ButtonGroup>
-
-        {/* <LabelsSubmenu
-          isOpen={
-            this.state.activeSubmenuAnchor ===
-            this.refBtnsPopovers["Annotation Label"]
-          }
-          anchorElement={this.state.activeSubmenuAnchor}
-          onClose={this.handleClose(
-            this.state.isToolPinned["Annotation Label"]
-          )}
-          annotationsObject={this.annotationsObject}
-          activeAnnotationID={this.state.activeAnnotationID}
-          defaultLabels={this.props.defaultLabels}
-          restrictLabels={this.props.restrictLabels}
-          multiLabel={this.props.multiLabel}
-          isPinned={this.state.isToolPinned["Annotation Label"]}
-          handlePin={this.setIsToolPinned("Annotation Label")}
-        /> */}
       </div>
     );
 
