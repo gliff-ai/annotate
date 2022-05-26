@@ -13,6 +13,7 @@ import { palette, getRGBAString } from "@/components/palette";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
 import { usePaintbrushStore } from "./Store";
 import { Brush } from "./interfaces";
+import { slic } from "./slic";
 import { drawCapsule } from "@/download/DownloadAsTiff";
 import { getNewImageSizeAndDisplacement } from "@/toolboxes/background/drawImage";
 
@@ -21,6 +22,7 @@ const mainColor = theme.palette.primary.main;
 interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   isActive: boolean;
   is3D: boolean;
+  isSuper: boolean;
   activeToolbox: Toolbox | string;
   mode: Mode;
   setMode: (mode: Mode) => void;
@@ -65,6 +67,14 @@ export class CanvasClass extends PureComponent<Props, State> {
 
   private tempCtx: CanvasRenderingContext2D | null;
 
+  private slicData: XYPoint[][] | null;
+
+  private slicSegmentation: Int32Array | null;
+
+  private currentSuperPixelID: number | null;
+
+  private hasSuperPixelChanged: boolean;
+
   private cursorCtx: CanvasRenderingContext2D | null;
 
   private isDrawing: boolean;
@@ -81,6 +91,10 @@ export class CanvasClass extends PureComponent<Props, State> {
     this.pixelCtx = null;
     this.tempCanvas = null;
     this.tempCtx = null;
+    this.slicData = null;
+    this.slicSegmentation = null;
+    this.currentSuperPixelID = null;
+    this.hasSuperPixelChanged = false;
 
     this.state = {
       pixelView: false,
@@ -94,7 +108,7 @@ export class CanvasClass extends PureComponent<Props, State> {
     }
   }
 
-  componentDidUpdate(): void {
+  componentDidUpdate(prevProps: Props): void {
     // can't just initialize this canvas in the constructor because backgroundCanvas doesn't get
     // the correct width/height until canvasPositionAndSize is set via callback from elsewhere
     if (!this.backgroundCanvas) return;
@@ -109,11 +123,24 @@ export class CanvasClass extends PureComponent<Props, State> {
     }
 
     // Redraw if we change pan or zoom
-
     try {
       this.drawAllStrokes(this.backgroundCanvas?.canvasContext);
     } catch (e) {
       console.error(`${(e as Error).message}`);
+    }
+
+    // check if we've turned the Super Marker on and initialise super pixels
+    if (this.props.isSuper && this.props.isSuper !== prevProps.isSuper) {
+      ({ annotations: this.slicData, segmentation: this.slicSegmentation } =
+        slic(
+          this.backgroundCanvas.canvasContext.getImageData(
+            0,
+            0,
+            this.backgroundCanvas.canvasContext.canvas.width,
+            this.backgroundCanvas.canvasContext.canvas.height
+          ),
+          2 * this.props.brushRadius
+        ));
     }
   }
 
@@ -463,6 +490,26 @@ export class CanvasClass extends PureComponent<Props, State> {
       this.updateStroke(canvasX, canvasY);
     }
 
+    if (this.props.isSuper) {
+      // get super pixel ID
+      const newSuperPixelID =
+        this.slicSegmentation[
+          this.sub2ind(
+            canvasX,
+            canvasY,
+            this.backgroundCanvas.canvasContext.canvas.width
+          )
+        ];
+      if (newSuperPixelID !== this.currentSuperPixelID) {
+        this.currentSuperPixelID = newSuperPixelID;
+        console.log("super pixel has changed");
+        this.hasSuperPixelChanged = true;
+      } else {
+        console.log("super pixel has not changed");
+        this.hasSuperPixelChanged = false;
+      }
+    }
+
     if (this.cursorCtx && this.props.mode === Mode.draw) {
       this.drawCursor(canvasX, canvasY);
     }
@@ -485,6 +532,12 @@ export class CanvasClass extends PureComponent<Props, State> {
     }
   };
 
+  sub2ind = (x: number, y: number, width: number): number => {
+    // convert x and y coordinates into a column-wise index
+    const index = x * width + y;
+    return index;
+  };
+
   getCursor = (): Cursor => {
     if (["Paintbrush", "Eraser"].includes(this.props.activeToolbox)) {
       return this.props.mode === Mode.draw ? "none" : "pointer";
@@ -499,15 +552,47 @@ export class CanvasClass extends PureComponent<Props, State> {
     this.cursorCtx.strokeStyle = "white";
     this.cursorCtx.globalAlpha = this.isDrawing ? 0.8 : 0.3;
 
-    this.cursorCtx.beginPath();
-    this.cursorCtx.arc(
-      canvasX,
-      canvasY,
-      this.getCanvasBrushDiameter(this.props.brushRadius) / 2,
-      0,
-      2 * Math.PI
-    );
-    this.cursorCtx.stroke();
+    if (!this.props.isSuper) {
+      this.cursorCtx.beginPath();
+      this.cursorCtx.arc(
+        canvasX,
+        canvasY,
+        this.getCanvasBrushDiameter(this.props.brushRadius) / 2,
+        0,
+        2 * Math.PI
+      );
+      this.cursorCtx.stroke();
+    } else if (this.hasSuperPixelChanged && this.currentSuperPixelID !== null) {
+      console.log(this.hasSuperPixelChanged);
+      console.log(this.currentSuperPixelID);
+      let currentSuperPixelSegmentation = new Uint8ClampedArray(
+        this.slicSegmentation.length
+      );
+      let brightPixels = 0;
+      for (let idx = 0; idx < this.slicSegmentation.length; idx += 1) {
+        if (this.slicSegmentation[idx] === this.currentSuperPixelID) {
+          currentSuperPixelSegmentation[idx] = 255;
+          brightPixels += 1;
+        }
+      }
+      console.log(brightPixels);
+      console.log(
+        currentSuperPixelSegmentation.length,
+        this.cursorCtx.canvas.width,
+        this.cursorCtx.canvas.height
+      );
+      this.cursorCtx.putImageData(
+        new ImageData(
+          currentSuperPixelSegmentation,
+          this.cursorCtx.canvas.width,
+          this.cursorCtx.canvas.height
+        ),
+        0,
+        0
+      );
+
+      this.hasSuperPixelChanged = false;
+    }
   };
 
   handleEvent = (event: Event): void => {
@@ -608,6 +693,7 @@ export const Canvas = (
     | "annotationAlpha"
     | "annotationActiveAlpha"
     | "is3D"
+    | "isSuper"
   >
 ): ReactElement => {
   // we will overwrite props.activeToolbox, which will be paintbrush
@@ -625,6 +711,7 @@ export const Canvas = (
     <CanvasClass
       isActive={isActive}
       is3D={paintbrush.is3D}
+      isSuper={paintbrush.isSuper}
       activeToolbox={activeToolbox}
       mode={props.mode}
       setMode={props.setMode}

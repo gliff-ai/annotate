@@ -23,6 +23,7 @@ interface SubmenuProps {
   anchorElement: HTMLButtonElement | null;
   openSubmenu: () => void;
   is3D: boolean;
+  isSuper: boolean;
 }
 
 interface Props {
@@ -33,6 +34,7 @@ interface Props {
   ) => (anchorElement?: HTMLButtonElement) => void;
   anchorElement: HTMLButtonElement | null;
   is3D: boolean;
+  isSuper: boolean;
 }
 
 const baseSliderStyle = {
@@ -59,6 +61,7 @@ interface Event extends CustomEvent {
 
 const Submenu = (props: SubmenuProps): ReactElement => {
   const [paintbrush, setPaintbrush] = usePaintbrushStore();
+  const [isSuperMarker, setIsSuperMarker] = useState<boolean>(props.isSuper);
   const [showTransparency, setShowTransparency] = useState<boolean>(false);
   const [openSubmenu, setOpenSubMenu] = useState<boolean>(false);
   const [openSlider, setOpenSlider] = useState<boolean>(true);
@@ -67,6 +70,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     "selectBrush",
     "selectEraser",
     "toggleShowTransparency",
+    "toggleSuperMarker",
   ] as const;
 
   function changeBrushRadius(_e: Event, value: number) {
@@ -92,6 +96,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     });
     setOpenSubMenu(true);
     setShowTransparency(false);
+    setIsSuperMarker(false);
 
     return true;
   }
@@ -124,6 +129,18 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       ...paintbrush,
       brushType: "",
     });
+    return true;
+  }
+
+  function toggleSuperMarker() {
+    setPaintbrush({
+      ...paintbrush,
+      isSuper: !paintbrush.isSuper,
+    });
+    document.dispatchEvent(
+      new CustomEvent("toggleSuperMarker", { detail: Toolboxes.paintbrush })
+    );
+
     return true;
   }
 
@@ -228,6 +245,13 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       icon: icons.fill,
       event: fillBrush,
       active: () => false,
+      disabled: () => false,
+    },
+    {
+      name: "Super Marker",
+      icon: icons.annotationTransparency,
+      event: toggleSuperMarker,
+      active: () => paintbrush.isSuper,
       disabled: () => false,
     },
     {
@@ -385,6 +409,7 @@ class Toolbar extends Component<Props> {
         openSubmenu={this.openSubmenu}
         anchorElement={this.props.anchorElement}
         is3D={this.props.is3D}
+        isSuper={this.props.isSuper}
       />
     </>
   );

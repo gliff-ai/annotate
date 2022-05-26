@@ -543,6 +543,39 @@ export class Annotations {
   }
 
   @log
+  addSuperPixel(
+    sliceIndex: number,
+    pixels: XYPoint[],
+    addToUndoRedo = true
+  ): void {
+    // add super pixel to paintbrush annotation
+
+    let color = this.getActiveAnnotationColor();
+    // Do we already have a colour for this layer?
+    color =
+      color ||
+      getRGBAString(palette[this.getActiveAnnotationID() % palette.length]);
+
+    this.addBrushStrokeMulti(
+      pixels.map((pixel: XYPoint) => ({
+        coordinates: [pixel],
+        spaceTimeInfo: { z: sliceIndex, t: 0 },
+        brush: {
+          color,
+          radius: 1,
+          type: "paint",
+          is3D: false,
+        },
+      }))
+    );
+
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("deleteBrushStrokes", [pixels.length]);
+      this.redoData = [];
+    }
+  }
+
+  @log
   fillBrush(sliceIndex: number, is3D: boolean, addToUndoRedo = true): void {
     // Treat the current paintbrush item as a closed polygon and fill
     // Simplifying the line for computational efficiency

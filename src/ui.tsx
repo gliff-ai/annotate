@@ -896,6 +896,7 @@ class UserInterface extends Component<Props, State> {
             handleOpen={this.handleOpen}
             anchorElement={this.state.activeSubmenuAnchor}
             is3D={this.slicesData?.length > 1}
+            isSuper={false}
           />
           <SplineToolbar
             active={this.state.activeToolbox === "spline"}
