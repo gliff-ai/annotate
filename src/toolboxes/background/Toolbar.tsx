@@ -75,7 +75,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     type: typeof submenuEvents[number];
   }
 
-  function selectBrightness() {
+  function selectBrightness(): boolean {
+    if (props.isChannelPinned) return false;
     setButtonClicked("Brightness");
     return true;
   }
@@ -87,7 +88,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     });
   }
 
-  function selectContrast() {
+  function selectContrast(): boolean {
+    if (props.isChannelPinned) return false;
     setButtonClicked("Contrast");
     return true;
   }
@@ -99,7 +101,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     });
   }
 
-  function selectChannels() {
+  function selectChannels(): boolean {
     setButtonClicked("Channels");
     return true;
   }
@@ -155,7 +157,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   });
 
   const handleClickAway = () => {
-    if (buttonClicked === "Channels" && props.isChannelPinned) return;
+    if (props.isChannelPinned) return;
     setButtonClicked("");
   };
 
