@@ -29,6 +29,8 @@ interface Props {
   imageData: ImageBitmap[][];
   annotationsObject: Annotations;
   imageFileInfo: ImageFileInfo;
+  isPinned: boolean;
+  handlePin: () => void;
 }
 
 export const PluginsCard = ({
@@ -38,6 +40,8 @@ export const PluginsCard = ({
   imageData,
   imageFileInfo,
   annotationsObject,
+  isPinned,
+  handlePin,
 }: Props): ReactElement | null => {
   const [error, setError] = useState<string | null>(null);
   const [dialogContent, setDialogContent] = useState<JSX.Element | null>(null);
@@ -164,7 +168,7 @@ export const PluginsCard = ({
     return pluginElements;
   };
   return (
-    <Card title="Plugins" noPadding>
+    <Card title="Plugins" noPadding isPinned={isPinned} handlePin={handlePin}>
       <>
         <MenuList>{getPluginButtons()}</MenuList>
         <Divider

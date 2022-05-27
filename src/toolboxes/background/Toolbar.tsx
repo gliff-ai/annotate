@@ -31,6 +31,8 @@ interface SubmenuProps {
   anchorElement: HTMLButtonElement | null;
   channelControls: ReactElement[];
   openSubmenu: () => void;
+  isChannelPinned: boolean;
+  handleChannelPin: () => void;
 }
 
 interface Props {
@@ -40,6 +42,8 @@ interface Props {
   anchorElement: HTMLButtonElement | null;
   channels: boolean[];
   toggleChannelAtIndex: (index: number) => void;
+  isChannelPinned: boolean;
+  handleChannelPin: () => void;
 }
 
 const baseSliderStyle = {
@@ -71,7 +75,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     type: typeof submenuEvents[number];
   }
 
-  function selectBrightness() {
+  function selectBrightness(): boolean {
+    if (props.isChannelPinned) return false;
     setButtonClicked("Brightness");
     return true;
   }
@@ -83,7 +88,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     });
   }
 
-  function selectContrast() {
+  function selectContrast(): boolean {
+    if (props.isChannelPinned) return false;
     setButtonClicked("Contrast");
     return true;
   }
@@ -95,7 +101,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     });
   }
 
-  function selectChannels() {
+  function selectChannels(): boolean {
     setButtonClicked("Channels");
     return true;
   }
@@ -151,6 +157,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
   });
 
   const handleClickAway = () => {
+    if (props.isChannelPinned) return;
     setButtonClicked("");
   };
 
@@ -231,7 +238,11 @@ const Submenu = (props: SubmenuProps): ReactElement => {
                 )}
                 {buttonClicked === "Channels" && props.channelControls && (
                   <>
-                    <Card title="Channel">
+                    <Card
+                      title="Channel"
+                      isPinned={props.isChannelPinned}
+                      handlePin={props.handleChannelPin}
+                    >
                       <FormControl component="fieldset">
                         <FormGroup aria-label="position">
                           {props.channelControls.map((control, i) => (
@@ -331,6 +342,8 @@ class Toolbar extends Component<Props> {
         openSubmenu={this.openSubmenu}
         anchorElement={this.props.anchorElement}
         channelControls={this.channelControls}
+        isChannelPinned={this.props.isChannelPinned}
+        handleChannelPin={this.props.handleChannelPin}
       />
     </>
   );
