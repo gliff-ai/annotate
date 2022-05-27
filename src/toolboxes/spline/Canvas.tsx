@@ -133,10 +133,7 @@ class CanvasClass extends PureComponent<Props, State> {
           splineVector[this.selectedPointIndex + 1].x += translation.x;
           splineVector[this.selectedPointIndex + 1].y += translation.y;
         }
-        if (
-          this.selectedPointIndex === 0 &&
-          this.props.annotationsObject.splineIsClosed()
-        ) {
+        if (this.selectedPointIndex === 0 && spline.isClosed) {
           splineVector[splineVector.length - 1].x += translation.x;
           splineVector[splineVector.length - 1].y += translation.y;
         }
@@ -184,10 +181,7 @@ class CanvasClass extends PureComponent<Props, State> {
           );
           i += 3;
         }
-        if (
-          this.props.annotationsObject.splineIsClosed() &&
-          i + 2 === splineVector.length
-        ) {
+        if (spline.isClosed && i + 2 === splineVector.length) {
           // draw final arc to close the curve:
           context.bezierCurveTo(
             splineVector[i].x,
@@ -232,10 +226,7 @@ class CanvasClass extends PureComponent<Props, State> {
           }
           i += 3;
         }
-        if (
-          this.props.annotationsObject.splineIsClosed() &&
-          i === splineVector.length
-        ) {
+        if (spline.isClosed && i === splineVector.length) {
           // draw line connecting first point with its "first" control point:
           context.moveTo(splineVector[0].x, splineVector[0].y);
           context.lineTo(
