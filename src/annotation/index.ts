@@ -89,12 +89,16 @@ export class Annotations {
 
   @log
   deleteActiveAnnotation(): void {
+    const wasBezier = this.splineIsBezier();
     this.data.splice(this.activeAnnotationID, 1);
     if (this.activeAnnotationID >= this.data.length && this.data.length > 0) {
       this.activeAnnotationID = this.data.length - 1; // necessary if we delete the one on the end
     }
     if (this.data.length === 0) {
       this.addAnnotation(Toolboxes.paintbrush); // re-create a new empty annotation if we delete the last one (toolbox will be re-assigned by reuseEmptyAnnotation if necessary)
+      if (wasBezier) {
+        this.setSplineBezier(true);
+      }
     }
     this.initUndoRedo();
   }
