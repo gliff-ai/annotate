@@ -22,7 +22,7 @@ import {
   icons,
   generateClassName,
   WarningSnackbar,
-  MuiPopover,
+  Popper,
 } from "@gliff-ai/style";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
@@ -94,6 +94,7 @@ interface State {
     scale: number;
   };
   activeToolbox?: Toolbox; // FIXME
+  isToolPinned?: { [tool: string]: boolean };
   displayedImage?: ImageBitmap;
   activeAnnotationID: number;
   viewportPositionAndSize: Required<PositionAndSize>;
@@ -101,7 +102,7 @@ interface State {
   redrawEverything: number;
   sliceIndex: number;
   channels: boolean[];
-  activeSubmenuAnchor: HTMLButtonElement | null; // A HTML element. It specifies which button has its submenu open, and serves as anchorEl for that submenu: https://material-ui.com/api/menu/#props
+  activeSubmenuAnchor: { [tool: string]: HTMLButtonElement | null }; // A HTML element. It specifies which button has its submenu open, and serves as anchorEl for that submenu: https://material-ui.com/api/menu/#props
   buttonClicked: string;
   mode: Mode;
   canvasContainerColour: number[];
@@ -236,11 +237,16 @@ class UserInterface extends Component<Props, State> {
       channels: [true],
       displayedImage: this.slicesData ? this.slicesData[0][0] : null,
       redrawEverything: 0,
-      activeSubmenuAnchor: null,
+      activeSubmenuAnchor: {},
       buttonClicked: null,
       activeToolbox: Toolboxes.paintbrush,
       mode: Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
+      isToolPinned: {
+        "Annotation Label": false,
+        Plugins: false,
+        Background: false,
+      },
     };
 
     this.imageFileInfo = this.props.imageFileInfo || null;
@@ -584,6 +590,15 @@ class UserInterface extends Component<Props, State> {
     });
   };
 
+  setIsToolPinned = (tool: string, value?: boolean) => (): void => {
+    if (this.state.isToolPinned[tool] === undefined) return;
+    this.setState((prevState) => {
+      const newIsPinned = { ...prevState.isToolPinned };
+      newIsPinned[tool] = value !== undefined ? value : !newIsPinned[tool];
+      return { isToolPinned: newIsPinned };
+    });
+  };
+
   reuseEmptyAnnotation = (): void => {
     /* If the active annotation object is empty, change the value of toolbox
     to match the active tool. */
@@ -634,19 +649,40 @@ class UserInterface extends Component<Props, State> {
     }, this.mixChannels);
   };
 
-  handleClose = (): void => {
-    this.setState({ activeSubmenuAnchor: null });
+  setActiveSubmenuAnchor = (
+    tool: string,
+    value: HTMLButtonElement | null
+  ): void => {
+    this.setState((prevState) => {
+      const activeSubmenuAnchor = { ...prevState.activeSubmenuAnchor };
+      activeSubmenuAnchor[tool] = value; // set new anchor
+
+      // set anchor for all other non-pinned dialogs to null
+      for (const t of Object.keys(activeSubmenuAnchor)) {
+        if (t !== tool && !prevState.isToolPinned[t]) {
+          activeSubmenuAnchor[t] = null;
+        }
+      }
+      return { activeSubmenuAnchor };
+    });
+  };
+
+  handleClose = (tool: string): void => {
+    this.setActiveSubmenuAnchor(tool, null);
+    this.setState({ buttonClicked: "" });
   };
 
   handleOpen =
+    (tool: string) =>
     (event?: React.MouseEvent) =>
     (activeSubmenuAnchor?: HTMLButtonElement): void => {
       if (activeSubmenuAnchor !== undefined) {
-        this.setState({ activeSubmenuAnchor });
+        this.setActiveSubmenuAnchor(tool, activeSubmenuAnchor);
       } else if (event) {
-        this.setState({
-          activeSubmenuAnchor: event.currentTarget as HTMLButtonElement,
-        });
+        this.setActiveSubmenuAnchor(
+          tool,
+          event.currentTarget as HTMLButtonElement
+        );
       }
     };
 
@@ -656,28 +692,28 @@ class UserInterface extends Component<Props, State> {
   // Functions of type select<ToolTip.name>, added for use in keybindings and OnClick events
   // TODO: find a way to pass parameters in keybindings and get rid of code duplication
   selectContrast = (): void => {
-    this.handleOpen()(this.refBtnsPopovers.Contrast);
+    this.handleOpen("Contrast")()(this.refBtnsPopovers.Contrast);
     this.setButtonClicked("Contrast");
   };
 
   selectBrightness = (): void => {
-    this.handleOpen()(this.refBtnsPopovers.Brightness);
+    this.handleOpen("Brightness")()(this.refBtnsPopovers.Brightness);
     this.setButtonClicked("Brightness");
   };
 
   selectChannels = (): void => {
-    this.handleOpen()(this.refBtnsPopovers.Channels);
+    this.handleOpen("Channels")()(this.refBtnsPopovers.Channels);
     this.setButtonClicked("Channels");
   };
 
   selectAnnotationLabel = (): void => {
-    this.handleOpen()(this.refBtnsPopovers["Annotation Label"]);
-    this.setButtonClicked("Annotation Label");
+    this.handleOpen("Annotation Label")()(
+      this.refBtnsPopovers["Annotation Label"]
+    );
   };
 
   selectPlugins = (): void => {
-    this.handleOpen()(this.refBtnsPopovers.Plugins);
-    this.setButtonClicked("Plugins");
+    this.handleOpen("Plugins")()(this.refBtnsPopovers.Plugins);
   };
 
   saveAnnotations = (): void => {
@@ -700,7 +736,7 @@ class UserInterface extends Component<Props, State> {
   isTyping = (): boolean =>
     // Added to prevent single-key shortcuts that are also valid text input
     // to get triggered during text input.
-    this.refBtnsPopovers["Annotation Label"] === this.state.activeSubmenuAnchor;
+    this.state.activeSubmenuAnchor["Annotation Label"] !== null;
 
   setModeCallback = (mode: Mode): void => {
     this.setState(() => ({ mode, buttonClicked: null }));
@@ -716,6 +752,18 @@ class UserInterface extends Component<Props, State> {
 
   setCanvasContainerColourCallback = (canvasContainerColour: number[]): void =>
     this.setState({ canvasContainerColour });
+
+  handleClickAway = (tool: string) => (): void => {
+    console.log(this.state.activeSubmenuAnchor[tool]);
+    if (!this.state.isToolPinned[tool]) {
+      if (this.state.buttonClicked === tool) {
+        this.handleClose(tool);
+        this.setIsToolPinned(tool, false); // reset default
+      } else if (this.state.buttonClicked !== tool) {
+        this.setButtonClicked(tool); // set button clicked at first open
+      }
+    }
+  };
 
   render = (): ReactNode => {
     const { classes, showAppBar, saveAnnotationsCallback } = this.props;
@@ -792,9 +840,7 @@ class UserInterface extends Component<Props, State> {
         name: "Annotation Label",
         icon: icons.annotationLabel,
         event: "selectAnnotationLabel",
-        active: () =>
-          this.state.activeSubmenuAnchor ===
-          this.refBtnsPopovers["Annotation Label"],
+        active: () => !!this.state.activeSubmenuAnchor["Annotation Label"],
         enabled: () => true,
       },
       {
@@ -815,8 +861,7 @@ class UserInterface extends Component<Props, State> {
         name: "Plugins",
         icon: icons.plugins,
         event: "selectPlugins",
-        active: () =>
-          this.state.activeSubmenuAnchor === this.refBtnsPopovers.Plugins,
+        active: () => !!this.state.activeSubmenuAnchor.Plugins,
         enabled: () => !!this.props?.plugins,
       },
     ] as const;
@@ -857,79 +902,67 @@ class UserInterface extends Component<Props, State> {
             />
           )}
           <LabelsSubmenu
-            isOpen={
-              this.state.activeSubmenuAnchor ===
-              this.refBtnsPopovers["Annotation Label"]
-            }
-            anchorElement={this.state.activeSubmenuAnchor}
-            onClose={this.handleClose}
+            isOpen={!!this.state.activeSubmenuAnchor["Annotation Label"]}
+            anchorElement={this.state.activeSubmenuAnchor["Annotation Label"]}
+            handleClickAway={this.handleClickAway("Annotation Label")}
             annotationsObject={this.annotationsObject}
             activeAnnotationID={this.state.activeAnnotationID}
             defaultLabels={this.props.defaultLabels}
             restrictLabels={this.props.restrictLabels}
             multiLabel={this.props.multiLabel}
+            isPinned={this.state.isToolPinned["Annotation Label"]}
+            handlePin={this.setIsToolPinned("Annotation Label")}
           />
-          <MuiPopover
-            open={
-              this.state.activeSubmenuAnchor === this.refBtnsPopovers.Plugins
+          <Popper
+            open={!!this.state.activeSubmenuAnchor.Plugins}
+            anchorEl={this.state.activeSubmenuAnchor.Plugins}
+            popperPlacement="right-end"
+            handleClickAway={this.handleClickAway("Plugins")}
+            el={
+              <PluginsCard
+                plugins={this.props.plugins}
+                launchPluginSettingsCallback={
+                  this.props.launchPluginSettingsCallback
+                }
+                imageData={this.slicesData}
+                imageFileInfo={this.props.imageFileInfo}
+                annotationsObject={this.annotationsObject}
+                saveMetadataCallback={this.props.saveMetadataCallback}
+                isPinned={this.state.isToolPinned.Plugins}
+                handlePin={this.setIsToolPinned("Plugins")}
+              />
             }
-            anchorEl={this.state.activeSubmenuAnchor}
-            onClose={this.handleClose}
-          >
-            <PluginsCard
-              plugins={this.props.plugins}
-              launchPluginSettingsCallback={
-                this.props.launchPluginSettingsCallback
-              }
-              imageData={this.slicesData}
-              imageFileInfo={this.props.imageFileInfo}
-              annotationsObject={this.annotationsObject}
-              saveMetadataCallback={this.props.saveMetadataCallback}
-            />
-          </MuiPopover>
+          />
         </ButtonGroup>
-
         <ButtonGroup>
           <PaintbrushToolbar
             active={this.state.activeToolbox === "paintbrush"}
             activateToolbox={this.activateToolbox}
-            handleOpen={this.handleOpen}
-            anchorElement={this.state.activeSubmenuAnchor}
+            handleOpen={this.handleOpen("Paintbrush")}
+            anchorElement={this.state.activeSubmenuAnchor.Paintbrush}
             is3D={this.slicesData?.length > 1}
           />
           <SplineToolbar
             active={this.state.activeToolbox === "spline"}
             activateToolbox={this.activateToolbox}
-            handleOpen={this.handleOpen}
-            anchorElement={this.state.activeSubmenuAnchor}
+            handleOpen={this.handleOpen("Spline")}
+            anchorElement={this.state.activeSubmenuAnchor.Spline}
           />
 
           <BoundingBoxToolbar
             active={this.state.activeToolbox === "boundingBox"}
             activateToolbox={this.activateToolbox}
-            handleOpen={this.handleOpen}
+            handleOpen={this.handleOpen("BoundingBox")}
           />
           <BackgroundToolbar
-            handleOpen={this.handleOpen}
-            anchorElement={this.state.activeSubmenuAnchor}
+            handleOpen={this.handleOpen("Background")}
+            anchorElement={this.state.activeSubmenuAnchor.Background}
             channels={this.state.channels}
             toggleChannelAtIndex={this.toggleChannelAtIndex}
+            isChannelPinned={this.state.isToolPinned.Background}
+            handleChannelPin={this.setIsToolPinned("Background")}
           />
         </ButtonGroup>
-
-        <LabelsSubmenu
-          isOpen={
-            this.state.activeSubmenuAnchor ===
-            this.refBtnsPopovers["Annotation Label"]
-          }
-          anchorElement={this.state.activeSubmenuAnchor}
-          onClose={this.handleClose}
-          annotationsObject={this.annotationsObject}
-          activeAnnotationID={this.state.activeAnnotationID}
-          defaultLabels={this.props.defaultLabels}
-          restrictLabels={this.props.restrictLabels}
-          multiLabel={this.props.multiLabel}
-        />
       </div>
     );
 

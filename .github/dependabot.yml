@@ -1,14 +1,21 @@
 version: 2
 updates:
   - package-ecosystem: "github-actions"
-    directory: "/"
+    directory: "/.github/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     reviewers:
-      - "gliff-ai/frontend"
+      - "gliff-ai/ci-cd"
+    commit-message:
+      prefix: "chore: "
   - package-ecosystem: "npm"
+    # ignore all minor and patch updates as these will be caught by our gliff-ai-robot
     directory: "/"
     schedule:
       interval: "weekly"
     reviewers:
       - "gliff-ai/frontend"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          ["version-update:semver-minor", "version-update:semver-patch"]
