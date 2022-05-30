@@ -994,7 +994,7 @@ class UserInterface extends Component<Props, State> {
 
     const readonlyToolbar = this.props.readonly && (
       <div className={classes.leftToolbar}>
-        <ButtonGroup>
+        <ButtonGroup variant="text">
           <IconButton
             id="id-select-annotation"
             key="Select Annotation"
