@@ -25,6 +25,7 @@ interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
   setActiveToolbox: (tool: Toolbox) => void;
+  readonly: boolean;
 }
 
 interface State {
@@ -395,6 +396,8 @@ class CanvasClass extends PureComponent<Props, State> {
       }
     }
 
+    if (this.props.readonly) return;
+
     // if no spline tool is turned on then do nothing
     if (!this.isActive()) return;
 
@@ -723,7 +726,12 @@ class CanvasClass extends PureComponent<Props, State> {
   };
 
   onMouseDownOrTouchStart = (x: number, y: number): void => {
-    if (!this.sliceIndexMatch() || this.props.mode === Mode.select) return;
+    if (
+      !this.sliceIndexMatch() ||
+      this.props.mode === Mode.select ||
+      this.props.readonly
+    )
+      return;
 
     const coordinates = this.props.annotationsObject.getSplineCoordinates();
 
@@ -782,7 +790,7 @@ class CanvasClass extends PureComponent<Props, State> {
   };
 
   onMouseMoveOrTouchMove = (x: number, y: number): void => {
-    if (!(this.isDrawing || this.dragPoint)) return;
+    if (!(this.isDrawing || this.dragPoint || this.props.readonly)) return;
 
     this.numberOfMoves += 1;
 
@@ -962,6 +970,7 @@ export const Canvas = (props: Props): ReactElement => {
       sliceIndex={props.sliceIndex}
       setUIActiveAnnotationID={props.setUIActiveAnnotationID}
       setActiveToolbox={props.setActiveToolbox}
+      readonly={props.readonly}
     />
   );
 };

@@ -1100,6 +1100,7 @@ class UserInterface extends Component<Props, State> {
                     }
                     setActiveToolbox={this.setActiveToolboxCallback}
                     setScaleAndPan={this.setScaleAndPan}
+                    readonly={this.props.readonly}
                   />
                   <BoundingBoxCanvas
                     scaleAndPan={this.state.scaleAndPan}
@@ -1115,6 +1116,7 @@ class UserInterface extends Component<Props, State> {
                     }
                     setActiveToolbox={this.setActiveToolboxCallback}
                     setScaleAndPan={this.setScaleAndPan}
+                    readonly={this.props.readonly}
                   />
                   <PaintbrushCanvas
                     scaleAndPan={this.state.scaleAndPan}
@@ -1130,6 +1132,7 @@ class UserInterface extends Component<Props, State> {
                     }
                     setActiveToolbox={this.setActiveToolboxCallback}
                     setScaleAndPan={this.setScaleAndPan}
+                    readonly={this.props.readonly}
                   />
                   {this.slicesData?.length > 1 && (
                     <Paper
