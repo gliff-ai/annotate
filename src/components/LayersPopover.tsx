@@ -102,7 +102,7 @@ export const LayersPopover = (props: Props): ReactElement => {
                   {name}
                 </AccordionSummary>
                 <AccordionDetails className={classes.accordionDetails}>
-                  {annotation.labels.map((label, j) => (
+                  {annotation.labels.map((label) => (
                     <Chip
                       className={classes.labelsChip}
                       label={

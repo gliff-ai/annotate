@@ -18,9 +18,7 @@ interface Props {
 
 let refBackgroundSettingsPopover: HTMLButtonElement;
 
-export const UsersPopover = (props: Props): ReactElement => {
-  console.log(props.currentUser);
-  return (
+export const UsersPopover = (props: Props): ReactElement => (
     <Popover
       title="Select A User"
       anchorOrigin={{ vertical: "top", horizontal: "right" }}
@@ -63,4 +61,3 @@ export const UsersPopover = (props: Props): ReactElement => {
       />
     </Popover>
   );
-};
