@@ -1015,8 +1015,15 @@ class UserInterface extends Component<Props, State> {
             currentUser={this.state.user1}
             users={Object.keys(this.props.userAnnotations)}
             changeUser={(username: string) => {
-              this.setState({ user1: username });
-              this.annotationsObject = this.props.userAnnotations[username];
+              this.setState(() => {
+                this.annotationsObject = this.props.userAnnotations[username];
+                return {
+                  user1: username,
+                  activeAnnotationID:
+                    this.annotationsObject.getActiveAnnotationID(),
+                };
+              });
+
               this.redrawEverything();
             }}
             handleOpen={this.handleOpen("Users")}
