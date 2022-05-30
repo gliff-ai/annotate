@@ -1,3 +1,16 @@
+export function getDataFromImageBitmap(
+  imageBitmap: ImageBitmap
+): Uint8ClampedArray {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = imageBitmap.width;
+  canvas.height = imageBitmap.height;
+
+  ctx.drawImage(imageBitmap, 0, 0);
+
+  return ctx.getImageData(0, 0, imageBitmap.width, imageBitmap.height).data;
+}
+
 export function getNewImageSizeAndDisplacement(
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement | ImageBitmap | ImageData,
@@ -28,9 +41,25 @@ export function getNewImageSizeAndDisplacement(
   return { offsetX, offsetY, newWidth, newHeight }; // used as the destination rectangle in ctx.drawImage
 }
 
+function resizeImageData(
+  img: ImageData,
+  newWidth: number,
+  newHeight: number
+): HTMLCanvasElement {
+  const canvas = document.createElement("canvas");
+  canvas.width = img.width;
+  canvas.height = img.height;
+  const scaledCanvas = canvas;
+  scaledCanvas.getContext("2d").putImageData(img, 0, 0);
+  scaledCanvas
+    .getContext("2d")
+    .scale(newWidth / img.width, newHeight / img.height);
+  return scaledCanvas;
+}
+
 export function drawImageOnCanvas(
   ctx: CanvasRenderingContext2D,
-  img: HTMLImageElement | ImageBitmap,
+  img: HTMLImageElement | ImageBitmap | ImageData,
   scaleAndPan: {
     x: number;
     y: number;
@@ -42,7 +71,12 @@ export function drawImageOnCanvas(
   const { offsetX, offsetY, newWidth, newHeight } =
     getNewImageSizeAndDisplacement(ctx, img, scaleAndPan);
 
-  ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
+  if (img instanceof ImageData) {
+    const scaledCanvas = resizeImageData(img, newWidth, newHeight);
+    ctx.drawImage(scaledCanvas, offsetX, offsetY, newWidth, newHeight);
+  } else {
+    ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
+  }
 
   // Draw edge around the image
   if (edgeColour) {

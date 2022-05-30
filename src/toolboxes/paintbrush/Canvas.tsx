@@ -14,7 +14,10 @@ import { Toolboxes, Toolbox } from "@/Toolboxes";
 import { usePaintbrushStore } from "./Store";
 import { Brush } from "./interfaces";
 import { drawCapsule } from "@/download/DownloadAsTiff";
-import { getNewImageSizeAndDisplacement } from "@/toolboxes/background/drawImage";
+import {
+  getNewImageSizeAndDisplacement,
+  drawImageOnCanvas,
+} from "@/toolboxes/helpers";
 
 const mainColor = theme.palette.primary.main;
 
