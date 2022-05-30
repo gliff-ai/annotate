@@ -333,7 +333,8 @@ export const slic = (
       label = segmentation[pixel];
       numExpanded = 0;
       segmentSize = 0;
-      segment[(segmentSize += 1)] = pixel;
+      segment[segmentSize] = pixel;
+      segmentSize += 1;
 
       cleanedLabel = label + 1;
       cleaned[pixel] = label + 1;
@@ -357,7 +358,8 @@ export const slic = (
     }
 
     while (numExpanded < segmentSize) {
-      const open = segment[(numExpanded += 1)];
+      const open = segment[numExpanded];
+      numExpanded += 1;
 
       ({ x: x1, y: y1 } = ind2sub(open, imWidth));
 
@@ -375,14 +377,16 @@ export const slic = (
           segmentation[neighbour] === label
         ) {
           cleaned[neighbour] = label + 1;
-          segment[(segmentSize += 1)] = neighbour;
+          segment[segmentSize] = neighbour;
+          segmentSize += 1;
         }
       }
     }
 
     if (segmentSize < minRegionSize) {
       while (segmentSize > 0) {
-        cleaned[segment[(segmentSize -= 1)]] = cleanedLabel;
+        cleaned[segment[segmentSize]] = cleanedLabel;
+        segmentSize -= 1;
       }
     }
   }

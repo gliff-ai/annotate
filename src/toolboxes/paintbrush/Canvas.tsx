@@ -139,8 +139,24 @@ export class CanvasClass extends PureComponent<Props, State> {
             this.backgroundCanvas.canvasContext.canvas.width,
             this.backgroundCanvas.canvasContext.canvas.height
           ),
-          2 * this.props.brushRadius
+          5 * this.props.brushRadius
         ));
+
+      let maxSegmentationIndex = 0;
+      let undefinedSegmentationIndex = 0;
+      console.log("done");
+      console.log(this.slicSegmentation.length);
+      for (let index = 0; index < this.slicSegmentation.length; index += 1) {
+        if (this.slicSegmentation[index] === undefined) {
+          undefinedSegmentationIndex += 1;
+        }
+        maxSegmentationIndex = Math.max(
+          maxSegmentationIndex,
+          this.slicSegmentation[index]
+        );
+      }
+      console.log(JSON.stringify(undefinedSegmentationIndex));
+      console.log(JSON.stringify(maxSegmentationIndex));
     }
   }
 
@@ -500,9 +516,43 @@ export class CanvasClass extends PureComponent<Props, State> {
             this.backgroundCanvas.canvasContext.canvas.width
           )
         ];
+      console.log(newSuperPixelID);
+      //   console.log(
+      //     "x: " +
+      //       canvasX +
+      //       " y: " +
+      //       canvasY +
+      //       " index: " +
+      //       this.sub2ind(
+      //         canvasX,
+      //         canvasY,
+      //         this.backgroundCanvas.canvasContext.canvas.width
+      //       ) +
+      //       " super: " +
+      //       this.slicSegmentation[
+      //         this.sub2ind(
+      //           canvasX,
+      //           canvasY,
+      //           this.backgroundCanvas.canvasContext.canvas.width
+      //         )
+      //       ] +
+      //       "    " +
+      //       newSuperPixelID
+      //   );
+      //   console.log(
+      //     "canvas width: " +
+      //       this.backgroundCanvas.canvasContext.canvas.width +
+      //       " canvas height: " +
+      //       this.backgroundCanvas.canvasContext.canvas.height +
+      //       "segmentation length: " +
+      //       this.slicSegmentation.length
+      //   );
       if (newSuperPixelID !== this.currentSuperPixelID) {
         this.currentSuperPixelID = newSuperPixelID;
-        console.log("super pixel has changed");
+        console.log(
+          "super pixel has changed to " +
+            JSON.stringify(this.currentSuperPixelID)
+        );
         this.hasSuperPixelChanged = true;
       } else {
         console.log("super pixel has not changed");
@@ -534,7 +584,7 @@ export class CanvasClass extends PureComponent<Props, State> {
 
   sub2ind = (x: number, y: number, width: number): number => {
     // convert x and y coordinates into a column-wise index
-    const index = x * width + y;
+    const index = y * width + x;
     return index;
   };
 
@@ -562,34 +612,40 @@ export class CanvasClass extends PureComponent<Props, State> {
         2 * Math.PI
       );
       this.cursorCtx.stroke();
-    } else if (this.hasSuperPixelChanged && this.currentSuperPixelID !== null) {
-      console.log(this.hasSuperPixelChanged);
-      console.log(this.currentSuperPixelID);
-      let currentSuperPixelSegmentation = new Uint8ClampedArray(
-        this.slicSegmentation.length
+    } else if (this.hasSuperPixelChanged) {
+      console.log(this.hasSuperPixelChanged, this.currentSuperPixelID);
+      const currentSuperPixelSegmentation = new Uint8ClampedArray(
+        this.slicSegmentation.length * 4
       );
       let brightPixels = 0;
       for (let idx = 0; idx < this.slicSegmentation.length; idx += 1) {
-        if (this.slicSegmentation[idx] === this.currentSuperPixelID) {
-          currentSuperPixelSegmentation[idx] = 255;
+        if (this.slicSegmentation[idx] === 0) {
+          currentSuperPixelSegmentation[idx * 4] = 255;
+          currentSuperPixelSegmentation[idx * 4 + 1] = 0;
+          currentSuperPixelSegmentation[idx * 4 + 2] = 0;
+          currentSuperPixelSegmentation[idx * 4 + 3] = 255;
           brightPixels += 1;
         }
       }
-      console.log(brightPixels);
-      console.log(
-        currentSuperPixelSegmentation.length,
+      //   console.log(brightPixels);
+      //   console.log(
+      //     currentSuperPixelSegmentation.length,
+      //     this.cursorCtx.canvas.width,
+      //     this.cursorCtx.canvas.height
+      //   );
+      //   console.log(
+      //     this.backgroundCanvas.canvasContext.canvas.width,
+      //     this.backgroundCanvas.canvasContext.canvas.height
+      //   );
+      //   console.log(this.cursorCtx.canvas.width, this.cursorCtx.canvas.height);
+      const imageD = new ImageData(
+        currentSuperPixelSegmentation,
         this.cursorCtx.canvas.width,
         this.cursorCtx.canvas.height
       );
-      this.cursorCtx.putImageData(
-        new ImageData(
-          currentSuperPixelSegmentation,
-          this.cursorCtx.canvas.width,
-          this.cursorCtx.canvas.height
-        ),
-        0,
-        0
-      );
+      this.cursorCtx.putImageData(imageD, 0, 0);
+      const data = this.cursorCtx.canvas.toDataURL("image/png");
+      //   console.log(JSON.stringify(data));
 
       this.hasSuperPixelChanged = false;
     }
