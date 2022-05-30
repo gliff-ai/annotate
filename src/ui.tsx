@@ -736,7 +736,7 @@ class UserInterface extends Component<Props, State> {
   isTyping = (): boolean =>
     // Added to prevent single-key shortcuts that are also valid text input
     // to get triggered during text input.
-    this.state.activeSubmenuAnchor["Annotation Label"] !== null;
+    !!this.state.activeSubmenuAnchor["Annotation Label"];
 
   setModeCallback = (mode: Mode): void => {
     this.setState(() => ({ mode, buttonClicked: null }));
