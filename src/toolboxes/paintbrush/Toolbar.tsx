@@ -67,6 +67,7 @@ const Submenu = (props: SubmenuProps): ReactElement => {
     "selectBrush",
     "selectEraser",
     "toggleShowTransparency",
+    "toggleSuperMarker",
   ] as const;
 
   function changeBrushRadius(_e: Event, value: number) {
@@ -124,6 +125,22 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       ...paintbrush,
       brushType: "",
     });
+    return true;
+  }
+
+  function toggleSuperMarker() {
+    // like the brush and eraser we open the radius slider as regions depend on it for size
+    if (!openSlider) {
+      setOpenSlider(true);
+    }
+    setPaintbrush({
+      ...paintbrush,
+      isSuper: !paintbrush.isSuper,
+    });
+    document.dispatchEvent(
+      new CustomEvent("toggleSuperMarker", { detail: Toolboxes.paintbrush })
+    );
+    setOpenSubMenu(true);
     return true;
   }
 
@@ -228,6 +245,13 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       icon: icons.fill,
       event: fillBrush,
       active: () => false,
+      disabled: () => false,
+    },
+    {
+      name: "Super Marker",
+      icon: icons.annotationTransparency,
+      event: toggleSuperMarker,
+      active: () => paintbrush.isSuper,
       disabled: () => false,
     },
     {
