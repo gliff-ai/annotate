@@ -19,45 +19,45 @@ interface Props {
 let refBackgroundSettingsPopover: HTMLButtonElement;
 
 export const UsersPopover = (props: Props): ReactElement => (
-    <Popover
-      title="Select A User"
-      anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      transformOrigin={{ vertical: "top", horizontal: "left" }}
-      TriggerButton={
-        <IconButton
-          tooltip={{ name: "Select A User" }}
-          icon={icons.usersPage}
-          size="small"
-          setRefCallback={(ref) => {
-            refBackgroundSettingsPopover = ref;
-          }}
-          onClick={() => {
-            props.handleOpen()(refBackgroundSettingsPopover);
+  <Popover
+    title="Select A User"
+    anchorOrigin={{ vertical: "top", horizontal: "right" }}
+    transformOrigin={{ vertical: "top", horizontal: "left" }}
+    TriggerButton={
+      <IconButton
+        tooltip={{ name: "Select A User" }}
+        icon={icons.usersPage}
+        size="small"
+        setRefCallback={(ref) => {
+          refBackgroundSettingsPopover = ref;
+        }}
+        onClick={() => {
+          props.handleOpen()(refBackgroundSettingsPopover);
+        }}
+      />
+    }
+  >
+    <Autocomplete
+      onChange={(event, value) => {
+        props.changeUser(value);
+      }}
+      value={props.currentUser}
+      key="input-user1"
+      placeholder=""
+      renderInput={(params) => (
+        <TextField
+          {...params} // eslint-disable-line react/jsx-props-no-spreading
+          label="Username"
+          autoFocus
+          sx={{
+            fontSize: 14,
+            width: "300px",
+            marginBottom: "20px",
+            borderBottom: "solid 1px #dadde9",
           }}
         />
-      }
-    >
-      <Autocomplete
-        onChange={(event, value) => {
-          props.changeUser(value);
-        }}
-        value={props.currentUser}
-        key="input-user1"
-        placeholder=""
-        renderInput={(params) => (
-          <TextField
-            {...params} // eslint-disable-line react/jsx-props-no-spreading
-            label="Username"
-            autoFocus
-            sx={{
-              fontSize: 14,
-              width: "300px",
-              marginBottom: "20px",
-              borderBottom: "solid 1px #dadde9",
-            }}
-          />
-        )}
-        options={props.users}
-      />
-    </Popover>
-  );
+      )}
+      options={props.users}
+    />
+  </Popover>
+);
