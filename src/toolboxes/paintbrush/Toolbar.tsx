@@ -248,8 +248,8 @@ const Submenu = (props: SubmenuProps): ReactElement => {
       disabled: () => false,
     },
     {
-      name: "Super Marker",
-      icon: icons.annotationTransparency,
+      name: "Super Marker (Beta)",
+      icon: icons.superMarker,
       event: toggleSuperMarker,
       active: () => paintbrush.isSuper,
       disabled: () => false,
