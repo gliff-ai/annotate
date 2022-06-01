@@ -361,14 +361,8 @@ export const slic = (
 
       if (segmentSize < minRegionSize) {
         while (segmentSize > 0) {
-          // eslint-disable no-plusplus
-          // FIXME for some reason I can't replace this line:
-          cleaned[segment[--segmentSize]] = cleanedLabel;
-          // with these two lines:
-          // cleaned[segment[segmentSize]] = cleanedLabel;
-          // segmentSize -= 1;
-          // as it doesn't clean the small areas properly?
-          // eslint-enable no-plusplus
+          segmentSize -= 1;
+          cleaned[segment[segmentSize]] = cleanedLabel;
         }
       }
     }
