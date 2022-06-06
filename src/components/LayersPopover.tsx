@@ -15,6 +15,7 @@ import createStyles from "@mui/styles/createStyles";
 import makeStyles from "@mui/styles/makeStyles";
 import { Annotations } from "@/annotation";
 import { Annotation } from "@/annotation/interfaces";
+import { Toolboxes, Toolbox } from "@/Toolboxes";
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -43,6 +44,7 @@ interface Props {
   handleOpen: (
     event?: MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
+  setActiveToolbox: (tool: Toolbox) => void;
 }
 
 let refBackgroundSettingsPopover: HTMLButtonElement;
@@ -88,9 +90,13 @@ export const LayersPopover = (props: Props): ReactElement => {
               <Accordion
                 disableGutters
                 expanded={props.annotationsObject.getActiveAnnotationID() === i}
-                onChange={(event, expanded) => {
+                onChange={(event, expanded: boolean) => {
                   if (expanded) {
                     props.setActiveAnnotation(i);
+                    props.setActiveToolbox(
+                      props.annotationsObject.getAllAnnotations()[i]
+                        .toolbox as Toolbox
+                    );
                   }
                 }}
                 key={name}

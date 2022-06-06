@@ -1036,6 +1036,7 @@ class UserInterface extends Component<Props, State> {
               this.annotationsObject.setActiveAnnotationID(id);
               this.redrawEverything();
             }}
+            setActiveToolbox={this.setActiveToolboxCallback}
           />
           <BackgroundToolbar
             handleOpen={this.handleOpen("Background")}
