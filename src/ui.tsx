@@ -275,7 +275,8 @@ class UserInterface extends Component<Props, State> {
     this.mixChannels();
 
     this.annotationsObject.giveRedrawCallback(this.redrawUI);
-    this.annotationsObject.addAnnotation(this.state.activeToolbox);
+    if (!this.props.readonly)
+      this.annotationsObject.addAnnotation(this.state.activeToolbox);
   }
 
   componentDidUpdate = (prevProps: Props): void => {
