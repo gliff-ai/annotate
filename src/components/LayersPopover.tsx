@@ -62,6 +62,7 @@ export const LayersPopover = (props: Props): ReactElement => {
       transformOrigin={{ vertical: "top", horizontal: "left" }}
       TriggerButton={
         <IconButton
+          id="id-layers-button"
           tooltip={{ name: "Annotation Layers" }}
           icon={icons.layers}
           size="small"
