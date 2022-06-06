@@ -275,6 +275,20 @@ class UserInterface extends Component<Props, State> {
     this.mixChannels();
 
     this.annotationsObject.giveRedrawCallback(this.redrawUI);
+
+    if (
+      this.props.annotationsObject &&
+      Object.keys(this.props.userAnnotations).length > 0
+    ) {
+      // this normally only runs in the readonly example page, where props are all passed in at the same time
+      const user1 = Object.entries(this.props.userAnnotations).find(
+        ([username, annotationsObject]) =>
+          JSON.stringify(annotationsObject.getAllAnnotations()) ===
+          JSON.stringify(this.props.annotationsObject.getAllAnnotations())
+      )[0];
+      this.setState({ user1 });
+    }
+
     if (!this.props.readonly)
       this.annotationsObject.addAnnotation(this.state.activeToolbox);
   }
@@ -309,6 +323,9 @@ class UserInterface extends Component<Props, State> {
     }
 
     if (this.props.readonly) {
+      // once props.annotationsObject and props.userAnnotations become both available,
+      // find the username key in userAnnotations that matches annotationsObject, and
+      // set that username as this.state.user1:
       if (
         this.props.annotationsObject &&
         Object.keys(this.props.userAnnotations).length > 0 &&
