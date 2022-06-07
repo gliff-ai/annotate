@@ -44,6 +44,7 @@ import { KeybindPopup } from "./keybindings/KeybindPopup";
 import { PluginObject, PluginsCard } from "./components/plugins";
 import { UsersPopover } from "./components/UsersPopover";
 import { LayersPopover } from "./components/LayersPopover";
+import { CanvasStack } from "./components/CanvasStack";
 
 declare module "@mui/styles/defaultTheme" {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -1084,100 +1085,27 @@ class UserInterface extends Component<Props, State> {
               >
                 {appBar}
                 {this.props.readonly ? readonlyToolbar : leftToolbar}
-                <div
-                  style={{
-                    display: "block",
-                    position: "fixed",
-                    bottom: 0,
-                    width: "100%",
-                    // the height of the canvas container is 100% of the parent minus the height of the app bar
-                    // when the app bar is displayed and 100% otherwise.
-                    height: showAppBar ? "calc(100% - 85px)" : "100%",
-                  }}
-                >
-                  <BackgroundCanvas
-                    scaleAndPan={this.state.scaleAndPan}
-                    displayedImage={this.state.displayedImage}
-                    canvasPositionAndSize={this.state.viewportPositionAndSize}
-                    setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                    setCanvasContainerColourCallback={
-                      this.setCanvasContainerColourCallback
-                    }
-                    setScaleAndPan={this.setScaleAndPan}
-                  />
-                  <SplineCanvas
-                    scaleAndPan={this.state.scaleAndPan}
-                    activeToolbox={this.state.activeToolbox}
-                    mode={this.state.mode}
-                    setMode={this.setModeCallback}
-                    annotationsObject={this.annotationsObject}
-                    displayedImage={this.state.displayedImage}
-                    redraw={this.state.redrawEverything}
-                    sliceIndex={this.state.sliceIndex}
-                    setUIActiveAnnotationID={
-                      this.setUIActiveAnnotationIDCallback
-                    }
-                    setActiveToolbox={this.setActiveToolboxCallback}
-                    setScaleAndPan={this.setScaleAndPan}
-                    readonly={this.props.readonly}
-                  />
-                  <BoundingBoxCanvas
-                    scaleAndPan={this.state.scaleAndPan}
-                    activeToolbox={this.state.activeToolbox}
-                    mode={this.state.mode}
-                    setMode={this.setModeCallback}
-                    annotationsObject={this.annotationsObject}
-                    displayedImage={this.state.displayedImage}
-                    redraw={this.state.redrawEverything}
-                    sliceIndex={this.state.sliceIndex}
-                    setUIActiveAnnotationID={
-                      this.setUIActiveAnnotationIDCallback
-                    }
-                    setActiveToolbox={this.setActiveToolboxCallback}
-                    setScaleAndPan={this.setScaleAndPan}
-                    readonly={this.props.readonly}
-                  />
-                  <PaintbrushCanvas
-                    scaleAndPan={this.state.scaleAndPan}
-                    activeToolbox={this.state.activeToolbox}
-                    mode={this.state.mode}
-                    setMode={this.setModeCallback}
-                    annotationsObject={this.annotationsObject}
-                    displayedImage={this.state.displayedImage}
-                    redraw={this.state.redrawEverything}
-                    sliceIndex={this.state.sliceIndex}
-                    setUIActiveAnnotationID={
-                      this.setUIActiveAnnotationIDCallback
-                    }
-                    setActiveToolbox={this.setActiveToolboxCallback}
-                    setScaleAndPan={this.setScaleAndPan}
-                    readonly={this.props.readonly}
-                  />
-                  {this.slicesData?.length > 1 && (
-                    <Paper
-                      elevation={3}
-                      className={classes.slicesSlider}
-                      style={{ position: "absolute" }}
-                    >
-                      <BaseSlider
-                        value={this.state.sliceIndex}
-                        config={
-                          {
-                            name: "slices",
-                            id: "slices-slider",
-                            initial: 1,
-                            step: 1,
-                            min: 0,
-                            max: this.slicesData.length - 1,
-                            unit: "",
-                          } as Config
-                        }
-                        onChange={() => this.changeSlice}
-                        sliderHeight="300px"
-                      />
-                    </Paper>
-                  )}
-                </div>
+
+                <CanvasStack
+                  scaleAndPan={this.state.scaleAndPan}
+                  activeToolbox={this.state.activeToolbox}
+                  mode={this.state.mode}
+                  setMode={this.setModeCallback}
+                  annotationsObject={this.annotationsObject}
+                  displayedImage={this.state.displayedImage}
+                  showAppBar={showAppBar}
+                  redraw={this.state.redrawEverything}
+                  sliceIndex={this.state.sliceIndex}
+                  viewportPositionAndSize={this.state.viewportPositionAndSize}
+                  setViewportPositionAndSize={this.setViewportPositionAndSize}
+                  setUIActiveAnnotationID={this.setUIActiveAnnotationIDCallback}
+                  setActiveToolbox={this.setActiveToolboxCallback}
+                  setScaleAndPan={this.setScaleAndPan}
+                  setCanvasContainerColour={
+                    this.setCanvasContainerColourCallback
+                  }
+                  readonly={this.props.readonly}
+                />
               </Container>
               <Minimap
                 buttonClicked={this.state.buttonClicked}
