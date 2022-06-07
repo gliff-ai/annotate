@@ -1,6 +1,6 @@
 import { PureComponent, ReactNode, ReactElement } from "react";
 import { BaseCanvas, CanvasProps } from "@/components/baseCanvas";
-import { drawImageOnCanvas, getImageDataFromCanvas } from "./drawImage";
+import { drawImageOnCanvas, getImageDataFromCanvas } from "@/toolboxes/helpers";
 import { useBackgroundStore } from "./Store";
 
 interface Props extends CanvasProps {

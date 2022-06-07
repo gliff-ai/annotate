@@ -13,14 +13,19 @@ import { palette, getRGBAString } from "@/components/palette";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
 import { usePaintbrushStore } from "./Store";
 import { Brush } from "./interfaces";
+import { slic } from "./slic";
 import { drawCapsule } from "@/download/DownloadAsTiff";
-import { getNewImageSizeAndDisplacement } from "@/toolboxes/background/drawImage";
+import {
+  getNewImageSizeAndDisplacement,
+  drawImageOnCanvas,
+} from "@/toolboxes/helpers";
 
 const mainColor = theme.palette.primary.main;
 
 interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   isActive: boolean;
   is3D: boolean;
+  isSuper: boolean;
   activeToolbox: Toolbox | string;
   mode: Mode;
   setMode: (mode: Mode) => void;
@@ -66,6 +71,12 @@ export class CanvasClass extends PureComponent<Props, State> {
 
   private tempCtx: CanvasRenderingContext2D | null;
 
+  private superpixels: Int32Array | null; // a map of the image labelled with superpixel indices
+
+  private currentSuperPixelID: number | null; // the superpixel ID of the current pixel (if in that mode)
+
+  private hasSuperPixelChanged: boolean; // to save rendering the same superpixel multiple times we keep track of whether it has changed
+
   private cursorCtx: CanvasRenderingContext2D | null;
 
   private isDrawing: boolean;
@@ -82,6 +93,9 @@ export class CanvasClass extends PureComponent<Props, State> {
     this.pixelCtx = null;
     this.tempCanvas = null;
     this.tempCtx = null;
+    this.superpixels = null;
+    this.currentSuperPixelID = null;
+    this.hasSuperPixelChanged = false;
 
     this.state = {
       pixelView: false,
@@ -95,7 +109,7 @@ export class CanvasClass extends PureComponent<Props, State> {
     }
   }
 
-  componentDidUpdate(): void {
+  componentDidUpdate(prevProps: Props): void {
     // can't just initialize this canvas in the constructor because backgroundCanvas doesn't get
     // the correct width/height until canvasPositionAndSize is set via callback from elsewhere
     if (!this.backgroundCanvas) return;
@@ -110,11 +124,25 @@ export class CanvasClass extends PureComponent<Props, State> {
     }
 
     // Redraw if we change pan or zoom
-
     try {
       this.drawAllStrokes(this.backgroundCanvas?.canvasContext);
     } catch (e) {
       console.error(`${(e as Error).message}`);
+    }
+
+    // check if we've turned the Super Marker on and initialise super pixels
+    // or reinitialise if we change the brush size
+    // the size of the super pixels is based on the brush size
+    // TODO check if this gets reinitialised if we change image?
+    if (
+      this.props.isSuper &&
+      (this.props.isSuper !== prevProps.isSuper ||
+        this.props.brushRadius !== prevProps.brushRadius)
+    ) {
+      ({ superpixels: this.superpixels } = slic(
+        this.props.displayedImage,
+        2 * this.props.brushRadius
+      ));
     }
   }
 
@@ -424,7 +452,10 @@ export class CanvasClass extends PureComponent<Props, State> {
         }
 
         // Ensure the initial down position gets added to our line
-        this.updateStroke(canvasX, canvasY);
+        // unless a superpixel (as we don't support dragging those yet FIXME)
+        if (!this.props.isSuper) {
+          this.updateStroke(canvasX, canvasY);
+        }
 
         // Redraw cursor (it will be brighter now because this.isDrawing === true):
         this.drawCursor(canvasX, canvasY);
@@ -460,7 +491,54 @@ export class CanvasClass extends PureComponent<Props, State> {
   };
 
   onMouseMove = (canvasX: number, canvasY: number): void => {
-    if (this.props.mode === Mode.draw && this.isDrawing) {
+    if (this.props.isSuper) {
+      // get image position
+      let { x: imageX, y: imageY } = canvasToImage(
+        canvasX,
+        canvasY,
+        this.props.displayedImage.width,
+        this.props.displayedImage.height,
+        this.props.scaleAndPan,
+        this.state.canvasPositionAndSize
+      );
+      imageX = Math.round(imageX);
+      imageY = Math.round(imageY);
+      // get super pixel ID
+      const newSuperPixelID =
+        this.superpixels[
+          this.sub2ind(imageX, imageY, this.props.displayedImage.width)
+        ];
+
+      // update the visualised superpixel
+      if (newSuperPixelID !== this.currentSuperPixelID) {
+        // and if we're dragging add the previous superpixel to the annotation
+        // FIXME this is bloody slow so lets not bother with this yet
+        // if (this.props.mode === Mode.draw && this.isDrawing) {
+        //   // get all pixels for the last superpixel
+        //   const pixels: XYPoint[] = [];
+        //   for (let idx = 0; idx < this.superpixels.length; idx += 1) {
+        //     if (this.superpixels[idx] === this.currentSuperPixelID) {
+        //       const { x, y } = this.ind2sub(
+        //         idx,
+        //         this.props.displayedImage.width
+        //       );
+        //       pixels.push({ x, y });
+        //     }
+        //   }
+        //   this.props.annotationsObject.addSuperPixel(
+        //     this.props.sliceIndex,
+        //     pixels
+        //   );
+        //   this.drawAllStrokes(this.backgroundCanvas?.canvasContext);
+        // }
+        this.currentSuperPixelID = newSuperPixelID;
+        this.hasSuperPixelChanged = true;
+      } else {
+        this.hasSuperPixelChanged = false;
+      }
+    } else if (this.props.mode === Mode.draw && this.isDrawing) {
+      // Draw to this end pos
+      // unless a superpixel (as we don't support dragging those yet FIXME)
       this.updateStroke(canvasX, canvasY);
     }
 
@@ -473,17 +551,48 @@ export class CanvasClass extends PureComponent<Props, State> {
     if (this.props.mode === Mode.draw && this.isDrawing) {
       // End painting & save painting
 
-      // Draw to this end pos
-      this.updateStroke(canvasX, canvasY);
+      if (!this.props.isSuper) {
+        // Draw to this end pos
+        // unless a superpixel (as we don't support dragging those yet FIXME)
+        this.updateStroke(canvasX, canvasY);
+      }
 
-      // Stop drawing & save the drawn line
+      // Stop drawing & save the drawn line or superpixel
       this.isDrawing = false;
 
-      this.saveLine(this.props.brushRadius);
+      if (!this.props.isSuper) {
+        this.saveLine(this.props.brushRadius);
+      } else {
+        // get all pixels for this superpixel
+        const pixels: XYPoint[] = [];
+        for (let idx = 0; idx < this.superpixels.length; idx += 1) {
+          if (this.superpixels[idx] === this.currentSuperPixelID) {
+            const { x, y } = this.ind2sub(idx, this.props.displayedImage.width);
+            pixels.push({ x, y });
+          }
+        }
+        this.props.annotationsObject.addSuperPixel(
+          this.props.sliceIndex,
+          pixels
+        );
+      }
       this.drawAllStrokes(this.backgroundCanvas?.canvasContext);
 
       this.drawCursor(canvasX, canvasY);
     }
+  };
+
+  private sub2ind = (x: number, y: number, width: number): number => {
+    // convert x and y coordinates into a row-wise index
+    const index = y * width + x;
+    return index;
+  };
+
+  private ind2sub = (index: number, width: number): XYPoint => {
+    // convert a row-wise index into x and y coordinates
+    const x = index % width;
+    const y = Math.floor(index / width);
+    return { x, y };
   };
 
   getCursor = (): Cursor => {
@@ -496,21 +605,56 @@ export class CanvasClass extends PureComponent<Props, State> {
   drawCursor = (canvasX: number, canvasY: number): void => {
     if (this.props.readonly) return;
 
-    this.clearCanvas(this.cursorCtx);
+    if (!this.props.isSuper || this.hasSuperPixelChanged) {
+      // don't clear the canvas in superpixel mode unless the pixel has changed
+      // otherwise, always clear the canvas
+      this.clearCanvas(this.cursorCtx);
+    }
 
     this.cursorCtx.lineWidth = 2;
     this.cursorCtx.strokeStyle = "white";
     this.cursorCtx.globalAlpha = this.isDrawing ? 0.8 : 0.3;
 
-    this.cursorCtx.beginPath();
-    this.cursorCtx.arc(
-      canvasX,
-      canvasY,
-      this.getCanvasBrushDiameter(this.props.brushRadius) / 2,
-      0,
-      2 * Math.PI
-    );
-    this.cursorCtx.stroke();
+    if (!this.props.isSuper) {
+      // if not a superpixel, draw a circle
+      this.cursorCtx.beginPath();
+      this.cursorCtx.arc(
+        canvasX,
+        canvasY,
+        this.getCanvasBrushDiameter(this.props.brushRadius) / 2,
+        0,
+        2 * Math.PI
+      );
+      this.cursorCtx.stroke();
+    } else if (this.hasSuperPixelChanged) {
+      // if a superpixel, draw the region
+      const currentSuperPixelSegmentation = new Uint8ClampedArray(
+        this.superpixels.length * 4
+      );
+      for (let idx = 0; idx < this.superpixels.length; idx += 1) {
+        if (this.superpixels[idx] === this.currentSuperPixelID) {
+          // set to the gliff.ai green with transparency set by the active annotation slider
+          currentSuperPixelSegmentation[idx * 4] = 6;
+          currentSuperPixelSegmentation[idx * 4 + 1] = 255;
+          currentSuperPixelSegmentation[idx * 4 + 2] = 178;
+          currentSuperPixelSegmentation[idx * 4 + 3] =
+            255 * this.props.annotationActiveAlpha;
+        }
+      }
+      const highlightedImageData = new ImageData(
+        currentSuperPixelSegmentation,
+        this.props.displayedImage.width,
+        this.props.displayedImage.height
+      );
+      drawImageOnCanvas(
+        this.cursorCtx,
+        highlightedImageData,
+        this.props.scaleAndPan
+      );
+
+      // reset the visualisation
+      this.hasSuperPixelChanged = false;
+    }
   };
 
   handleEvent = (event: Event): void => {
@@ -611,6 +755,7 @@ export const Canvas = (
     | "annotationAlpha"
     | "annotationActiveAlpha"
     | "is3D"
+    | "isSuper"
   >
 ): ReactElement => {
   // we will overwrite props.activeToolbox, which will be paintbrush
@@ -628,6 +773,7 @@ export const Canvas = (
     <CanvasClass
       isActive={isActive}
       is3D={paintbrush.is3D}
+      isSuper={paintbrush.isSuper}
       activeToolbox={activeToolbox}
       mode={props.mode}
       setMode={props.setMode}

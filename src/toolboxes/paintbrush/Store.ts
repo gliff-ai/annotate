@@ -9,6 +9,7 @@ interface PaintbrushData {
   annotationActiveAlpha: number;
   pixelView: boolean;
   is3D: boolean;
+  isSuper: boolean;
 }
 
 const defaultPaintbrush: PaintbrushData = {
@@ -18,6 +19,7 @@ const defaultPaintbrush: PaintbrushData = {
   annotationActiveAlpha: SLIDER_CONFIG[Sliders.annotationActiveAlpha].initial,
   pixelView: false,
   is3D: false,
+  isSuper: false,
 };
 
 // we've created store with initial value. This can now be used anywhere and will share the value.
