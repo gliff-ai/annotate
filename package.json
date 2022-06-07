@@ -62,9 +62,7 @@
     "vite-plugin-checker": "^0.3.4"
   },
   "peerDependencies": {
-    "@emotion/react": "^11.7.1",
-    "@emotion/styled": "^11.6.0",
-    "@gliff-ai/style": "^13.5.0",
+    "@gliff-ai/style": "^13.9.2",
     "@gliff-ai/upload": "^1.2.8",
     "@mui/icons-material": "^5.4.3",
     "@mui/material": "^5.4.3",
