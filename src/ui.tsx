@@ -33,7 +33,11 @@ import {
   BackgroundToolbar,
   Minimap,
 } from "@/toolboxes/background";
-import { SplineCanvas, SplineToolbar } from "@/toolboxes/spline";
+import {
+  SplineCanvas,
+  SplineToolbar,
+  SplineCanvasClass,
+} from "@/toolboxes/spline";
 import { BoundingBoxCanvas, BoundingBoxToolbar } from "@/toolboxes/boundingBox";
 import { PaintbrushCanvas, PaintbrushToolbar } from "@/toolboxes/paintbrush";
 import { LabelsSubmenu } from "@/toolboxes/labels";
@@ -227,6 +231,8 @@ class UserInterface extends Component<Props, State> {
 
   private keyListener: (event: KeyboardEvent) => boolean;
 
+  private splineCanvasRef: { [name: string]: SplineCanvasClass };
+
   constructor(props: Props) {
     super(props);
 
@@ -263,6 +269,7 @@ class UserInterface extends Component<Props, State> {
 
     this.imageFileInfo = this.props.imageFileInfo || null;
     this.refBtnsPopovers = {};
+    this.splineCanvasRef = {};
   }
 
   @pageLoading
@@ -1105,6 +1112,7 @@ class UserInterface extends Component<Props, State> {
                     this.setCanvasContainerColourCallback
                   }
                   readonly={this.props.readonly}
+                  canvasRefs={this.splineCanvasRef}
                 />
               </Container>
               <Minimap

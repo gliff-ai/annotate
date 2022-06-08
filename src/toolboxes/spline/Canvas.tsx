@@ -1,4 +1,4 @@
-import { ReactNode, PureComponent, ReactElement } from "react";
+import { ReactNode, PureComponent, ReactElement, forwardRef } from "react";
 import { theme } from "@gliff-ai/style";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
 import { Mode } from "@/ui";
@@ -51,10 +51,10 @@ interface Event extends CustomEvent {
 
 type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 
-class CanvasClass extends PureComponent<Props, State> {
+export class CanvasClass extends PureComponent<Props, State> {
   readonly name = Toolboxes.spline;
 
-  private baseCanvas: BaseCanvas;
+  public baseCanvas: BaseCanvas; // public because CanvasStack needs to access it to create the diff image in comparison mode
 
   private selectedPointIndex: number;
 
@@ -948,29 +948,32 @@ class CanvasClass extends PureComponent<Props, State> {
     ) : null;
 }
 
-export const Canvas = (props: Props): ReactElement => {
-  // we will overwrite props.activeToolbox, which will be spline
-  // with spline.splineType, which will be spline/lasso/magic/rect
-  const [spline] = useSplineStore();
-  let { activeToolbox } = props;
-  if (activeToolbox === Toolboxes.spline) {
-    activeToolbox = spline.splineType;
-  }
+export const Canvas = forwardRef(
+  (props: Props, ref: React.ForwardedRef<CanvasClass>): ReactElement => {
+    // we will overwrite props.activeToolbox, which will be spline
+    // with spline.splineType, which will be spline/lasso/magic/rect
+    const [spline] = useSplineStore();
+    let { activeToolbox } = props;
+    if (activeToolbox === Toolboxes.spline) {
+      activeToolbox = spline.splineType;
+    }
 
-  return (
-    <CanvasClass
-      activeToolbox={activeToolbox}
-      mode={props.mode}
-      setMode={props.setMode}
-      annotationsObject={props.annotationsObject}
-      displayedImage={props.displayedImage}
-      scaleAndPan={props.scaleAndPan}
-      setScaleAndPan={props.setScaleAndPan}
-      redraw={props.redraw}
-      sliceIndex={props.sliceIndex}
-      setUIActiveAnnotationID={props.setUIActiveAnnotationID}
-      setActiveToolbox={props.setActiveToolbox}
-      readonly={props.readonly}
-    />
-  );
-};
+    return (
+      <CanvasClass
+        activeToolbox={activeToolbox}
+        mode={props.mode}
+        setMode={props.setMode}
+        annotationsObject={props.annotationsObject}
+        displayedImage={props.displayedImage}
+        scaleAndPan={props.scaleAndPan}
+        setScaleAndPan={props.setScaleAndPan}
+        redraw={props.redraw}
+        sliceIndex={props.sliceIndex}
+        setUIActiveAnnotationID={props.setUIActiveAnnotationID}
+        setActiveToolbox={props.setActiveToolbox}
+        readonly={props.readonly}
+        ref={ref}
+      />
+    );
+  }
+);
