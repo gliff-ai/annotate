@@ -264,7 +264,7 @@ export class BaseCanvas extends Component<Props> {
         cursor: this.props.cursor || "pointer",
         left: this.props.canvasPositionAndSize.left,
         bottom: "0px",
-        position: "absolute",
+        // position: "absolute",
       }}
     >
       <canvas

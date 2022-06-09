@@ -1093,28 +1093,56 @@ class UserInterface extends Component<Props, State> {
                 {appBar}
                 {this.props.readonly ? readonlyToolbar : leftToolbar}
 
-                <CanvasStack
-                  scaleAndPan={this.state.scaleAndPan}
-                  activeToolbox={this.state.activeToolbox}
-                  mode={this.state.mode}
-                  setMode={this.setModeCallback}
-                  annotationsObject={this.annotationsObject}
-                  displayedImage={this.state.displayedImage}
-                  showAppBar={showAppBar}
-                  redraw={this.state.redrawEverything}
-                  sliceIndex={this.state.sliceIndex}
-                  viewportPositionAndSize={this.state.viewportPositionAndSize}
-                  setViewportPositionAndSize={this.setViewportPositionAndSize}
-                  setUIActiveAnnotationID={this.setUIActiveAnnotationIDCallback}
-                  setActiveToolbox={this.setActiveToolboxCallback}
-                  setScaleAndPan={this.setScaleAndPan}
-                  setCanvasContainerColour={
-                    this.setCanvasContainerColourCallback
-                  }
-                  readonly={this.props.readonly}
-                  canvasRefs={this.splineCanvasRef}
-                />
+                <div style={{ display: "flex", height: "100%", width: "100%" }}>
+                  <CanvasStack
+                    scaleAndPan={this.state.scaleAndPan}
+                    activeToolbox={this.state.activeToolbox}
+                    mode={this.state.mode}
+                    setMode={this.setModeCallback}
+                    annotationsObject={this.annotationsObject}
+                    displayedImage={this.state.displayedImage}
+                    showAppBar={showAppBar}
+                    redraw={this.state.redrawEverything}
+                    sliceIndex={this.state.sliceIndex}
+                    viewportPositionAndSize={this.state.viewportPositionAndSize}
+                    setViewportPositionAndSize={this.setViewportPositionAndSize}
+                    setUIActiveAnnotationID={
+                      this.setUIActiveAnnotationIDCallback
+                    }
+                    setActiveToolbox={this.setActiveToolboxCallback}
+                    setScaleAndPan={this.setScaleAndPan}
+                    setCanvasContainerColour={
+                      this.setCanvasContainerColourCallback
+                    }
+                    readonly={this.props.readonly}
+                    canvasRefs={this.splineCanvasRef}
+                  />
+                  <CanvasStack
+                    scaleAndPan={this.state.scaleAndPan}
+                    activeToolbox={this.state.activeToolbox}
+                    mode={this.state.mode}
+                    setMode={this.setModeCallback}
+                    annotationsObject={this.annotationsObject}
+                    displayedImage={this.state.displayedImage}
+                    showAppBar={showAppBar}
+                    redraw={this.state.redrawEverything}
+                    sliceIndex={this.state.sliceIndex}
+                    viewportPositionAndSize={this.state.viewportPositionAndSize}
+                    setViewportPositionAndSize={this.setViewportPositionAndSize}
+                    setUIActiveAnnotationID={
+                      this.setUIActiveAnnotationIDCallback
+                    }
+                    setActiveToolbox={this.setActiveToolboxCallback}
+                    setScaleAndPan={this.setScaleAndPan}
+                    setCanvasContainerColour={
+                      this.setCanvasContainerColourCallback
+                    }
+                    readonly={this.props.readonly}
+                    canvasRefs={this.splineCanvasRef}
+                  />
+                </div>
               </Container>
+
               <Minimap
                 buttonClicked={this.state.buttonClicked}
                 displayedImage={this.state.displayedImage}

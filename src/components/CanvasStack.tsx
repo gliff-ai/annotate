@@ -46,7 +46,7 @@ export const CanvasStack = (props: Props) => {
     <div
       style={{
         display: "block",
-        position: "fixed",
+        // position: "fixed",
         bottom: 0,
         width: "100%",
         // the height of the canvas container is 100% of the parent minus the height of the app bar
