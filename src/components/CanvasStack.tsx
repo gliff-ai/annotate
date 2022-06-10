@@ -35,10 +35,6 @@ interface Props {
   setActiveToolbox: (tool: Toolbox) => void;
 }
 
-let paintbrushCanvasRef,
-  splineCanvasRef: SplineCanvasClass,
-  boundingboxCanvasRef;
-
 export const CanvasStack = (props: Props) => {
   // console.log(splineCanvasRef?.baseCanvas.canvasContext);
 

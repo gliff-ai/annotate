@@ -49,6 +49,7 @@ import { PluginObject, PluginsCard } from "./components/plugins";
 import { UsersPopover } from "./components/UsersPopover";
 import { LayersPopover } from "./components/LayersPopover";
 import { CanvasStack } from "./components/CanvasStack";
+import { DiffCanvas } from "./components/DiffCanvas";
 
 declare module "@mui/styles/defaultTheme" {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -231,7 +232,8 @@ class UserInterface extends Component<Props, State> {
 
   private keyListener: (event: KeyboardEvent) => boolean;
 
-  private splineCanvasRef: { [name: string]: SplineCanvasClass };
+  private leftCanvasRefs: { [name: string]: SplineCanvasClass };
+  private rightCanvasRefs: { [name: string]: SplineCanvasClass };
 
   constructor(props: Props) {
     super(props);
@@ -269,7 +271,8 @@ class UserInterface extends Component<Props, State> {
 
     this.imageFileInfo = this.props.imageFileInfo || null;
     this.refBtnsPopovers = {};
-    this.splineCanvasRef = {};
+    this.leftCanvasRefs = {};
+    this.rightCanvasRefs = {};
   }
 
   @pageLoading
@@ -1115,7 +1118,7 @@ class UserInterface extends Component<Props, State> {
                       this.setCanvasContainerColourCallback
                     }
                     readonly={this.props.readonly}
-                    canvasRefs={this.splineCanvasRef}
+                    canvasRefs={this.leftCanvasRefs}
                   />
                   <CanvasStack
                     scaleAndPan={this.state.scaleAndPan}
@@ -1138,7 +1141,15 @@ class UserInterface extends Component<Props, State> {
                       this.setCanvasContainerColourCallback
                     }
                     readonly={this.props.readonly}
-                    canvasRefs={this.splineCanvasRef}
+                    canvasRefs={this.rightCanvasRefs}
+                  />
+                  <DiffCanvas
+                    scaleAndPan={this.state.scaleAndPan}
+                    setScaleAndPan={this.setScaleAndPan}
+                    canvasPositionAndSize={this.state.viewportPositionAndSize}
+                    showAppBar={showAppBar}
+                    leftCanvasRefs={this.leftCanvasRefs}
+                    rightCanvasRefs={this.rightCanvasRefs}
                   />
                 </div>
               </Container>
