@@ -45,9 +45,8 @@ export const CanvasStack = (props: Props) => {
   return (
     <div
       style={{
-        display: "block",
-        // position: "fixed",
-        bottom: 0,
+        position: "relative",
+        top: props.showAppBar ? "85px" : "0px", // this becomes unnecessary if we set position: static on the appbar
         width: "100%",
         // the height of the canvas container is 100% of the parent minus the height of the app bar
         // when the app bar is displayed and 100% otherwise.
@@ -81,7 +80,7 @@ export const CanvasStack = (props: Props) => {
           }
         }}
       />
-      <BoundingBoxCanvas
+      {/* <BoundingBoxCanvas
         scaleAndPan={props.scaleAndPan}
         activeToolbox={props.activeToolbox}
         mode={props.mode}
@@ -108,7 +107,7 @@ export const CanvasStack = (props: Props) => {
         setActiveToolbox={props.setActiveToolbox}
         setScaleAndPan={props.setScaleAndPan}
         readonly={props.readonly}
-      />
+      /> */}
     </div>
   );
 };

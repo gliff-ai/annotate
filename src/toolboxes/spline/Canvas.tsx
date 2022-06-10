@@ -922,7 +922,7 @@ export class CanvasClass extends PureComponent<Props, State> {
 
   render = (): ReactNode =>
     this.props?.displayedImage ? (
-      <div style={{ pointerEvents: this.isActive() ? "auto" : "none" }}>
+      <div style={{ height: "100%", position: "relative" }}>
         <BaseCanvas
           onClick={this.onClick}
           onMouseDown={this.onMouseDownOrTouchStart}

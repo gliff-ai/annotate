@@ -257,14 +257,13 @@ export class BaseCanvas extends Component<Props> {
       }}
       style={{
         pointerEvents: "inherit",
-        display: "block",
         touchAction: "none",
         width: "100%",
         height: "100%",
         cursor: this.props.cursor || "pointer",
         left: this.props.canvasPositionAndSize.left,
         bottom: "0px",
-        // position: "absolute",
+        position: "absolute",
       }}
     >
       <canvas
