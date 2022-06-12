@@ -6,19 +6,22 @@ import {
   useEffect,
   useCallback,
 } from "react";
-import {
-  Avatar,
-  Chip,
-  Divider,
-  IconButton,
-  InputBase,
-  ListItemText,
-  Typography,
-} from "@mui/material";
+
 import createStyles from "@mui/styles/createStyles";
 import makeStyles from "@mui/styles/makeStyles";
 import SVG from "react-inlinesvg";
-import { theme, icons } from "@gliff-ai/style";
+import {
+  theme,
+  icons,
+  Avatar,
+  Chip,
+  Divider,
+  MuiIconbutton,
+  InputBase,
+  ListItemText,
+  Typography,
+  Box,
+} from "@gliff-ai/style";
 import { Annotations } from "@/annotation";
 
 export interface Props {
@@ -36,12 +39,15 @@ const useStyles = makeStyles(() =>
       fontSize: "14px",
     },
     list: { width: "100%" },
-    inputBase: { marginRight: "55px", fontSize: "14px" },
+    inputBase: {
+      fontSize: "14px",
+      "& .MuiInputBase-input": {
+        width: "245px",
+      },
+    },
     labelsChip: {
       margin: "5px",
-      borderColor: theme.palette.primary.main,
       borderRadius: "9px",
-      color: theme.palette.primary.main,
     },
     chipFont: {
       fontSize: "14px",
@@ -145,7 +151,7 @@ export const Labels: FunctionComponent<Props> = ({
             }}
             id="id-labels-input"
           />
-          <IconButton
+          <MuiIconbutton
             className={classes.addButton}
             type="submit"
             aria-label="add-new-label"
@@ -154,62 +160,64 @@ export const Labels: FunctionComponent<Props> = ({
             size="small"
           >
             <SVG src={icons.add} width="12px" height="100%" fill="#A1A1A1" />
-          </IconButton>
+          </MuiIconbutton>
           <Divider className={classes.divider} />
         </>
       )}
-
-      {assignedLabels.map((label) => (
-        <Chip
-          key={`chip-delete-${label}`}
-          avatar={
-            <Avatar
-              variant="circular"
-              style={{ cursor: "pointer" }}
-              onClick={handleRemoveLabel(label)}
-              data-testid={`delete-${label}`}
-            >
-              <SVG
-                src={icons.removeLabel}
-                className={classes.svgSmall}
-                fill={theme.palette.primary.main}
+      <Box width={"272px"} maxHeight={"345px"} overflow={"auto"}>
+        {assignedLabels.map((label) => (
+          <Chip
+            key={`chip-delete-${label}`}
+            avatar={
+              <Avatar
+                variant="circular"
+                style={{ cursor: "pointer" }}
+                onClick={handleRemoveLabel(label)}
+                data-testid={`delete-${label}`}
+              >
+                <SVG
+                  src={icons.removeLabel}
+                  className={classes.svgSmall}
+                  fill={theme.palette.primary.main}
+                />
+              </Avatar>
+            }
+            className={classes.labelsChip}
+            label={
+              <Typography className={classes.chipFont}>{label}</Typography>
+            }
+            variant="outlined"
+          />
+        ))}
+        {menuLabels.map((label) => (
+          <Chip
+            key={`chip-add-${label}`}
+            avatar={
+              <Avatar
+                variant="circular"
+                style={{ cursor: "pointer" }}
+                onClick={handleAddLabel(label)}
+                data-testid={`add-${label}`}
+              >
+                <SVG
+                  src={icons.add}
+                  className={classes.svgSmall}
+                  fill={theme.palette.text.secondary}
+                />
+              </Avatar>
+            }
+            className={[classes.labelsChip, classes.menuLabelsChip].join(" ")}
+            label={
+              <ListItemText
+                primary={
+                  <Typography className={classes.chipFont}>{label}</Typography>
+                }
               />
-            </Avatar>
-          }
-          className={classes.labelsChip}
-          label={<Typography className={classes.chipFont}>{label}</Typography>}
-          variant="outlined"
-        />
-      ))}
-
-      {menuLabels.map((label) => (
-        <Chip
-          key={`chip-add-${label}`}
-          avatar={
-            <Avatar
-              variant="circular"
-              style={{ cursor: "pointer" }}
-              onClick={handleAddLabel(label)}
-              data-testid={`add-${label}`}
-            >
-              <SVG
-                src={icons.add}
-                className={classes.svgSmall}
-                fill={theme.palette.text.secondary}
-              />
-            </Avatar>
-          }
-          className={[classes.labelsChip, classes.menuLabelsChip].join(" ")}
-          label={
-            <ListItemText
-              primary={
-                <Typography className={classes.chipFont}>{label}</Typography>
-              }
-            />
-          }
-          variant="outlined"
-        />
-      ))}
+            }
+            variant="outlined"
+          />
+        ))}
+      </Box>
     </>
   );
 };
