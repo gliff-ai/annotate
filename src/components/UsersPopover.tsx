@@ -47,13 +47,12 @@ export const UsersPopover = (props: Props): ReactElement => (
       renderInput={(params) => (
         <TextField
           {...params} // eslint-disable-line react/jsx-props-no-spreading
-          label="Username"
+          label="User"
           autoFocus
           sx={{
             fontSize: 14,
             width: "300px",
             marginBottom: "20px",
-            borderBottom: "solid 1px #dadde9",
           }}
         />
       )}
