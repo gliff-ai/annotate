@@ -28,9 +28,6 @@ const useStyles = makeStyles(() =>
     chipFont: {
       fontSize: "14px",
     },
-    accordionSummary: {
-      marginTop: "5px",
-    },
     accordionDetails: {
       paddingTop: "0px",
       paddingBottom: "0px",
@@ -102,10 +99,7 @@ export const LayersPopover = (props: Props): ReactElement => {
                 }}
                 key={name}
               >
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  className={classes.accordionSummary}
-                >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   {name}
                 </AccordionSummary>
                 <AccordionDetails className={classes.accordionDetails}>
