@@ -790,7 +790,7 @@ class CanvasClass extends PureComponent<Props, State> {
   };
 
   onMouseMoveOrTouchMove = (x: number, y: number): void => {
-    if (!(this.isDrawing || this.dragPoint || this.props.readonly)) return;
+    if (!(this.isDrawing || this.dragPoint) || this.props.readonly) return;
 
     this.numberOfMoves += 1;
 
