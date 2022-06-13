@@ -16,7 +16,7 @@ interface Props {
   ) => (anchorElement?: HTMLButtonElement) => void;
 }
 
-let refBackgroundSettingsPopover: HTMLButtonElement;
+let refUsersPopoverButton: HTMLButtonElement;
 
 export const UsersPopover = (props: Props): ReactElement => (
   <Popover
@@ -29,10 +29,10 @@ export const UsersPopover = (props: Props): ReactElement => (
         icon={icons.usersPage}
         size="small"
         setRefCallback={(ref) => {
-          refBackgroundSettingsPopover = ref;
+          refUsersPopoverButton = ref;
         }}
         onClick={() => {
-          props.handleOpen()(refBackgroundSettingsPopover);
+          props.handleOpen()(refUsersPopoverButton);
         }}
       />
     }

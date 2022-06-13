@@ -698,6 +698,7 @@ class UserInterface extends Component<Props, State> {
     tool: string,
     value: HTMLButtonElement | null
   ): void => {
+    // sets this.state.activeSubmenuAnchor[tool] to value, and activeSubmenuAnchor[<all other tools>] to null
     this.setState((prevState) => {
       const activeSubmenuAnchor = { ...prevState.activeSubmenuAnchor };
       activeSubmenuAnchor[tool] = value; // set new anchor

@@ -47,7 +47,7 @@ interface Props {
   setActiveToolbox: (tool: Toolbox) => void;
 }
 
-let refBackgroundSettingsPopover: HTMLButtonElement;
+let refLayersPopoverButton: HTMLButtonElement;
 
 const layerTypeString = (layer: Annotation) =>
   `${layer.toolbox.charAt(0).toUpperCase()}${layer.toolbox.slice(1)}`;
@@ -67,10 +67,10 @@ export const LayersPopover = (props: Props): ReactElement => {
           icon={icons.layers}
           size="small"
           setRefCallback={(ref) => {
-            refBackgroundSettingsPopover = ref;
+            refLayersPopoverButton = ref;
           }}
           onClick={() => {
-            props.handleOpen()(refBackgroundSettingsPopover);
+            props.handleOpen()(refLayersPopoverButton);
           }}
         />
       }
