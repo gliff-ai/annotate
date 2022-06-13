@@ -15,7 +15,7 @@ import createStyles from "@mui/styles/createStyles";
 import makeStyles from "@mui/styles/makeStyles";
 import { Annotations } from "@/annotation";
 import { Annotation } from "@/annotation/interfaces";
-import { Toolboxes, Toolbox } from "@/Toolboxes";
+import { Toolbox } from "@/Toolboxes";
 
 const useStyles = makeStyles(() =>
   createStyles({
