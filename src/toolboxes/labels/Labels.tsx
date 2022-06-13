@@ -142,7 +142,7 @@ export const Labels: FunctionComponent<Props> = ({
           <Divider sx={{ ...divider }} />
         </>
       )}
-      <Box width={"272px"} maxHeight={"345px"} overflow={"auto"}>
+      <Box width="272px" maxHeight="345px" overflow="auto">
         {assignedLabels.map((label) => (
           <Chip
             key={`chip-delete-${label}`}
@@ -162,7 +162,7 @@ export const Labels: FunctionComponent<Props> = ({
               </Avatar>
             }
             sx={{ ...labelsChip }}
-            label={<Typography fontSize={"14px"}>{label}</Typography>}
+            label={<Typography fontSize="14px">{label}</Typography>}
             variant="outlined"
           />
         ))}
