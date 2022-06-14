@@ -487,6 +487,8 @@ export class CanvasClass extends PureComponent<Props, State> {
       if (selectedAnnotationID !== null) {
         this.props.setMode(Mode.draw);
       }
+      if (this.props.readonly)
+        this.drawAllStrokes(this.backgroundCanvas?.canvasContext); // this is unnecessary when not in readonly because calling setMode will not be disabled and thus will pass a different value in for mode, causing rerender
     }
   };
 

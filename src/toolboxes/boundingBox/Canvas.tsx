@@ -467,7 +467,10 @@ export class CanvasClass extends PureComponent<Props, State> {
       }
     }
 
-    if (this.props.readonly) return;
+    if (this.props.readonly) {
+      this.drawAllBoundingBoxes();
+      return;
+    }
 
     // if no bounding box tool is turned on then do nothing
     if (!this.isActive()) return;
