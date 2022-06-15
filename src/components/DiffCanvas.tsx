@@ -58,7 +58,11 @@ export const DiffCanvas = (props: Props) => {
     console.log(`Diff loop took ${performance.now() - t0}ms`);
 
     diffCanvasRef.canvasContext.putImageData(diffImageData, 0, 0);
-  }, [props.leftCanvasRefs, props.rightCanvasRefs]);
+  }, [
+    props.leftCanvasRefs.splineCanvasRef?.baseCanvas.canvasContext.canvas.width,
+    props.rightCanvasRefs.splineCanvasRef?.baseCanvas.canvasContext.canvas
+      .width,
+  ]);
 
   return (
     <div
