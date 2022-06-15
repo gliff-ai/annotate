@@ -18,7 +18,7 @@ export const Submenu = (props: Props): ReactElement => (
     open={props.isOpen}
     anchorEl={props.anchorElement}
     handleClickAway={props.handleClickAway}
-    popperPlacement="right-end"
+    popperPlacement="right-start"
     el={
       <Card
         title="Annotation Labels"

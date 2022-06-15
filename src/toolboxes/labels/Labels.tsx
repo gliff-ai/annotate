@@ -6,19 +6,20 @@ import {
   useEffect,
   useCallback,
 } from "react";
+
+import SVG from "react-inlinesvg";
 import {
+  theme,
+  icons,
   Avatar,
   Chip,
   Divider,
-  IconButton,
+  MuiIconbutton,
   InputBase,
   ListItemText,
   Typography,
-} from "@mui/material";
-import createStyles from "@mui/styles/createStyles";
-import makeStyles from "@mui/styles/makeStyles";
-import SVG from "react-inlinesvg";
-import { theme, icons } from "@gliff-ai/style";
+  Box,
+} from "@gliff-ai/style";
 import { Annotations } from "@/annotation";
 
 export interface Props {
@@ -29,39 +30,21 @@ export interface Props {
   multiLabel: boolean;
 }
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    listItem: {
-      color: theme.palette.primary.main,
-      fontSize: "14px",
-    },
-    list: { width: "100%" },
-    inputBase: { marginRight: "55px", fontSize: "14px" },
-    labelsChip: {
-      margin: "5px",
-      borderColor: theme.palette.primary.main,
-      borderRadius: "9px",
-      color: theme.palette.primary.main,
-    },
-    chipFont: {
-      fontSize: "14px",
-    },
-    menuLabelsChip: {
-      color: theme.palette.text.secondary,
-      borderColor: theme.palette.text.secondary,
-    },
-    addButton: {
-      position: "absolute !important" as "absolute",
-      right: "18px",
-    },
-    divider: {
-      width: "90%",
-      marginTop: "inherit",
-      marginLeft: "-1%",
-    },
-    svgSmall: { width: "10px", height: "100%" },
-  })
-);
+const inputBase = {
+  fontSize: "14px",
+  "& .MuiInputBase-input": {
+    width: "245px",
+  },
+};
+const labelsChip = {
+  margin: "5px",
+  borderRadius: "9px",
+};
+const divider = {
+  width: "90%",
+  marginTop: "inherit",
+  marginLeft: "-1%",
+};
 
 export const Labels: FunctionComponent<Props> = ({
   annotationsObject,
@@ -70,8 +53,6 @@ export const Labels: FunctionComponent<Props> = ({
   restrictLabels,
   multiLabel,
 }: Props): ReactElement => {
-  const classes = useStyles();
-
   // Get array with labels that are yet to be assigned.
   const getMenuLabels = useCallback(() => {
     const menuLabels = restrictLabels
@@ -133,7 +114,7 @@ export const Labels: FunctionComponent<Props> = ({
       {!restrictLabels && (
         <>
           <InputBase
-            className={classes.inputBase}
+            sx={{ ...inputBase }}
             placeholder="New Label"
             value={newLabel}
             onChange={(e) => handleNewLabelChange(e)}
@@ -145,71 +126,74 @@ export const Labels: FunctionComponent<Props> = ({
             }}
             id="id-labels-input"
           />
-          <IconButton
-            className={classes.addButton}
+          <MuiIconbutton
             type="submit"
             aria-label="add-new-label"
             onClick={handleAddLabel(newLabel)}
             edge="end"
             size="small"
+            sx={{
+              position: "absolute",
+              right: "18px",
+            }}
           >
             <SVG src={icons.add} width="12px" height="100%" fill="#A1A1A1" />
-          </IconButton>
-          <Divider className={classes.divider} />
+          </MuiIconbutton>
+          <Divider sx={{ ...divider }} />
         </>
       )}
-
-      {assignedLabels.map((label) => (
-        <Chip
-          key={`chip-delete-${label}`}
-          avatar={
-            <Avatar
-              variant="circular"
-              style={{ cursor: "pointer" }}
-              onClick={handleRemoveLabel(label)}
-              data-testid={`delete-${label}`}
-            >
-              <SVG
-                src={icons.removeLabel}
-                className={classes.svgSmall}
-                fill={theme.palette.primary.main}
+      <Box width="272px" maxHeight="345px" overflow="auto">
+        {assignedLabels.map((label) => (
+          <Chip
+            key={`chip-delete-${label}`}
+            avatar={
+              <Avatar
+                variant="circular"
+                style={{ cursor: "pointer" }}
+                onClick={handleRemoveLabel(label)}
+                data-testid={`delete-${label}`}
+              >
+                <SVG
+                  src={icons.removeLabel}
+                  width="10px"
+                  height="100%"
+                  fill={theme.palette.primary.main}
+                />
+              </Avatar>
+            }
+            sx={{ ...labelsChip }}
+            label={<Typography fontSize="14px">{label}</Typography>}
+            variant="outlined"
+          />
+        ))}
+        {menuLabels.map((label) => (
+          <Chip
+            key={`chip-add-${label}`}
+            avatar={
+              <Avatar
+                variant="circular"
+                style={{ cursor: "pointer" }}
+                onClick={handleAddLabel(label)}
+                data-testid={`add-${label}`}
+              >
+                <SVG
+                  src={icons.add}
+                  width="10px"
+                  height="100%"
+                  fill={theme.palette.text.secondary}
+                />
+              </Avatar>
+            }
+            sx={{ ...labelsChip }}
+            label={
+              <ListItemText
+                primary={<Typography fontSize="14px">{label}</Typography>}
               />
-            </Avatar>
-          }
-          className={classes.labelsChip}
-          label={<Typography className={classes.chipFont}>{label}</Typography>}
-          variant="outlined"
-        />
-      ))}
-
-      {menuLabels.map((label) => (
-        <Chip
-          key={`chip-add-${label}`}
-          avatar={
-            <Avatar
-              variant="circular"
-              style={{ cursor: "pointer" }}
-              onClick={handleAddLabel(label)}
-              data-testid={`add-${label}`}
-            >
-              <SVG
-                src={icons.add}
-                className={classes.svgSmall}
-                fill={theme.palette.text.secondary}
-              />
-            </Avatar>
-          }
-          className={[classes.labelsChip, classes.menuLabelsChip].join(" ")}
-          label={
-            <ListItemText
-              primary={
-                <Typography className={classes.chipFont}>{label}</Typography>
-              }
-            />
-          }
-          variant="outlined"
-        />
-      ))}
+            }
+            variant="outlined"
+          />
+        ))}
+      </Box>
     </>
   );
 };
