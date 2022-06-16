@@ -48,6 +48,7 @@ Promise.all([
                 plugins={plugins}
                 readonly={true}
                 annotationsObject={new Annotations(annotation[0])}
+                annotationsObject2={new Annotations(annotation[1])}
                 userAnnotations={{
                   "user1@gliff.ai": new Annotations(annotation[0]),
                   "user2@gliff.ai": new Annotations(annotation[1]),

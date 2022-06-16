@@ -115,7 +115,7 @@ interface State {
   mode: Mode;
   canvasContainerColour: number[];
   user1: string;
-  // user2: string;
+  user2: string;
 }
 
 const styles = {
@@ -186,7 +186,7 @@ interface Props extends WithStyles<typeof styles> {
   slicesData?: ImageBitmap[][] | null;
   imageFileInfo?: ImageFileInfo;
   annotationsObject?: Annotations;
-  // annotationsObject2?: Annotations; // second annotation chosen by user in CURATE View Annotations dialog, for side-by-side comparison
+  annotationsObject2?: Annotations; // second annotation chosen by user in CURATE View Annotations dialog, for side-by-side comparison
   saveAnnotationsCallback?: (annotationsObject: Annotations) => void;
   showAppBar?: boolean;
   // setIsLoading is used, but in progress.tsx
@@ -223,6 +223,7 @@ class UserInterface extends Component<Props, State> {
   };
 
   annotationsObject: Annotations;
+  annotationsObject2: Annotations;
 
   private slicesData: ImageBitmap[][] | null;
 
@@ -239,6 +240,8 @@ class UserInterface extends Component<Props, State> {
     super(props);
 
     this.annotationsObject = this.props.annotationsObject || new Annotations();
+    this.annotationsObject2 =
+      this.props.annotationsObject2 || new Annotations();
 
     this.slicesData = this.props.slicesData || null;
 
@@ -261,7 +264,7 @@ class UserInterface extends Component<Props, State> {
       mode: Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
       user1: "", // initialised properly in componentDidMount once annotations objects are passed in
-      // user2: "",
+      user2: "",
       isToolPinned: {
         "Annotation Label": false,
         Plugins: false,
@@ -300,6 +303,18 @@ class UserInterface extends Component<Props, State> {
       this.setState({ user1 });
     }
 
+    if (
+      this.props.annotationsObject2 &&
+      Object.keys(this.props.userAnnotations).length > 0
+    ) {
+      const user2 = Object.entries(this.props.userAnnotations).find(
+        ([username, annotationsObject2]) =>
+          JSON.stringify(annotationsObject2.getAllAnnotations()) ===
+          JSON.stringify(this.props.annotationsObject2.getAllAnnotations())
+      )[0];
+      this.setState({ user2 });
+    }
+
     if (!this.props.readonly)
       this.annotationsObject.addAnnotation(this.state.activeToolbox);
   }
@@ -333,6 +348,16 @@ class UserInterface extends Component<Props, State> {
       this.redrawUI();
     }
 
+    if (
+      this.props.annotationsObject2 &&
+      prevProps.annotationsObject2 !== this.props.annotationsObject2
+    ) {
+      console.log("setting annotationObject2 in componentDidUpdate");
+      this.annotationsObject2 = this.props.annotationsObject2;
+      this.annotationsObject2.giveRedrawCallback(this.redrawUI);
+      this.redrawUI();
+    }
+
     if (this.props.readonly) {
       // once props.annotationsObject and props.userAnnotations become both available,
       // find the username key in userAnnotations that matches annotationsObject, and
@@ -349,6 +374,20 @@ class UserInterface extends Component<Props, State> {
             JSON.stringify(this.props.annotationsObject.getAllAnnotations())
         )[0];
         this.setState({ user1 });
+      }
+
+      if (
+        this.props.annotationsObject2 &&
+        Object.keys(this.props.userAnnotations).length > 0 &&
+        (!prevProps.annotationsObject2 ||
+          Object.keys(prevProps.userAnnotations).length === 0)
+      ) {
+        const user2 = Object.entries(this.props.userAnnotations).find(
+          ([username, annotationsObject2]) =>
+            JSON.stringify(annotationsObject2.getAllAnnotations()) ===
+            JSON.stringify(this.props.annotationsObject2.getAllAnnotations())
+        )[0];
+        this.setState({ user2 });
       }
     }
   };
@@ -1125,7 +1164,7 @@ class UserInterface extends Component<Props, State> {
                     activeToolbox={this.state.activeToolbox}
                     mode={this.state.mode}
                     setMode={this.setModeCallback}
-                    annotationsObject={this.annotationsObject}
+                    annotationsObject={this.annotationsObject2}
                     displayedImage={this.state.displayedImage}
                     showAppBar={showAppBar}
                     redraw={this.state.redrawEverything}
