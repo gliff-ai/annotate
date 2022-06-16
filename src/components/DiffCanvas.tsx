@@ -44,34 +44,45 @@ export const DiffCanvas = (props: Props) => {
     )
       return;
 
-    const leftCanvas = props.leftCanvasRefs.splineCanvasRef.baseCanvas;
-    const rightCanvas = props.rightCanvasRefs.splineCanvasRef.baseCanvas;
-    const width = leftCanvas.canvasContext.canvas.width;
-    const height = leftCanvas.canvasContext.canvas.height;
-    const leftData = leftCanvas.canvasContext.getImageData(
-      0,
-      0,
-      width,
-      height
-    ).data; // RGBA
-    const rightData = rightCanvas.canvasContext.getImageData(
-      0,
-      0,
-      width,
-      height
-    ).data; // RGBA
+    let diffData, width, height;
 
     const t0 = performance.now();
-    const diffData = new Uint8ClampedArray(4 * width * height);
-    for (let i = 0; i < diffData.length; i += 4) {
-      // compare alpha values for this pixel to detect difference,
-      // since we don't care about differences in colour, only differences in
-      // whether there's something there or not
-      if ((leftData[i + 3] !== 0) !== (rightData[i + 3] !== 0)) {
-        diffData[i] = 255;
-        diffData[i + 3] = 255;
+
+    for (const refname of [
+      "splineCanvasRef",
+      "paintbrushCanvasRef",
+      "boundingBoxCanvasRef",
+    ]) {
+      const leftCanvas = props.leftCanvasRefs[refname].baseCanvas;
+      const rightCanvas = props.rightCanvasRefs[refname].baseCanvas;
+      width = leftCanvas.canvasContext.canvas.width;
+      height = leftCanvas.canvasContext.canvas.height;
+      const leftData = leftCanvas.canvasContext.getImageData(
+        0,
+        0,
+        width,
+        height
+      ).data; // RGBA
+      const rightData = rightCanvas.canvasContext.getImageData(
+        0,
+        0,
+        width,
+        height
+      ).data; // RGBA
+
+      if (!diffData) diffData = new Uint8ClampedArray(4 * width * height);
+
+      for (let i = 0; i < diffData.length; i += 4) {
+        // compare alpha values for this pixel to detect difference,
+        // since we don't care about differences in colour, only differences in
+        // whether there's something there or not
+        if ((leftData[i + 3] !== 0) !== (rightData[i + 3] !== 0)) {
+          diffData[i] = 255;
+          diffData[i + 3] = 255;
+        }
       }
     }
+
     console.log(`Diff loop took ${performance.now() - t0}ms`);
 
     const diffImageData = new ImageData(diffData, width);
