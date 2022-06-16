@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { BaseCanvas } from "./baseCanvas";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { SplineCanvasClass } from "@/toolboxes/spline";
-
-let diffCanvasRef: BaseCanvas;
 
 interface Props {
   scaleAndPan: {
@@ -23,8 +21,11 @@ interface Props {
 }
 
 export const DiffCanvas = (props: Props) => {
-  useEffect(() => {
-    if (!props.leftCanvasRefs || !props.rightCanvasRefs || !diffCanvasRef)
+  const drawDiff = (diffCanvasRef: BaseCanvas) => {
+    if (
+      !props.leftCanvasRefs?.splineCanvasRef ||
+      !props.rightCanvasRefs?.splineCanvasRef
+    )
       return;
 
     const leftCanvas = props.leftCanvasRefs.splineCanvasRef.baseCanvas;
@@ -45,40 +46,39 @@ export const DiffCanvas = (props: Props) => {
     ).data; // RGBA
 
     const t0 = performance.now();
-    const diffImageData = new ImageData(width, height);
-    for (let i = 0; i < diffImageData.data.length; i += 4) {
+    const diffData = new Uint8ClampedArray(4 * width * height);
+    for (let i = 0; i < diffData.length; i += 4) {
       // compare alpha values for this pixel to detect difference,
       // since we don't care about differences in colour, only differences in
       // whether there's something there or not
-      if (leftData[i + 3] !== rightData[i + 3]) {
-        diffImageData.data[i] = 255;
-        diffImageData.data[i + 3] = 255;
+      if ((leftData[i + 3] !== 0) !== (rightData[i + 3] !== 0)) {
+        diffData[i] = 255;
+        diffData[i + 3] = 255;
       }
     }
     console.log(`Diff loop took ${performance.now() - t0}ms`);
 
+    const diffImageData = new ImageData(diffData, width);
     diffCanvasRef.canvasContext.putImageData(diffImageData, 0, 0);
-  }, [
-    props.leftCanvasRefs.splineCanvasRef?.baseCanvas.canvasContext.canvas.width,
-    props.rightCanvasRefs.splineCanvasRef?.baseCanvas.canvasContext.canvas
-      .width,
-  ]);
+  };
 
   return (
     <div
       style={{
         position: "absolute",
-        width: "100%",
-        top: props.showAppBar ? "85px" : "0px",
+        right: "0px",
+        width: "50%",
         height: props.showAppBar ? "calc(100% - 85px)" : "100%",
+        bottom: "0px",
       }}
     >
       <BaseCanvas
+        name="diff"
         scaleAndPan={props.scaleAndPan}
         setScaleAndPan={props.setScaleAndPan}
         canvasPositionAndSize={props.canvasPositionAndSize}
         ref={(ref) => {
-          diffCanvasRef = ref;
+          if (ref) drawDiff(ref);
         }}
       />
     </div>
