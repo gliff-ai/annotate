@@ -1,4 +1,7 @@
-export { Canvas as PaintbrushCanvas } from "./Canvas";
+export {
+  Canvas as PaintbrushCanvas,
+  CanvasClass as PaintbrushCanvasClass,
+} from "./Canvas";
 export {
   Toolbar as PaintbrushToolbar,
   ToolboxName as PaintbrushToolboxName,

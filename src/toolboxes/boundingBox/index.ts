@@ -1,4 +1,8 @@
-export { Canvas as BoundingBoxCanvas, events } from "./Canvas";
+export {
+  Canvas as BoundingBoxCanvas,
+  CanvasClass as BoundingBoxCanvasClass,
+  events,
+} from "./Canvas";
 export {
   Toolbar as BoundingBoxToolbar,
   ToolboxName as BoundingBoxToolboxName,

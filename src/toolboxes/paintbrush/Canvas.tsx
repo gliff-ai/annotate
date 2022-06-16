@@ -1,4 +1,4 @@
-import { ReactNode, PureComponent, ReactElement } from "react";
+import { ReactNode, PureComponent, ReactElement, forwardRef } from "react";
 import { theme } from "@gliff-ai/style";
 import { Mode } from "@/ui";
 import { Annotations } from "@/annotation";
@@ -57,6 +57,8 @@ export class CanvasClass extends PureComponent<Props, State> {
   private interactionCanvas: BaseCanvas;
 
   private backgroundCanvas: BaseCanvas | null;
+
+  public baseCanvas: BaseCanvas | null; // public because CanvasStack needs to access it to create the diff image in comparison mode
 
   private pixelCanvas: HTMLCanvasElement | null; // used for transfering pixelView Uint8Array data into the (background/interaction)Canvas
 
@@ -558,6 +560,7 @@ export class CanvasClass extends PureComponent<Props, State> {
             cursor="none"
             ref={(backgroundCanvas) => {
               this.backgroundCanvas = backgroundCanvas;
+              this.baseCanvas = this.backgroundCanvas;
             }}
             name={`${this.name}-background`}
             scaleAndPan={this.props.scaleAndPan}
@@ -603,46 +606,50 @@ export class CanvasClass extends PureComponent<Props, State> {
     ) : null;
 }
 
-export const Canvas = (
-  props: Omit<
-    Props,
-    | "brushRadius"
-    | "isActive"
-    | "annotationAlpha"
-    | "annotationActiveAlpha"
-    | "is3D"
-  >
-): ReactElement => {
-  // we will overwrite props.activeToolbox, which will be paintbrush
-  // with paintbrush.brushType, which will be paintbrush/eraser
-  const [paintbrush] = usePaintbrushStore();
-  let { activeToolbox } = props;
-  let isActive = false;
-  if (activeToolbox === Toolboxes.paintbrush) {
-    activeToolbox = paintbrush.brushType;
-    isActive = true;
-  }
+export const Canvas = forwardRef(
+  (
+    props: Omit<
+      Props,
+      | "brushRadius"
+      | "isActive"
+      | "annotationAlpha"
+      | "annotationActiveAlpha"
+      | "is3D"
+    >,
+    ref: React.ForwardedRef<CanvasClass>
+  ): ReactElement => {
+    // we will overwrite props.activeToolbox, which will be paintbrush
+    // with paintbrush.brushType, which will be paintbrush/eraser
+    const [paintbrush] = usePaintbrushStore();
+    let { activeToolbox } = props;
+    let isActive = false;
+    if (activeToolbox === Toolboxes.paintbrush) {
+      activeToolbox = paintbrush.brushType;
+      isActive = true;
+    }
 
-  // we also use the brushRadius and is3D that's in the store
-  return (
-    <CanvasClass
-      isActive={isActive}
-      is3D={paintbrush.is3D}
-      activeToolbox={activeToolbox}
-      mode={props.mode}
-      setMode={props.setMode}
-      annotationsObject={props.annotationsObject}
-      displayedImage={props.displayedImage}
-      scaleAndPan={props.scaleAndPan}
-      setScaleAndPan={props.setScaleAndPan}
-      brushRadius={paintbrush.brushRadius}
-      annotationActiveAlpha={paintbrush.annotationActiveAlpha / 100}
-      annotationAlpha={paintbrush.annotationAlpha / 100}
-      redraw={props.redraw}
-      sliceIndex={props.sliceIndex}
-      setUIActiveAnnotationID={props.setUIActiveAnnotationID}
-      setActiveToolbox={props.setActiveToolbox}
-      readonly={props.readonly}
-    />
-  );
-};
+    // we also use the brushRadius and is3D that's in the store
+    return (
+      <CanvasClass
+        isActive={isActive}
+        is3D={paintbrush.is3D}
+        activeToolbox={activeToolbox}
+        mode={props.mode}
+        setMode={props.setMode}
+        annotationsObject={props.annotationsObject}
+        displayedImage={props.displayedImage}
+        scaleAndPan={props.scaleAndPan}
+        setScaleAndPan={props.setScaleAndPan}
+        brushRadius={paintbrush.brushRadius}
+        annotationActiveAlpha={paintbrush.annotationActiveAlpha / 100}
+        annotationAlpha={paintbrush.annotationAlpha / 100}
+        redraw={props.redraw}
+        sliceIndex={props.sliceIndex}
+        setUIActiveAnnotationID={props.setUIActiveAnnotationID}
+        setActiveToolbox={props.setActiveToolbox}
+        readonly={props.readonly}
+        ref={ref}
+      />
+    );
+  }
+);

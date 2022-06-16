@@ -1,7 +1,13 @@
 import { BackgroundCanvas } from "@/toolboxes/background";
 import { SplineCanvas, SplineCanvasClass } from "@/toolboxes/spline";
-import { BoundingBoxCanvas } from "@/toolboxes/boundingBox";
-import { PaintbrushCanvas } from "@/toolboxes/paintbrush";
+import {
+  BoundingBoxCanvas,
+  BoundingBoxCanvasClass,
+} from "@/toolboxes/boundingBox";
+import {
+  PaintbrushCanvas,
+  PaintbrushCanvasClass,
+} from "@/toolboxes/paintbrush";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { Mode } from "@/ui";
 import { Toolbox } from "@/Toolboxes";
@@ -22,7 +28,12 @@ interface Props {
   showAppBar: boolean;
   redraw: number;
   readonly: boolean;
-  canvasRefs?: { [name: string]: SplineCanvasClass };
+  canvasRefs?: {
+    [name: string]:
+      | SplineCanvasClass
+      | PaintbrushCanvasClass
+      | BoundingBoxCanvasClass;
+  };
   setViewportPositionAndSize?: (canvasPositionAndSize: PositionAndSize) => void;
   setCanvasContainerColour?: (colour: number[]) => void;
   setScaleAndPan: (scaleAndPan: {
@@ -76,7 +87,7 @@ export const CanvasStack = (props: Props) => {
           }
         }}
       />
-      {/* <BoundingBoxCanvas
+      <BoundingBoxCanvas
         scaleAndPan={props.scaleAndPan}
         activeToolbox={props.activeToolbox}
         mode={props.mode}
@@ -89,6 +100,11 @@ export const CanvasStack = (props: Props) => {
         setActiveToolbox={props.setActiveToolbox}
         setScaleAndPan={props.setScaleAndPan}
         readonly={props.readonly}
+        ref={(ref) => {
+          if (ref) {
+            props.canvasRefs.boundingBoxCanvasRef = ref;
+          }
+        }}
       />
       <PaintbrushCanvas
         scaleAndPan={props.scaleAndPan}
@@ -103,7 +119,12 @@ export const CanvasStack = (props: Props) => {
         setActiveToolbox={props.setActiveToolbox}
         setScaleAndPan={props.setScaleAndPan}
         readonly={props.readonly}
-      /> */}
+        ref={(ref) => {
+          if (ref) {
+            props.canvasRefs.paintbrushCanvasRef = ref;
+          }
+        }}
+      />
     </div>
   );
 };

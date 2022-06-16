@@ -1,7 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import { BaseCanvas } from "./baseCanvas";
 import { PositionAndSize } from "@/annotation/interfaces";
+import { PaintbrushCanvasClass } from "@/toolboxes/paintbrush";
 import { SplineCanvasClass } from "@/toolboxes/spline";
+import { BoundingBoxCanvasClass } from "@/toolboxes/boundingBox";
 
 interface Props {
   scaleAndPan: {
@@ -16,15 +18,29 @@ interface Props {
   }) => void;
   canvasPositionAndSize: PositionAndSize;
   showAppBar: boolean;
-  leftCanvasRefs: { [name: string]: SplineCanvasClass };
-  rightCanvasRefs: { [name: string]: SplineCanvasClass };
+  leftCanvasRefs: {
+    [name: string]:
+      | PaintbrushCanvasClass
+      | SplineCanvasClass
+      | BoundingBoxCanvasClass;
+  };
+  rightCanvasRefs: {
+    [name: string]:
+      | PaintbrushCanvasClass
+      | SplineCanvasClass
+      | BoundingBoxCanvasClass;
+  };
 }
 
 export const DiffCanvas = (props: Props) => {
   const drawDiff = (diffCanvasRef: BaseCanvas) => {
     if (
       !props.leftCanvasRefs?.splineCanvasRef ||
-      !props.rightCanvasRefs?.splineCanvasRef
+      !props.rightCanvasRefs?.splineCanvasRef ||
+      !props.leftCanvasRefs?.paintbrushCanvasRef ||
+      !props.rightCanvasRefs?.paintbrushCanvasRef ||
+      !props.leftCanvasRefs?.boundingBoxCanvasRef ||
+      !props.rightCanvasRefs?.boundingBoxCanvasRef
     )
       return;
 

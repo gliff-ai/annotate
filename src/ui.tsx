@@ -38,8 +38,16 @@ import {
   SplineToolbar,
   SplineCanvasClass,
 } from "@/toolboxes/spline";
-import { BoundingBoxCanvas, BoundingBoxToolbar } from "@/toolboxes/boundingBox";
-import { PaintbrushCanvas, PaintbrushToolbar } from "@/toolboxes/paintbrush";
+import {
+  BoundingBoxCanvas,
+  BoundingBoxToolbar,
+  BoundingBoxCanvasClass,
+} from "@/toolboxes/boundingBox";
+import {
+  PaintbrushCanvas,
+  PaintbrushToolbar,
+  PaintbrushCanvasClass,
+} from "@/toolboxes/paintbrush";
 import { LabelsSubmenu } from "@/toolboxes/labels";
 import { Download } from "@/download/UI";
 import { getShortcut, keydownListener } from "@/keybindings";
@@ -233,8 +241,19 @@ class UserInterface extends Component<Props, State> {
 
   private keyListener: (event: KeyboardEvent) => boolean;
 
-  private leftCanvasRefs: { [name: string]: SplineCanvasClass };
-  private rightCanvasRefs: { [name: string]: SplineCanvasClass };
+  // private leftCanvasRefs: { [name: string]: SplineCanvasClass };
+  private leftCanvasRefs: {
+    [name: string]:
+      | SplineCanvasClass
+      | PaintbrushCanvasClass
+      | BoundingBoxCanvasClass;
+  };
+  private rightCanvasRefs: {
+    [name: string]:
+      | SplineCanvasClass
+      | PaintbrushCanvasClass
+      | BoundingBoxCanvasClass;
+  };
 
   constructor(props: Props) {
     super(props);
