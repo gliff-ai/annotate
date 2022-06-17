@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useRef } from "react";
 import { BaseCanvas } from "./baseCanvas";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { PaintbrushCanvasClass } from "@/toolboxes/paintbrush";
@@ -32,14 +32,8 @@ interface Props {
   };
 }
 
-let diffCanvasRef: BaseCanvas;
-
 export const DiffCanvas = (props: Props) => {
   const diffCanvasRef = useRef<BaseCanvas>();
-
-  useEffect(() => {
-    drawDiff(diffCanvasRef.current);
-  }, []);
 
   const drawDiff = (diffCanvasRef: BaseCanvas) => {
     if (
@@ -96,8 +90,6 @@ export const DiffCanvas = (props: Props) => {
     const diffImageData = new ImageData(diffData, width);
     diffCanvasRef.canvasContext.putImageData(diffImageData, 0, 0);
   };
-
-  drawDiff(diffCanvasRef.current);
 
   return (
     <div
