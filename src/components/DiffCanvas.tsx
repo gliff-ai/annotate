@@ -97,6 +97,7 @@ export const DiffCanvas = (props: Props) => {
         width: "50%",
         height: props.showAppBar ? "calc(100% - 85px)" : "100%",
         bottom: "0px",
+        pointerEvents: "none",
       }}
     >
       <BaseCanvas
