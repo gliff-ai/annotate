@@ -32,7 +32,15 @@ interface Props {
   };
 }
 
+let diffCanvasRef: BaseCanvas;
+
 export const DiffCanvas = (props: Props) => {
+  const diffCanvasRef = useRef<BaseCanvas>();
+
+  useEffect(() => {
+    drawDiff(diffCanvasRef.current);
+  }, []);
+
   const drawDiff = (diffCanvasRef: BaseCanvas) => {
     if (
       !props.leftCanvasRefs?.splineCanvasRef ||
@@ -89,6 +97,8 @@ export const DiffCanvas = (props: Props) => {
     diffCanvasRef.canvasContext.putImageData(diffImageData, 0, 0);
   };
 
+  drawDiff(diffCanvasRef.current);
+
   return (
     <div
       style={{
@@ -106,7 +116,10 @@ export const DiffCanvas = (props: Props) => {
         setScaleAndPan={props.setScaleAndPan}
         canvasPositionAndSize={props.canvasPositionAndSize}
         ref={(ref) => {
-          if (ref) drawDiff(ref);
+          if (ref) {
+            drawDiff(ref);
+            diffCanvasRef.current = ref;
+          }
         }}
       />
     </div>

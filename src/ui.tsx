@@ -640,7 +640,7 @@ class UserInterface extends Component<Props, State> {
   };
 
   addAnnotation = (): void => {
-    if (!this.state.displayedImage) return;
+    if (!this.state.displayedImage || this.props.readonly) return;
     this.annotationsObject.addAnnotation(this.state.activeToolbox);
     this.annotationsObject.setSplineSpaceTimeInfo(this.state.sliceIndex);
     this.setState({
@@ -858,6 +858,7 @@ class UserInterface extends Component<Props, State> {
     if (!this.props.readonly)
       // select mode always active in readonly mode as there's no other reason to click on the canvas
       this.setState(() => ({ mode, buttonClicked: null }));
+    else this.redrawEverything(); // still want to re-render canvases though so they render unselected things correctly
   };
 
   setUIActiveAnnotationIDCallback = (id: number): void => {
