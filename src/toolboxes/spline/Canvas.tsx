@@ -396,7 +396,10 @@ export class CanvasClass extends PureComponent<Props, State> {
       }
     }
 
-    if (this.props.readonly) return;
+    if (this.props.readonly) {
+      this.drawAllSplines();
+      return;
+    }
 
     // if no spline tool is turned on then do nothing
     if (!this.isActive()) return;
@@ -790,7 +793,7 @@ export class CanvasClass extends PureComponent<Props, State> {
   };
 
   onMouseMoveOrTouchMove = (x: number, y: number): void => {
-    if (!(this.isDrawing || this.dragPoint || this.props.readonly)) return;
+    if (!(this.isDrawing || this.dragPoint) || this.props.readonly) return;
 
     this.numberOfMoves += 1;
 

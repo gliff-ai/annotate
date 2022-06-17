@@ -15,7 +15,7 @@ import createStyles from "@mui/styles/createStyles";
 import makeStyles from "@mui/styles/makeStyles";
 import { Annotations } from "@/annotation";
 import { Annotation } from "@/annotation/interfaces";
-import { Toolboxes, Toolbox } from "@/Toolboxes";
+import { Toolbox } from "@/Toolboxes";
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -27,9 +27,6 @@ const useStyles = makeStyles(() =>
     },
     chipFont: {
       fontSize: "14px",
-    },
-    accordionSummary: {
-      marginTop: "5px",
     },
     accordionDetails: {
       paddingTop: "0px",
@@ -47,7 +44,7 @@ interface Props {
   setActiveToolbox: (tool: Toolbox) => void;
 }
 
-let refBackgroundSettingsPopover: HTMLButtonElement;
+let refLayersPopoverButton: HTMLButtonElement;
 
 const layerTypeString = (layer: Annotation) =>
   `${layer.toolbox.charAt(0).toUpperCase()}${layer.toolbox.slice(1)}`;
@@ -67,10 +64,10 @@ export const LayersPopover = (props: Props): ReactElement => {
           icon={icons.layers}
           size="small"
           setRefCallback={(ref) => {
-            refBackgroundSettingsPopover = ref;
+            refLayersPopoverButton = ref;
           }}
           onClick={() => {
-            props.handleOpen()(refBackgroundSettingsPopover);
+            props.handleOpen()(refLayersPopoverButton);
           }}
         />
       }
@@ -102,10 +99,7 @@ export const LayersPopover = (props: Props): ReactElement => {
                 }}
                 key={name}
               >
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  className={classes.accordionSummary}
-                >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   {name}
                 </AccordionSummary>
                 <AccordionDetails className={classes.accordionDetails}>

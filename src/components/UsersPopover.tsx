@@ -16,7 +16,7 @@ interface Props {
   ) => (anchorElement?: HTMLButtonElement) => void;
 }
 
-let refBackgroundSettingsPopover: HTMLButtonElement;
+let refUsersPopoverButton: HTMLButtonElement;
 
 export const UsersPopover = (props: Props): ReactElement => (
   <Popover
@@ -29,10 +29,10 @@ export const UsersPopover = (props: Props): ReactElement => (
         icon={icons.usersPage}
         size="small"
         setRefCallback={(ref) => {
-          refBackgroundSettingsPopover = ref;
+          refUsersPopoverButton = ref;
         }}
         onClick={() => {
-          props.handleOpen()(refBackgroundSettingsPopover);
+          props.handleOpen()(refUsersPopoverButton);
         }}
       />
     }
@@ -47,13 +47,12 @@ export const UsersPopover = (props: Props): ReactElement => (
       renderInput={(params) => (
         <TextField
           {...params} // eslint-disable-line react/jsx-props-no-spreading
-          label="Username"
+          label="User"
           autoFocus
           sx={{
             fontSize: 14,
             width: "300px",
             marginBottom: "20px",
-            borderBottom: "solid 1px #dadde9",
           }}
         />
       )}

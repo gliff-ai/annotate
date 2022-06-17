@@ -492,6 +492,17 @@ export class Annotations {
         )
           return index;
       }
+      if (spline.isClosed) {
+        // there's an extra edge to check for closed splines:
+        if (
+          this.isClickNearLineSegment(
+            { x: imageX, y: imageY },
+            spline.coordinates[spline.coordinates.length - 1],
+            spline.coordinates[0]
+          )
+        )
+          return index;
+      }
     }
 
     return null;
@@ -544,6 +555,42 @@ export class Annotations {
     this.deleteActiveAnnotation();
     this.addAnnotation(Toolboxes.paintbrush, labels);
     this.addBrushStroke(brushStroke);
+  }
+
+  @log
+  addSuperPixel(
+    sliceIndex: number,
+    pixels: XYPoint[],
+    addToUndoRedo = true
+  ): void {
+    // add super pixel to paintbrush annotation
+    // we basically do this as a bunch of single pixel strokes
+    // this isn't ideal but it's okay for now
+    // TODO improve this
+
+    let color = this.getActiveAnnotationColor();
+    // Do we already have a colour for this layer?
+    color =
+      color ||
+      getRGBAString(palette[this.getActiveAnnotationID() % palette.length]);
+
+    this.addBrushStrokeMulti(
+      pixels.map((pixel: XYPoint) => ({
+        coordinates: [pixel],
+        spaceTimeInfo: { z: sliceIndex, t: 0 },
+        brush: {
+          color,
+          radius: 1,
+          type: "paint",
+          is3D: false,
+        },
+      }))
+    );
+
+    if (addToUndoRedo) {
+      this.updateUndoRedoActions("deleteBrushStrokes", [pixels.length]);
+      this.redoData = [];
+    }
   }
 
   @log

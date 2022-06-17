@@ -280,7 +280,7 @@ class UserInterface extends Component<Props, State> {
       activeSubmenuAnchor: {},
       buttonClicked: null,
       activeToolbox: Toolboxes.paintbrush,
-      mode: Mode.draw,
+      mode: this.props.readonly ? Mode.select : Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
       user1: "", // initialised properly in componentDidMount once annotations objects are passed in
       user2: "",
@@ -678,7 +678,8 @@ class UserInterface extends Component<Props, State> {
 
   toggleMode = (): void => {
     // Toggle between draw and select mode.
-    if (this.state.mode === Mode.draw) {
+    if (this.state.mode === Mode.draw || this.props.readonly) {
+      // select mode always active in readonly mode as there's no other reason to click on the canvas
       this.setState({ mode: Mode.select, buttonClicked: "Select" });
     } else {
       this.selectDrawMode();
@@ -767,6 +768,7 @@ class UserInterface extends Component<Props, State> {
     tool: string,
     value: HTMLButtonElement | null
   ): void => {
+    // sets this.state.activeSubmenuAnchor[tool] to value, and activeSubmenuAnchor[<all other tools>] to null
     this.setState((prevState) => {
       const activeSubmenuAnchor = { ...prevState.activeSubmenuAnchor };
       activeSubmenuAnchor[tool] = value; // set new anchor
@@ -853,7 +855,9 @@ class UserInterface extends Component<Props, State> {
     !!this.state.activeSubmenuAnchor["Annotation Label"];
 
   setModeCallback = (mode: Mode): void => {
-    this.setState(() => ({ mode, buttonClicked: null }));
+    if (!this.props.readonly)
+      // select mode always active in readonly mode as there's no other reason to click on the canvas
+      this.setState(() => ({ mode, buttonClicked: null }));
   };
 
   setUIActiveAnnotationIDCallback = (id: number): void => {
