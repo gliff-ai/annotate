@@ -38,6 +38,7 @@ interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
   setActiveToolbox: (tool: Toolbox) => void;
+  readonly: boolean;
 }
 
 interface State {
@@ -433,7 +434,7 @@ export class CanvasClass extends PureComponent<Props, State> {
 
   /* *** Mouse/Touch events *** */
   onMouseDown = (canvasX: number, canvasY: number): void => {
-    if (this.props.mode === Mode.draw) {
+    if (this.props.mode === Mode.draw && !this.props.readonly) {
       if (this.isDrawing === false) {
         // Start drawing
         this.isDrawing = true;
@@ -486,6 +487,8 @@ export class CanvasClass extends PureComponent<Props, State> {
       if (selectedAnnotationID !== null) {
         this.props.setMode(Mode.draw);
       }
+      if (this.props.readonly)
+        this.drawAllStrokes(this.backgroundCanvas?.canvasContext); // this is unnecessary when not in readonly because calling setMode will not be disabled and thus will pass a different value in for mode, causing rerender
     }
   };
 
@@ -602,6 +605,8 @@ export class CanvasClass extends PureComponent<Props, State> {
   };
 
   drawCursor = (canvasX: number, canvasY: number): void => {
+    if (this.props.readonly) return;
+
     if (!this.props.isSuper || this.hasSuperPixelChanged) {
       // don't clear the canvas in superpixel mode unless the pixel has changed
       // otherwise, always clear the canvas
@@ -785,6 +790,7 @@ export const Canvas = (
       sliceIndex={props.sliceIndex}
       setUIActiveAnnotationID={props.setUIActiveAnnotationID}
       setActiveToolbox={props.setActiveToolbox}
+      readonly={props.readonly}
     />
   );
 };

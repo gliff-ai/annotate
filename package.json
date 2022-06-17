@@ -17,7 +17,7 @@
     "lint": "npm run lint:ts && npm run prettier",
     "lint:ts": "npx --no-install eslint src",
     "serve": "npx vite",
-    "build:example": "vite build",
+    "build:example": "vite build && cp staticwebapp.config.json dist/",
     "test": "jest --coverage --passWithNoTests",
     "build:patch": "sed -i 's/const generateClassName$1 = createGenerateClassName();/const generateClassName$1 = createGenerateClassName({seed:\"\",disableGlobal:true,productionPrefix:\"jss-annotate-\"});/g' dist/index.es.js",
     "test:visual": "npx percy snapshot snapshots.yml",
@@ -80,6 +80,7 @@
     "@use-gesture/react": "^10.2.15",
     "detect-browser": "^5.3.0",
     "react-inlinesvg": "^2.3.0",
+    "react-router-dom": "^6.3.0",
     "simplify-js": "^1.2.4",
     "utif": "^3.1.0"
   }

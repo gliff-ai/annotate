@@ -492,6 +492,17 @@ export class Annotations {
         )
           return index;
       }
+      if (spline.isClosed) {
+        // there's an extra edge to check for closed splines:
+        if (
+          this.isClickNearLineSegment(
+            { x: imageX, y: imageY },
+            spline.coordinates[spline.coordinates.length - 1],
+            spline.coordinates[0]
+          )
+        )
+          return index;
+      }
     }
 
     return null;

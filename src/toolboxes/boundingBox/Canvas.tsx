@@ -37,6 +37,7 @@ interface Props extends Omit<CanvasProps, "canvasPositionAndSize"> {
   sliceIndex: number;
   setUIActiveAnnotationID: (id: number) => void;
   setActiveToolbox: (tool: Toolbox) => void;
+  readonly: boolean;
 }
 
 interface State {
@@ -466,6 +467,11 @@ export class CanvasClass extends PureComponent<Props, State> {
       }
     }
 
+    if (this.props.readonly) {
+      this.drawAllBoundingBoxes();
+      return;
+    }
+
     // if no bounding box tool is turned on then do nothing
     if (!this.isActive()) return;
 
@@ -478,7 +484,7 @@ export class CanvasClass extends PureComponent<Props, State> {
 
   onMouseDownOrTouchStart = (x: number, y: number): void => {
     // if no bounding box tool is turned on then do nothing
-    if (!this.isActive()) return;
+    if (!this.isActive() || this.props.readonly) return;
 
     // if existing annotation is on a different slice, do nothing
     if (!this.sliceIndexMatch()) return;
@@ -533,7 +539,7 @@ export class CanvasClass extends PureComponent<Props, State> {
 
   onMouseMoveOrTouchMove = (x: number, y: number): void => {
     // if no bounding box tool is turned on then do nothing
-    if (!this.isActive()) return;
+    if (!this.isActive() || this.props.readonly) return;
 
     // if no mouse is down then do nothing
     if (!this.isMouseDown) return;
@@ -608,6 +614,8 @@ export class CanvasClass extends PureComponent<Props, State> {
   };
 
   onMouseUpOrTouchEnd = (): void => {
+    if (this.props.readonly) return;
+
     // the following two bits of logic are needed for drag and drop
 
     // if updating an existing corner, update the annotation
@@ -701,5 +709,6 @@ export const Canvas = (props: Props): ReactElement => (
     sliceIndex={props.sliceIndex}
     setUIActiveAnnotationID={props.setUIActiveAnnotationID}
     setActiveToolbox={props.setActiveToolbox}
+    readonly={props.readonly}
   />
 );

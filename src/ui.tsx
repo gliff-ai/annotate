@@ -42,6 +42,8 @@ import { getShortcut, keydownListener } from "@/keybindings";
 import { BaseSlider, Config } from "@/components/BaseSlider";
 import { KeybindPopup } from "./keybindings/KeybindPopup";
 import { PluginObject, PluginsCard } from "./components/plugins";
+import { UsersPopover } from "./components/UsersPopover";
+import { LayersPopover } from "./components/LayersPopover";
 
 declare module "@mui/styles/defaultTheme" {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -106,6 +108,8 @@ interface State {
   buttonClicked: string;
   mode: Mode;
   canvasContainerColour: number[];
+  user1: string;
+  // user2: string;
 }
 
 const styles = {
@@ -176,6 +180,7 @@ interface Props extends WithStyles<typeof styles> {
   slicesData?: ImageBitmap[][] | null;
   imageFileInfo?: ImageFileInfo;
   annotationsObject?: Annotations;
+  // annotationsObject2?: Annotations; // second annotation chosen by user in CURATE View Annotations dialog, for side-by-side comparison
   saveAnnotationsCallback?: (annotationsObject: Annotations) => void;
   showAppBar?: boolean;
   // setIsLoading is used, but in progress.tsx
@@ -188,6 +193,8 @@ interface Props extends WithStyles<typeof styles> {
   restrictLabels?: boolean;
   multiLabel?: boolean;
   saveMetadataCallback?: ((data: any) => void) | null;
+  readonly?: boolean;
+  userAnnotations?: { [username: string]: Annotations };
 }
 
 class UserInterface extends Component<Props, State> {
@@ -205,6 +212,8 @@ class UserInterface extends Component<Props, State> {
     restrictLabels: false,
     multiLabel: true,
     saveMetadataCallback: null,
+    readonly: false,
+    userAnnotations: {},
   };
 
   annotationsObject: Annotations;
@@ -240,8 +249,10 @@ class UserInterface extends Component<Props, State> {
       activeSubmenuAnchor: {},
       buttonClicked: null,
       activeToolbox: Toolboxes.paintbrush,
-      mode: Mode.draw,
+      mode: this.props.readonly ? Mode.select : Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
+      user1: "", // initialised properly in componentDidMount once annotations objects are passed in
+      // user2: "",
       isToolPinned: {
         "Annotation Label": false,
         Plugins: false,
@@ -264,7 +275,22 @@ class UserInterface extends Component<Props, State> {
     this.mixChannels();
 
     this.annotationsObject.giveRedrawCallback(this.redrawUI);
-    this.annotationsObject.addAnnotation(this.state.activeToolbox);
+
+    if (
+      this.props.annotationsObject &&
+      Object.keys(this.props.userAnnotations).length > 0
+    ) {
+      // this normally only runs in the readonly example page, where props are all passed in at the same time
+      const user1 = Object.entries(this.props.userAnnotations).find(
+        ([username, annotationsObject]) =>
+          JSON.stringify(annotationsObject.getAllAnnotations()) ===
+          JSON.stringify(this.props.annotationsObject.getAllAnnotations())
+      )[0];
+      this.setState({ user1 });
+    }
+
+    if (!this.props.readonly)
+      this.annotationsObject.addAnnotation(this.state.activeToolbox);
   }
 
   componentDidUpdate = (prevProps: Props): void => {
@@ -294,6 +320,25 @@ class UserInterface extends Component<Props, State> {
       this.annotationsObject = this.props.annotationsObject;
       this.annotationsObject.giveRedrawCallback(this.redrawUI);
       this.redrawUI();
+    }
+
+    if (this.props.readonly) {
+      // once props.annotationsObject and props.userAnnotations become both available,
+      // find the username key in userAnnotations that matches annotationsObject, and
+      // set that username as this.state.user1:
+      if (
+        this.props.annotationsObject &&
+        Object.keys(this.props.userAnnotations).length > 0 &&
+        (!prevProps.annotationsObject ||
+          Object.keys(prevProps.userAnnotations).length === 0)
+      ) {
+        const user1 = Object.entries(this.props.userAnnotations).find(
+          ([username, annotationsObject]) =>
+            JSON.stringify(annotationsObject.getAllAnnotations()) ===
+            JSON.stringify(this.props.annotationsObject.getAllAnnotations())
+        )[0];
+        this.setState({ user1 });
+      }
     }
   };
 
@@ -564,7 +609,8 @@ class UserInterface extends Component<Props, State> {
 
   toggleMode = (): void => {
     // Toggle between draw and select mode.
-    if (this.state.mode === Mode.draw) {
+    if (this.state.mode === Mode.draw || this.props.readonly) {
+      // select mode always active in readonly mode as there's no other reason to click on the canvas
       this.setState({ mode: Mode.select, buttonClicked: "Select" });
     } else {
       this.selectDrawMode();
@@ -653,6 +699,7 @@ class UserInterface extends Component<Props, State> {
     tool: string,
     value: HTMLButtonElement | null
   ): void => {
+    // sets this.state.activeSubmenuAnchor[tool] to value, and activeSubmenuAnchor[<all other tools>] to null
     this.setState((prevState) => {
       const activeSubmenuAnchor = { ...prevState.activeSubmenuAnchor };
       activeSubmenuAnchor[tool] = value; // set new anchor
@@ -739,7 +786,9 @@ class UserInterface extends Component<Props, State> {
     !!this.state.activeSubmenuAnchor["Annotation Label"];
 
   setModeCallback = (mode: Mode): void => {
-    this.setState(() => ({ mode, buttonClicked: null }));
+    if (!this.props.readonly)
+      // select mode always active in readonly mode as there's no other reason to click on the canvas
+      this.setState(() => ({ mode, buttonClicked: null }));
   };
 
   setUIActiveAnnotationIDCallback = (id: number): void => {
@@ -948,11 +997,51 @@ class UserInterface extends Component<Props, State> {
             handleOpen={this.handleOpen("Spline")}
             anchorElement={this.state.activeSubmenuAnchor.Spline}
           />
-
           <BoundingBoxToolbar
             active={this.state.activeToolbox === "boundingBox"}
             activateToolbox={this.activateToolbox}
             handleOpen={this.handleOpen("BoundingBox")}
+          />
+          <BackgroundToolbar
+            handleOpen={this.handleOpen("Background")}
+            anchorElement={this.state.activeSubmenuAnchor.Background}
+            channels={this.state.channels}
+            toggleChannelAtIndex={this.toggleChannelAtIndex}
+            isChannelPinned={this.state.isToolPinned.Background}
+            handleChannelPin={this.setIsToolPinned("Background")}
+          />
+        </ButtonGroup>
+      </div>
+    );
+
+    const readonlyToolbar = this.props.readonly && (
+      <div className={classes.leftToolbar}>
+        <ButtonGroup variant="text">
+          <UsersPopover
+            currentUser={this.state.user1}
+            users={Object.keys(this.props.userAnnotations)}
+            changeUser={(username: string) => {
+              this.setState(() => {
+                this.annotationsObject = this.props.userAnnotations[username];
+                return {
+                  user1: username,
+                  activeAnnotationID:
+                    this.annotationsObject.getActiveAnnotationID(),
+                };
+              });
+
+              this.redrawEverything();
+            }}
+            handleOpen={this.handleOpen("Users")}
+          />
+          <LayersPopover
+            annotationsObject={this.annotationsObject}
+            handleOpen={this.handleOpen("Layers")}
+            setActiveAnnotation={(id: number) => {
+              this.annotationsObject.setActiveAnnotationID(id);
+              this.redrawEverything();
+            }}
+            setActiveToolbox={this.setActiveToolboxCallback}
           />
           <BackgroundToolbar
             handleOpen={this.handleOpen("Background")}
@@ -982,7 +1071,7 @@ class UserInterface extends Component<Props, State> {
                 }}
               >
                 {appBar}
-                {leftToolbar}
+                {this.props.readonly ? readonlyToolbar : leftToolbar}
                 <div
                   style={{
                     display: "block",
@@ -1018,6 +1107,7 @@ class UserInterface extends Component<Props, State> {
                     }
                     setActiveToolbox={this.setActiveToolboxCallback}
                     setScaleAndPan={this.setScaleAndPan}
+                    readonly={this.props.readonly}
                   />
                   <BoundingBoxCanvas
                     scaleAndPan={this.state.scaleAndPan}
@@ -1033,6 +1123,7 @@ class UserInterface extends Component<Props, State> {
                     }
                     setActiveToolbox={this.setActiveToolboxCallback}
                     setScaleAndPan={this.setScaleAndPan}
+                    readonly={this.props.readonly}
                   />
                   <PaintbrushCanvas
                     scaleAndPan={this.state.scaleAndPan}
@@ -1048,6 +1139,7 @@ class UserInterface extends Component<Props, State> {
                     }
                     setActiveToolbox={this.setActiveToolboxCallback}
                     setScaleAndPan={this.setScaleAndPan}
+                    readonly={this.props.readonly}
                   />
                   {this.slicesData?.length > 1 && (
                     <Paper
