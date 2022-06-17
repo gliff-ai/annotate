@@ -1086,22 +1086,6 @@ class UserInterface extends Component<Props, State> {
     const readonlyToolbar = this.props.readonly && (
       <div className={classes.leftToolbar}>
         <ButtonGroup variant="text">
-          <IconButton
-            id="id-select-annotation"
-            key="Select Annotation"
-            icon={tools[0].icon}
-            tooltip={{
-              name: "Select Annotation",
-              ...getShortcut("ui.toggleMode"),
-            }}
-            onClick={this.toggleMode}
-            fill={tools[0].active()}
-            setRefCallback={(ref: HTMLButtonElement) => {
-              this.refBtnsPopovers["Select Annotation"] = ref;
-            }}
-            disabled={!tools[0].enabled()}
-            size="small"
-          />
           <UsersPopover
             currentUser={this.state.user1}
             users={Object.keys(this.props.userAnnotations)}
