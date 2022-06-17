@@ -761,6 +761,7 @@ export const Canvas = forwardRef(
       | "annotationAlpha"
       | "annotationActiveAlpha"
       | "is3D"
+      | "isSuper"
     >,
     ref: React.ForwardedRef<CanvasClass>
   ): ReactElement => {
