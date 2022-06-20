@@ -33,8 +33,6 @@ interface Props {
 }
 
 export const DiffCanvas = (props: Props) => {
-  const diffCanvasRef = useRef<BaseCanvas>();
-
   const drawDiff = (diffCanvasRef: BaseCanvas) => {
     if (
       !props.leftCanvasRefs?.splineCanvasRef ||
@@ -109,8 +107,7 @@ export const DiffCanvas = (props: Props) => {
         canvasPositionAndSize={props.canvasPositionAndSize}
         ref={(ref) => {
           if (ref) {
-            drawDiff(ref);
-            diffCanvasRef.current = ref;
+            setTimeout(() => drawDiff(ref));
           }
         }}
       />
