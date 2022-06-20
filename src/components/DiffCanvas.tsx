@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { BaseCanvas } from "./baseCanvas";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { PaintbrushCanvasClass } from "@/toolboxes/paintbrush";
@@ -30,6 +29,7 @@ interface Props {
       | SplineCanvasClass
       | BoundingBoxCanvasClass;
   };
+  sidebyside: boolean;
 }
 
 export const DiffCanvas = (props: Props) => {
@@ -94,7 +94,7 @@ export const DiffCanvas = (props: Props) => {
       style={{
         position: "absolute",
         right: "0px",
-        width: "50%",
+        width: props.sidebyside ? "50%" : "100%",
         height: props.showAppBar ? "calc(100% - 85px)" : "100%",
         bottom: "0px",
         pointerEvents: "none",

@@ -125,6 +125,7 @@ interface State {
   user1: string;
   user2: string;
   showDiff: boolean;
+  sidebyside: boolean;
 }
 
 const styles = {
@@ -306,6 +307,7 @@ class UserInterface extends Component<Props, State> {
         Background: false,
       },
       showDiff: this.props.readonly ? true : false,
+      sidebyside: this.props.readonly ? true : false,
     };
 
     this.imageFileInfo = this.props.imageFileInfo || null;
@@ -1146,12 +1148,30 @@ class UserInterface extends Component<Props, State> {
       <div className={classes.diffToolbar}>
         <ButtonGroup variant="text">
           <IconButton
+            tooltip={{ name: "Single view" }}
+            icon={icons.viewSingleAnnotation}
+            onClick={() => {
+              this.setState({ sidebyside: false });
+            }}
+            fill={!this.state.sidebyside}
+            size="small"
+          />
+          <IconButton
+            tooltip={{ name: "Side-by-side view" }}
+            icon={icons.viewSideBySideAnnotations}
+            onClick={() => {
+              this.setState({ sidebyside: true });
+            }}
+            fill={this.state.sidebyside}
+            size="small"
+          />
+          <IconButton
             tooltip={{ name: "Show diff" }}
             icon={icons.viewAnnotationDifference}
             onClick={() => {
               this.setState({ showDiff: !this.state.showDiff });
             }}
-            fill={this.state.buttonClicked === "Save Annotations"}
+            fill={this.state.showDiff}
             size="small"
           />
         </ButtonGroup>
@@ -1205,6 +1225,7 @@ class UserInterface extends Component<Props, State> {
                     }
                     readonly={this.props.readonly}
                     canvasRefs={this.leftCanvasRefs}
+                    visible={true}
                   />
                   <CanvasStack
                     scaleAndPan={this.state.scaleAndPan}
@@ -1228,6 +1249,7 @@ class UserInterface extends Component<Props, State> {
                     }
                     readonly={this.props.readonly}
                     canvasRefs={this.rightCanvasRefs}
+                    visible={this.state.sidebyside}
                   />
                   {this.state.showDiff && (
                     <DiffCanvas
@@ -1237,6 +1259,7 @@ class UserInterface extends Component<Props, State> {
                       showAppBar={showAppBar}
                       leftCanvasRefs={this.leftCanvasRefs}
                       rightCanvasRefs={this.rightCanvasRefs}
+                      sidebyside={this.state.sidebyside}
                     />
                   )}
                 </div>

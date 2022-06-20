@@ -34,6 +34,7 @@ interface Props {
       | PaintbrushCanvasClass
       | BoundingBoxCanvasClass;
   };
+  visible: boolean;
   setViewportPositionAndSize?: (canvasPositionAndSize: PositionAndSize) => void;
   setCanvasContainerColour?: (colour: number[]) => void;
   setScaleAndPan: (scaleAndPan: {
@@ -52,7 +53,8 @@ export const CanvasStack = (props: Props) => {
   return (
     <div
       style={{
-        position: "relative",
+        position: props.visible ? "relative" : "absolute",
+        zIndex: props.visible ? 0 : -1,
         top: props.showAppBar ? "85px" : "0px", // this becomes unnecessary if we set position: static on the appbar
         width: "100%",
         // the height of the canvas container is 100% of the parent minus the height of the app bar
