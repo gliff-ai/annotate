@@ -124,6 +124,7 @@ interface State {
   canvasContainerColour: number[];
   user1: string;
   user2: string;
+  showDiff: boolean;
 }
 
 const styles = {
@@ -146,6 +147,21 @@ const styles = {
     display: "flex",
     flexDirection: "column" as const,
     top: "108px",
+    left: "18px",
+    bottom: "18px",
+    width: "63px",
+    zIndex: 100,
+    justifyContent: "space-between",
+    position: "fixed" as const,
+    "& $button": {
+      [theme.breakpoints.down("lg")]: {
+        margin: "0px",
+      },
+    },
+  },
+  diffToolbar: {
+    display: "flex",
+    flexDirection: "column" as const,
     left: "18px",
     bottom: "18px",
     width: "63px",
@@ -289,6 +305,7 @@ class UserInterface extends Component<Props, State> {
         Plugins: false,
         Background: false,
       },
+      showDiff: this.props.readonly ? true : false,
     };
 
     this.imageFileInfo = this.props.imageFileInfo || null;
@@ -1125,6 +1142,22 @@ class UserInterface extends Component<Props, State> {
       </div>
     );
 
+    const diffToolbar = this.props.readonly && (
+      <div className={classes.diffToolbar}>
+        <ButtonGroup variant="text">
+          <IconButton
+            tooltip={{ name: "Show diff" }}
+            icon={icons.viewAnnotationDifference}
+            onClick={() => {
+              this.setState({ showDiff: !this.state.showDiff });
+            }}
+            fill={this.state.buttonClicked === "Save Annotations"}
+            size="small"
+          />
+        </ButtonGroup>
+      </div>
+    );
+
     return (
       <StylesProvider generateClassName={generateClassName("annotate")}>
         <StyledEngineProvider injectFirst>
@@ -1141,7 +1174,13 @@ class UserInterface extends Component<Props, State> {
                 }}
               >
                 {appBar}
-                {this.props.readonly ? readonlyToolbar : leftToolbar}
+                {this.props.readonly ? (
+                  <>
+                    {readonlyToolbar} {diffToolbar}
+                  </>
+                ) : (
+                  leftToolbar
+                )}
 
                 <div style={{ display: "flex", height: "100%", width: "100%" }}>
                   <CanvasStack
@@ -1190,14 +1229,16 @@ class UserInterface extends Component<Props, State> {
                     readonly={this.props.readonly}
                     canvasRefs={this.rightCanvasRefs}
                   />
-                  <DiffCanvas
-                    scaleAndPan={this.state.scaleAndPan}
-                    setScaleAndPan={this.setScaleAndPan}
-                    canvasPositionAndSize={this.state.viewportPositionAndSize}
-                    showAppBar={showAppBar}
-                    leftCanvasRefs={this.leftCanvasRefs}
-                    rightCanvasRefs={this.rightCanvasRefs}
-                  />
+                  {this.state.showDiff && (
+                    <DiffCanvas
+                      scaleAndPan={this.state.scaleAndPan}
+                      setScaleAndPan={this.setScaleAndPan}
+                      canvasPositionAndSize={this.state.viewportPositionAndSize}
+                      showAppBar={showAppBar}
+                      leftCanvasRefs={this.leftCanvasRefs}
+                      rightCanvasRefs={this.rightCanvasRefs}
+                    />
+                  )}
                 </div>
               </Container>
 
