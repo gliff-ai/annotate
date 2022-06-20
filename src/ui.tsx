@@ -1137,7 +1137,7 @@ class UserInterface extends Component<Props, State> {
           />
           <LayersPopover
             annotationsObject={this.annotationsObject}
-            annotationsObject2={this.props.annotationsObject2}
+            annotationsObject2={this.annotationsObject2}
             usernames={{ user1: this.state.user1, user2: this.state.user2 }}
             handleOpen={this.handleOpen("Layers")}
             setActiveAnnotation={(
