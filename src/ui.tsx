@@ -276,8 +276,7 @@ class UserInterface extends Component<Props, State> {
     super(props);
 
     this.annotationsObject = this.props.annotationsObject || new Annotations();
-    this.annotationsObject2 =
-      this.props.annotationsObject2 || new Annotations();
+    this.annotationsObject2 = this.props.annotationsObject2;
 
     this.slicesData = this.props.slicesData || null;
 
@@ -1125,9 +1124,14 @@ class UserInterface extends Component<Props, State> {
           />
           <LayersPopover
             annotationsObject={this.annotationsObject}
+            annotationsObject2={this.props.annotationsObject2}
+            usernames={{ user1: this.state.user1, user2: this.state.user2 }}
             handleOpen={this.handleOpen("Layers")}
-            setActiveAnnotation={(id: number) => {
-              this.annotationsObject.setActiveAnnotationID(id);
+            setActiveAnnotation={(
+              annotationsObject: Annotations,
+              id: number
+            ) => {
+              annotationsObject.setActiveAnnotationID(id);
               this.redrawEverything();
             }}
             setActiveToolbox={this.setActiveToolboxCallback}
@@ -1227,30 +1231,36 @@ class UserInterface extends Component<Props, State> {
                     canvasRefs={this.leftCanvasRefs}
                     visible={true}
                   />
-                  <CanvasStack
-                    scaleAndPan={this.state.scaleAndPan}
-                    activeToolbox={this.state.activeToolbox}
-                    mode={this.state.mode}
-                    setMode={this.setModeCallback}
-                    annotationsObject={this.annotationsObject2}
-                    displayedImage={this.state.displayedImage}
-                    showAppBar={showAppBar}
-                    redraw={this.state.redrawEverything}
-                    sliceIndex={this.state.sliceIndex}
-                    viewportPositionAndSize={this.state.viewportPositionAndSize}
-                    setViewportPositionAndSize={this.setViewportPositionAndSize}
-                    setUIActiveAnnotationID={
-                      this.setUIActiveAnnotationIDCallback
-                    }
-                    setActiveToolbox={this.setActiveToolboxCallback}
-                    setScaleAndPan={this.setScaleAndPan}
-                    setCanvasContainerColour={
-                      this.setCanvasContainerColourCallback
-                    }
-                    readonly={this.props.readonly}
-                    canvasRefs={this.rightCanvasRefs}
-                    visible={this.state.sidebyside}
-                  />
+                  {this.annotationsObject2 && (
+                    <CanvasStack
+                      scaleAndPan={this.state.scaleAndPan}
+                      activeToolbox={this.state.activeToolbox}
+                      mode={this.state.mode}
+                      setMode={this.setModeCallback}
+                      annotationsObject={this.annotationsObject2}
+                      displayedImage={this.state.displayedImage}
+                      showAppBar={showAppBar}
+                      redraw={this.state.redrawEverything}
+                      sliceIndex={this.state.sliceIndex}
+                      viewportPositionAndSize={
+                        this.state.viewportPositionAndSize
+                      }
+                      setViewportPositionAndSize={
+                        this.setViewportPositionAndSize
+                      }
+                      setUIActiveAnnotationID={
+                        this.setUIActiveAnnotationIDCallback
+                      }
+                      setActiveToolbox={this.setActiveToolboxCallback}
+                      setScaleAndPan={this.setScaleAndPan}
+                      setCanvasContainerColour={
+                        this.setCanvasContainerColourCallback
+                      }
+                      readonly={this.props.readonly}
+                      canvasRefs={this.rightCanvasRefs}
+                      visible={this.state.sidebyside}
+                    />
+                  )}
                   {this.state.showDiff && (
                     <DiffCanvas
                       scaleAndPan={this.state.scaleAndPan}
