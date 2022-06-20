@@ -9,8 +9,10 @@ import {
 
 interface Props {
   currentUser: string;
+  currentUser2?: string;
   users: string[];
   changeUser: (username: string) => void;
+  changeUser2: (username: string) => void;
   handleOpen: (
     event?: MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
@@ -37,26 +39,51 @@ export const UsersPopover = (props: Props): ReactElement => (
       />
     }
   >
-    <Autocomplete
-      onChange={(event, value) => {
-        props.changeUser(value);
-      }}
-      value={props.currentUser}
-      key="input-user1"
-      placeholder=""
-      renderInput={(params) => (
-        <TextField
-          {...params} // eslint-disable-line react/jsx-props-no-spreading
-          label="User"
-          autoFocus
-          sx={{
-            fontSize: 14,
-            width: "300px",
-            marginBottom: "20px",
+    <>
+      <Autocomplete
+        onChange={(event, value) => {
+          props.changeUser(value);
+        }}
+        value={props.currentUser}
+        key="input-user1"
+        placeholder=""
+        renderInput={(params) => (
+          <TextField
+            {...params} // eslint-disable-line react/jsx-props-no-spreading
+            label="User"
+            autoFocus
+            sx={{
+              fontSize: 14,
+              width: "300px",
+              marginBottom: "20px",
+            }}
+          />
+        )}
+        options={props.users}
+      />
+      {props.currentUser2 && (
+        <Autocomplete
+          onChange={(event, value) => {
+            props.changeUser2(value);
           }}
+          value={props.currentUser2}
+          key="input-user2"
+          placeholder=""
+          renderInput={(params) => (
+            <TextField
+              {...params} // eslint-disable-line react/jsx-props-no-spreading
+              label="User"
+              autoFocus
+              sx={{
+                fontSize: 14,
+                width: "300px",
+                marginBottom: "20px",
+              }}
+            />
+          )}
+          options={props.users}
         />
       )}
-      options={props.users}
-    />
+    </>
   </Popover>
 );

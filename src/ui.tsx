@@ -1107,12 +1107,25 @@ class UserInterface extends Component<Props, State> {
         <ButtonGroup variant="text">
           <UsersPopover
             currentUser={this.state.user1}
+            currentUser2={this.state.user2}
             users={Object.keys(this.props.userAnnotations)}
             changeUser={(username: string) => {
               this.setState(() => {
                 this.annotationsObject = this.props.userAnnotations[username];
                 return {
                   user1: username,
+                  activeAnnotationID:
+                    this.annotationsObject.getActiveAnnotationID(),
+                };
+              });
+
+              this.redrawEverything();
+            }}
+            changeUser2={(username: string) => {
+              this.setState(() => {
+                this.annotationsObject2 = this.props.userAnnotations[username];
+                return {
+                  user2: username,
                   activeAnnotationID:
                     this.annotationsObject.getActiveAnnotationID(),
                 };
