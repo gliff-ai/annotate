@@ -1155,7 +1155,7 @@ class UserInterface extends Component<Props, State> {
       <div className={classes.diffToolbar}>
         <ButtonGroup variant="text">
           <IconButton
-            tooltip={{ name: "Single view" }}
+            tooltip={{ name: "Single View" }}
             icon={icons.viewSingleAnnotation}
             onClick={() => {
               this.setState({ sidebyside: false });
@@ -1164,7 +1164,7 @@ class UserInterface extends Component<Props, State> {
             size="small"
           />
           <IconButton
-            tooltip={{ name: "Side-by-side view" }}
+            tooltip={{ name: "Side-by-Side View" }}
             icon={icons.viewSideBySideAnnotations}
             onClick={() => {
               this.setState({ sidebyside: true });
@@ -1173,7 +1173,7 @@ class UserInterface extends Component<Props, State> {
             size="small"
           />
           <IconButton
-            tooltip={{ name: "Show diff" }}
+            tooltip={{ name: "Show Difference" }}
             icon={icons.viewAnnotationDifference}
             onClick={() => {
               this.setState((prevState) => ({
