@@ -50,7 +50,7 @@ export const UsersPopover = (props: Props): ReactElement => (
         renderInput={(params) => (
           <TextField
             {...params} // eslint-disable-line react/jsx-props-no-spreading
-            label="User"
+            label="User 1"
             autoFocus
             sx={{
               fontSize: 14,
@@ -72,7 +72,7 @@ export const UsersPopover = (props: Props): ReactElement => (
           renderInput={(params) => (
             <TextField
               {...params} // eslint-disable-line react/jsx-props-no-spreading
-              label="User"
+              label="User 2"
               autoFocus
               sx={{
                 fontSize: 14,
