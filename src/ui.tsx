@@ -1235,7 +1235,8 @@ class UserInterface extends Component<Props, State> {
                     }
                     readonly={this.props.readonly}
                     canvasRefs={this.leftCanvasRefs}
-                    visible
+                    sidebyside={this.state.sidebyside}
+                    left
                   />
                   {this.annotationsObject2 && (
                     <CanvasStack
@@ -1264,7 +1265,7 @@ class UserInterface extends Component<Props, State> {
                       }
                       readonly={this.props.readonly}
                       canvasRefs={this.rightCanvasRefs}
-                      visible={this.state.sidebyside}
+                      sidebyside={this.state.sidebyside}
                     />
                   )}
                   {this.state.showDiff && (
