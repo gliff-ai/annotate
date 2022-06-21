@@ -1311,7 +1311,8 @@ class UserInterface extends Component<Props, State> {
                 this.annotationsObject.length() > 0 &&
                 !this.annotationsObject.isActiveAnnotationEmpty() &&
                 this.state.activeToolbox !==
-                  this.annotationsObject.getActiveAnnotation().toolbox
+                  this.annotationsObject.getActiveAnnotation().toolbox &&
+                !this.props.readonly
               }
             />
           </ThemeProvider>
