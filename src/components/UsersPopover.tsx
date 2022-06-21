@@ -87,3 +87,7 @@ export const UsersPopover = (props: Props): ReactElement => (
     </>
   </Popover>
 );
+
+UsersPopover.defaultProps = {
+  currentUser2: null,
+};

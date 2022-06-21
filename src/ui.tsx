@@ -6,7 +6,6 @@ import {
   ButtonGroup,
   Grid,
   CssBaseline,
-  Paper,
   ThemeProvider,
   Theme,
   StyledEngineProvider,
@@ -28,30 +27,19 @@ import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
 import { pageLoading } from "@/decorators";
+import { BackgroundToolbar, Minimap } from "@/toolboxes/background";
+import { SplineToolbar, SplineCanvasClass } from "@/toolboxes/spline";
 import {
-  BackgroundCanvas,
-  BackgroundToolbar,
-  Minimap,
-} from "@/toolboxes/background";
-import {
-  SplineCanvas,
-  SplineToolbar,
-  SplineCanvasClass,
-} from "@/toolboxes/spline";
-import {
-  BoundingBoxCanvas,
   BoundingBoxToolbar,
   BoundingBoxCanvasClass,
 } from "@/toolboxes/boundingBox";
 import {
-  PaintbrushCanvas,
   PaintbrushToolbar,
   PaintbrushCanvasClass,
 } from "@/toolboxes/paintbrush";
 import { LabelsSubmenu } from "@/toolboxes/labels";
 import { Download } from "@/download/UI";
 import { getShortcut, keydownListener } from "@/keybindings";
-import { BaseSlider, Config } from "@/components/BaseSlider";
 import { KeybindPopup } from "./keybindings/KeybindPopup";
 import { PluginObject, PluginsCard } from "./components/plugins";
 import { UsersPopover } from "./components/UsersPopover";
@@ -231,6 +219,7 @@ interface Props extends WithStyles<typeof styles> {
 class UserInterface extends Component<Props, State> {
   public static defaultProps: Omit<Props, "classes"> = {
     annotationsObject: null,
+    annotationsObject2: null,
     saveAnnotationsCallback: null,
     showAppBar: true,
     setIsLoading: null,
@@ -248,6 +237,7 @@ class UserInterface extends Component<Props, State> {
   };
 
   annotationsObject: Annotations;
+
   annotationsObject2: Annotations;
 
   private slicesData: ImageBitmap[][] | null;
@@ -265,6 +255,7 @@ class UserInterface extends Component<Props, State> {
       | PaintbrushCanvasClass
       | BoundingBoxCanvasClass;
   };
+
   private rightCanvasRefs: {
     [name: string]:
       | SplineCanvasClass
@@ -305,8 +296,8 @@ class UserInterface extends Component<Props, State> {
         Plugins: false,
         Background: false,
       },
-      showDiff: this.props.readonly ? true : false,
-      sidebyside: this.props.readonly ? true : false,
+      showDiff: this.props.readonly,
+      sidebyside: this.props.readonly,
     };
 
     this.imageFileInfo = this.props.imageFileInfo || null;
@@ -389,7 +380,6 @@ class UserInterface extends Component<Props, State> {
       this.props.annotationsObject2 &&
       prevProps.annotationsObject2 !== this.props.annotationsObject2
     ) {
-      console.log("setting annotationObject2 in componentDidUpdate");
       this.annotationsObject2 = this.props.annotationsObject2;
       this.annotationsObject2.giveRedrawCallback(this.redrawUI);
       this.redrawUI();
@@ -1186,7 +1176,9 @@ class UserInterface extends Component<Props, State> {
             tooltip={{ name: "Show diff" }}
             icon={icons.viewAnnotationDifference}
             onClick={() => {
-              this.setState({ showDiff: !this.state.showDiff });
+              this.setState((prevState) => ({
+                showDiff: !prevState.showDiff,
+              }));
             }}
             fill={this.state.showDiff}
             size="small"
@@ -1242,7 +1234,7 @@ class UserInterface extends Component<Props, State> {
                     }
                     readonly={this.props.readonly}
                     canvasRefs={this.leftCanvasRefs}
-                    visible={true}
+                    visible
                   />
                   {this.annotationsObject2 && (
                     <CanvasStack

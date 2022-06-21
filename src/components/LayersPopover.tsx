@@ -122,13 +122,25 @@ export const LayersPopover = (props: Props): ReactElement => {
             >
               {props.usernames.user1}
             </div>
-            <img
-              src={icons.convert}
-              className={classes.convertIcon}
+            <button
+              type="button"
               onClick={() => {
                 setShowUser1(!showUser1);
               }}
-            />
+              style={{
+                backgroundColor: "white",
+                border: "none",
+                display: "flex",
+                alignContent: "center",
+              }}
+            >
+              <img
+                src={icons.convert}
+                alt="Toggle annotations"
+                className={classes.convertIcon}
+              />
+            </button>
+
             <div
               className={classes.nameBox}
               style={{
@@ -187,4 +199,9 @@ export const LayersPopover = (props: Props): ReactElement => {
       </>
     </Popover>
   );
+};
+
+LayersPopover.defaultProps = {
+  annotationsObject2: null,
+  usernames: {},
 };

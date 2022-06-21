@@ -752,52 +752,52 @@ export class CanvasClass extends PureComponent<Props, State> {
     ) : null;
 }
 
-export const Canvas = forwardRef(
-  (
-    props: Omit<
-      Props,
-      | "brushRadius"
-      | "isActive"
-      | "annotationAlpha"
-      | "annotationActiveAlpha"
-      | "is3D"
-      | "isSuper"
-    >,
-    ref: React.ForwardedRef<CanvasClass>
-  ): ReactElement => {
-    // we will overwrite props.activeToolbox, which will be paintbrush
-    // with paintbrush.brushType, which will be paintbrush/eraser
-    const [paintbrush] = usePaintbrushStore();
-    let { activeToolbox } = props;
-    let isActive = false;
-    if (activeToolbox === Toolboxes.paintbrush) {
-      activeToolbox = paintbrush.brushType;
-      isActive = true;
-    }
-
-    // we also use the brushRadius and is3D that's in the store
-    return (
-      <CanvasClass
-        isActive={isActive}
-        is3D={paintbrush.is3D}
-        isSuper={paintbrush.isSuper}
-        activeToolbox={activeToolbox}
-        mode={props.mode}
-        setMode={props.setMode}
-        annotationsObject={props.annotationsObject}
-        displayedImage={props.displayedImage}
-        scaleAndPan={props.scaleAndPan}
-        setScaleAndPan={props.setScaleAndPan}
-        brushRadius={paintbrush.brushRadius}
-        annotationActiveAlpha={paintbrush.annotationActiveAlpha / 100}
-        annotationAlpha={paintbrush.annotationAlpha / 100}
-        redraw={props.redraw}
-        sliceIndex={props.sliceIndex}
-        setUIActiveAnnotationID={props.setUIActiveAnnotationID}
-        setActiveToolbox={props.setActiveToolbox}
-        readonly={props.readonly}
-        ref={ref}
-      />
-    );
+const CanvasFunction = (
+  props: Omit<
+    Props,
+    | "brushRadius"
+    | "isActive"
+    | "annotationAlpha"
+    | "annotationActiveAlpha"
+    | "is3D"
+    | "isSuper"
+  >,
+  ref: React.ForwardedRef<CanvasClass>
+): ReactElement => {
+  // we will overwrite props.activeToolbox, which will be paintbrush
+  // with paintbrush.brushType, which will be paintbrush/eraser
+  const [paintbrush] = usePaintbrushStore();
+  let { activeToolbox } = props;
+  let isActive = false;
+  if (activeToolbox === Toolboxes.paintbrush) {
+    activeToolbox = paintbrush.brushType;
+    isActive = true;
   }
-);
+
+  // we also use the brushRadius and is3D that's in the store
+  return (
+    <CanvasClass
+      isActive={isActive}
+      is3D={paintbrush.is3D}
+      isSuper={paintbrush.isSuper}
+      activeToolbox={activeToolbox}
+      mode={props.mode}
+      setMode={props.setMode}
+      annotationsObject={props.annotationsObject}
+      displayedImage={props.displayedImage}
+      scaleAndPan={props.scaleAndPan}
+      setScaleAndPan={props.setScaleAndPan}
+      brushRadius={paintbrush.brushRadius}
+      annotationActiveAlpha={paintbrush.annotationActiveAlpha / 100}
+      annotationAlpha={paintbrush.annotationAlpha / 100}
+      redraw={props.redraw}
+      sliceIndex={props.sliceIndex}
+      setUIActiveAnnotationID={props.setUIActiveAnnotationID}
+      setActiveToolbox={props.setActiveToolbox}
+      readonly={props.readonly}
+      ref={ref}
+    />
+  );
+};
+
+export const Canvas = forwardRef(CanvasFunction);

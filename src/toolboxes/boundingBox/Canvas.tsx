@@ -696,22 +696,25 @@ export class CanvasClass extends PureComponent<Props, State> {
     ) : null;
 }
 
-export const Canvas = forwardRef(
-  (props: Props, ref: React.ForwardedRef<CanvasClass>): ReactElement => (
-    <CanvasClass
-      activeToolbox={props.activeToolbox}
-      mode={props.mode}
-      setMode={props.setMode}
-      annotationsObject={props.annotationsObject}
-      displayedImage={props.displayedImage}
-      scaleAndPan={props.scaleAndPan}
-      setScaleAndPan={props.setScaleAndPan}
-      redraw={props.redraw}
-      sliceIndex={props.sliceIndex}
-      setUIActiveAnnotationID={props.setUIActiveAnnotationID}
-      setActiveToolbox={props.setActiveToolbox}
-      readonly={props.readonly}
-      ref={ref}
-    />
-  )
+const CanvasFunction = (
+  props: Props,
+  ref: React.ForwardedRef<CanvasClass>
+): ReactElement => (
+  <CanvasClass
+    activeToolbox={props.activeToolbox}
+    mode={props.mode}
+    setMode={props.setMode}
+    annotationsObject={props.annotationsObject}
+    displayedImage={props.displayedImage}
+    scaleAndPan={props.scaleAndPan}
+    setScaleAndPan={props.setScaleAndPan}
+    redraw={props.redraw}
+    sliceIndex={props.sliceIndex}
+    setUIActiveAnnotationID={props.setUIActiveAnnotationID}
+    setActiveToolbox={props.setActiveToolbox}
+    readonly={props.readonly}
+    ref={ref}
+  />
 );
+
+export const Canvas = forwardRef(CanvasFunction);

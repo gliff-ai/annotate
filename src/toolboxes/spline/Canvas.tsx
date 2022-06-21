@@ -951,32 +951,35 @@ export class CanvasClass extends PureComponent<Props, State> {
     ) : null;
 }
 
-export const Canvas = forwardRef(
-  (props: Props, ref: React.ForwardedRef<CanvasClass>): ReactElement => {
-    // we will overwrite props.activeToolbox, which will be spline
-    // with spline.splineType, which will be spline/lasso/magic/rect
-    const [spline] = useSplineStore();
-    let { activeToolbox } = props;
-    if (activeToolbox === Toolboxes.spline) {
-      activeToolbox = spline.splineType;
-    }
-
-    return (
-      <CanvasClass
-        activeToolbox={activeToolbox}
-        mode={props.mode}
-        setMode={props.setMode}
-        annotationsObject={props.annotationsObject}
-        displayedImage={props.displayedImage}
-        scaleAndPan={props.scaleAndPan}
-        setScaleAndPan={props.setScaleAndPan}
-        redraw={props.redraw}
-        sliceIndex={props.sliceIndex}
-        setUIActiveAnnotationID={props.setUIActiveAnnotationID}
-        setActiveToolbox={props.setActiveToolbox}
-        readonly={props.readonly}
-        ref={ref}
-      />
-    );
+const CanvasFunction = (
+  props: Props,
+  ref: React.ForwardedRef<CanvasClass>
+): ReactElement => {
+  // we will overwrite props.activeToolbox, which will be spline
+  // with spline.splineType, which will be spline/lasso/magic/rect
+  const [spline] = useSplineStore();
+  let { activeToolbox } = props;
+  if (activeToolbox === Toolboxes.spline) {
+    activeToolbox = spline.splineType;
   }
-);
+
+  return (
+    <CanvasClass
+      activeToolbox={activeToolbox}
+      mode={props.mode}
+      setMode={props.setMode}
+      annotationsObject={props.annotationsObject}
+      displayedImage={props.displayedImage}
+      scaleAndPan={props.scaleAndPan}
+      setScaleAndPan={props.setScaleAndPan}
+      redraw={props.redraw}
+      sliceIndex={props.sliceIndex}
+      setUIActiveAnnotationID={props.setUIActiveAnnotationID}
+      setActiveToolbox={props.setActiveToolbox}
+      readonly={props.readonly}
+      ref={ref}
+    />
+  );
+};
+
+export const Canvas = forwardRef(CanvasFunction);

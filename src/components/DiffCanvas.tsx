@@ -1,3 +1,4 @@
+import { ReactElement } from "react";
 import { BaseCanvas } from "./baseCanvas";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { PaintbrushCanvasClass } from "@/toolboxes/paintbrush";
@@ -32,7 +33,7 @@ interface Props {
   sidebyside: boolean;
 }
 
-export const DiffCanvas = (props: Props) => {
+export const DiffCanvas = (props: Props): ReactElement => {
   const drawDiff = (diffCanvasRef: BaseCanvas) => {
     if (
       !props.leftCanvasRefs?.splineCanvasRef ||
@@ -44,9 +45,9 @@ export const DiffCanvas = (props: Props) => {
     )
       return;
 
-    let diffData, width, height;
-
-    const t0 = performance.now();
+    let diffData;
+    let width;
+    let height;
 
     for (const refname of [
       "splineCanvasRef",
@@ -82,8 +83,6 @@ export const DiffCanvas = (props: Props) => {
         }
       }
     }
-
-    console.log(`Diff loop took ${performance.now() - t0}ms`);
 
     const diffImageData = new ImageData(diffData, width);
     diffCanvasRef.canvasContext.putImageData(diffImageData, 0, 0);

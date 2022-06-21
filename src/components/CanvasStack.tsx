@@ -1,3 +1,4 @@
+import { ReactElement } from "react";
 import { BackgroundCanvas } from "@/toolboxes/background";
 import { SplineCanvas, SplineCanvasClass } from "@/toolboxes/spline";
 import {
@@ -47,86 +48,88 @@ interface Props {
   setActiveToolbox: (tool: Toolbox) => void;
 }
 
-export const CanvasStack = (props: Props) => {
-  // console.log(splineCanvasRef?.baseCanvas.canvasContext);
-
-  return (
-    <div
-      style={{
-        position: props.visible ? "relative" : "absolute",
-        zIndex: props.visible ? 0 : -1,
-        top: props.showAppBar ? "85px" : "0px", // this becomes unnecessary if we set position: static on the appbar
-        width: "100%",
-        // the height of the canvas container is 100% of the parent minus the height of the app bar
-        // when the app bar is displayed and 100% otherwise.
-        height: props.showAppBar ? "calc(100% - 85px)" : "100%",
+export const CanvasStack = (props: Props): ReactElement => (
+  <div
+    style={{
+      position: props.visible ? "relative" : "absolute",
+      zIndex: props.visible ? 0 : -1,
+      top: props.showAppBar ? "85px" : "0px", // this becomes unnecessary if we set position: static on the appbar
+      width: "100%",
+      // the height of the canvas container is 100% of the parent minus the height of the app bar
+      // when the app bar is displayed and 100% otherwise.
+      height: props.showAppBar ? "calc(100% - 85px)" : "100%",
+    }}
+  >
+    <BackgroundCanvas
+      scaleAndPan={props.scaleAndPan}
+      displayedImage={props.displayedImage}
+      canvasPositionAndSize={props.viewportPositionAndSize}
+      setCanvasPositionAndSize={props.setViewportPositionAndSize}
+      setCanvasContainerColourCallback={props.setCanvasContainerColour}
+      setScaleAndPan={props.setScaleAndPan}
+    />
+    <SplineCanvas
+      scaleAndPan={props.scaleAndPan}
+      activeToolbox={props.activeToolbox}
+      mode={props.mode}
+      setMode={props.setMode}
+      annotationsObject={props.annotationsObject}
+      displayedImage={props.displayedImage}
+      redraw={props.redraw}
+      sliceIndex={props.sliceIndex}
+      setUIActiveAnnotationID={props.setUIActiveAnnotationID}
+      setActiveToolbox={props.setActiveToolbox}
+      setScaleAndPan={props.setScaleAndPan}
+      readonly={props.readonly}
+      ref={(ref) => {
+        if (ref) {
+          props.canvasRefs.splineCanvasRef = ref;
+        }
       }}
-    >
-      <BackgroundCanvas
-        scaleAndPan={props.scaleAndPan}
-        displayedImage={props.displayedImage}
-        canvasPositionAndSize={props.viewportPositionAndSize}
-        setCanvasPositionAndSize={props.setViewportPositionAndSize}
-        setCanvasContainerColourCallback={props.setCanvasContainerColour}
-        setScaleAndPan={props.setScaleAndPan}
-      />
-      <SplineCanvas
-        scaleAndPan={props.scaleAndPan}
-        activeToolbox={props.activeToolbox}
-        mode={props.mode}
-        setMode={props.setMode}
-        annotationsObject={props.annotationsObject}
-        displayedImage={props.displayedImage}
-        redraw={props.redraw}
-        sliceIndex={props.sliceIndex}
-        setUIActiveAnnotationID={props.setUIActiveAnnotationID}
-        setActiveToolbox={props.setActiveToolbox}
-        setScaleAndPan={props.setScaleAndPan}
-        readonly={props.readonly}
-        ref={(ref) => {
-          if (ref) {
-            props.canvasRefs.splineCanvasRef = ref;
-          }
-        }}
-      />
-      <BoundingBoxCanvas
-        scaleAndPan={props.scaleAndPan}
-        activeToolbox={props.activeToolbox}
-        mode={props.mode}
-        setMode={props.setMode}
-        annotationsObject={props.annotationsObject}
-        displayedImage={props.displayedImage}
-        redraw={props.redraw}
-        sliceIndex={props.sliceIndex}
-        setUIActiveAnnotationID={props.setUIActiveAnnotationID}
-        setActiveToolbox={props.setActiveToolbox}
-        setScaleAndPan={props.setScaleAndPan}
-        readonly={props.readonly}
-        ref={(ref) => {
-          if (ref) {
-            props.canvasRefs.boundingBoxCanvasRef = ref;
-          }
-        }}
-      />
-      <PaintbrushCanvas
-        scaleAndPan={props.scaleAndPan}
-        activeToolbox={props.activeToolbox}
-        mode={props.mode}
-        setMode={props.setMode}
-        annotationsObject={props.annotationsObject}
-        displayedImage={props.displayedImage}
-        redraw={props.redraw}
-        sliceIndex={props.sliceIndex}
-        setUIActiveAnnotationID={props.setUIActiveAnnotationID}
-        setActiveToolbox={props.setActiveToolbox}
-        setScaleAndPan={props.setScaleAndPan}
-        readonly={props.readonly}
-        ref={(ref) => {
-          if (ref) {
-            props.canvasRefs.paintbrushCanvasRef = ref;
-          }
-        }}
-      />
-    </div>
-  );
+    />
+    <BoundingBoxCanvas
+      scaleAndPan={props.scaleAndPan}
+      activeToolbox={props.activeToolbox}
+      mode={props.mode}
+      setMode={props.setMode}
+      annotationsObject={props.annotationsObject}
+      displayedImage={props.displayedImage}
+      redraw={props.redraw}
+      sliceIndex={props.sliceIndex}
+      setUIActiveAnnotationID={props.setUIActiveAnnotationID}
+      setActiveToolbox={props.setActiveToolbox}
+      setScaleAndPan={props.setScaleAndPan}
+      readonly={props.readonly}
+      ref={(ref) => {
+        if (ref) {
+          props.canvasRefs.boundingBoxCanvasRef = ref;
+        }
+      }}
+    />
+    <PaintbrushCanvas
+      scaleAndPan={props.scaleAndPan}
+      activeToolbox={props.activeToolbox}
+      mode={props.mode}
+      setMode={props.setMode}
+      annotationsObject={props.annotationsObject}
+      displayedImage={props.displayedImage}
+      redraw={props.redraw}
+      sliceIndex={props.sliceIndex}
+      setUIActiveAnnotationID={props.setUIActiveAnnotationID}
+      setActiveToolbox={props.setActiveToolbox}
+      setScaleAndPan={props.setScaleAndPan}
+      readonly={props.readonly}
+      ref={(ref) => {
+        if (ref) {
+          props.canvasRefs.paintbrushCanvasRef = ref;
+        }
+      }}
+    />
+  </div>
+);
+
+CanvasStack.defaultProps = {
+  canvasRefs: {},
+  setViewportPositionAndSize: null,
+  setCanvasContainerColour: null,
 };
