@@ -37,6 +37,7 @@ interface Props {
   };
   sidebyside: boolean;
   left?: boolean;
+  username?: string;
   setViewportPositionAndSize?: (canvasPositionAndSize: PositionAndSize) => void;
   setCanvasContainerColour?: (colour: number[]) => void;
   setScaleAndPan: (scaleAndPan: {
@@ -131,6 +132,22 @@ export const CanvasStack = (props: Props): ReactElement => {
           }
         }}
       />
+      {props.username && (
+        <div
+          style={{
+            position: "absolute",
+            top: "16px",
+            right: "16px",
+            border: "1px solid",
+            borderRadius: "9px",
+            backgroundColor: "white",
+            padding: "6px 10px 6px 10px",
+            fontWeight: "bold",
+          }}
+        >
+          {props.username}
+        </div>
+      )}
     </div>
   );
 };
