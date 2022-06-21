@@ -1179,6 +1179,7 @@ class UserInterface extends Component<Props, State> {
               this.setState((prevState) => ({
                 showDiff: !prevState.showDiff,
               }));
+              this.redrawEverything();
             }}
             fill={this.state.showDiff}
             size="small"
