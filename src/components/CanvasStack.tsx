@@ -139,10 +139,11 @@ export const CanvasStack = (props: Props): ReactElement => {
             top: "16px",
             right: "16px",
             border: "1px solid",
-            borderRadius: "9px",
+            borderRadius: "8px",
+            borderColor: "#F2F2F2",
             backgroundColor: "white",
             padding: "6px 10px 6px 10px",
-            fontWeight: "bold",
+            fontWeight: "regular",
           }}
         >
           {props.username}
