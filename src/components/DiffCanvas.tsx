@@ -31,7 +31,6 @@ interface Props {
       | BoundingBoxCanvasClass;
   };
   sidebyside: boolean;
-  redraw: number;
 }
 
 export const DiffCanvas = (props: Props): ReactElement => {

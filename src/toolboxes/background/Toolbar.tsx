@@ -1,5 +1,5 @@
 import { Component, ReactElement, useState, MouseEvent } from "react";
-import { FormGroup, ClickAwayListener } from "@mui/material"; // TODO move to STYLE
+import { FormGroup } from "@mui/material"; // TODO move to STYLE
 
 import SVG from "react-inlinesvg";
 import { detect } from "detect-browser";

@@ -1281,7 +1281,6 @@ class UserInterface extends Component<Props, State> {
                       leftCanvasRefs={this.leftCanvasRefs}
                       rightCanvasRefs={this.rightCanvasRefs}
                       sidebyside={this.state.sidebyside}
-                      redraw={this.state.redrawEverything}
                     />
                   )}
                 </div>
