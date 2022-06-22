@@ -1176,9 +1176,12 @@ class UserInterface extends Component<Props, State> {
             tooltip={{ name: "Show Difference" }}
             icon={icons.viewAnnotationDifference}
             onClick={() => {
-              this.setState({ showDiff: !this.state.showDiff }, () => {
-                this.redrawEverything();
-              });
+              this.setState(
+                (prevState) => ({ showDiff: !prevState.showDiff }),
+                () => {
+                  this.redrawEverything();
+                }
+              );
             }}
             fill={this.state.showDiff}
             size="small"
