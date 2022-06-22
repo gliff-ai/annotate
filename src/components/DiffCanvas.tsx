@@ -107,7 +107,7 @@ export const DiffCanvas = (props: Props): ReactElement => {
         canvasPositionAndSize={props.canvasPositionAndSize}
         ref={(ref) => {
           if (ref) {
-            setTimeout(() => drawDiff(ref));
+            setTimeout(() => drawDiff(ref), 10);
           }
         }}
       />
