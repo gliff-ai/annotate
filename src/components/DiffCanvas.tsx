@@ -94,7 +94,7 @@ export const DiffCanvas = (props: Props): ReactElement => {
         position: "absolute",
         right: "0px",
         width: props.sidebyside ? "calc(50% - 2px)" : "100%",
-        height: props.showAppBar ? "calc(100% - 85px)" : "100%",
+        height: props.showAppBar ? "calc(100% - 84px)" : "100%",
         bottom: "0px",
         pointerEvents: "none",
       }}

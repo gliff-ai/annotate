@@ -58,11 +58,11 @@ export const CanvasStack = (props: Props): ReactElement => {
       style={{
         position: visible ? "relative" : "absolute",
         zIndex: visible ? 0 : -1,
-        top: props.showAppBar ? "85px" : "0px", // this becomes unnecessary if we set position: static on the appbar
+        top: props.showAppBar ? "84px" : "0px", // this becomes unnecessary if we set position: static on the appbar
         width: "100%",
         // the height of the canvas container is 100% of the parent minus the height of the app bar
         // when the app bar is displayed and 100% otherwise.
-        height: props.showAppBar ? "calc(100% - 85px)" : "100%",
+        height: props.showAppBar ? "calc(100% - 80px)" : "100%",
         borderRight: props.left && props.sidebyside ? "2px solid white" : "0px",
         borderLeft: !props.left && props.sidebyside ? "2px solid white" : "0px",
       }}
