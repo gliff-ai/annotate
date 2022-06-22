@@ -157,4 +157,5 @@ CanvasStack.defaultProps = {
   setViewportPositionAndSize: null,
   setCanvasContainerColour: null,
   left: false,
+  username: null,
 };
