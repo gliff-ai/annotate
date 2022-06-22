@@ -63,8 +63,8 @@ export const CanvasStack = (props: Props): ReactElement => {
         // the height of the canvas container is 100% of the parent minus the height of the app bar
         // when the app bar is displayed and 100% otherwise.
         height: props.showAppBar ? "calc(100% - 85px)" : "100%",
-        borderRight: props.left && props.sidebyside ? "4px solid white" : "0px",
-        borderLeft: !props.left && props.sidebyside ? "4px solid white" : "0px",
+        borderRight: props.left && props.sidebyside ? "2px solid white" : "0px",
+        borderLeft: !props.left && props.sidebyside ? "2px solid white" : "0px",
       }}
     >
       <BackgroundCanvas
