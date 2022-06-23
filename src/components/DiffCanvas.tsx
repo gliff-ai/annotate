@@ -56,6 +56,7 @@ export const DiffCanvas = (props: Props): ReactElement => {
     ]) {
       const leftCanvas = props.leftCanvasRefs[refname].baseCanvas;
       const rightCanvas = props.rightCanvasRefs[refname].baseCanvas;
+      if (!leftCanvas || !rightCanvas) return;
       width = leftCanvas.canvasContext.canvas.width;
       height = leftCanvas.canvasContext.canvas.height;
       const leftData = leftCanvas.canvasContext.getImageData(
