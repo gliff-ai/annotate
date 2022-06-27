@@ -143,6 +143,14 @@ export class Annotations {
     this.data[this.activeAnnotationID].toolbox = newToolbox;
   }
 
+  logSessionStart(): void {
+    this.addAudit("sessionStart", []);
+  }
+
+  logSave(): void {
+    this.addAudit("save", []);
+  }
+
   // LABELS
   @log
   addLabel(newLabel: string): void {
