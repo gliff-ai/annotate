@@ -1208,13 +1208,8 @@ class UserInterface extends Component<Props, State> {
                 }}
               >
                 {appBar}
-                {this.props.readonly ? (
-                  <>
-                    {readonlyToolbar} {diffToolbar}
-                  </>
-                ) : (
-                  leftToolbar
-                )}
+                {this.props.readonly ? readonlyToolbar : leftToolbar}
+                {this.annotationsObject2 && diffToolbar}
 
                 <div style={{ display: "flex", height: "100%", width: "100%" }}>
                   <CanvasStack
