@@ -343,8 +343,10 @@ class UserInterface extends Component<Props, State> {
       this.setState({ user2 });
     }
 
-    if (!this.props.readonly)
+    if (this.annotationsObject.length() === 0)
       this.annotationsObject.addAnnotation(this.state.activeToolbox);
+    if (this.annotationsObject2 && this.annotationsObject2.length() === 0)
+      this.annotationsObject2.addAnnotation(this.state.activeToolbox);
   }
 
   componentDidUpdate = (prevProps: Props): void => {
