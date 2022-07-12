@@ -1,12 +1,5 @@
-const { until, By, Origin } = require("selenium-webdriver");
-const { skipPartiallyEmittedExpressions } = require("typescript");
-const {
-  dragBetweenPoints,
-  drawPentagon,
-  clickMouseAtPoint,
-  clickById,
-  sleep,
-} = require("./helpers");
+const { until } = require("selenium-webdriver");
+const { clickById, sleep } = require("./helpers");
 
 const { wrapper, test, webdriver } =
   require("@gliff-ai/jest-browserstack-automate")("Annotate", [
@@ -41,7 +34,7 @@ const { TARGET_URL = "http://localhost:3000/readonly" } = process.env;
 wrapper(() => {
   describe("Desktop Percy complex screenshot", () => {
     test(
-      "paintbrush-splodge",
+      "readonly-mode",
       async (driver, percySnapshot) => {
         await driver.get(TARGET_URL);
 
@@ -50,7 +43,7 @@ wrapper(() => {
         await clickById(driver, "id-layers-button");
 
         // upload snapshot to Percy:
-        await percySnapshot(driver, "paintbrush-splodge");
+        await percySnapshot(driver, "readonly-mode");
 
         await sleep();
       },
