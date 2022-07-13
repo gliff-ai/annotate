@@ -29,7 +29,8 @@ const { wrapper, test, webdriver } =
     },
   ]);
 
-const TARGET_URL = "http://localhost:3000/readonly";
+let { TARGET_URL = "http://localhost:3000/" } = process.env;
+TARGET_URL += "readonly";
 
 wrapper(() => {
   describe("Desktop Percy complex screenshot", () => {
