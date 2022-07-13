@@ -35,7 +35,7 @@ jobs:
       - run: npm run build:example
 
       - name: "Running application under test"
-        run: npx http-server -p 8080 -a bs-local.com dist &
+        run: npx http-server -p 8080 -a bs-local.com --proxy "http://bs-local.com:8080?" dist &
 
       - run: sleep 10
 
