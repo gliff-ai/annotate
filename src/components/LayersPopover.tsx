@@ -1,4 +1,4 @@
-import { ReactElement, MouseEvent } from "react";
+import { ReactElement, MouseEvent, useState } from "react";
 import {
   Popover,
   IconButton,
@@ -32,12 +32,37 @@ const useStyles = makeStyles(() =>
       paddingTop: "0px",
       paddingBottom: "0px",
     },
+    convertIcon: {
+      border: "1px solid",
+      borderColor: "#DADDE9",
+      borderRadius: "9px",
+      height: "40px",
+      width: "40px",
+      padding: "10px",
+    },
+    nameBox: {
+      border: "1px solid",
+      borderColor: "#DADDE9",
+      borderRadius: "9px",
+      height: "42px",
+      verticalAlign: "middle",
+      fontFamily: "Roboto",
+      fontWeight: "400",
+      fontSize: "0.875rem",
+      lineHeight: "1.75",
+      display: "flex",
+      alignItems: "center",
+      paddingLeft: "10px",
+      paddingRight: "10px",
+    },
   })
 );
 
 interface Props {
   annotationsObject: Annotations;
-  setActiveAnnotation: (id: number) => void;
+  annotationsObject2?: Annotations;
+  usernames?: { user1: string; user2: string };
+  setActiveAnnotation: (annotationsObject: Annotations, id: number) => void;
   handleOpen: (
     event?: MouseEvent
   ) => (anchorElement?: HTMLButtonElement) => void;
@@ -50,7 +75,12 @@ const layerTypeString = (layer: Annotation) =>
   `${layer.toolbox.charAt(0).toUpperCase()}${layer.toolbox.slice(1)}`;
 
 export const LayersPopover = (props: Props): ReactElement => {
+  const [showUser1, setShowUser1] = useState<boolean>(true);
   const classes = useStyles();
+
+  const annotationsObject = showUser1
+    ? props.annotationsObject
+    : props.annotationsObject2;
 
   return (
     <Popover
@@ -73,53 +103,105 @@ export const LayersPopover = (props: Props): ReactElement => {
       }
     >
       <>
-        {props.annotationsObject
-          .getAllAnnotations()
-          .map((annotation, i, array) => {
-            const name = `${layerTypeString(annotation)} ${
-              array
-                .filter(
-                  (annotation2) => annotation2.toolbox === annotation.toolbox
-                )
-                .indexOf(annotation) + 1
-            }`;
+        {props.annotationsObject2 && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "12px",
+            }}
+          >
+            <div
+              className={classes.nameBox}
+              style={{
+                backgroundColor: showUser1
+                  ? theme.palette.primary.main
+                  : "white",
+              }}
+            >
+              {props.usernames.user1}
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setShowUser1(!showUser1);
+              }}
+              style={{
+                backgroundColor: "white",
+                border: "none",
+                display: "flex",
+                alignContent: "center",
+              }}
+            >
+              <img
+                src={icons.convert}
+                alt="Toggle annotations"
+                className={classes.convertIcon}
+              />
+            </button>
 
-            return (
-              <Accordion
-                disableGutters
-                expanded={props.annotationsObject.getActiveAnnotationID() === i}
-                onChange={(event, expanded: boolean) => {
-                  if (expanded) {
-                    props.setActiveAnnotation(i);
-                    props.setActiveToolbox(
-                      props.annotationsObject.getAllAnnotations()[i]
-                        .toolbox as Toolbox
-                    );
-                  }
-                }}
-                key={name}
-              >
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  {name}
-                </AccordionSummary>
-                <AccordionDetails className={classes.accordionDetails}>
-                  {annotation.labels.map((label) => (
-                    <Chip
-                      className={classes.labelsChip}
-                      label={
-                        <Typography className={classes.chipFont}>
-                          {label}
-                        </Typography>
-                      }
-                      variant="outlined"
-                      key={`${name}-${label}`}
-                    />
-                  ))}
-                </AccordionDetails>
-              </Accordion>
-            );
-          })}
+            <div
+              className={classes.nameBox}
+              style={{
+                backgroundColor: showUser1
+                  ? "white"
+                  : theme.palette.primary.main,
+              }}
+            >
+              {props.usernames.user2}
+            </div>
+          </div>
+        )}
+        {annotationsObject.getAllAnnotations().map((annotation, i, array) => {
+          const name = `${layerTypeString(annotation)} ${
+            array
+              .filter(
+                (annotation2) => annotation2.toolbox === annotation.toolbox
+              )
+              .indexOf(annotation) + 1
+          }`;
+
+          return (
+            <Accordion
+              disableGutters
+              expanded={annotationsObject.getActiveAnnotationID() === i}
+              onChange={(event, expanded: boolean) => {
+                if (expanded) {
+                  props.setActiveAnnotation(annotationsObject, i);
+                  props.setActiveToolbox(
+                    annotationsObject.getAllAnnotations()[i].toolbox as Toolbox
+                  );
+                }
+              }}
+              key={name}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                {name}
+              </AccordionSummary>
+              <AccordionDetails className={classes.accordionDetails}>
+                {annotation.labels.map((label) => (
+                  <Chip
+                    className={classes.labelsChip}
+                    label={
+                      <Typography className={classes.chipFont}>
+                        {label}
+                      </Typography>
+                    }
+                    variant="outlined"
+                    key={`${name}-${label}`}
+                  />
+                ))}
+              </AccordionDetails>
+            </Accordion>
+          );
+        })}
       </>
     </Popover>
   );
+};
+
+LayersPopover.defaultProps = {
+  annotationsObject2: null,
+  usernames: {},
 };

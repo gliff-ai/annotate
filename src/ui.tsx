@@ -6,7 +6,6 @@ import {
   ButtonGroup,
   Grid,
   CssBaseline,
-  Paper,
   ThemeProvider,
   Theme,
   StyledEngineProvider,
@@ -28,22 +27,25 @@ import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
 import { pageLoading } from "@/decorators";
+import { BackgroundToolbar, Minimap } from "@/toolboxes/background";
+import { SplineToolbar, SplineCanvasClass } from "@/toolboxes/spline";
 import {
-  BackgroundCanvas,
-  BackgroundToolbar,
-  Minimap,
-} from "@/toolboxes/background";
-import { SplineCanvas, SplineToolbar } from "@/toolboxes/spline";
-import { BoundingBoxCanvas, BoundingBoxToolbar } from "@/toolboxes/boundingBox";
-import { PaintbrushCanvas, PaintbrushToolbar } from "@/toolboxes/paintbrush";
+  BoundingBoxToolbar,
+  BoundingBoxCanvasClass,
+} from "@/toolboxes/boundingBox";
+import {
+  PaintbrushToolbar,
+  PaintbrushCanvasClass,
+} from "@/toolboxes/paintbrush";
 import { LabelsSubmenu } from "@/toolboxes/labels";
 import { Download } from "@/download/UI";
 import { getShortcut, keydownListener } from "@/keybindings";
-import { BaseSlider, Config } from "@/components/BaseSlider";
 import { KeybindPopup } from "./keybindings/KeybindPopup";
 import { PluginObject, PluginsCard } from "./components/plugins";
 import { UsersPopover } from "./components/UsersPopover";
 import { LayersPopover } from "./components/LayersPopover";
+import { CanvasStack } from "./components/CanvasStack";
+import { DiffCanvas } from "./components/DiffCanvas";
 
 declare module "@mui/styles/defaultTheme" {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -109,7 +111,9 @@ interface State {
   mode: Mode;
   canvasContainerColour: number[];
   user1: string;
-  // user2: string;
+  user2: string;
+  showDiff: boolean;
+  sidebyside: boolean;
 }
 
 const styles = {
@@ -132,6 +136,21 @@ const styles = {
     display: "flex",
     flexDirection: "column" as const,
     top: "108px",
+    left: "18px",
+    bottom: "18px",
+    width: "63px",
+    zIndex: 100,
+    justifyContent: "space-between",
+    position: "fixed" as const,
+    "& $button": {
+      [theme.breakpoints.down("lg")]: {
+        margin: "0px",
+      },
+    },
+  },
+  diffToolbar: {
+    display: "flex",
+    flexDirection: "column" as const,
     left: "18px",
     bottom: "18px",
     width: "63px",
@@ -180,7 +199,7 @@ interface Props extends WithStyles<typeof styles> {
   slicesData?: ImageBitmap[][] | null;
   imageFileInfo?: ImageFileInfo;
   annotationsObject?: Annotations;
-  // annotationsObject2?: Annotations; // second annotation chosen by user in CURATE View Annotations dialog, for side-by-side comparison
+  annotationsObject2?: Annotations; // second annotation chosen by user in CURATE View Annotations dialog, for side-by-side comparison
   saveAnnotationsCallback?: (annotationsObject: Annotations) => void;
   showAppBar?: boolean;
   // setIsLoading is used, but in progress.tsx
@@ -200,6 +219,7 @@ interface Props extends WithStyles<typeof styles> {
 class UserInterface extends Component<Props, State> {
   public static defaultProps: Omit<Props, "classes"> = {
     annotationsObject: null,
+    annotationsObject2: null,
     saveAnnotationsCallback: null,
     showAppBar: true,
     setIsLoading: null,
@@ -218,6 +238,8 @@ class UserInterface extends Component<Props, State> {
 
   annotationsObject: Annotations;
 
+  annotationsObject2: Annotations;
+
   private slicesData: ImageBitmap[][] | null;
 
   private imageFileInfo: ImageFileInfo | null;
@@ -226,10 +248,26 @@ class UserInterface extends Component<Props, State> {
 
   private keyListener: (event: KeyboardEvent) => boolean;
 
+  // private leftCanvasRefs: { [name: string]: SplineCanvasClass };
+  private leftCanvasRefs: {
+    [name: string]:
+      | SplineCanvasClass
+      | PaintbrushCanvasClass
+      | BoundingBoxCanvasClass;
+  };
+
+  private rightCanvasRefs: {
+    [name: string]:
+      | SplineCanvasClass
+      | PaintbrushCanvasClass
+      | BoundingBoxCanvasClass;
+  };
+
   constructor(props: Props) {
     super(props);
 
     this.annotationsObject = this.props.annotationsObject || new Annotations();
+    this.annotationsObject2 = this.props.annotationsObject2;
 
     this.slicesData = this.props.slicesData || null;
 
@@ -252,16 +290,20 @@ class UserInterface extends Component<Props, State> {
       mode: this.props.readonly ? Mode.select : Mode.draw,
       canvasContainerColour: [255, 255, 255, 1],
       user1: "", // initialised properly in componentDidMount once annotations objects are passed in
-      // user2: "",
+      user2: "",
       isToolPinned: {
         "Annotation Label": false,
         Plugins: false,
         Background: false,
       },
+      showDiff: this.props.readonly,
+      sidebyside: this.props.readonly,
     };
 
     this.imageFileInfo = this.props.imageFileInfo || null;
     this.refBtnsPopovers = {};
+    this.leftCanvasRefs = {};
+    this.rightCanvasRefs = {};
   }
 
   @pageLoading
@@ -289,8 +331,22 @@ class UserInterface extends Component<Props, State> {
       this.setState({ user1 });
     }
 
-    if (!this.props.readonly)
+    if (
+      this.props.annotationsObject2 &&
+      Object.keys(this.props.userAnnotations).length > 0
+    ) {
+      const user2 = Object.entries(this.props.userAnnotations).find(
+        ([username, annotationsObject2]) =>
+          JSON.stringify(annotationsObject2.getAllAnnotations()) ===
+          JSON.stringify(this.props.annotationsObject2.getAllAnnotations())
+      )[0];
+      this.setState({ user2 });
+    }
+
+    if (this.annotationsObject.length() === 0)
       this.annotationsObject.addAnnotation(this.state.activeToolbox);
+    if (this.annotationsObject2 && this.annotationsObject2.length() === 0)
+      this.annotationsObject2.addAnnotation(this.state.activeToolbox);
   }
 
   componentDidUpdate = (prevProps: Props): void => {
@@ -322,6 +378,15 @@ class UserInterface extends Component<Props, State> {
       this.redrawUI();
     }
 
+    if (
+      this.props.annotationsObject2 &&
+      prevProps.annotationsObject2 !== this.props.annotationsObject2
+    ) {
+      this.annotationsObject2 = this.props.annotationsObject2;
+      this.annotationsObject2.giveRedrawCallback(this.redrawUI);
+      this.redrawUI();
+    }
+
     if (this.props.readonly) {
       // once props.annotationsObject and props.userAnnotations become both available,
       // find the username key in userAnnotations that matches annotationsObject, and
@@ -338,6 +403,20 @@ class UserInterface extends Component<Props, State> {
             JSON.stringify(this.props.annotationsObject.getAllAnnotations())
         )[0];
         this.setState({ user1 });
+      }
+
+      if (
+        this.props.annotationsObject2 &&
+        Object.keys(this.props.userAnnotations).length > 0 &&
+        (!prevProps.annotationsObject2 ||
+          Object.keys(prevProps.userAnnotations).length === 0)
+      ) {
+        const user2 = Object.entries(this.props.userAnnotations).find(
+          ([username, annotationsObject2]) =>
+            JSON.stringify(annotationsObject2.getAllAnnotations()) ===
+            JSON.stringify(this.props.annotationsObject2.getAllAnnotations())
+        )[0];
+        this.setState({ user2 });
       }
     }
   };
@@ -571,7 +650,7 @@ class UserInterface extends Component<Props, State> {
   };
 
   addAnnotation = (): void => {
-    if (!this.state.displayedImage) return;
+    if (!this.state.displayedImage || this.props.readonly) return;
     this.annotationsObject.addAnnotation(this.state.activeToolbox);
     this.annotationsObject.setSplineSpaceTimeInfo(this.state.sliceIndex);
     this.setState({
@@ -789,6 +868,7 @@ class UserInterface extends Component<Props, State> {
     if (!this.props.readonly)
       // select mode always active in readonly mode as there's no other reason to click on the canvas
       this.setState(() => ({ mode, buttonClicked: null }));
+    else this.redrawEverything(); // still want to re-render canvases though so they render unselected things correctly
   };
 
   setUIActiveAnnotationIDCallback = (id: number): void => {
@@ -1019,6 +1099,7 @@ class UserInterface extends Component<Props, State> {
         <ButtonGroup variant="text">
           <UsersPopover
             currentUser={this.state.user1}
+            currentUser2={this.state.user2}
             users={Object.keys(this.props.userAnnotations)}
             changeUser={(username: string) => {
               this.setState(() => {
@@ -1032,13 +1113,30 @@ class UserInterface extends Component<Props, State> {
 
               this.redrawEverything();
             }}
+            changeUser2={(username: string) => {
+              this.setState(() => {
+                this.annotationsObject2 = this.props.userAnnotations[username];
+                return {
+                  user2: username,
+                  activeAnnotationID:
+                    this.annotationsObject.getActiveAnnotationID(),
+                };
+              });
+
+              this.redrawEverything();
+            }}
             handleOpen={this.handleOpen("Users")}
           />
           <LayersPopover
             annotationsObject={this.annotationsObject}
+            annotationsObject2={this.annotationsObject2}
+            usernames={{ user1: this.state.user1, user2: this.state.user2 }}
             handleOpen={this.handleOpen("Layers")}
-            setActiveAnnotation={(id: number) => {
-              this.annotationsObject.setActiveAnnotationID(id);
+            setActiveAnnotation={(
+              annotationsObject: Annotations,
+              id: number
+            ) => {
+              annotationsObject.setActiveAnnotationID(id);
               this.redrawEverything();
             }}
             setActiveToolbox={this.setActiveToolboxCallback}
@@ -1050,6 +1148,45 @@ class UserInterface extends Component<Props, State> {
             toggleChannelAtIndex={this.toggleChannelAtIndex}
             isChannelPinned={this.state.isToolPinned.Background}
             handleChannelPin={this.setIsToolPinned("Background")}
+          />
+        </ButtonGroup>
+      </div>
+    );
+
+    const diffToolbar = this.props.readonly && (
+      <div className={classes.diffToolbar}>
+        <ButtonGroup variant="text">
+          <IconButton
+            tooltip={{ name: "Single View" }}
+            icon={icons.viewSingleAnnotation}
+            onClick={() => {
+              this.setState({ sidebyside: false });
+            }}
+            fill={!this.state.sidebyside}
+            size="small"
+          />
+          <IconButton
+            tooltip={{ name: "Side-by-Side View" }}
+            icon={icons.viewSideBySideAnnotations}
+            onClick={() => {
+              this.setState({ sidebyside: true });
+            }}
+            fill={this.state.sidebyside}
+            size="small"
+          />
+          <IconButton
+            tooltip={{ name: "Show Difference" }}
+            icon={icons.viewAnnotationDifference}
+            onClick={() => {
+              this.setState(
+                (prevState) => ({ showDiff: !prevState.showDiff }),
+                () => {
+                  this.redrawEverything();
+                }
+              );
+            }}
+            fill={this.state.showDiff}
+            size="small"
           />
         </ButtonGroup>
       </div>
@@ -1072,101 +1209,80 @@ class UserInterface extends Component<Props, State> {
               >
                 {appBar}
                 {this.props.readonly ? readonlyToolbar : leftToolbar}
-                <div
-                  style={{
-                    display: "block",
-                    position: "fixed",
-                    bottom: 0,
-                    width: "100%",
-                    // the height of the canvas container is 100% of the parent minus the height of the app bar
-                    // when the app bar is displayed and 100% otherwise.
-                    height: showAppBar ? "calc(100% - 85px)" : "100%",
-                  }}
-                >
-                  <BackgroundCanvas
+                {this.annotationsObject2 && diffToolbar}
+
+                <div style={{ display: "flex", height: "100%", width: "100%" }}>
+                  <CanvasStack
                     scaleAndPan={this.state.scaleAndPan}
+                    activeToolbox={this.state.activeToolbox}
+                    mode={this.state.mode}
+                    setMode={this.setModeCallback}
+                    annotationsObject={this.annotationsObject}
                     displayedImage={this.state.displayedImage}
-                    canvasPositionAndSize={this.state.viewportPositionAndSize}
-                    setCanvasPositionAndSize={this.setViewportPositionAndSize}
-                    setCanvasContainerColourCallback={
+                    showAppBar={showAppBar}
+                    redraw={this.state.redrawEverything}
+                    sliceIndex={this.state.sliceIndex}
+                    viewportPositionAndSize={this.state.viewportPositionAndSize}
+                    setViewportPositionAndSize={this.setViewportPositionAndSize}
+                    setUIActiveAnnotationID={
+                      this.setUIActiveAnnotationIDCallback
+                    }
+                    setActiveToolbox={this.setActiveToolboxCallback}
+                    setScaleAndPan={this.setScaleAndPan}
+                    setCanvasContainerColour={
                       this.setCanvasContainerColourCallback
                     }
-                    setScaleAndPan={this.setScaleAndPan}
-                  />
-                  <SplineCanvas
-                    scaleAndPan={this.state.scaleAndPan}
-                    activeToolbox={this.state.activeToolbox}
-                    mode={this.state.mode}
-                    setMode={this.setModeCallback}
-                    annotationsObject={this.annotationsObject}
-                    displayedImage={this.state.displayedImage}
-                    redraw={this.state.redrawEverything}
-                    sliceIndex={this.state.sliceIndex}
-                    setUIActiveAnnotationID={
-                      this.setUIActiveAnnotationIDCallback
-                    }
-                    setActiveToolbox={this.setActiveToolboxCallback}
-                    setScaleAndPan={this.setScaleAndPan}
                     readonly={this.props.readonly}
+                    canvasRefs={this.leftCanvasRefs}
+                    sidebyside={this.state.sidebyside}
+                    left
+                    username={this.props.readonly && this.state.user1}
                   />
-                  <BoundingBoxCanvas
-                    scaleAndPan={this.state.scaleAndPan}
-                    activeToolbox={this.state.activeToolbox}
-                    mode={this.state.mode}
-                    setMode={this.setModeCallback}
-                    annotationsObject={this.annotationsObject}
-                    displayedImage={this.state.displayedImage}
-                    redraw={this.state.redrawEverything}
-                    sliceIndex={this.state.sliceIndex}
-                    setUIActiveAnnotationID={
-                      this.setUIActiveAnnotationIDCallback
-                    }
-                    setActiveToolbox={this.setActiveToolboxCallback}
-                    setScaleAndPan={this.setScaleAndPan}
-                    readonly={this.props.readonly}
-                  />
-                  <PaintbrushCanvas
-                    scaleAndPan={this.state.scaleAndPan}
-                    activeToolbox={this.state.activeToolbox}
-                    mode={this.state.mode}
-                    setMode={this.setModeCallback}
-                    annotationsObject={this.annotationsObject}
-                    displayedImage={this.state.displayedImage}
-                    redraw={this.state.redrawEverything}
-                    sliceIndex={this.state.sliceIndex}
-                    setUIActiveAnnotationID={
-                      this.setUIActiveAnnotationIDCallback
-                    }
-                    setActiveToolbox={this.setActiveToolboxCallback}
-                    setScaleAndPan={this.setScaleAndPan}
-                    readonly={this.props.readonly}
-                  />
-                  {this.slicesData?.length > 1 && (
-                    <Paper
-                      elevation={3}
-                      className={classes.slicesSlider}
-                      style={{ position: "absolute" }}
-                    >
-                      <BaseSlider
-                        value={this.state.sliceIndex}
-                        config={
-                          {
-                            name: "slices",
-                            id: "slices-slider",
-                            initial: 1,
-                            step: 1,
-                            min: 0,
-                            max: this.slicesData.length - 1,
-                            unit: "",
-                          } as Config
-                        }
-                        onChange={() => this.changeSlice}
-                        sliderHeight="300px"
-                      />
-                    </Paper>
+                  {this.annotationsObject2 && (
+                    <CanvasStack
+                      scaleAndPan={this.state.scaleAndPan}
+                      activeToolbox={this.state.activeToolbox}
+                      mode={this.state.mode}
+                      setMode={this.setModeCallback}
+                      annotationsObject={this.annotationsObject2}
+                      displayedImage={this.state.displayedImage}
+                      showAppBar={showAppBar}
+                      redraw={this.state.redrawEverything}
+                      sliceIndex={this.state.sliceIndex}
+                      viewportPositionAndSize={
+                        this.state.viewportPositionAndSize
+                      }
+                      setViewportPositionAndSize={
+                        this.setViewportPositionAndSize
+                      }
+                      setUIActiveAnnotationID={
+                        this.setUIActiveAnnotationIDCallback
+                      }
+                      setActiveToolbox={this.setActiveToolboxCallback}
+                      setScaleAndPan={this.setScaleAndPan}
+                      setCanvasContainerColour={
+                        this.setCanvasContainerColourCallback
+                      }
+                      readonly={this.props.readonly}
+                      canvasRefs={this.rightCanvasRefs}
+                      sidebyside={this.state.sidebyside}
+                      username={this.props.readonly && this.state.user2}
+                    />
+                  )}
+                  {this.state.showDiff && (
+                    <DiffCanvas
+                      scaleAndPan={this.state.scaleAndPan}
+                      setScaleAndPan={this.setScaleAndPan}
+                      canvasPositionAndSize={this.state.viewportPositionAndSize}
+                      showAppBar={showAppBar}
+                      leftCanvasRefs={this.leftCanvasRefs}
+                      rightCanvasRefs={this.rightCanvasRefs}
+                      sidebyside={this.state.sidebyside}
+                    />
                   )}
                 </div>
               </Container>
+
               <Minimap
                 buttonClicked={this.state.buttonClicked}
                 displayedImage={this.state.displayedImage}
@@ -1194,7 +1310,8 @@ class UserInterface extends Component<Props, State> {
                 this.annotationsObject.length() > 0 &&
                 !this.annotationsObject.isActiveAnnotationEmpty() &&
                 this.state.activeToolbox !==
-                  this.annotationsObject.getActiveAnnotation().toolbox
+                  this.annotationsObject.getActiveAnnotation().toolbox &&
+                !this.props.readonly
               }
             />
           </ThemeProvider>

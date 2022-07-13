@@ -257,7 +257,6 @@ export class BaseCanvas extends Component<Props> {
       }}
       style={{
         pointerEvents: "inherit",
-        display: "block",
         touchAction: "none",
         width: "100%",
         height: "100%",

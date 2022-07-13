@@ -1,4 +1,4 @@
-import { ReactNode, PureComponent, ReactElement } from "react";
+import { ReactNode, PureComponent, ReactElement, forwardRef } from "react";
 import { theme } from "@gliff-ai/style";
 import { Mode } from "@/ui";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
@@ -60,7 +60,7 @@ type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 export class CanvasClass extends PureComponent<Props, State> {
   readonly name = Toolboxes.boundingBox;
 
-  private baseCanvas: BaseCanvas;
+  public baseCanvas: BaseCanvas; // public because CanvasStack needs to access it to create the diff image in comparison mode
 
   private selectedCorner: SelectedCorners;
 
@@ -696,7 +696,10 @@ export class CanvasClass extends PureComponent<Props, State> {
     ) : null;
 }
 
-export const Canvas = (props: Props): ReactElement => (
+const CanvasFunction = (
+  props: Props,
+  ref: React.ForwardedRef<CanvasClass>
+): ReactElement => (
   <CanvasClass
     activeToolbox={props.activeToolbox}
     mode={props.mode}
@@ -710,5 +713,8 @@ export const Canvas = (props: Props): ReactElement => (
     setUIActiveAnnotationID={props.setUIActiveAnnotationID}
     setActiveToolbox={props.setActiveToolbox}
     readonly={props.readonly}
+    ref={ref}
   />
 );
+
+export const Canvas = forwardRef(CanvasFunction);
