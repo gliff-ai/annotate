@@ -168,7 +168,7 @@ export const PluginsCard = ({
     return pluginElements;
   };
   return (
-    <Card title="Plugins" noPadding isPinned={isPinned} handlePin={handlePin}>
+    <Card title="Plugins" isPinned={isPinned} handlePin={handlePin}>
       <>
         <MenuList>{getPluginButtons()}</MenuList>
         <Divider

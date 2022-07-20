@@ -46,6 +46,7 @@ import { UsersPopover } from "./components/UsersPopover";
 import { LayersPopover } from "./components/LayersPopover";
 import { CanvasStack } from "./components/CanvasStack";
 import { DiffCanvas } from "./components/DiffCanvas";
+import { FeedbackDialogue } from "./components";
 
 declare module "@mui/styles/defaultTheme" {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -114,6 +115,7 @@ interface State {
   user2: string;
   showDiff: boolean;
   sidebyside: boolean;
+  isTyping: boolean;
 }
 
 const styles = {
@@ -214,6 +216,10 @@ interface Props extends WithStyles<typeof styles> {
   saveMetadataCallback?: ((data: any) => void) | null;
   readonly?: boolean;
   userAnnotations?: { [username: string]: Annotations };
+  saveUserFeedback?: (data: {
+    rating: number;
+    comment: string;
+  }) => Promise<number> | null;
 }
 
 class UserInterface extends Component<Props, State> {
@@ -234,6 +240,7 @@ class UserInterface extends Component<Props, State> {
     saveMetadataCallback: null,
     readonly: false,
     userAnnotations: {},
+    saveUserFeedback: null,
   };
 
   annotationsObject: Annotations;
@@ -298,8 +305,10 @@ class UserInterface extends Component<Props, State> {
       },
       showDiff: this.props.readonly,
       sidebyside: this.props.readonly,
+      isTyping: false,
     };
 
+    // other variables
     this.imageFileInfo = this.props.imageFileInfo || null;
     this.refBtnsPopovers = {};
     this.leftCanvasRefs = {};
@@ -308,7 +317,7 @@ class UserInterface extends Component<Props, State> {
 
   @pageLoading
   componentDidMount(): void {
-    this.keyListener = keydownListener(this.isTyping);
+    this.keyListener = keydownListener(this.getIsTyping);
     document.addEventListener("keydown", this.keyListener);
 
     for (const event of events) {
@@ -859,10 +868,10 @@ class UserInterface extends Component<Props, State> {
     this.annotationsObject.redo();
   };
 
-  isTyping = (): boolean =>
+  getIsTyping = (): boolean =>
     // Added to prevent single-key shortcuts that are also valid text input
     // to get triggered during text input.
-    !!this.state.activeSubmenuAnchor["Annotation Label"];
+    !!this.state.activeSubmenuAnchor["Annotation Label"] || this.state.isTyping;
 
   setModeCallback = (mode: Mode): void => {
     if (!this.props.readonly)
@@ -892,6 +901,10 @@ class UserInterface extends Component<Props, State> {
         this.setButtonClicked(tool); // set button clicked at first open
       }
     }
+  };
+
+  setIsTyping = (value: boolean): void => {
+    this.setState({ isTyping: value });
   };
 
   render = (): ReactNode => {
@@ -1018,16 +1031,25 @@ class UserInterface extends Component<Props, State> {
           ))}
 
           {saveAnnotationsCallback && (
-            <IconButton
-              tooltip={{ name: "Save Annotations" }}
-              icon={icons.save}
-              onMouseDown={() => {
-                this.setButtonClicked("Save Annotations");
-                this.saveAnnotations();
-              }}
-              onMouseUp={this.selectDrawMode}
-              fill={this.state.buttonClicked === "Save Annotations"}
-              size="small"
+            <FeedbackDialogue
+              setIsTyping={this.setIsTyping}
+              saveUserFeedback={this.props.saveUserFeedback}
+              TriggerButton={
+                <IconButton
+                  tooltip={{ name: "Save Annotations" }}
+                  icon={icons.save}
+                  onMouseDown={() => {
+                    this.setIsTyping(true);
+                    this.setButtonClicked("Save Annotations");
+                    this.saveAnnotations();
+                  }}
+                  onMouseUp={() => {
+                    this.selectDrawMode();
+                  }}
+                  fill={this.state.buttonClicked === "Save Annotations"}
+                  size="small"
+                />
+              }
             />
           )}
           <LabelsSubmenu
