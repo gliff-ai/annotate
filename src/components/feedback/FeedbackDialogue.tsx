@@ -32,6 +32,8 @@ export const FeedbackDialogue = ({
       confirmEnabled={rating !== null}
       afterClose={() => {
         setIsTyping(false);
+        setRating(null);
+        setComment("");
       }}
     >
       <div
