@@ -29,6 +29,7 @@ export const FeedbackDialogue = ({
           const result = await saveUserFeedback({ rating, comment });
         }
       }}
+      confirmEnabled={rating !== null}
       afterClose={() => {
         setIsTyping(false);
       }}
