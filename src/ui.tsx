@@ -216,10 +216,11 @@ interface Props extends WithStyles<typeof styles> {
   saveMetadataCallback?: ((data: any) => void) | null;
   readonly?: boolean;
   userAnnotations?: { [username: string]: Annotations };
-  saveUserFeedback?: (data: {
-    rating: number;
+  saveUserFeedback?: ((data: {
+    rating: number | null;
     comment: string;
-  }) => Promise<number> | null;
+  }) => Promise<number>) | null;
+  canRequestFeedback?: (() => Promise<boolean>) | null;
 }
 
 class UserInterface extends Component<Props, State> {
@@ -241,6 +242,7 @@ class UserInterface extends Component<Props, State> {
     readonly: false,
     userAnnotations: {},
     saveUserFeedback: null,
+    canRequestFeedback: null,
   };
 
   annotationsObject: Annotations;
@@ -908,7 +910,8 @@ class UserInterface extends Component<Props, State> {
   };
 
   render = (): ReactNode => {
-    const { classes, showAppBar, saveAnnotationsCallback } = this.props;
+    const { classes, showAppBar, saveAnnotationsCallback, canRequestFeedback } =
+      this.props;
 
     const uploadDownload = (
       <>
@@ -1039,7 +1042,6 @@ class UserInterface extends Component<Props, State> {
                   tooltip={{ name: "Save Annotations" }}
                   icon={icons.save}
                   onMouseDown={() => {
-                    this.setIsTyping(true);
                     this.setButtonClicked("Save Annotations");
                     this.saveAnnotations();
                   }}
@@ -1050,6 +1052,7 @@ class UserInterface extends Component<Props, State> {
                   size="small"
                 />
               }
+              canRequestFeedback={canRequestFeedback}
             />
           )}
           <LabelsSubmenu

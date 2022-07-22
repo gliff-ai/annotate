@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 import { Notepad, Dialogue } from "@gliff-ai/style";
 import { Star } from "./Star";
 
@@ -6,35 +6,54 @@ const RATINGS = ["Poor", "Fair", "Good", "Very good", "Excellent"];
 interface Props {
   TriggerButton: ReactElement;
   setIsTyping: (value: boolean) => void;
-  saveUserFeedback: (data: {
-    rating: number;
-    comment: string;
-  }) => Promise<number> | null;
+  saveUserFeedback:
+    | ((data: { rating: number | null; comment: string }) => Promise<number>)
+    | null;
+  canRequestFeedback: (() => Promise<boolean>) | null;
 }
 export const FeedbackDialogue = ({
   TriggerButton,
   setIsTyping,
   saveUserFeedback,
+  canRequestFeedback,
 }: Props) => {
   const [comment, setComment] = useState<string>("");
   const [rating, setRating] = useState<number | null>(null);
+  const [canOpen, setCanOpen] = useState<boolean>(false);
 
-  return (
+  const updateCanOpen = useCallback(() => {
+    if (canRequestFeedback) void canRequestFeedback().then(setCanOpen);
+  }, [canRequestFeedback]);
+
+  useEffect(() => {
+    updateCanOpen();
+  }, []);
+
+  return canOpen ? (
     <Dialogue
       close
       title="Feedback"
       TriggerButton={TriggerButton}
-      onConfirm={async () => {
+      afterOpen={() => {
+        setIsTyping(true); // to deactivate shortcuts
+      }}
+      afterClose={() => {
+        setIsTyping(false); // to re-activate shortcuts
+        setRating(null);
+        setComment("");
+        updateCanOpen();
+      }}
+      onConfirm={() => {
         if (saveUserFeedback) {
-          const result = await saveUserFeedback({ rating, comment });
+          void saveUserFeedback({ rating, comment });
+        }
+      }}
+      onCancel={() => {
+        if (saveUserFeedback) {
+          void saveUserFeedback({ rating: null, comment });
         }
       }}
       confirmEnabled={rating !== null}
-      afterClose={() => {
-        setIsTyping(false);
-        setRating(null);
-        setComment("");
-      }}
     >
       <div
         style={{
@@ -65,5 +84,7 @@ export const FeedbackDialogue = ({
         />
       </div>
     </Dialogue>
+  ) : (
+    TriggerButton
   );
 };
