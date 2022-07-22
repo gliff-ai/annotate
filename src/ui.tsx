@@ -22,6 +22,8 @@ import {
   generateClassName,
   WarningSnackbar,
   Popper,
+  AdvancedDialog,
+  Button,
 } from "@gliff-ai/style";
 import { Annotations } from "@/annotation";
 import { PositionAndSize } from "@/annotation/interfaces";
@@ -195,6 +197,18 @@ const styles = {
   },
 };
 
+const connectionError = {
+  // maxHeight: "200px",
+};
+const offlineButtonsGrid = {
+  display: "flex",
+  justifyContent: "space-between",
+};
+const warningContainer = {
+  marginTop: "5px",
+  marginBottom: "20px",
+};
+
 interface Props extends WithStyles<typeof styles> {
   slicesData?: ImageBitmap[][] | null;
   imageFileInfo?: ImageFileInfo;
@@ -205,6 +219,7 @@ interface Props extends WithStyles<typeof styles> {
   // setIsLoading is used, but in progress.tsx
   // eslint-disable-next-line react/no-unused-prop-types
   setIsLoading?: (isLoading: boolean) => void;
+  offline?: boolean;
   userAccess?: UserAccess;
   plugins?: PluginObject | null;
   launchPluginSettingsCallback?: (() => void) | null;
@@ -223,6 +238,7 @@ class UserInterface extends Component<Props, State> {
     saveAnnotationsCallback: null,
     showAppBar: true,
     setIsLoading: null,
+    offline: false,
     slicesData: null,
     imageFileInfo: undefined,
     userAccess: UserAccess.Collaborator,
@@ -1314,6 +1330,25 @@ class UserInterface extends Component<Props, State> {
                 !this.props.readonly
               }
             />
+            <AdvancedDialog
+              sx={connectionError}
+              open={this.props.offline || true}
+              title="Connection Error"
+              warningDialog={true}
+            >
+              <Container sx={warningContainer}>
+                Please check your connection. Your unsaved changes will be lost
+                if we are unable to establish a connection.
+              </Container>
+              <Grid sx={offlineButtonsGrid}>
+                <Button color="secondary" variant="outlined">
+                  Exit without Saving
+                </Button>
+                <Button color="secondary" variant="contained">
+                  Retry Saving
+                </Button>
+              </Grid>
+            </AdvancedDialog>
           </ThemeProvider>
         </StyledEngineProvider>
       </StylesProvider>
