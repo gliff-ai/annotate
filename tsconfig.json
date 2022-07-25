@@ -20,16 +20,11 @@
     "experimentalDecorators": true,
   },
   "include": [
-    "typings/**/*",
     "examples/**/*.ts*",
-    "src/**/*.tsx",
-    "src/**/*.ts",
-    "src/*.ts",
-    "test/**/*.ts",
-    "typings/**/*.ts"
+    "src/**/**/**/*.ts*",
   ],
   "exclude": [
-    "src/**/*_.tsx",
+  "src/**/**/**/*_.ts*",
     "__tests__/*"
   ]
 }
