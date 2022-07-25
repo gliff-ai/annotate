@@ -36,6 +36,7 @@ Promise.all([
                 userAccess={UserAccess.Owner}
                 plugins={plugins}
                 saveAnnotationsCallback={() => {}}
+                canRequestFeedback={() => Promise.resolve(true)}
               />
             }
           />
@@ -55,6 +56,7 @@ Promise.all([
                   "user2@gliff.ai": new Annotations(annotation[1]),
                 }}
                 saveAnnotationsCallback={() => {}}
+                canRequestFeedback={() => Promise.resolve(true)}
               />
             }
           />
