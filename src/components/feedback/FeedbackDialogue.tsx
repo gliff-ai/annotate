@@ -1,5 +1,11 @@
-import { ReactElement, useCallback, useEffect, useState } from "react";
-import { Notepad, Dialogue } from "@gliff-ai/style";
+import {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useState,
+  ChangeEvent,
+} from "react";
+import { Dialogue, Notepad } from "@gliff-ai/style";
 import { Star } from "./Star";
 
 const RATINGS = ["Poor", "Fair", "Good", "Very good", "Excellent"];
@@ -77,7 +83,9 @@ export const FeedbackDialogue = ({
         </div>
         <Notepad
           value={comment}
-          onChange={(e) => setComment(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setComment(e.target.value)
+          }
           rows={5}
           maxCharacters={500}
           placeholder="Any comments? Suggestions?"
