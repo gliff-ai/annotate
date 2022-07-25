@@ -216,10 +216,9 @@ interface Props extends WithStyles<typeof styles> {
   saveMetadataCallback?: ((data: any) => void) | null;
   readonly?: boolean;
   userAnnotations?: { [username: string]: Annotations };
-  saveUserFeedback?: ((data: {
-    rating: number | null;
-    comment: string;
-  }) => Promise<number>) | null;
+  saveUserFeedback?:
+    | ((data: { rating: number | null; comment: string }) => Promise<number>)
+    | null;
   canRequestFeedback?: (() => Promise<boolean>) | null;
 }
 
