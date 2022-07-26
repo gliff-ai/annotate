@@ -5,8 +5,16 @@ import {
   useState,
   ChangeEvent,
 } from "react";
-import { Dialogue, Notepad, Divider } from "@gliff-ai/style";
-import { Star } from "./Star";
+import {
+  theme,
+  black,
+  Dialogue,
+  Notepad,
+  Divider,
+  MuiIconbutton,
+} from "@gliff-ai/style";
+import { StarOutlineRounded, StarRounded } from "@mui/icons-material";
+import { SvgIcon } from "@mui/material"; // TODO: export from STYLE
 
 const RATINGS = ["Poor", "Fair", "Good", "Very good", "Excellent"];
 interface Props {
@@ -82,15 +90,33 @@ export const FeedbackDialogue = ({
             marginBottom: "10px",
           }}
         >
-          <p style={{ fontSize: "16px", marginRight: "15px" }}>Rating:</p>
-          {RATINGS.map((ratingText, i) => (
-            <Star
-              key={ratingText}
-              rating={i}
-              setRating={setRating}
-              isSelected={rating !== null && i <= rating}
-            />
-          ))}
+          <p style={{ fontSize: "16px", marginRight: "5px" }}>Rating:</p>
+          {RATINGS.map((ratingText, i) => {
+            const isSelected = rating !== null && i <= rating;
+
+            return (
+              <MuiIconbutton
+                sx={{ padding: "2px" }}
+                key={ratingText}
+                size="large"
+                onClick={() => setRating(i)}
+              >
+                <SvgIcon
+                  sx={{
+                    width: "40px",
+                    height: "40px",
+                    ...(isSelected
+                      ? {
+                          fill: theme.palette.primary.main,
+                          stroke: theme.palette.primary.main,
+                        }
+                      : { fill: black }),
+                  }}
+                  component={isSelected ? StarRounded : StarOutlineRounded}
+                />
+              </MuiIconbutton>
+            );
+          })}
         </div>
         <Notepad
           value={comment}
