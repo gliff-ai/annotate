@@ -1,5 +1,6 @@
 // source: //dev.to/yosraskhiri/rating-stars-in-react-js-4dfg
-import { MouseEvent } from "react";
+import { MouseEvent, ReactElement } from "react";
+import { theme, black } from "@gliff-ai/style";
 
 interface Props {
   rating: number;
@@ -7,7 +8,11 @@ interface Props {
   isSelected: boolean;
 }
 
-export const Star = ({ rating, setRating, isSelected }: Props) => (
+export const Star = ({
+  rating,
+  setRating,
+  isSelected,
+}: Props): ReactElement => (
   <label
     htmlFor={`star-${rating}`}
     style={{ position: "relative", cursor: "pointer", marginRight: "15px" }}
@@ -24,13 +29,18 @@ export const Star = ({ rating, setRating, isSelected }: Props) => (
     />
 
     <svg
-      style={isSelected ? { fill: "yellow" } : {}}
+      style={
+        isSelected
+          ? {
+              fill: theme.palette.primary.main,
+              stroke: theme.palette.primary.main,
+            }
+          : { fill: "none", stroke: black }
+      }
       width="34"
       height="34"
       viewBox="0 0 24 24"
-      fill="none"
-      stroke="#393939"
-      strokeWidth="1"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
