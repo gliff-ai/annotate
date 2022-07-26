@@ -76,6 +76,7 @@ export const FeedbackDialogue = ({
           textAlign: "left",
           verticalAlign: "middle",
           width: "500px",
+          marginTop: "-10px",
         }}
       >
         <p style={{ fontSize: "16px", marginBottom: "10px" }}>
