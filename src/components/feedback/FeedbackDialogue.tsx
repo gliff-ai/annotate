@@ -60,6 +60,7 @@ export const FeedbackDialogue = ({
         }
       }}
       confirmEnabled={rating !== null}
+      confirmText="Send Feedback"
     >
       <div
         style={{
