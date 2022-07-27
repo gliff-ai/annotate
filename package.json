@@ -31,7 +31,7 @@
     "@emotion/styled": "^11.9.3",
     "@gliff-ai/eslint-config": "^0.2.4",
     "@gliff-ai/jest-browserstack-automate": "^6.0.8",
-    "@gliff-ai/style": "^14.7.0",
+    "@gliff-ai/style": "^16.0.0",
     "@gliff-ai/upload": "^1.3.0",
     "@mui/icons-material": "^5.8.4",
     "@mui/material": "^5.9.0",
@@ -63,7 +63,7 @@
     "vite-plugin-checker": "^0.3.4"
   },
   "peerDependencies": {
-    "@gliff-ai/style": "^14.4.0",
+    "@gliff-ai/style": "^16.0.0",
     "@gliff-ai/upload": "^1.2.8",
     "@mui/icons-material": "^5.4.3",
     "@mui/material": "^5.4.3",
