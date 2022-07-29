@@ -385,6 +385,7 @@ class UserInterface extends Component<Props, State> {
     ) {
       this.annotationsObject = this.props.annotationsObject;
       this.annotationsObject.giveRedrawCallback(this.redrawUI);
+      this.annotationsObject.logSessionStart();
       this.redrawUI();
     }
 
@@ -854,6 +855,7 @@ class UserInterface extends Component<Props, State> {
 
   saveAnnotations = (): void => {
     if (!this.props.saveAnnotationsCallback) return;
+    this.annotationsObject.logSave();
     this.props.saveAnnotationsCallback(this.annotationsObject);
   };
 
