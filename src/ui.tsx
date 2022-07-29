@@ -197,9 +197,6 @@ const styles = {
   },
 };
 
-const connectionError = {
-  // maxHeight: "200px",
-};
 const offlineButtonsGrid = {
   display: "flex",
   justifyContent: "space-between",
@@ -264,6 +261,8 @@ class UserInterface extends Component<Props, State> {
 
   private keyListener: (event: KeyboardEvent) => boolean;
 
+  private saveTimeout: NodeJS.Timeout | undefined;
+
   // private leftCanvasRefs: { [name: string]: SplineCanvasClass };
   private leftCanvasRefs: {
     [name: string]:
@@ -326,6 +325,8 @@ class UserInterface extends Component<Props, State> {
   componentDidMount(): void {
     this.keyListener = keydownListener(this.isTyping);
     document.addEventListener("keydown", this.keyListener);
+
+    document.addEventListener("mousedown", this.autoSave);
 
     for (const event of events) {
       document.addEventListener(event, this.handleEvent);
@@ -875,6 +876,17 @@ class UserInterface extends Component<Props, State> {
     this.annotationsObject.redo();
   };
 
+  autoSave = (): void => {
+    if (this.saveTimeout) {
+      clearTimeout(this.saveTimeout);
+    }
+
+    this.saveTimeout = setTimeout(() => {
+      this.saveAnnotations();
+      this.saveTimeout = undefined;
+    }, 5000);
+  };
+
   isTyping = (): boolean =>
     // Added to prevent single-key shortcuts that are also valid text input
     // to get triggered during text input.
@@ -1331,8 +1343,7 @@ class UserInterface extends Component<Props, State> {
               }
             />
             <AdvancedDialog
-              sx={connectionError}
-              open={this.props.offline || true}
+              open={this.props.offline}
               title="Connection Error"
               warningDialog={true}
             >
