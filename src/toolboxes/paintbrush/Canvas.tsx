@@ -1,4 +1,4 @@
-import { ReactNode, PureComponent, ReactElement } from "react";
+import { ReactNode, PureComponent, ReactElement, forwardRef } from "react";
 import { theme } from "@gliff-ai/style";
 import { Mode } from "@/ui";
 import { Annotations } from "@/annotation";
@@ -62,6 +62,8 @@ export class CanvasClass extends PureComponent<Props, State> {
   private interactionCanvas: BaseCanvas;
 
   private backgroundCanvas: BaseCanvas | null;
+
+  public baseCanvas: BaseCanvas | null; // public because CanvasStack needs to access it to create the diff image in comparison mode
 
   private pixelCanvas: HTMLCanvasElement | null; // used for transfering pixelView Uint8Array data into the (background/interaction)Canvas
 
@@ -704,6 +706,7 @@ export class CanvasClass extends PureComponent<Props, State> {
             cursor="none"
             ref={(backgroundCanvas) => {
               this.backgroundCanvas = backgroundCanvas;
+              this.baseCanvas = this.backgroundCanvas;
             }}
             name={`${this.name}-background`}
             scaleAndPan={this.props.scaleAndPan}
@@ -749,7 +752,7 @@ export class CanvasClass extends PureComponent<Props, State> {
     ) : null;
 }
 
-export const Canvas = (
+const CanvasFunction = (
   props: Omit<
     Props,
     | "brushRadius"
@@ -758,7 +761,8 @@ export const Canvas = (
     | "annotationActiveAlpha"
     | "is3D"
     | "isSuper"
-  >
+  >,
+  ref: React.ForwardedRef<CanvasClass>
 ): ReactElement => {
   // we will overwrite props.activeToolbox, which will be paintbrush
   // with paintbrush.brushType, which will be paintbrush/eraser
@@ -791,6 +795,9 @@ export const Canvas = (
       setUIActiveAnnotationID={props.setUIActiveAnnotationID}
       setActiveToolbox={props.setActiveToolbox}
       readonly={props.readonly}
+      ref={ref}
     />
   );
 };
+
+export const Canvas = forwardRef(CanvasFunction);

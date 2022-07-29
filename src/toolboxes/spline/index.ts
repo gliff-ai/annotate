@@ -1,4 +1,8 @@
-export { Canvas as SplineCanvas, events } from "./Canvas";
+export {
+  Canvas as SplineCanvas,
+  CanvasClass as SplineCanvasClass,
+  events,
+} from "./Canvas";
 export {
   Toolbar as SplineToolbar,
   ToolboxName as SplineToolboxName,

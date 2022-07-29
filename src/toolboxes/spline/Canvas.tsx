@@ -1,4 +1,4 @@
-import { ReactNode, PureComponent, ReactElement } from "react";
+import { ReactNode, PureComponent, ReactElement, forwardRef } from "react";
 import { theme } from "@gliff-ai/style";
 import { Toolboxes, Toolbox } from "@/Toolboxes";
 import { Mode } from "@/ui";
@@ -51,10 +51,10 @@ interface Event extends CustomEvent {
 
 type Cursor = "crosshair" | "pointer" | "none" | "not-allowed";
 
-class CanvasClass extends PureComponent<Props, State> {
+export class CanvasClass extends PureComponent<Props, State> {
   readonly name = Toolboxes.spline;
 
-  private baseCanvas: BaseCanvas;
+  public baseCanvas: BaseCanvas; // public because CanvasStack needs to access it to create the diff image in comparison mode
 
   private selectedPointIndex: number;
 
@@ -925,7 +925,7 @@ class CanvasClass extends PureComponent<Props, State> {
 
   render = (): ReactNode =>
     this.props?.displayedImage ? (
-      <div style={{ pointerEvents: this.isActive() ? "auto" : "none" }}>
+      <div style={{ height: "100%", position: "relative" }}>
         <BaseCanvas
           onClick={this.onClick}
           onMouseDown={this.onMouseDownOrTouchStart}
@@ -951,7 +951,10 @@ class CanvasClass extends PureComponent<Props, State> {
     ) : null;
 }
 
-export const Canvas = (props: Props): ReactElement => {
+const CanvasFunction = (
+  props: Props,
+  ref: React.ForwardedRef<CanvasClass>
+): ReactElement => {
   // we will overwrite props.activeToolbox, which will be spline
   // with spline.splineType, which will be spline/lasso/magic/rect
   const [spline] = useSplineStore();
@@ -974,6 +977,9 @@ export const Canvas = (props: Props): ReactElement => {
       setUIActiveAnnotationID={props.setUIActiveAnnotationID}
       setActiveToolbox={props.setActiveToolbox}
       readonly={props.readonly}
+      ref={ref}
     />
   );
 };
+
+export const Canvas = forwardRef(CanvasFunction);
