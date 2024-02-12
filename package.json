@@ -48,7 +48,7 @@
     "@types/resize-observer-browser": "^0.1.7",
     "@types/selenium-webdriver": "^4.1.1",
     "@types/utif": "^3.0.1",
-    "@typescript-eslint/eslint-plugin": "^4.33.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^4.33.0",
     "eslint": "^7.32.0",
     "jest": "^27.5.1",
